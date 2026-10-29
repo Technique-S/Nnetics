@@ -247,6 +247,7 @@ fn owner_cannot_install_a_post_incident_checkpoint() {
 
 #[test]
 fn hash_encodings_match_near_primitives_protocol_types() {
+    use near_primitives::hash::CryptoHash;
     testing_env!(context("vault.testnet", 0, 0));
     let v = validator(1, 17);
     let official = near_primitives::views::validator_stake_view::ValidatorStakeView::V1(
@@ -274,18 +275,18 @@ fn hash_encodings_match_near_primitives_protocol_types() {
     let local_header = header([0; 32]);
     let lite = near_primitives::views::BlockHeaderInnerLiteView {
         height: 50,
-        epoch_id: [3; 32].into(),
-        next_epoch_id: [4; 32].into(),
-        prev_state_root: [5; 32].into(),
-        outcome_root: [0; 32].into(),
+        epoch_id: CryptoHash([3; 32]),
+        next_epoch_id: CryptoHash([4; 32]),
+        prev_state_root: CryptoHash([5; 32]),
+        outcome_root: CryptoHash([0; 32]),
         timestamp: 100,
         timestamp_nanosec: 100,
-        next_bp_hash: [6; 32].into(),
-        block_merkle_root: [7; 32].into(),
+        next_bp_hash: CryptoHash([6; 32]),
+        block_merkle_root: CryptoHash([7; 32]),
     };
     let official_header = near_primitives::views::LightClientBlockLiteView {
-        prev_block_hash: [1; 32].into(),
-        inner_rest_hash: [2; 32].into(),
+        prev_block_hash: CryptoHash([1; 32]),
+        inner_rest_hash: CryptoHash([2; 32]),
         inner_lite: lite,
     };
     assert_eq!(local_header.hash(), official_header.hash().0);
@@ -329,7 +330,7 @@ fn signed_update(approved: usize) -> (Checkpoint, Update) {
         })
         .collect();
     let mut ctx = context("vault.testnet", 0, 1000);
-    ctx.block_height = 1000;
+    ctx.block_index = 1000;
     testing_env!(ctx);
     (checkpoint, update)
 }
