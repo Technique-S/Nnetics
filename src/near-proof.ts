@@ -84,7 +84,7 @@ export function normalizeCheckpoint(block: any, orderedCurrentValidators: unknow
 export function normalizeUpdate(block: any, ancestry: any) {
   return { header: normalizeHeader(block), next_block_inner_hash: hash(block.next_block_inner_hash),
     next_bps: block.next_bps === null ? null : list(block.next_bps, 128, validator),
-    approvals_after_next: list(block.approvals_after_next, 128, signature => {
+    approvals_after_next: list(block.approvals_after_next, 256, signature => {
       if (signature === null) return null;
       if (typeof signature !== 'string' || !signature.startsWith('ed25519:')) throw new Error('Unsupported signature');
       return Buffer.from(decodeBase58(signature.slice(8), 64)).toString('base64');

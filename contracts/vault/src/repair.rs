@@ -243,7 +243,7 @@ impl Checkpoint {
             &self.current_bps
         };
         require!(
-            update.approvals_after_next.len() <= signers.len(),
+            update.approvals_after_next.len() <= 2 * MAX_VALIDATORS,
             "SIGNATURE_LIMIT"
         );
         let mut message = vec![0u8]; // ApprovalInner::Endorsement

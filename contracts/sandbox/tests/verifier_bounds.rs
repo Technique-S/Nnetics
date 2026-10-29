@@ -32,7 +32,7 @@ fn key(index: usize) -> SigningKey {
 fn validators(offset: usize) -> Vec<Validator> {
     (0..128)
         .map(|i| Validator {
-            account_id: format!("v{:03}{}.testnet", i, "x".repeat(52))
+            account_id: format!("v{:03}{}.testnet", i + offset, "x".repeat(52))
                 .parse()
                 .unwrap(),
             public_key: near_sdk::PublicKey::from_parts(
@@ -347,7 +347,7 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
             header: head,
             next_block_inner_hash: [12; 32],
             next_bps: Some(following),
-            approvals_after_next: (128..256)
+            approvals_after_next: (128..384)
                 .map(|i| Some(Base64VecU8(key(i).sign(&message).to_bytes().to_vec())))
                 .collect(),
             ancestry,
@@ -485,7 +485,7 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
             "REPAIR_NOT_PENDING",
         )?;
         measurements.push(json!({"synthetic_authenticated_vm_workload":true,"real_chain_consensus_evidence":false,
-            "transfer_success":success,"validators_per_set":128,"verified_signatures":128,"path_siblings":64,"paths_in_repair":6,
+            "transfer_success":success,"validators_per_set":128,"verified_signatures":128,"approval_slots":256,"path_siblings":64,"paths_in_repair":6,
             "request_bytes":LIMIT,"structured_update_bytes":serde_json::to_vec(&update_args)?.len(),"structured_repair_bytes":serde_json::to_vec(&repair)?.len(),
             "checkpoint_gas":bootstrap_result.total_gas_burnt.as_gas(),"checkpoint_storage_bytes":checkpoint_bytes,
             "update_gas":update_result.total_gas_burnt.as_gas(),"repair_gas":repaired.total_gas_burnt.as_gas(),"repair_storage_bytes":repair_bytes,

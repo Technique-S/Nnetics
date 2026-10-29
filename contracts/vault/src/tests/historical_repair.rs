@@ -430,9 +430,19 @@ fn next_epoch_cannot_alias_current_epoch() {
 
 #[test]
 #[should_panic(expected = "SIGNATURE_LIMIT")]
-fn ignored_trailing_approvals_are_rejected() {
+fn approval_vectors_over_the_union_bound_are_rejected() {
     let (mut checkpoint, mut update) = signed_update(3);
-    update.approvals_after_next.resize(5, None);
+    update.approvals_after_next.resize(257, None);
+    checkpoint.advance(update);
+}
+
+#[test]
+#[should_panic(expected = "INSUFFICIENT_APPROVAL_STAKE")]
+fn next_epoch_only_approval_tail_cannot_add_current_stake() {
+    let (mut checkpoint, mut update) = signed_update(2);
+    let tail = update.approvals_after_next[0].clone();
+    update.approvals_after_next.resize(4, None);
+    update.approvals_after_next.push(tail);
     checkpoint.advance(update);
 }
 
