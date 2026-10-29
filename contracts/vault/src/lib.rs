@@ -449,16 +449,16 @@ impl Vault {
             payment.status = PaymentStatus::Failed;
             self.invoices.remove(&payment.invoice_id);
         }
-        // Test-only: also permit a genuine late gas exhaustion when this method
-        // is called inside repair, after proof-consumption writes have occurred.
-        #[cfg(feature = "fault-finalize-gas")]
-        loop {
-            env::sha256(&[0u8; 32_768]);
-        }
         #[cfg(feature = "fault-finalize-storage")]
         inject_storage_exhaustion();
         self.orders.insert(&payment.order_id, &order);
         self.payments.insert(&attempt_id.0, &payment);
+        // Test-only late trap: proof consumption, invoice changes and terminal
+        // collection writes have already occurred and must ALL roll back.
+        #[cfg(feature = "fault-finalize-gas")]
+        loop {
+            env::sha256(&[0u8; 32_768]);
+        }
         require!(
             self.committed() <= self.budget && self.committed() <= self.funded,
             "LEDGER_INVARIANT"
