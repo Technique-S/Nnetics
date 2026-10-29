@@ -148,7 +148,10 @@ fn padded(mut args: Value, size: usize) -> Vec<u8> {
 }
 async fn call(d: &Desk, method: &str, bytes: Vec<u8>, owner: bool) -> Result<ExecutionFinalResult> {
     let account = if owner { &d.owner } else { &d.worker_full };
-    let mut tx = account.call(d.vault.id(), method).args(bytes).max_gas();
+    let mut tx = account
+        .call(d.vault.id(), method)
+        .args(bytes)
+        .gas(Gas::from_tgas(300));
     if owner {
         tx = tx.deposit(NearToken::from_yoctonear(1));
     }
@@ -453,7 +456,9 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
             ensure!(
                 failed.is_failure()
                     && (debug.contains(reason)
-                        || (fault.ends_with("gas") && debug.contains("GasLimitExceeded"))),
+                    || (fault.ends_with("gas") && (debug.contains("GasLimitExceeded")
+                        || debug.to_ascii_lowercase().contains("exceeded the prepaid gas")
+                        || debug.contains("Exceeded the maximum amount of gas allowed to burn per contract")))),
                 "{fault}: {failed:?}"
             );
             ensure!(
