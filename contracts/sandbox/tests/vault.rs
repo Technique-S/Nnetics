@@ -4,6 +4,7 @@ use near_workspaces::{network::Sandbox, result::ExecutionFinalResult, Account, C
 use serde_json::{json, Value};
 use std::{path::PathBuf, time::Duration};
 mod historical_repair;
+mod verifier_bounds;
 
 const NEAR: u128 = 10u128.pow(24);
 const ZERO: NearToken = NearToken::from_yoctonear(0);

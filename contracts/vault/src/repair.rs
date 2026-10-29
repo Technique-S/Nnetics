@@ -224,6 +224,15 @@ impl Checkpoint {
         );
         let transition = next.epoch_id == old.next_epoch_id;
         require!(next.epoch_id == old.epoch_id || transition, "UNKNOWN_EPOCH");
+        require!(next.epoch_id != next.next_epoch_id, "INVALID_EPOCHS");
+        // An epoch's following epoch and validator commitment are immutable, even
+        // when a redundant next_bps array accompanies the signed header.
+        require!(
+            transition
+                || (next.next_epoch_id == old.next_epoch_id
+                    && next.next_bp_hash == old.next_bp_hash),
+            "NEXT_BPS_CHANGED"
+        );
         require!(
             !transition || update.next_bps.is_some(),
             "NEXT_EPOCH_BPS_REQUIRED"
@@ -234,7 +243,7 @@ impl Checkpoint {
             &self.current_bps
         };
         require!(
-            update.approvals_after_next.len() <= 2 * MAX_VALIDATORS,
+            update.approvals_after_next.len() <= signers.len(),
             "SIGNATURE_LIMIT"
         );
         let mut message = vec![0u8]; // ApprovalInner::Endorsement

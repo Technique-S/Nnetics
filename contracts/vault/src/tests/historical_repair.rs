@@ -409,3 +409,51 @@ fn previously_accepted_head_cannot_be_replayed() {
     checkpoint.advance(update);
     checkpoint.advance(again);
 }
+
+#[test]
+#[should_panic(expected = "NEXT_BPS_CHANGED")]
+fn same_epoch_cannot_replace_a_committed_validator_set() {
+    let (mut checkpoint, mut update) = signed_update(3);
+    let changed: Vec<_> = (10..=13).map(|i| validator(i, 1)).collect();
+    update.header.inner_lite.next_bp_hash = validators_hash(&changed);
+    update.next_bps = Some(changed);
+    checkpoint.advance(update);
+}
+
+#[test]
+#[should_panic(expected = "INVALID_EPOCHS")]
+fn next_epoch_cannot_alias_current_epoch() {
+    let (mut checkpoint, mut update) = signed_update(3);
+    update.header.inner_lite.next_epoch_id = update.header.inner_lite.epoch_id;
+    checkpoint.advance(update);
+}
+
+#[test]
+#[should_panic(expected = "SIGNATURE_LIMIT")]
+fn ignored_trailing_approvals_are_rejected() {
+    let (mut checkpoint, mut update) = signed_update(3);
+    update.approvals_after_next.resize(5, None);
+    checkpoint.advance(update);
+}
+
+#[test]
+#[should_panic(expected = "INSUFFICIENT_APPROVAL_STAKE")]
+fn quorum_rounding_never_accepts_only_three_fifths() {
+    let (mut checkpoint, update) = signed_update(3);
+    checkpoint.current_bps[3].stake = U128(2);
+    checkpoint.advance(update);
+}
+
+#[test]
+fn endorsement_encoding_matches_official_type_at_large_height() {
+    use near_primitives::{block_header::ApprovalInner, hash::CryptoHash};
+    let next_hash = [123; 32];
+    let height = 0x0102_0304_0506_0708u64;
+    let mut local = vec![0];
+    local.extend(next_hash);
+    local.extend(height.to_le_bytes());
+    let mut official =
+        near_primitives::borsh::to_vec(&ApprovalInner::Endorsement(CryptoHash(next_hash))).unwrap();
+    official.extend(height.to_le_bytes());
+    assert_eq!(local, official);
+}
