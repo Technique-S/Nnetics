@@ -32,7 +32,7 @@ fn key(index: usize) -> SigningKey {
 fn validators(offset: usize) -> Vec<Validator> {
     (0..128)
         .map(|i| Validator {
-            account_id: format!("v{:03}{}.testnet", i + offset, "x".repeat(52))
+            account_id: format!("{}v{:03}.testnet", "x".repeat(52), i + offset)
                 .parse()
                 .unwrap(),
             public_key: near_sdk::PublicKey::from_parts(
@@ -448,7 +448,7 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
             let before = snapshot(&d).await?;
             let failed = call(&d, "repair_payment", padded(repair.clone(), LIMIT), false).await?;
             let reason = if fault.ends_with("storage") {
-                "LackBalanceForState"
+                "STORAGE_OR_LIQUIDITY_RESERVE"
             } else {
                 "GasExceeded"
             };
@@ -469,7 +469,9 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
                 number(&d.state().await?, "reserved") == NEAR
                     && number(&d.state().await?, "spent") == 0
             );
-            failures.push(json!({"fault":fault,"gas":failed.total_gas_burnt.as_gas(),"all_payment_claim_ledger_audit_state_unchanged":true,"outcome":debug}));
+            failures.push(json!({"fault":fault,"gas":failed.total_gas_burnt.as_gas(),
+                "failure_kind":if fault.ends_with("storage") {"late contract storage-funding guard"} else {"VM gas exhaustion after terminal writes"},
+                "all_payment_claim_ledger_audit_state_unchanged":true,"outcome":debug}));
         }
         d.vault
             .as_account()

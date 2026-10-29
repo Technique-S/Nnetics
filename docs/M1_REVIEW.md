@@ -48,15 +48,18 @@ keys, installed by the owner before the first attempt. It is a VM resource/rollb
 fixture, **not authentic NEAR chain evidence**. Separate existing tests still collect
 real RPC proofs and signed finality updates.
 
-It exercises 128 current/next/following validators, 64-character IDs, large stakes
+It exercises 128 current/next/following validators, 64-character IDs with long shared prefixes, large stakes
 whose total fits u128, 128 verified signatures and 256 filled approval slots, 64 siblings on each path, all six
 repair paths at maximum length, maximum receipt/log fields, and exactly 128,000
 request bytes for bootstrap, update and repair. Opaque ignored JSON padding fills
 the remaining request bytes; this is a measured shape, not every possible JSON shape.
 129 validators, 257 approval slots, 65 siblings and 128,001 bytes must reject.
 
-For both successful and failed transfers, test-only fault artifacts force late gas
-exhaustion and protocol storage-stake failure inside repair. No production interface
+For both successful and failed transfers, explicit 300 Tgas calls and test-only fault
+artifacts force late gas exhaustion and the late storage-funding guard after a 1 MB
+write inside repair. The latter guard runs before the node's end-of-receipt stake
+check; it must not be reported as protocol LackBalanceForState. The existing callback
+matrix separately exercises that protocol error. No production interface
 or bypass is added. After each failed receipt, compare vault/order/payment/invoice/
 audit state, retain reservation and zero spent, then restore production code and retry
 the same proof. Successful retry also proves the consumed-receipt key rolled back.
