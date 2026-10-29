@@ -1,6 +1,27 @@
 # Payment core validation — 29 October 2026
 
-**All requested automated Milestone 1 checks pass in Linux. Overall milestone acceptance remains incomplete pending independent review of the bounded light-client consensus and resource assumptions.** No audited or production-ready verifier claim is made.
+**The pre-rename Milestone 1 build passed the requested automated Linux checks. Overall milestone acceptance remains incomplete pending independent review of the bounded light-client consensus and resource assumptions.** No audited or production-ready verifier claim is made.
+
+## Nnetics rename — verification boundary
+
+The product rename updates package identifiers, verification environment variables,
+the `NNETICS_TRANSFER_V1` receipt marker and the `nnetics:repair:v1:` storage-key
+namespace. Use a fresh vault for this build: upgrading an existing vault would
+require an explicitly reviewed migration, and earlier markers cannot be used as
+repair evidence by this build. No public deployment exists. The Linux results and
+WASM checksums below describe the earlier source commits, not the renamed build.
+Rust unit and sandbox execution for the renamed build remains pending Linux CI.
+
+Executed locally after the rename: 41 reference-policy tests and 11 owner-adapter
+tests passed; all eight desktop/mobile browser scenarios passed with explicit
+Nnetics title/branding assertions. The browser runner hung during local server
+cleanup after reporting all eight scenarios successful and was interrupted; a clean
+runner exit is not claimed. The owner production build and strict TypeScript
+checks, both Rust format checks, locked sandbox manifest resolution and the locked
+offline production WASM build passed. Renamed WASM SHA-256:
+`fc53f50fa7f684bee78b788a47a50f12a29b5955f870ac1b2797a7de846ed3fd`.
+Native Rust unit/sandbox tests were not executed on this Windows host. The user
+authorized pushing the renamed dashboard branch; deployment remains disabled.
 
 ## Bounded review continuation — latest result
 
@@ -46,7 +67,7 @@ not alter or authorize this core.
 
 ## Actual successful execution
 
-[GitHub Actions run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) tested commit d515974d64656caa62666b97b4d5fce494340166 on branch codex/payscope-milestone-1. It finished successfully at 11:48:20 UTC on 29 October 2026. Environment: Ubuntu 24.04 x86_64, Node 24.22.1, Rust/Cargo 1.93.0, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12 / nearcore 2.13.0 (protocol 86).
+[GitHub Actions run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) tested commit d515974d64656caa62666b97b4d5fce494340166. It finished successfully at 11:48:20 UTC on 29 October 2026. Environment: Ubuntu 24.04 x86_64, Node 24.22.1, Rust/Cargo 1.93.0, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12 / nearcore 2.13.0 (protocol 86).
 
 | Check | Written | Executed in this run | Result |
 | --- | --- | --- | --- |

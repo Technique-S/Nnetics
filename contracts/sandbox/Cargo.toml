@@ -1,5 +1,5 @@
 [package]
-name = "payscope-sandbox-tests"
+name = "nnetics-sandbox-tests"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -13,7 +13,7 @@ serde_json = "=1.0.145"
 tokio = { version = "=1.48.0", features = ["macros", "rt-multi-thread", "time"] }
 near-primitives = "=0.37.4"
 reqwest = { version = "=0.13.5", default-features = false, features = ["json"] }
-payscope-vault = { path = "../vault" }
+nnetics-vault = { path = "../vault" }
 near-sdk = { version = "=5.29.1", features = ["unit-testing", "legacy"] }
 near-sdk-env = "=0.1.6"
 near-sys = "=0.2.14"

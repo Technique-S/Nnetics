@@ -5,7 +5,7 @@ use super::*;
 use ed25519_dalek::{Signer, SigningKey};
 use near_primitives::{borsh, hash::CryptoHash};
 use near_sdk::json_types::{Base64VecU8, U128, U64};
-use payscope_vault::repair::{
+use nnetics_vault::repair::{
     Checkpoint, Direction, Hash, Header, InnerLite, OutcomeProof, PartialOutcome, PathItem, Status,
     Update, Validator,
 };
@@ -177,7 +177,7 @@ async fn snapshot(d: &Desk) -> Result<Value> {
 }
 fn retain(name: &str, value: &Value) -> Result<()> {
     let dir =
-        PathBuf::from(std::env::var_os("PAYSCOPE_EVIDENCE_DIR").context("evidence directory")?);
+        PathBuf::from(std::env::var_os("NNETICS_EVIDENCE_DIR").context("evidence directory")?);
     std::fs::create_dir_all(&dir)?;
     std::fs::write(dir.join(name), serde_json::to_vec_pretty(value)?)?;
     Ok(())
@@ -249,16 +249,12 @@ async fn maximum_verifier_inputs_and_atomic_vm_failures() -> Result<()> {
         let initiation = transfer_result
             .receipt_outcomes()
             .iter()
-            .find(|o| {
-                o.logs
-                    .iter()
-                    .any(|s| s.starts_with("PAYSCOPE_TRANSFER_V1:"))
-            })
+            .find(|o| o.logs.iter().any(|s| s.starts_with("NNETICS_TRANSFER_V1:")))
             .context("marker")?;
         let marker = initiation
             .logs
             .iter()
-            .find(|s| s.starts_with("PAYSCOPE_TRANSFER_V1:"))
+            .find(|s| s.starts_with("NNETICS_TRANSFER_V1:"))
             .unwrap()
             .clone();
         d.admin("set_paused", json!({"paused":true})).await?;

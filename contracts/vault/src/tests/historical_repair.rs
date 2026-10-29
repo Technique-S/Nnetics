@@ -160,7 +160,7 @@ fn multi_payment_receipt_cannot_lend_evidence_to_another_attempt() {
     let mut v = fixture();
     execute(&mut v, "invoice");
     let (mut a, mut b) = proofs(&v, 1, true);
-    a.logs.push("PAYSCOPE_TRANSFER_V1:another-attempt".into());
+    a.logs.push("NNETICS_TRANSFER_V1:another-attempt".into());
     reanchor(&mut a, &mut b);
     v.repair_payment(U64(1), a, b);
 }

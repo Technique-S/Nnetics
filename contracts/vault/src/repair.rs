@@ -8,7 +8,7 @@ use near_sdk::{
 };
 
 pub type Hash = [u8; 32];
-pub const STATE_KEY: &[u8] = b"payscope:repair:v1:light-client";
+pub const STATE_KEY: &[u8] = b"nnetics:repair:v1:light-client";
 pub const MAX_VALIDATORS: usize = 128;
 
 #[near(serializers = [borsh, json])]
@@ -345,11 +345,11 @@ pub fn save(checkpoint: &Checkpoint) {
 }
 pub fn record_key(attempt: U64) -> Vec<u8> {
     [
-        b"payscope:repair:v1:attempt:".as_slice(),
+        b"nnetics:repair:v1:attempt:".as_slice(),
         &attempt.0.to_le_bytes(),
     ]
     .concat()
 }
 pub fn used_receipt_key(receipt: &Hash) -> Vec<u8> {
-    [b"payscope:repair:v1:receipt:".as_slice(), receipt].concat()
+    [b"nnetics:repair:v1:receipt:".as_slice(), receipt].concat()
 }

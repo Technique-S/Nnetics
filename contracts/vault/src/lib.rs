@@ -572,7 +572,7 @@ impl Vault {
         let markers: Vec<_> = initiation
             .logs
             .iter()
-            .filter(|s| s.starts_with("PAYSCOPE_TRANSFER_V1:"))
+            .filter(|s| s.starts_with("NNETICS_TRANSFER_V1:"))
             .collect();
         // A full-access worker key could batch several execute actions into one receipt.
         // The first child is unambiguous only for exactly one initiation. Such unsupported
@@ -651,7 +651,7 @@ impl Vault {
             payment.initiated_at_ns,
         ));
         let hex: String = digest.iter().map(|byte| format!("{byte:02x}")).collect();
-        format!("PAYSCOPE_TRANSFER_V1:{hex}")
+        format!("NNETICS_TRANSFER_V1:{hex}")
     }
     fn assert_owner(&self) {
         require!(env::predecessor_account_id() == self.owner, "OWNER_ONLY");

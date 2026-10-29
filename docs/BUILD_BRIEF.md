@@ -1,4 +1,4 @@
-# PayScope: build brief and milestone 1
+# Nnetics: build brief and milestone 1
 
 Status: implementation baseline, 29 October 2026. Product decisions below are lead-developer defaults within the agreed MVP.
 
@@ -8,7 +8,7 @@ Historical repair continuation: `docs/HISTORICAL_REPAIR.md` specifies a frozen p
 
 ## Problem and first user
 
-A small Web3 content team pays a writer, designer and video editor. Its owner repeatedly checks invoice amounts, approved work, recipients and previous payments. PayScope lets the owner approve those facts once, then delegates eligible invoice payments within that authority.
+A small Web3 content team pays a writer, designer and video editor. Its owner repeatedly checks invoice amounts, approved work, recipients and previous payments. Nnetics lets the owner approve those facts once, then delegates eligible invoice payments within that authority.
 
 Product promise: every payment is tied to one owner-approved work order and an inspectable decision/receipt.
 
@@ -23,7 +23,7 @@ Product promise: every payment is tied to one owner-approved work order and an i
 7. Once enabled, the worker submits eligible invoices within existing authority. The contract rechecks all payment rules, reserves funds and starts the transfer.
 8. The application shows pending, confirmed success or confirmed failure, with a transaction link. Pause and revocation stop future payment initiation.
 
-Owner approval of a work order represents acceptance of that work for payment. PayScope does not verify whether a writer actually completed an article. An invoice cannot create approval.
+Owner approval of a work order represents acceptance of that work for payment. Nnetics does not verify whether a writer actually completed an article. An invoice cannot create approval.
 
 ## MVP boundary
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "PayScope · Owner simulation",
+  title: "Nnetics · Owner simulation",
   description:
     "Local owner dashboard with synthetic data. No wallet or deployment.",
   robots: { index: false, follow: false },

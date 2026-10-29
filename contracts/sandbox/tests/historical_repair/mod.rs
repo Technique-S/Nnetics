@@ -134,9 +134,7 @@ async fn evidence(d: &Desk, result: &ExecutionFinalResult, old_head: &str) -> Re
         .iter()
         .find(|r| {
             r.executor_id == *d.vault.id()
-                && r.logs
-                    .iter()
-                    .any(|s| s.starts_with("PAYSCOPE_TRANSFER_V1:"))
+                && r.logs.iter().any(|s| s.starts_with("NNETICS_TRANSFER_V1:"))
         })
         .context("initiating receipt log")?;
     let transfer_id = initiation
@@ -173,7 +171,7 @@ async fn evidence(d: &Desk, result: &ExecutionFinalResult, old_head: &str) -> Re
 }
 
 fn retain(name: &str, value: &Value) -> Result<()> {
-    let dir = std::env::var_os("PAYSCOPE_EVIDENCE_DIR")
+    let dir = std::env::var_os("NNETICS_EVIDENCE_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|| {
             PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../artifacts/evidence")

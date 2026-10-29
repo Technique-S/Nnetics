@@ -2505,7 +2505,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "payscope-sandbox-tests"
+name = "nnetics-sandbox-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2516,14 +2516,14 @@ dependencies = [
  "near-sdk-env",
  "near-sys",
  "near-workspaces",
- "payscope-vault",
+ "nnetics-vault",
  "reqwest 0.13.5",
  "serde_json",
  "tokio",
 ]
 
 [[package]]
-name = "payscope-vault"
+name = "nnetics-vault"
 version = "0.1.0"
 dependencies = [
  "near-sdk",

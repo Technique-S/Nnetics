@@ -1,4 +1,4 @@
-# PayScope
+# Nnetics
 
 An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
 
@@ -10,7 +10,7 @@ Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](d
 
 [Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review; no public-network deployment has occurred.
 
-Milestone 2 has begun locally: a Next.js owner dashboard with a typed mock adapter covers vendors, immutable work orders, invoice review, pause/revocation and payment history. All data and transfers are visibly simulated. It has no wallet, RPC or deployment adapter, and remains on the local-only branch `codex/owner-dashboard-local`. See [OWNER_DASHBOARD.md](docs/OWNER_DASHBOARD.md) for architecture, execution results and limitations.
+Milestone 2 has begun locally: a Next.js owner dashboard with a typed mock adapter covers vendors, immutable work orders, invoice review, pause/revocation and payment history. All data and transfers are visibly simulated. It has no wallet, RPC or deployment adapter, and is available on the branch `codex/owner-dashboard-local`. See [OWNER_DASHBOARD.md](docs/OWNER_DASHBOARD.md) for architecture, execution results and limitations.
 
 Not implemented: AI extraction, database, wallet connection, live chain integration, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is runtime-tested under the pinned protocol; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
 
@@ -63,7 +63,7 @@ The starter policy intentionally uses named `.testnet` accounts. The Rust contra
 
 ## Hackathon provenance
 
-New PayScope foundation and guarded core written on 29 October 2026. No StableSplit code or other pre-existing product code has been imported. AI assistance: OpenAI Codex. Runtimes: Node.js and Rust. Added libraries: NEAR Rust SDK 5.29.1, NEAR Workspaces 0.23.0, NEAR Sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests additionally use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are recorded in Cargo manifests and lockfiles. No contract deployment exists. License selection remains open; add the selected license before publishing.
+New Nnetics foundation and guarded core written on 29 October 2026. No StableSplit code or other pre-existing product code has been imported. AI assistance: OpenAI Codex. Runtimes: Node.js and Rust. Added libraries: NEAR Rust SDK 5.29.1, NEAR Workspaces 0.23.0, NEAR Sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests additionally use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are recorded in Cargo manifests and lockfiles. No contract deployment exists. License selection remains open; add the selected license before publishing.
 
 Official rules checked on 29 October 2026: https://nearhackathon.com/HACKATHON.md
 

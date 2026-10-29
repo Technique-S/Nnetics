@@ -4,6 +4,8 @@ import path from "node:path";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveTitle("Nnetics · Owner simulation");
+  await expect(page.locator("body")).toContainText("Nnetics");
   await expect(
     page.getByRole("heading", { name: "Your payment desk", exact: true }),
   ).toBeVisible();

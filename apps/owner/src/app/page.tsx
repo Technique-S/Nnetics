@@ -415,7 +415,7 @@ export default function OwnerDashboard() {
           <span className="brand-mark">
             P<span />
           </span>
-          PayScope<span className="brand-period">.</span>
+          Nnetics<span className="brand-period">.</span>
         </a>
         <div className="workspace">
           <span className="workspace-icon">CS</span>
@@ -1113,7 +1113,7 @@ export default function OwnerDashboard() {
             </button>
           </section>
           <footer>
-            <span>PayScope · Owner preview</span>
+            <span>Nnetics · Owner preview</span>
             <span>
               <Icon name="shield" size={13} />
               Deployment disabled pending Milestone 1 review
