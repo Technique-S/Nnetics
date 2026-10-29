@@ -4,7 +4,7 @@ Status: implementation baseline, 29 October 2026. Product decisions below are le
 
 Milestone 1 implementation update: Rust vault and local sandbox test sources are now under `contracts/`. The finalized API, dependency choices and repair procedure are in `docs/PAYMENT_CORE.md`; actual execution evidence and remaining gates are in `docs/VALIDATION.md`. This specification's milestones are acceptance criteria, not claims that the sandbox tests have passed.
 
-Historical repair continuation: `docs/HISTORICAL_REPAIR.md` specifies a frozen pre-payment trusted checkpoint, verified validator finality and exact native receipt proofs. It adds no owner outcome override or timeout release. This repair path and all Rust runtime acceptance tests remain unverified until the supported Linux run; the existing payout rules and serialized state layouts are preserved.
+Historical repair continuation: `docs/HISTORICAL_REPAIR.md` specifies a frozen pre-payment trusted checkpoint, verified validator finality and exact native receipt proofs. It adds no owner outcome override or timeout release. Linux execution now passes 36 unit and 15 sandbox tests, including maximum-input VM and rollback cases. `docs/M1_REVIEW.md` records the completed bounded author review, measured limits and unresolved assumptions; independent security review remains distinct. Existing public signatures, payout scope and serialized layouts are preserved.
 
 ## Problem and first user
 

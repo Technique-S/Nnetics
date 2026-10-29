@@ -8,9 +8,9 @@ Implemented in source: the Rust native-NEAR vault, account/key authorization, im
 
 Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](docs/VALIDATION.md). Read [docs/PAYMENT_CORE.md](docs/PAYMENT_CORE.md) for APIs, version decisions, sandbox reproduction and callback repair limits. Passing the TypeScript tests alone does not establish contract security or chain integration.
 
-[Linux verification run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) passed 41 TypeScript, 30 Rust unit and 14 sandbox tests, including actual receipt-proof repair and exact recipient balances. Overall acceptance remains open for independent consensus/resource review; no public-network deployment has occurred.
+[Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review; no public-network deployment has occurred.
 
-Not implemented: web application, AI extraction, database, wallet connection, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is not runtime-verified; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
+Not implemented in this core branch: web application, AI extraction, database, wallet connection, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is runtime-tested under the pinned protocol; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
 
 ## Try the foundation
 
@@ -44,7 +44,7 @@ The Rust vault targets native NEAR on testnet after local sandbox validation and
 
 On Linux with Node 24 and rustup, run `bash scripts/check-core.sh`. See the payment core guide for system dependencies. Tests use local Sandbox only; the command does not deploy to testnet or mainnet. Fault artifacts are test fixtures and must never be deployed to a public network.
 
-The starter policy intentionally uses named `.testnet` accounts. Contract implementation will use validated SDK account IDs and bounded inputs.
+The starter policy intentionally uses named `.testnet` accounts. The Rust contract uses validated SDK account IDs and bounded inputs.
 
 ## Hackathon provenance
 

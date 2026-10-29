@@ -2,6 +2,48 @@
 
 **All requested automated Milestone 1 checks pass in Linux. Overall milestone acceptance remains incomplete pending independent review of the bounded light-client consensus and resource assumptions.** No audited or production-ready verifier claim is made.
 
+## Bounded review continuation — latest result
+
+[Run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725), commit
+629a7c17d9e471a4e90024e3477204182beba26c, completed successfully at 13:07:50 UTC.
+**Executed: 41 TypeScript tests, 36 Rust unit tests and 15 sandbox tests**, all passed,
+with no ignored/filtered tests. Five WASM builds, production Clippy and both Rust
+format checks also passed. The following older results remain historical evidence;
+this continuation supersedes their test counts and artifact checksum.
+
+[M1_REVIEW.md](M1_REVIEW.md) records the pinned official comparison, epoch commitment
+hardening, six additional unit regressions, maximum VM workload, failed/superseded
+runs and unresolved assumptions. It is an implementation-author review, not an
+independent audit. The public contract signatures and serialized state layouts remain
+unchanged; new fault behavior is restricted to existing test-only artifacts.
+
+The VM exercised 128 validators, 256 approval slots, six 64-sibling repair paths and
+exactly 128,000 request bytes together at explicit 300 Tgas prepaid function-call gas.
+Measured total gas: bootstrap 40.864 Tgas, head transition at most 62.568 Tgas,
+repair at most 31.125 Tgas. Added storage: bootstrap 31,327 bytes, repair 287 bytes
+for success / 231 for failure. Existing numerical bounds were retained for this
+measured workload; this is not a formal upper bound for every possible input shape.
+
+Late gas exhaustion after terminal collection writes and the late storage-funding
+guard after a 1 MB write left reservations, claims, payment/order state and audit
+records unchanged in both success/failure cases. Retrying the identical proof on
+production code then finalized safely and replay rejected. The repair storage test
+hits the contract guard, not protocol LackBalanceForState; the existing callback
+matrix separately exercises protocol storage failures.
+
+Latest production WASM: **421,118 bytes**, SHA-256
+2fc8ed792bf63a27db049a8c90e222bccd1e208fa9a7535ff3c997139b4e5540.
+Evidence is retained in artifacts/github/40877809725/payment-core-40877809725-1/20261029T125923Z-40877809725-1-3925/,
+including verifier-bounds.json and run.json. The tested WASM is copied to
+artifacts/vault.wasm. No deployment or public-network signing occurred.
+
+The bounded review and requested VM benchmarks are complete. Independent security
+review, trustworthy bootstrap/network selection, PoS weak-subjectivity assumptions,
+upgrade credentials and legacy attempts without pre-payment anchors remain outside
+what passing tests establish. Overall acceptance remains explicitly false. No extra
+environment access is needed. Milestone 2 work is a separate, local mock UI and does
+not alter or authorize this core.
+
 ## Actual successful execution
 
 [GitHub Actions run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) tested commit d515974d64656caa62666b97b4d5fce494340166 on branch codex/payscope-milestone-1. It finished successfully at 11:48:20 UTC on 29 October 2026. Environment: Ubuntu 24.04 x86_64, Node 24.22.1, Rust/Cargo 1.93.0, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12 / nearcore 2.13.0 (protocol 86).
@@ -81,7 +123,7 @@ Vault, WorkOrder, Payment, status variants and collection prefixes retain their 
 
 No additional environment access is needed. The user supplied [Technique-S/Nnetics](https://github.com/Technique-S/Nnetics), explicitly authorized pushing, and completed GitHub authentication. Branch pushes, Ubuntu execution and artifact retrieval succeeded. No public-network transaction was signed or deployment performed.
 
-Independent review remains necessary for the trusted bootstrap, consensus encoding/protocol assumptions and worst-case gas/storage bounds. Real tests exercised the small sandbox validator set and its signed updates; maximum 128-validator/64-sibling/128-KB inputs were not benchmarked in the VM. The bounded verifier supports Ed25519/protocol-86 encodings and requires timely authenticated synchronization under normal PoS/light-client assumptions, including weak subjectivity. Unsupported evidence fails closed and can leave an attempt blocked.
+Independent review remains necessary for the trusted bootstrap, consensus encoding/protocol assumptions and resource guarantees. The initial run exercised a small real validator set; the latest bounded-review run above additionally benchmarked synthetic 128-validator/256-approval/64-sibling/128,000-byte inputs in the VM. That finite workload is not a formal worst-case guarantee for every JSON shape or future gas schedule. The verifier supports Ed25519/protocol-86 encodings and requires timely authenticated synchronization under normal PoS/light-client assumptions, including weak subjectivity. Unsupported evidence fails closed and can leave an attempt blocked.
 
 Old attempts lacking an initiation marker or pre-payment checkpoint remain blocked; the owner cannot install a post-incident trust root or use a migration escape hatch. Resolving such legacy history requires a separately reviewed design. Public-network provisioning, transactions and deployment still require separate approval.
 
