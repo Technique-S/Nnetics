@@ -2,7 +2,7 @@
 
 An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
 
-## Current status: guarded core implementation, 29 October 2026
+## Current status: bounded core review and local owner preview, 29 October 2026
 
 Implemented in source: the Rust native-NEAR vault, account/key authorization, immutable work orders, invoice/order guards, spending reservations, asynchronous settlement and evidence-based reconciliation. Added a bounded historical receipt-proof repair path with a frozen pre-payment trust anchor. SDK unit tests, a local sandbox suite and a Linux CI workflow retain execution logs/proofs. The TypeScript reference policy, synthetic fixtures and MVP specification remain available.
 
@@ -10,7 +10,19 @@ Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](d
 
 [Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review; no public-network deployment has occurred.
 
-Not implemented in this core branch: web application, AI extraction, database, wallet connection, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is runtime-tested under the pinned protocol; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
+Milestone 2 has begun locally: a Next.js owner dashboard with a typed mock adapter covers vendors, immutable work orders, invoice review, pause/revocation and payment history. All data and transfers are visibly simulated. It has no wallet, RPC or deployment adapter, and remains on the local-only branch `codex/owner-dashboard-local`. See [OWNER_DASHBOARD.md](docs/OWNER_DASHBOARD.md) for architecture, execution results and limitations.
+
+Not implemented: AI extraction, database, wallet connection, live chain integration, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is runtime-tested under the pinned protocol; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
+
+## Try the local owner dashboard
+
+```sh
+cd apps/owner
+npm ci
+npm run dev
+```
+
+Open http://127.0.0.1:3100. The preview uses synthetic session-only data and keeps deployment disabled. Executed checks: production build, strict TypeScript, 11 adapter tests and four browser scenarios at desktop/mobile sizes (eight passing executions). Actual chain integration and durable storage remain incomplete.
 
 ## Try the foundation
 
@@ -37,6 +49,9 @@ Expected: policy tests pass. The demo marks an approved invoice eligible, a chan
 - `docs/VALIDATION.md`: observed results, missing evidence and blockers.
 - `docs/HISTORICAL_REPAIR.md`: authoritative evidence, bootstrap trust, permissions and replay protection.
 - `scripts/prepare-repair.ts`: offline RPC-proof normalization; no signing or submissions.
+- `apps/owner`: local Next.js/TypeScript/Tailwind dashboard and simulation-only adapter.
+- `docs/OWNER_DASHBOARD.md`: local frontend setup, tested behavior and integration boundaries.
+- `docs/M1_REVIEW.md`: pinned official verifier comparison and measured VM limits.
 
 ## Guarded NEAR core
 
