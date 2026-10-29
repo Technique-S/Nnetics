@@ -531,12 +531,19 @@ async fn storage_headroom_failure_rolls_back_attempt_invoice_and_reservation() -
     d.approve("article", NEAR).await?;
     let s = d.state().await?;
     let balance = number(&s, "storage_stake") + number(&s, "operating_reserve") + NEAR - 1;
+    let original = d.vault.as_account().view_account().await?;
     // Emulate insufficient physical balance despite a funded payment ledger.
     d.chain
         .patch(d.vault.id())
-        .account(AccountDetailsPatch::default().balance(NearToken::from_yoctonear(balance)))
+        // Workspaces serializes omitted fields to defaults; preserve code and storage.
+        .account_from_current(move |account| {
+            AccountDetailsPatch::from(account).balance(NearToken::from_yoctonear(balance))
+        })
         .transact()
         .await?;
+    let patched = d.vault.as_account().view_account().await?;
+    ensure!(patched.contract_state == original.contract_state);
+    ensure!(patched.storage_usage == original.storage_usage);
     d.rejects(
         d.args("article", "inv", NEAR),
         "STORAGE_OR_LIQUIDITY_RESERVE",
