@@ -8,6 +8,8 @@ Implemented in source: the Rust native-NEAR vault, account/key authorization, im
 
 Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](docs/VALIDATION.md). Read [docs/PAYMENT_CORE.md](docs/PAYMENT_CORE.md) for APIs, version decisions, sandbox reproduction and callback repair limits. Passing the TypeScript tests alone does not establish contract security or chain integration.
 
+[Linux verification run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) passed 41 TypeScript, 30 Rust unit and 14 sandbox tests, including actual receipt-proof repair and exact recipient balances. Overall acceptance remains open for independent consensus/resource review; no public-network deployment has occurred.
+
 Not implemented: web application, AI extraction, database, wallet connection, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is not runtime-verified; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
 
 ## Try the foundation

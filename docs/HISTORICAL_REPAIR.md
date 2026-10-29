@@ -1,6 +1,6 @@
 # Historical native-transfer repair
 
-Status: implemented as an additive, unverified repair path. Production WASM compilation is evidence of buildability only. The Rust unit tests and real sandbox proof tests must pass before this is considered resolved for Milestone 1. See [VALIDATION.md](VALIDATION.md).
+Status: implemented as an additive repair path and exercised successfully by Linux unit tests and real sandbox proof tests in [run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834). Independent consensus/resource review remains outstanding; no audited or production-ready claim is made. See [VALIDATION.md](VALIDATION.md) for counts, failures, balances, gas and remaining acceptance limits.
 
 ## What counts as authoritative evidence
 
@@ -11,7 +11,7 @@ A transaction hash, explorer page, RPC JSON response, recipient balance, owner s
 
 Both proofs must independently establish outcome-to-shard-root, shard-root-to-block-outcome-root and block-to-finalized-head inclusion. Receipt IDs, executor accounts, timestamps and the attempt commitment are checked in addition to the Merkle paths. The contract reconstructs protocol Borsh hashes; it does not accept caller-computed roots or a caller-supplied success flag.
 
-The hashing and finality design follows the [NEAR light-client specification](https://nomicon.io/ChainSpec/LightClient), the [official light-client implementation](https://github.com/near/near-light-client/blob/master/crates/protocol/src/lib.rs), and `near-primitives` 0.37.4's partial execution status/outcome encodings. RPC proof shapes are documented by NEAR for [execution proofs](https://docs.near.org/api-reference/light-client-proof) and [block proofs](https://docs.near.org/api-reference/light-client-block-proof). Rust comparison tests against the official types are written; they have not yet executed.
+The hashing and finality design follows the [NEAR light-client specification](https://nomicon.io/ChainSpec/LightClient), the [official light-client implementation](https://github.com/near/near-light-client/blob/master/crates/protocol/src/lib.rs), and `near-primitives` 0.37.4's partial execution status/outcome encodings. RPC proof shapes are documented by NEAR for [execution proofs](https://docs.near.org/api-reference/light-client-proof) and [block proofs](https://docs.near.org/api-reference/light-client-block-proof). Rust comparison tests against the official types executed and passed in Linux run `40863676284`, after detecting and correcting a validator public-key serialization mismatch.
 
 ## Trust anchor and finality
 
@@ -69,4 +69,4 @@ If evidence is absent, unknown, unfinalized, ambiguous, unsupported or invalid, 
 
 Written tests cover protocol hash compatibility, signed validator quorum/invalid signatures/truncated approvals, stale heads, correct proof repair, unknown/tampered/unrelated/stale/replayed evidence, duplicate transfer consumption, ambiguous batched receipts and frozen bootstrap authority. Existing core tests continue to cover successful payments, duplicates/concurrency, limits, expiry, revocation, failed transfers and callback gas/storage failures.
 
-Additional sandbox tests collect actual node-generated receipt proofs and signed finality updates for transfers whose result-recording callback failed. They assert exact recipient deltas before any recipient-signed reconciliation call, persisted reservations, tamper rejection, success/failure repair, terminal accounting and replay rejection. Raw proofs and outcomes are retained as CI artifacts. These tests are **written, not executed** until the supported Linux run is available.
+Additional sandbox tests collected actual node-generated receipt proofs and verified signed finality updates for transfers whose result-recording callback failed. All four success/failure × callback gas/storage cases executed and passed, including exact recipient deltas before recipient-signed reconciliation, persisted reservations, tamper rejection, repair, terminal accounting and replay rejection. Raw proofs and outcomes are retained as CI artifacts and downloaded locally. The measured repairs burned about 5.1–5.2 Tgas; maximum-size proofs and validator sets have not been benchmarked.

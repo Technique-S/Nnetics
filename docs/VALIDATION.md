@@ -1,86 +1,88 @@
 # Payment core validation — 29 October 2026
 
-**Milestone 1 is incomplete.** Historical repair and the Linux verification workflow are implemented locally, but no Rust unit test or sandbox test has executed successfully. Buildability, written assertions and executable test evidence are separate below.
+**All requested automated Milestone 1 checks pass in Linux. Overall milestone acceptance remains incomplete pending independent review of the bounded light-client consensus and resource assumptions.** No audited or production-ready verifier claim is made.
 
-## Actual execution results from this continuation
+## Actual successful execution
 
-| Check | Written / available | Actually executed | Result |
+[GitHub Actions run 40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) tested commit d515974d64656caa62666b97b4d5fce494340166 on branch codex/payscope-milestone-1. It finished successfully at 11:48:20 UTC on 29 October 2026. Environment: Ubuntu 24.04 x86_64, Node 24.22.1, Rust/Cargo 1.93.0, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12 / nearcore 2.13.0 (protocol 86).
+
+| Check | Written | Executed in this run | Result |
 | --- | --- | --- | --- |
-| Foundation TypeScript policy tests | 34 tests | 34 | Passed, 0 failures |
-| RPC proof-normalization tests | 7 tests | 7 | Passed, 0 failures |
-| Rust SDK unit tests | 30 tests: 13 original + 17 historical-proof/finality cases | **0** | Fresh build attempt exited 101 before tests: `getrandom` could not find `dlltool.exe` on Windows GNU |
-| Rust sandbox integration tests | 14 top-level tests, including callback fault and real receipt-proof matrices | **0** | Not run: no supported Linux/macOS runtime available |
-| Production WASM build | Default features, Rust 1.93.0 / SDK 5.29.1 | Executed | Passed |
-| Production Clippy | WASM release library, `-D warnings` | Executed | Passed |
-| Four callback fault-feature WASM builds | Record/finalize × gas/storage | Executed | All passed |
-| WASM binary validation | Production + four fault variants | Executed with Node `WebAssembly.Module` | All five valid; 26 function exports each |
-| Rust formatting | Both crates, including all new test sources | Executed | Passed |
-| Bash script syntax / report JavaScript syntax | Linux verification harness | Executed with Git Bash `bash -n` / Node `--check` | Passed; this is not a Linux test run |
-| Report harness negative checks | Synthetic zero-test / missing-stage fixtures | Executed | Both rejected with exit 80; no Rust tests executed by these checks |
-| Existing serialized layouts | Vault, WorkOrder, Payment, collection keys and status enums | Compared against preserved baseline source | Field/variant layout unchanged; not a runtime migration test |
-| GitHub Actions | Pinned Ubuntu workflow with logs/proof uploads | **Not executed** | Local only; no run URL or run ID exists |
-| Public-network transactions / deployment | None | None | No signing, push, publication or deployment |
+| TypeScript reference policy | 34 tests | 34 | Passed |
+| RPC proof normalization | 7 tests | 7 | Passed |
+| Rust SDK unit tests | 30: 13 original + 17 proof/finality cases | 30 | Passed; 0 failed, ignored or filtered; 1.43 seconds |
+| Rust sandbox tests | 14 top-level tests with additional case matrices | 14 | Passed; 0 failed, ignored or filtered; 195.80 seconds |
+| Production WASM | Default features | Built | Passed |
+| Callback fault WASMs | Record/finalize × gas/storage | All four built | Passed |
+| Production Clippy | WASM release library, -D warnings | Executed | Passed |
+| Rust formatting | Both crates | Executed | Passed |
+| Evidence retention | Stage logs, manifest, WASM, receipt proofs/results | Uploaded and downloaded | Passed |
 
-The fresh unit build-attempt log is `artifacts/local-checks/rust-unit-attempt.log`. The error is an environment/toolchain setup failure, not a failed Rust assertion. New Rust test sources have been parsed/formatted but have not completed native type checking or execution. No claim is made that any of those tests passes.
+There are no written-but-unexecuted Rust test cases in the current suite. This does not establish coverage of every possible consensus/resource condition.
 
-The current production artifact is `artifacts/vault.wasm`, **437,608 bytes**. SHA-256:
+The tested production WASM is 421,025 bytes, SHA-256:
+e97f89494906baf07a818102aa58c343c1f8279ca6be72d4bfbc9f8af5f0b78f
 
-```text
-679c2a0ba88c57eda9113999b22d2ea64ef49c89628ee33463b7a99c2aabb07a
-```
+This checksum matches both final Linux runs. The successful run's manifest records source/configuration/lockfile hashes, all stage exit codes and nonzero Rust test counts. A subsequent documentation-only commit does not change the verified source.
 
-Binary validation proves WASM structure only. It does not establish receipt ordering, NEAR runtime compatibility, finality verification, transfer success or callback gas sufficiency.
+## Recipient balances and repair evidence
 
-## Preserved baseline and implementation changes
+The normal successful payment increased the recipient from 100000000000000000000000000 to 102000000000000000000000000 yoctoNEAR: exactly **2 NEAR**. The final payment is Paid, spent is 2 NEAR, reserved is zero and last_attempt is 1. The full PAYMENT_EVIDENCE record is in logs/sandbox-tests.log.
 
-The pre-continuation contract, tests, validation report and production WASM are preserved under `.tools/m1-baseline/`. That WASM was 290,318 bytes with SHA-256 `917e6b59fa879582421593e8d9d4c849048ae87ae11faa53a9fe6273ab172654`. It had compiled and passed Clippy, but its 13 unit and 12 sandbox tests were also unexecuted. Those prior build results are not evidence for the new repair code.
+The historical-proof matrix executed all four cases:
 
-The existing contract state structs, enum variants and storage collection prefixes are unchanged. All existing core tests remain. The additive `repair` module stores a one-time checkpoint and proof-consumption records under separate versioned prefixes. Payment initiation emits an attempt commitment for later receipt-proof linkage.
+| Lost result callback | Native transfer | Exact recipient delta | Repaired status | Final reserved / spent | Repair gas burned |
+| --- | --- | --- | --- | --- | --- |
+| Gas exhaustion | Success | 1 NEAR | Paid | 0 / 1 NEAR | 5,072,292,929,148 |
+| Gas exhaustion | Failure | 0 | Failed | 0 / 0 | 5,190,522,132,805 |
+| Protocol storage failure | Success | 1 NEAR | Paid | 0 / 1 NEAR | 5,072,341,471,752 |
+| Protocol storage failure | Failure | 0 | Failed | 0 / 0 | 5,186,041,151,479 |
 
-[HISTORICAL_REPAIR.md](HISTORICAL_REPAIR.md) defines the repair evidence and authority:
+Each case kept the reservation while the outcome was unknown, verified actual node-generated inclusion proofs under signed head updates, rejected tampering, repaired through an unprivileged account while paused/revoked, and rejected replay. Balance deltas were captured before recipient-signed calls consumed gas. Raw proof bundles and final payment/vault/audit records are retained in evidence/. These gas measurements are for the exercised sandbox proofs, not maximum-size proofs or validator sets.
 
-- A trusted finalized checkpoint and ordered validator set are frozen by the owner while paused, before the first lifetime payment attempt. They cannot be reset after an incident.
-- Subsequent heads require independently verified ancestry, epoch/validator commitments and more than two-thirds of the entire validator stake's valid approvals. Anyone may relay them.
-- Anyone may submit finalized initiation and native-transfer inclusion proofs. The exact attempt, invoice, approved recipient, amount and child receipt must match. No caller-supplied outcome flag is accepted.
-- Unknown, unfinalized, mismatched, stale, replayed or ambiguous batched evidence cannot release reservations. Proof consumption and final accounting are atomic; delayed callbacks cannot override a terminal repair.
+All 12 core sandbox tests also passed: exact payment and duplicate guards; concurrent same-order, shared-invoice and budget competition; amount/recipient/cap/budget/funding checks; pause, vendor/order/agent revocation and expiry; account/key/deposit/private-callback restrictions; real failed transfers and safe retry; bounded retries and immutable order IDs; storage/liquidity rejection with state rollback; callback gas/storage fault matrix and durable-evidence reconciliation; unknown client outcomes resolved by views without resubmission.
 
-This addresses the historical-proof gap **in source**, not as a validated security claim. The Linux proof suite, consensus encoding comparison tests, gas measurements and independent security review remain acceptance gates.
+The two additional sandbox tests passed the four historical-proof cases above and frozen checkpoint authority. Unit tests passed expiry boundaries, signer/predecessor and stale callback checks, in-flight revocation, immutable recipients, hashes compared with official near-primitives types, signed quorum/epoch transitions, invalid signatures/truncated approvals, stale heads, unknown/tampered/unrelated/stale/replayed evidence, consumed receipt rejection, ambiguous initiating receipts and immutable bootstrap.
 
-## Reproducible Linux verification
+## Execution failures and corrections
 
-The local workflow is `.github/workflows/payment-core.yml`. It pins official checkout/setup-node/upload-artifact actions to commit hashes, uses Ubuntu 24.04, installs compiler/OpenSSL/Clang/CMake prerequisites, installs the Rust toolchain declared in `rust-toolchain.toml`, and invokes:
+| Run / commit | Actual result and correction |
+| --- | --- |
+| [40862869517](https://github.com/Technique-S/Nnetics/actions/runs/40862869517) / 9206f07 | TypeScript 41 passed; Rust unit compilation failed on eight test hash conversions and one mock context field. Zero Rust tests executed. Fixed in 7125f38. |
+| [40863230050](https://github.com/Technique-S/Nnetics/actions/runs/40863230050) / 7125f38 | Rust unit 29 passed, 1 failed. Official-type comparison detected a real validator public-key length-prefix mismatch. Corrected consensus encoding in 919be5b; preserved the comparison assertion. |
+| [40863676284](https://github.com/Technique-S/Nnetics/actions/runs/40863676284) / 919be5b | Rust unit 30 passed; sandbox 0 passed, 14 failed during setup: finite worker-key allowance was below the sandbox upfront gas check. Raised only the ephemeral test key allowance to 100 NEAR in 47e059f; method restriction unchanged. |
+| [40864788315](https://github.com/Technique-S/Nnetics/actions/runs/40864788315) / 47e059f | Rust unit 30 passed; sandbox 0 passed, 14 failed at the setup rejection probe with an opaque WASM trap. Missing --cfg near selected off-chain SDK fallbacks. Corrected target flags and added a compile-time guard in d2ec5a7. |
+| [40865934492](https://github.com/Technique-S/Nnetics/actions/runs/40865934492) / d2ec5a7 | Rust unit 30 passed; sandbox 13 passed, 1 failed. Real proof/callback matrices passed. Storage-shortfall fixture accidentally reset the deployed code hash. Fixed in d515974 by preserving current account fields and checking unchanged code/storage. |
+| [40867146834](https://github.com/Technique-S/Nnetics/actions/runs/40867146834) / d515974 | All checks passed: TypeScript 41, Rust unit 30, sandbox 14, five WASM builds, Clippy and formatting. |
 
-```sh
-bash scripts/check-core.sh
-```
+**Artifacts built before d2ec5a7 must not be deployed.** Compilation and structural WASM validation did not detect the missing SDK on-chain configuration; sandbox execution did. The corrected .cargo/config.toml applies --cfg near to WASM builds, matching [official cargo-near behavior](https://github.com/near/cargo-near).
 
-The script uses locked Cargo dependencies and a pinned near-sandbox 0.3.12 / nearcore 2.13.0 node. It rejects a sandbox-binary override, runs all reference/unit/sandbox tests, builds production and four fault artifacts, and retains a fresh directory under `artifacts/runs/` containing:
+Earlier Windows native unit compilation failed before executing tests because dlltool.exe was unavailable. That environment failure is superseded by the Linux execution above. Additional local checks executed: Bash/report syntax; synthetic report failures for zero tests/missing stages (exit 80); configured WASM build with panic_utf8, sha256 and ed25519_verify host imports; a deliberately misconfigured WASM check rejected by the explicit --cfg near compile guard (exit 101, artifacts/local-checks/missing-near-cfg.log). These checks are separate from the Linux test counts.
 
-- Per-stage logs, actual Rust test-summary counts and exit codes.
-- `run.json` with commit/toolchain/platform/checksum information and explicit unit/sandbox pass fields.
-- Production WASM and available raw sandbox receipt proofs/result records.
+## Reproduction and retained evidence
 
-Missing stages, zero-test Rust runs and missing report generation fail verification. Prior local run files are never counted as a new run. Actions uploads evidence even on failure. The report deliberately leaves `milestone_1_accepted` false for review; a green build alone is not a security audit or automatic acceptance.
+Run bash scripts/check-core.sh from the repository root on Linux x86_64 with Node 24 and rustup. Ubuntu prerequisites: build-essential, pkg-config, libssl-dev, clang and cmake. rust-toolchain.toml pins Rust 1.93.0, formatter, Clippy and the WASM target. Both Cargo lockfiles are committed; preserve near-sdk-env 0.1.6 and near-sys 0.2.14 compatibility pins.
 
-All test identities and signatures are synthetic/ephemeral. Sandbox tests call only a fresh local node and require no wallet, faucet, deployment credentials or public RPC. `scripts/prepare-repair.ts` normalizes collected RPC data offline and does not sign or submit anything.
+The workflow .github/workflows/payment-core.yml uses Ubuntu 24.04 and pinned official action commits. It runs the script, which rejects sandbox binary overrides, builds fault variants in separate target directories and uses only fresh local nodes with synthetic accounts. No wallet, faucet, deployment credentials or public RPC is needed. Ambient Rust flag overrides cannot silently omit --cfg near: the contract compilation guard rejects them.
 
-## Written runtime assertions — not executed
+Every run gets a fresh artifacts/runs/ directory. Missing stages, zero-test Rust summaries or failed report generation fail verification. Actions uploads logs, checksums, the production WASM and available public sandbox proof/result bundles even on failure. The manifest deliberately leaves milestone_1_accepted false for review; a green workflow is not an automatic security approval.
 
-The 12 existing sandbox tests cover exact recipient balance deltas; duplicate and concurrent order/invoice protection; concurrent budget reservations; amount/recipient/cap/budget/funding checks; storage/liquidity rollback; pause, vendor/order/agent revocation and expiry; authorization/key restrictions; immutable IDs and retry bounds; real failed native transfers and restored reservations; record/finalize callback gas and protocol storage failures; idempotent reconciliation and unknown client outcomes without resubmission.
+All completed-run artifacts were downloaded to ignored artifacts/github/<run-id>/. The successful evidence is in artifacts/github/40867146834/payment-core-40867146834-1/20261029T114033Z-40867146834-1-2953/. The tested production WASM is also copied to ignored artifacts/vault.wasm. GitHub artifacts expire after 14 days; the local downloaded copies remain available.
 
-Two additional sandbox tests cover frozen checkpoint authority and actual node-generated inclusion proofs with signed finality updates. The proof matrix includes successful and failed native transfers with gas/storage failure of the result-recording callback. It asserts exact recipient deltas before recipient-signed calls consume gas, retained reservations, tamper rejection, proof-based repair, accounting and replay rejection. Raw proof bundles and repair records are retained if the suite reaches those stages.
+## Preserved contract and repair authority
 
-The 30 SDK unit tests additionally cover exact expiry boundaries, signer/predecessor checks, in-flight revocation, stale callbacks, immutable recipient snapshots, protocol hash compatibility with official near-primitives types, validator quorum/epoch transitions/signature failures/truncated arrays, stale heads, missing/nonterminal/unrelated/stale/replayed transfer evidence, duplicate receipt consumption, ambiguous multi-payment receipts and immutable checkpoint setup. Synthetic unit proof fixtures are not real chain evidence.
+The pre-continuation source, tests, validation report and WASM are preserved under ignored .tools/m1-baseline/. Original contract source SHA-256: b0321c1c2f7b80479ed0119f9cdccacd20ba5bfe3862e4b04609aa0b0d202c40. The original WASM was 290,318 bytes, SHA-256 917e6b59fa879582421593e8d9d4c849048ae87ae11faa53a9fe6273ab172654; it predates the corrected build configuration.
 
-## Access needed and remaining limitations
+Vault, WorkOrder, Payment, status variants and collection prefixes retain their serialized layouts. Proof state uses separate versioned prefixes. Source layouts were compared; sandbox fault-code replacement also exercised shared serialized state, but no generic legacy migration was implemented or claimed.
 
-The user selected GitHub Actions. To run it, the remaining access requirements are:
+[HISTORICAL_REPAIR.md](HISTORICAL_REPAIR.md) defines authoritative evidence: a one-time pre-payment trust anchor; subsequently verified signed finality/ancestry; finalized initiating and exact native-transfer receipt proofs; exact attempt/marker/recipient/child linkage; permanent receipt consumption. Anyone may relay heads or submit valid repair proofs. Unknown, invalid, unfinalized, stale, replayed or ambiguous evidence cannot release reservations. No owner outcome flag, timeout release or balance heuristic is accepted.
 
-1. GitHub authentication on this machine. A GitHub CLI device login has been started; browser authorization is pending.
-2. The authenticated account must have write access to [Technique-S/Nnetics](https://github.com/Technique-S/Nnetics) and permission to run Actions.
+## Remaining limitations and access
 
-The user supplied that repository and explicitly authorized pushing on 29 October 2026. A read-only remote inspection returned no refs (empty repository). The local Git branch is `codex/payscope-milestone-1`, with that repository configured as `origin`. No push or Actions run has completed yet. No supported Linux runner has been accessed. Native Windows lacks the pinned sandbox binary; WSL is not installed and Docker is absent. Consequently there are no actual Rust assertion results or authoritative sandbox balance/receipt proofs to report yet.
+No additional environment access is needed. The user supplied [Technique-S/Nnetics](https://github.com/Technique-S/Nnetics), explicitly authorized pushing, and completed GitHub authentication. Branch pushes, Ubuntu execution and artifact retrieval succeeded. No public-network transaction was signed or deployment performed.
 
-Repair limitations remain explicit: the initial checkpoint and ordered current validator set are trusted bootstrap inputs and must be independently verified; the bounded verifier currently supports Ed25519/protocol-86 encodings and requires timely verified synchronization under normal PoS/light-client assumptions. Cross-epoch history, real consensus encodings, resource limits and gas/storage margins still need execution/review. Multi-payment initiating receipts and old attempts without a marker/pre-payment checkpoint stay blocked. No owner override, timeout release, automatic retry or generic state-migration escape hatch is provided.
+Independent review remains necessary for the trusted bootstrap, consensus encoding/protocol assumptions and worst-case gas/storage bounds. Real tests exercised the small sandbox validator set and its signed updates; maximum 128-validator/64-sibling/128-KB inputs were not benchmarked in the VM. The bounded verifier supports Ed25519/protocol-86 encodings and requires timely authenticated synchronization under normal PoS/light-client assumptions, including weak subjectivity. Unsupported evidence fails closed and can leave an attempt blocked.
 
-Milestone 1 remains incomplete until the Linux unit/sandbox suite passes, exact balance and accounting evidence is retained, proof repair and rejection cases execute successfully, and the remaining consensus/resource assumptions are reviewed. UI, worker, AI extraction and testnet demonstration remain outside this milestone. No code has been pushed or deployed.
+Old attempts lacking an initiation marker or pre-payment checkpoint remain blocked; the owner cannot install a post-incident trust root or use a migration escape hatch. Resolving such legacy history requires a separately reviewed design. Public-network provisioning, transactions and deployment still require separate approval.
+
+Automated payment-core acceptance checks are now satisfied, including retained exact balances and real proof repair/rejection. Overall Milestone 1 acceptance remains incomplete while the stated consensus/resource review is outstanding. UI, worker, AI extraction and testnet demonstration remain outside this milestone.

@@ -29,6 +29,8 @@ bash scripts/check-core.sh
 
 `rust-toolchain.toml` installs the pinned toolchain, formatter, Clippy and WASM target. Initial Cargo and sandbox runs download dependencies and the local node binary. Tests generate ephemeral local accounts and restricted keys in memory and use only a fresh `near_workspaces::sandbox()` network. They need no wallet, environment secrets, faucet or public RPC. The script has no public-network deployment or transaction commands. Native Windows is unsupported by the sandbox dependency; use WSL2 or a Linux machine. Do not run only `npm test` and infer that the core is validated.
 
+Build from this repository so `.cargo/config.toml` applies `--cfg near` specifically to the WASM target. SDK 5.27+ requires it for on-chain host functions, matching [official cargo-near behavior](https://github.com/near/cargo-near). The contract deliberately fails WASM compilation if the flag is absent. Native tests do not receive it. An ambient `RUSTFLAGS` override can suppress Cargo target flags; such a build must fail rather than produce an off-chain fallback artifact.
+
 The script builds the production WASM with no fault features, then four distinctly named fault artifacts in separate target directories. It runs SDK unit tests and the sandbox tests sequentially. Each run retains stage logs, a `run.json` report, checksums and available raw sandbox receipt proofs under a fresh `artifacts/runs/` directory. GitHub Actions uploads these even when verification fails. A missing or zero-test Rust result cannot be counted as a pass. No fault artifact is a deployment candidate. Production deployment, account provisioning and any public-network signing require separate human approval.
 
 ## Authority and API
