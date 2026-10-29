@@ -16,6 +16,7 @@ import type { WorkerTransport } from "./worker.ts";
 import type { Queue } from "./queue.ts";
 import type { Payment } from "../data/owner-adapter.ts";
 import { transferMarker } from "./marker.ts";
+import { assertTestedProtocol } from "../data/protocol.ts";
 
 export class WorkerNearTransport implements WorkerTransport {
   readonly rpc: NearRpc;
@@ -36,10 +37,7 @@ export class WorkerNearTransport implements WorkerTransport {
     if (process.env.NNETICS_TRANSACTIONS_AUTHORIZED !== "testnet-reviewed")
       throw new Error("Testnet signing not authorized in this environment.");
     const block = await this.rpc.finalized();
-    if (block.protocolVersion !== 86)
-      throw new Error(
-        `Protocol ${block.protocolVersion} has not passed this build's protocol-86 compatibility review.`,
-      );
+    assertTestedProtocol(block.protocolVersion);
     if (!(await this.rpc.view("get_repair_checkpoint", {}, block.hash)))
       throw new Error(
         "A reviewed pre-payment repair checkpoint is required before worker signing.",
@@ -109,8 +107,7 @@ export class WorkerNearTransport implements WorkerTransport {
     if (process.env.NNETICS_TRANSACTIONS_AUTHORIZED !== "testnet-reviewed")
       throw new Error("Broadcast authorization required.");
     const block = await this.rpc.finalized();
-    if (block.protocolVersion !== 86)
-      throw new Error("Unreviewed testnet protocol; broadcast disabled.");
+    assertTestedProtocol(block.protocolVersion);
     const tx = SignedTransaction.decode(
       Buffer.from(signed, "base64"),
     ).transaction;

@@ -1,5 +1,6 @@
 import { Buffer } from "buffer";
 import { account, uint } from "./owner-adapter";
+import { assertTestedProtocol } from "./protocol";
 import type {
   Invoice,
   OwnerAdapter,
@@ -97,10 +98,7 @@ export class NearOwnerAdapter implements OwnerAdapter {
         "Signing is disabled pending specific testnet authorization and review.",
       );
     const state = await this.snapshot(); // Verify chain, deployment code and owner before wallet opens.
-    if (state.protocolVersion !== 86)
-      throw new Error(
-        `Protocol ${state.protocolVersion} requires compatibility review before signing.`,
-      );
+    assertTestedProtocol(state.protocolVersion);
     const wallet = await this.wallet();
     if (
       !(await wallet.getAccounts()).some(

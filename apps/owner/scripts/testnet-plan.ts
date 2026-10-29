@@ -90,7 +90,7 @@ export function deploymentPlan(): DeploymentPlan {
         "not configured; unknown transfer outcomes may remain blocked",
       rename: "fresh vault required",
       protocol:
-        "contract tested on protocol 86; testnet version must be assessed before deployment",
+        "contract runtime suites passed on protocols 86 and 88; future versions need new compatibility review",
       ai: "disabled until manual invoice acceptance passes",
     },
     steps: [

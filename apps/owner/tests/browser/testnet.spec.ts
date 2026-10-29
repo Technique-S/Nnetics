@@ -34,13 +34,13 @@ test("default mode never silently falls back to simulation or enables an unconfi
     page.getByText("Synthetic data. No wallet connected.", { exact: false }),
   ).toBeVisible();
 });
-test("controlled live adapter reads show finality and block protocol-88 signing before opening wallet", async ({
+test("controlled live adapter reads show finality and block unverified protocol-89 signing before opening wallet", async ({
   page,
 }) => {
   // HTTP fixtures exercise UI wiring only; this is not a deployed testnet test.
   const snapshot = await new MockOwnerAdapter(0).snapshot();
   snapshot.mode = "testnet";
-  snapshot.protocolVersion = 88;
+  snapshot.protocolVersion = 89;
   snapshot.blockHash = "controlled-final-block";
   await page.route("**/api/live/config", (route) =>
     route.fulfill({
@@ -74,7 +74,9 @@ test("controlled live adapter reads show finality and block protocol-88 signing 
     .click();
   await expect(
     page.getByRole("alert", { name: "Testnet error" }),
-  ).toContainText("Protocol 88 requires compatibility review before signing.");
+  ).toContainText(
+    "Protocol 89 requires compatibility verification before signing.",
+  );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

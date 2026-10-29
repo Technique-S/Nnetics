@@ -1,8 +1,33 @@
 # Payment core validation — 29 October 2026
 
-**The renamed Milestone 1 build passed automated Linux checks on protocol 86. Live integration and protocol-88 acceptance remain incomplete.** Independent security review remains open; no audited or production-ready verifier claim is made.
+**The integration build passed automated Linux checks on protocols 86 and 88. Milestone 1 and live-payment acceptance remain incomplete.** Independent security review remains open; no audited or production-ready verifier claim is made.
 
-## Live integration continuation — current local result
+## Approved integration push and Linux execution
+
+Commit `80d253d41d63bdd782abf7d66a2036dc07793e0b` was pushed to
+`codex/nnetics-live-integration` with explicit user approval. Completed execution:
+
+| Run | Executed result |
+| --- | --- |
+| [Contract matrix 40947353192](https://github.com/Technique-S/Nnetics/actions/runs/40947353192) | Both nearcore 2.13.0 / protocol 86 and 2.14.0-rc.5 / protocol 88 passed. Each: 41 root TypeScript, 36 Rust unit, 15 sandbox tests, five WASM builds, Clippy and formatting. Runtime protocol asserted. Finished 20:24:06 UTC / 20:22:50 UTC. |
+| [Owner 40947353242](https://github.com/Technique-S/Nnetics/actions/runs/40947353242) | Ubuntu 24.04, Node 24.22.1: 26 Node tests, strict TypeScript, production build and 12 Chromium browser executions passed. |
+
+Both production WASMs retain the SHA-256 below. Downloaded manifests, logs, actual
+receipt proofs and VM measurements are in ignored `artifacts/github/40947353192/`.
+See [PROTOCOL_88_REVIEW.md](PROTOCOL_88_REVIEW.md) for pinned official-source
+comparison, measured gas/storage and unresolved trust assumptions. Maximum tested
+88 update used 62.567 Tgas; repair at most 31.124 Tgas. Late gas/storage failures
+preserved the full compared payment/claim/ledger/audit state. This synthetic bounded
+workload and passing tests do not replace independent security review.
+
+The follow-up parser guard rejects non-null future Spice commitments, and a shared
+signing gate accepts only tested protocols 86/88. Locally executed: 42 root tests,
+26 application tests, strict TypeScript, production build and 12 desktop/mobile
+browser executions passed. This follow-up is separate from the executed `80d253d`
+source; its subsequent CI must be recorded separately. Transaction flags remain
+disabled; no public-network signing occurred.
+
+## Integration baseline and local evidence
 
 Inspected renamed source and retrieved [Linux run 40901797197](https://github.com/Technique-S/Nnetics/actions/runs/40901797197),
 commit `7d194e49c53c80884097a49ac113a1a509c4d654`, completed at 15:36:26 UTC:
@@ -28,20 +53,19 @@ Read-only RPC preflight reported **testnet protocol 88**; the deprecated NEAR en
 also returned a deprecation/429 error, and the app default was switched to the
 documented FASTNEAR testnet endpoint. The locally written contract CI matrix adds
 nearcore `2.14.0-rc.5` / protocol 88 alongside the preserved `2.13.0` / protocol 86
-baseline. Both runtime paths now assert the reported protocol. **The changed matrix
-and new owner CI workflow have not executed**. No claim of candidate Rust runtime
-execution is made; local format checks pass. Production Rust sources are unchanged.
+baseline. Both runtime paths assert the reported protocol; the completed executions
+are recorded above. Production Rust sources are unchanged.
 
 Browser failures during development: a demo-title hydration mismatch and an overly
 exact error-text locator. A stable title/named error assertion fixed these; all 12
 subsequent executions passed with a clean runner exit using a separately managed
 local server. Earlier runner-cleanup limitations remain historical below.
 
-Unmet acceptance: confirmed owner testnet identity, protocol-88 source/runtime review,
+Unmet acceptance: activated owner testnet account and named setup/sponsor plan,
 reviewed pre-payment checkpoint, independent verifier review, real wallet challenge
 and owner transactions, recipient balance delta/transaction-link proof, real restart
 journey, and transaction authorization. Local configuration based on a withdrawn
-account hint was cleared; no account was created. Dedicated generated role keys
+account hint was cleared; the supplied implicit account remains inactive and no account was created. Dedicated generated role keys
 are outside Git and unused. Dependency audit reports 10 low-severity transitive
 elliptic/secp256k1 advisories; no unsupported forced downgrade was applied.
 

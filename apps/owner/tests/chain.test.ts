@@ -10,12 +10,12 @@ import { Queue } from "../src/server/queue.ts";
 import { account, uint } from "../src/data/owner-adapter.ts";
 import { transferMarker } from "../src/server/marker.ts";
 import type { Payment } from "../src/data/owner-adapter.ts";
+import { assertTestedProtocol } from "../src/data/protocol.ts";
 
 test("implicit owner IDs are accepted on testnet while mainnet named owners remain disabled", () => {
   const previous = process.env.NNETICS_OWNER_ID;
   try {
-    process.env.NNETICS_OWNER_ID =
-      "28".repeat(32);
+    process.env.NNETICS_OWNER_ID = "28".repeat(32);
     assert.equal(liveConfig().owner, process.env.NNETICS_OWNER_ID);
     process.env.NNETICS_OWNER_ID = "owner.near";
     assert.throws(() => liveConfig(), /Mainnet is disabled/);
@@ -61,7 +61,10 @@ test("finalized reads reject wrong network/code and inconsistent block responses
   code = "unreviewed";
   await assert.rejects(() => chain.finalized(), /reviewed configuration/);
 });
-test("signer refuses signing/broadcast on protocol 88 even if generic authorization flag is set", async () => {
+test("signer accepts only tested runtime versions and refuses protocol 89 despite a generic authorization flag", async () => {
+  assert.doesNotThrow(() => assertTestedProtocol(86));
+  assert.doesNotThrow(() => assertTestedProtocol(88));
+  assert.throws(() => assertTestedProtocol(undefined));
   const previous = process.env.NNETICS_TRANSACTIONS_AUTHORIZED;
   process.env.NNETICS_TRANSACTIONS_AUTHORIZED = "testnet-reviewed";
   try {
@@ -69,7 +72,7 @@ test("signer refuses signing/broadcast on protocol 88 even if generic authorizat
     transport.rpc.finalized = async () => ({
       hash: "final-hash",
       timestamp: "1" as Awaited<ReturnType<NearRpc["finalized"]>>["timestamp"],
-      protocolVersion: 88,
+      protocolVersion: 89,
     });
     await assert.rejects(
       () =>
@@ -83,7 +86,7 @@ test("signer refuses signing/broadcast on protocol 88 even if generic authorizat
     );
     await assert.rejects(
       () => transport.broadcast("never-decode-or-send"),
-      /Unreviewed/,
+      /compatibility/,
     );
   } finally {
     if (previous === undefined)

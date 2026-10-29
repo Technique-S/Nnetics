@@ -2,6 +2,7 @@ import { liveConfig } from "./config.ts";
 import { Queue, workerLock } from "./queue.ts";
 import { WorkerNearTransport } from "./signer.ts";
 import { PaymentWorker } from "./worker.ts";
+import { assertTestedProtocol } from "../data/protocol.ts";
 const config = liveConfig();
 if (!config.configured)
   throw new Error("Complete testnet configuration first.");
@@ -11,10 +12,7 @@ if (process.env.NNETICS_TRANSACTIONS_AUTHORIZED !== "testnet-reviewed")
   );
 const transport = new WorkerNearTransport(config);
 const block = await transport.rpc.finalized();
-if (block.protocolVersion !== 86)
-  throw new Error(
-    "Testnet protocol differs from the reviewed protocol 86. Resolve compatibility before running the worker.",
-  );
+assertTestedProtocol(block.protocolVersion);
 if (!(await transport.rpc.view("get_repair_checkpoint", {}, block.hash)))
   throw new Error(
     "Install and review the pre-payment recovery checkpoint before starting the worker.",

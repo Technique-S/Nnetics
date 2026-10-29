@@ -16,6 +16,15 @@ test('decodes exactly sized base58 hashes and leading zeros', () => {
 test('uses exact nanosecond string rather than rounded legacy timestamp', () => {
   assert.equal(normalizeHeader(header()).inner_lite.timestamp, '1793232000000000001');
 });
+
+test('accepts absent/null legacy root and rejects future Spice header commitments', () => {
+  const h = header() as any;
+  const legacy = normalizeHeader(h);
+  h.inner_lite.chunk_execution_root = null;
+  assert.deepEqual(normalizeHeader(h), legacy);
+  h.inner_lite.chunk_execution_root = z;
+  assert.throws(() => normalizeHeader(h), /Unsupported Spice header/);
+});
 test('normalizes native transfer success without changing exact token values', () => {
   const result = normalizeOutcomeProof(proof());
   assert.deepEqual(result.outcome.status, { SuccessValue: [] });

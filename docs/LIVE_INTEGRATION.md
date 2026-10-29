@@ -7,13 +7,11 @@ The Rust production contract and its interface are unchanged in this milestone.
 
 ## Current blockers
 
-- Read-only testnet status reported protocol **88** on 29 October 2026. The last
-  executed contract suite used nearcore **2.13.0 / protocol 86**. The locally
-  prepared CI matrix also targets nearcore **2.14.0-rc.5**, official commit
-  `b7b4737cab46f17a6daa2ed694d7aebbd204363a`, but this candidate has not executed.
-  Signing and broadcast deliberately reject protocols other than 86. Do not remove
-  that check merely to make the demo run: assess protocol/receipt/consensus changes,
-  execute the candidate matrix, review its results, then update the gate explicitly.
+- Read-only testnet status reported protocol **88** on 29 October 2026. Linux CI
+  now passes nearcore **2.13.0 / protocol 86** and **2.14.0-rc.5 / protocol 88**.
+  [The bounded source/runtime comparison](PROTOCOL_88_REVIEW.md) supports an explicit
+  86/88 allowlist. Unknown versions fail closed. This resolves the runtime-test gap,
+  but does not resolve the independent review or transaction authorization gates.
 - Independent historical-verifier review remains incomplete. Bootstrap trust,
   ordered validator commitments, weak subjectivity, timely synchronization and
   upgrade-key custody remain assumptions in [M1_REVIEW.md](M1_REVIEW.md).
@@ -21,17 +19,18 @@ The Rust production contract and its interface are unchanged in this milestone.
   before the worker can start. The app does not invent a checkpoint or accept an
   owner assertion about an unknown transfer. An operator must prepare/review the
   exact `initialize_repair_checkpoint` payload separately; a bootstrap UI is absent.
-- A confirmed owner **testnet** account and public key are still needed. A mainnet
-  `.near` account cannot substitute. An earlier account hint was withdrawn and its
-  ignored local configuration cleared. No accounts were provisioned. Newly generated
-  testnet role keys remain unused in a protected user-only directory outside Git;
-  they are not wallet keys or authority on any existing account.
+- The supplied 64-hex testnet implicit owner is not activated: finalized read-only
+  RPC returned `UNKNOWN_ACCOUNT`. It must receive testnet NEAR before use. A mainnet
+  `.near` account cannot substitute. The current setup template also needs a named
+  setup account to create direct subaccounts; it cannot create children under a
+  64-character implicit address. A sponsor/provisioning plan remains unresolved.
+  No accounts were provisioned. Generated role keys remain unused outside Git.
 - Each public transaction needs specific human authorization. Environment switches
   are enforcement mechanisms, not evidence that authorization has been given.
 
 The official [testnet release notes](https://github.com/near/nearcore/releases/tag/2.14.0-rc.5)
 and [protocol-88 transition notes](https://github.com/near/nearcore/releases/tag/2.14.0-rc.4)
-are inputs to the outstanding compatibility review, not a claim of compatibility.
+were inputs to the bounded compatibility comparison; they are not independent approval.
 
 ## Run without sending transactions
 
@@ -155,7 +154,7 @@ npm run worker -- --once
 # or npm run worker for the continuous process
 ```
 
-The CLI currently refuses protocol 88 and missing pre-payment recovery checkpoints
+The CLI refuses protocols outside the tested 86/88 allowlist and missing pre-payment recovery checkpoints
 before it modifies queue state. It reads only the restricted worker secret from a
 protected local file. The API/browser has no worker secret or payment signing API.
 
@@ -202,18 +201,21 @@ inferred from permission to edit/push code.
 
 ## Executed evidence and remaining acceptance
 
-The renamed baseline CI passed 41 root TypeScript, 36 Rust unit and 15 Sandbox tests
-on protocol 86. For the current integration, 26 Node application tests, strict
-TypeScript (including scripts), a production build and 12 desktop/mobile browser
-executions passed locally. Browser live-mode tests use controlled HTTP fixtures;
-worker tests use SQLite plus a controlled transport. Neither proves deployment,
-wallet compatibility with a real owner, protocol-88 runtime behavior or real payment.
+[Contract Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40947353192)
+on integration commit `80d253d` passed 41 root TypeScript, 36 Rust unit and 15 sandbox
+tests per runtime on protocols 86 and 88, plus five WASM builds, Clippy and formatting.
+[Owner Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40947353242)
+passed 26 Node application tests, strict TypeScript (including scripts), a production
+build and 12 Chromium desktop/mobile browser executions. Browser live-mode tests
+use controlled HTTP fixtures; worker tests use SQLite plus a controlled transport.
+Neither proves deployment, wallet compatibility with a real owner or real payment.
 
 Initial browser execution found a demo title mismatch caused by client changes
 being overwritten by Next metadata, and an overly exact error-text locator.
 A stable neutral page title and a named error region fixed these; the subsequent
-12-scenario run exited successfully. The separate owner CI workflow and dual-runtime
-contract matrix are written locally but have not executed for this change.
+12-scenario run exited successfully. Follow-up local checks cover explicit rejection
+of protocol 89 and future Spice header commitments; see the validation record for
+the exact source and execution boundary.
 
 The dependency audit reports **10 low-severity transitive advisories** through
 Wallet Selector's elliptic/secp256k1 dependencies (GHSA-848j-6mx2-7j84). This app accepts

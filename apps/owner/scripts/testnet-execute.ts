@@ -12,6 +12,7 @@ import {
 import { deploymentPlan, planDigest } from "./testnet-plan.ts";
 import { NearRpc } from "../src/server/chain.ts";
 import { liveConfig } from "../src/server/config.ts";
+import { assertTestedProtocol } from "../src/data/protocol.ts";
 // No automatic provisioning/deploy loop. Each invocation runs exactly one named
 // step of the current digest-approved plan. Never retries with a new transaction.
 const plan = deploymentPlan(),
@@ -33,10 +34,7 @@ const status = await rpc.rpc<{ chain_id: string; protocol_version: number }>(
   [],
 );
 if (status.chain_id !== "testnet") throw new Error("Refusing non-testnet RPC.");
-if (status.protocol_version !== 86)
-  throw new Error(
-    `Testnet protocol ${status.protocol_version} differs from reviewed protocol 86; resolve protocol compatibility review before deployment.`,
-  );
+assertTestedProtocol(status.protocol_version);
 const keyFile = process.env.NNETICS_SETUP_KEY_FILE;
 if (!keyFile)
   throw new Error(

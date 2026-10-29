@@ -35,6 +35,10 @@ function list<T>(value: unknown, maximum: number, convert: (v: any) => T): T[] {
 }
 export function normalizeHeader(raw: any) {
   const h = raw.inner_lite;
+  // Protocol-88 adds this optional RPC field for future Spice/V7 headers.
+  // A non-null value changes the serialized inner-lite hash. Never silently
+  // discard it into this verifier's legacy header format.
+  if (h.chunk_execution_root !== undefined && h.chunk_execution_root !== null) throw new Error('Unsupported Spice header');
   return { prev_block_hash: hash(raw.prev_block_hash), inner_rest_hash: hash(raw.inner_rest_hash),
     inner_lite: { height: u64(h.height), epoch_id: hash(h.epoch_id), next_epoch_id: hash(h.next_epoch_id),
       prev_state_root: hash(h.prev_state_root), outcome_root: hash(h.outcome_root),
