@@ -179,7 +179,11 @@ pub fn validators_hash(bps: &[Validator]) -> Hash {
         .to_vec();
     for bp in bps {
         bytes.push(0);
-        bytes.extend(borsh::to_vec(bp).expect("VALIDATOR_ENCODING"));
+        bytes.extend(borsh::to_vec(&bp.account_id).expect("VALIDATOR_ENCODING"));
+        // near-crypto PublicKey is scheme + fixed key bytes. SDK PublicKey's
+        // storage serialization wraps a Vec and would add an incorrect length.
+        bytes.extend(bp.public_key.as_bytes());
+        bytes.extend(bp.stake.0.to_le_bytes());
     }
     hash(&bytes)
 }
