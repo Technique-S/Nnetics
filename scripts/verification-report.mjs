@@ -19,7 +19,7 @@ if (mode === 'stage') {
 } else if (mode === 'finish') {
   const run = (...args) => { const p = spawnSync(args[0], args.slice(1), { encoding: 'utf8' }); return p.status === 0 ? p.stdout.trim() : null; };
   const hashes = {};
-  for (const file of ['rust-toolchain.toml', 'contracts/vault/Cargo.lock', 'contracts/sandbox/Cargo.lock',
+  for (const file of ['rust-toolchain.toml', '.cargo/config.toml', 'contracts/vault/Cargo.lock', 'contracts/sandbox/Cargo.lock',
     'contracts/vault/src/lib.rs', 'contracts/vault/src/repair.rs', path.join(directory, '../vault.wasm')]) {
     if (fs.existsSync(file)) hashes[file] = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
   }

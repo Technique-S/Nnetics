@@ -1,3 +1,6 @@
+#[cfg(all(target_arch = "wasm32", not(near)))]
+compile_error!("WASM contracts require --cfg near; build from this repository with .cargo/config.toml or cargo-near.");
+
 use near_sdk::collections::LookupMap;
 use near_sdk::json_types::{U128, U64};
 use near_sdk::{

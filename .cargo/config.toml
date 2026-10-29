@@ -1,0 +1,3 @@
+[target.wasm32-unknown-unknown]
+# SDK >=5.27 requires this to select NEAR host functions (as cargo-near does).
+rustflags = ["--cfg", "near"]
