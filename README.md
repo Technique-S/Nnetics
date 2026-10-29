@@ -2,7 +2,7 @@
 
 An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
 
-## Current status: bounded core review and local owner preview, 29 October 2026
+## Current status: local live-integration candidate, 29 October 2026
 
 Implemented in source: the Rust native-NEAR vault, account/key authorization, immutable work orders, invoice/order guards, spending reservations, asynchronous settlement and evidence-based reconciliation. Added a bounded historical receipt-proof repair path with a frozen pre-payment trust anchor. SDK unit tests, a local sandbox suite and a Linux CI workflow retain execution logs/proofs. The TypeScript reference policy, synthetic fixtures and MVP specification remain available.
 
@@ -10,9 +10,9 @@ Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](d
 
 [Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review; no public-network deployment has occurred.
 
-Milestone 2 has begun locally: a Next.js owner dashboard with a typed mock adapter covers vendors, immutable work orders, invoice review, pause/revocation and payment history. All data and transfers are visibly simulated. It has no wallet, RPC or deployment adapter, and is available on the branch `codex/owner-dashboard-local`. See [OWNER_DASHBOARD.md](docs/OWNER_DASHBOARD.md) for architecture, execution results and limitations.
+Milestone 3 integration is implemented locally: a testnet wallet adapter, finalized contract reads, owner actions, structured invoice intake, a durable SQLite queue and a restricted-key payment worker. Demo mode remains explicitly simulated. The [live integration guide](docs/LIVE_INTEGRATION.md) describes setup, restart behavior, transaction approval and remaining gates. This code has not yet been pushed or accepted as a real testnet workflow.
 
-Not implemented: AI extraction, database, wallet connection, live chain integration, worker, legacy-attempt state migration or a public-network deployment. Historical proof repair is runtime-tested under the pinned protocol; its bootstrap assumptions and limits are in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No user funds or public-network transactions have been used.
+Not accepted: real wallet/payment acceptance and protocol-88 compatibility. Testnet currently reports protocol 88; the last executed vault suite used protocol 86. Scripts refuse transactions across that gap pending review. AI extraction, legacy migration and public deployment remain absent. Historical repair's bootstrap assumptions and limits remain in [docs/HISTORICAL_REPAIR.md](docs/HISTORICAL_REPAIR.md). No public-network signing or token transfers have been performed.
 
 ## Try the local owner dashboard
 
@@ -22,7 +22,7 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:3100. The preview uses synthetic session-only data and keeps deployment disabled. Executed checks: production build, strict TypeScript, 11 adapter tests and four browser scenarios at desktop/mobile sizes (eight passing executions). Actual chain integration and durable storage remain incomplete.
+Open http://127.0.0.1:3100 for testnet mode; it requires configuration and owner-wallet authentication. Open http://127.0.0.1:3100/?mode=demo for synthetic session-only data. Deployment remains disabled. Current local checks: production build, strict TypeScript, 26 application tests and 12 desktop/mobile browser executions passed. Browser/worker tests use controlled fixtures and do not establish real testnet acceptance. See [LIVE_INTEGRATION.md](docs/LIVE_INTEGRATION.md) before configuring accounts or enabling signing.
 
 ## Try the foundation
 
@@ -49,9 +49,10 @@ Expected: policy tests pass. The demo marks an approved invoice eligible, a chan
 - `docs/VALIDATION.md`: observed results, missing evidence and blockers.
 - `docs/HISTORICAL_REPAIR.md`: authoritative evidence, bootstrap trust, permissions and replay protection.
 - `scripts/prepare-repair.ts`: offline RPC-proof normalization; no signing or submissions.
-- `apps/owner`: local Next.js/TypeScript/Tailwind dashboard and simulation-only adapter.
+- `apps/owner`: Next.js dashboard, separate demo/testnet adapters, durable queue and worker.
 - `docs/OWNER_DASHBOARD.md`: local frontend setup, tested behavior and integration boundaries.
 - `docs/M1_REVIEW.md`: pinned official verifier comparison and measured VM limits.
+- `docs/LIVE_INTEGRATION.md`: wallet, persistence, worker recovery, deployment preparation and live acceptance gates.
 
 ## Guarded NEAR core
 

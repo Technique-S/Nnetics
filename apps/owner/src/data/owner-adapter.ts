@@ -1,5 +1,5 @@
 // JSON DTOs preserve the frozen Rust contract's field names and integer strings.
-// There is deliberately no live adapter, wallet capability or deployment method.
+// Deployment remains a separate, explicitly authorized operation.
 export type UInt = string & { readonly __uint: unique symbol };
 export type AccountId = string & { readonly __account: unique symbol };
 export const DEPLOYMENT_ENABLED = false as const;
@@ -92,7 +92,11 @@ export interface Vault {
   last_attempt: UInt;
 }
 export interface OwnerSnapshot {
-  mode: "simulation";
+  mode: "simulation" | "testnet";
+  blockHash?: string;
+  protocolVersion?: number;
+  chainTimeNs?: UInt;
+  queue?: { id: string; state: string; reason: string; hash: string | null }[];
   revision: number;
   vault: Vault;
   vendors: Vendor[];
@@ -165,7 +169,9 @@ export const reasonText: Record<ReviewCode, string> = {
 export function review(
   snapshot: OwnerSnapshot,
   invoice: Invoice,
-  now = BigInt(Date.now()) * 1_000_000n,
+  now = snapshot.chainTimeNs
+    ? BigInt(snapshot.chainTimeNs)
+    : BigInt(Date.now()) * 1_000_000n,
 ): ReviewCode[] {
   const order = snapshot.orders.find((o) => o.id === invoice.order_id);
   if (!order) return ["ORDER_MISSING"];
@@ -207,7 +213,7 @@ export function review(
   return reasons;
 }
 export interface OwnerAdapter {
-  readonly mode: "simulation";
+  readonly mode: "simulation" | "testnet";
   readonly deploymentEnabled: false;
   snapshot(): Promise<OwnerSnapshot>;
   subscribe(listener: () => void): () => void;

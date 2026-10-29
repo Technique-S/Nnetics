@@ -2,6 +2,13 @@
 
 Status: implementation baseline, 29 October 2026. Product decisions below are lead-developer defaults within the agreed MVP.
 
+Current user-directed sequence: Milestone 3 first integrates the live testnet owner
+dashboard and durable worker with manually entered structured invoices. Real
+exactly-once payment/duplicate/mismatch/restart acceptance must pass before AI
+extraction begins. This overrides the original numbered sequencing below while
+preserving the one-owner, three-vendor, native-testnet-NEAR MVP. Implementation and
+unresolved protocol-88/review/account gates are in [LIVE_INTEGRATION.md](LIVE_INTEGRATION.md).
+
 Milestone 1 implementation update: Rust vault and local sandbox test sources are now under `contracts/`. The finalized API, dependency choices and repair procedure are in `docs/PAYMENT_CORE.md`; actual execution evidence and remaining gates are in `docs/VALIDATION.md`. This specification's milestones are acceptance criteria, not claims that the sandbox tests have passed.
 
 Historical repair continuation: `docs/HISTORICAL_REPAIR.md` specifies a frozen pre-payment trusted checkpoint, verified validator finality and exact native receipt proofs. It adds no owner outcome override or timeout release. Linux execution now passes 36 unit and 15 sandbox tests, including maximum-input VM and rollback cases. `docs/M1_REVIEW.md` records the completed bounded author review, measured limits and unresolved assumptions; independent security review remains distinct. Existing public signatures, payout scope and serialized layouts are preserved.

@@ -4,6 +4,7 @@ node_modules/
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
 target/
 .next/
 .tools/

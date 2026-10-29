@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "Nnetics · Owner simulation",
+  title: "Nnetics · Owner dashboard",
   description:
-    "Local owner dashboard with synthetic data. No wallet or deployment.",
+    "Guarded NEAR testnet payments, with an explicitly labeled demo mode.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({

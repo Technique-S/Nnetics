@@ -16,6 +16,11 @@ if [[ -n "${NEAR_SANDBOX_BIN_PATH:-}" ]]; then
 fi
 export CARGO_TERM_COLOR=never
 export RUST_BACKTRACE=1
+export NNETICS_SANDBOX_VERSION="${NNETICS_SANDBOX_VERSION:-2.13.0}"
+case "$NNETICS_SANDBOX_VERSION" in
+  2.13.0|2.14.0-rc.5) ;;
+  *) echo "Only the pinned baseline or protocol-88 candidate runtime is allowed." >&2; exit 1 ;;
+esac
 export NNETICS_RUN_DIR="$PWD/artifacts/runs/$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}-$$"
 export NNETICS_LOG_DIR="$NNETICS_RUN_DIR/logs"
 export NNETICS_EVIDENCE_DIR="$NNETICS_RUN_DIR/evidence"

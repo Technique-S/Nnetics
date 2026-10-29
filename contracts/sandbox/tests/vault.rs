@@ -29,7 +29,25 @@ struct Desk {
 impl Desk {
     async fn new(code: &str, funded: u128) -> Result<Self> {
         // Always a fresh local Sandbox. No testnet/mainnet configuration or user keys.
-        let chain = near_workspaces::sandbox().await?;
+        let version =
+            std::env::var("NNETICS_SANDBOX_VERSION").unwrap_or_else(|_| "2.13.0".to_string());
+        let expected_protocol = match version.as_str() {
+            "2.13.0" => 86,
+            "2.14.0-rc.5" => 88,
+            _ => anyhow::bail!("Unsupported verification runtime"),
+        };
+        let chain = near_workspaces::sandbox_with_version(&version).await?;
+        let status: Value = reqwest::Client::new()
+            .post(chain.rpc_addr())
+            .json(&json!({"jsonrpc":"2.0","id":"runtime-preflight","method":"status","params":[]}))
+            .send()
+            .await?
+            .json()
+            .await?;
+        ensure!(
+            status["result"]["protocol_version"] == expected_protocol,
+            "Runtime protocol does not match the verification matrix"
+        );
         let owner = chain.dev_create_account().await?;
         let worker_full = chain.dev_create_account().await?;
         let recipient = chain.dev_create_account().await?;

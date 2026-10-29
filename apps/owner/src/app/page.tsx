@@ -2,6 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { MockOwnerAdapter, DEMO_AGENT } from "../data/mock-adapter";
+import { NearOwnerAdapter, api } from "../data/near-adapter";
+import type { PublicConfig } from "../data/near-adapter";
+import { TestnetControls } from "./testnet-controls";
 import {
   account,
   amountFromNear,
@@ -98,6 +101,7 @@ function Amount({ value, large = false }: { value: string; large?: boolean }) {
   );
 }
 function Modal({
+  live = false,
   title,
   error,
   busy,
@@ -105,6 +109,7 @@ function Modal({
   onSubmit,
   children,
 }: {
+  live?: boolean;
   title: string;
   error: string | null;
   busy: boolean;
@@ -128,7 +133,9 @@ function Modal({
     >
       <div className="modal-head">
         <div>
-          <span className="eyebrow">LOCAL SIMULATION</span>
+          <span className="eyebrow">
+            {live ? "NEAR TESTNET" : "LOCAL SIMULATION"}
+          </span>
           <h2 id="modal-title">{title}</h2>
         </div>
         <button
@@ -156,7 +163,11 @@ function Modal({
             Cancel
           </button>
           <button className="button primary" disabled={busy}>
-            {busy ? "Saving…" : "Save simulated change"}
+            {busy
+              ? "Saving…"
+              : live
+                ? "Review / submit"
+                : "Save simulated change"}
           </button>
         </div>
       </form>
@@ -165,7 +176,77 @@ function Modal({
 }
 
 export default function OwnerDashboard() {
-  const [adapter] = useState<OwnerAdapter>(() => new MockOwnerAdapter());
+  const [adapter, setAdapter] = useState<OwnerAdapter | null>(null);
+  const [live, setLive] = useState<NearOwnerAdapter | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get("mode") === "demo") {
+      setAdapter(new MockOwnerAdapter());
+      return;
+    }
+    void api<PublicConfig>("config")
+      .then(async (config) => {
+        const next = new NearOwnerAdapter(config);
+        setLive(next);
+        if (!config.configured) {
+          setError(
+            "Testnet accounts and reviewed deployment are not configured yet. Demo mode is available below.",
+          );
+          return;
+        }
+        try {
+          await next.snapshot();
+          setAdapter(next);
+        } catch (e) {
+          setError(
+            e instanceof Error ? e.message : "Connect the owner wallet.",
+          );
+        }
+      })
+      .catch((e) => setError(e.message));
+  }, []);
+  if (adapter) return <Dashboard adapter={adapter} />;
+  return (
+    <main className="loading-screen">
+      <div className="brand-mark">N</div>
+      <h1>Nnetics · NEAR testnet</h1>
+      <p>
+        Connect the configured owner wallet to read the finalized vault and
+        manage its durable invoice queue. No simulated data is shown in testnet
+        mode.
+      </p>
+      <p>
+        Deployment and transaction signing remain disabled pending specific
+        authorization. Independent verifier review and trusted pre-payment
+        bootstrap remain open.
+      </p>
+      {error && <p role="alert">{error}</p>}
+      <button
+        className="button primary"
+        disabled={!live || !live.config.configured || loading}
+        onClick={() => {
+          setLoading(true);
+          setError("");
+          void live!
+            .connect()
+            .then(() => live!.snapshot())
+            .then(() => setAdapter(live))
+            .catch((e) => setError(e.message))
+            .finally(() => setLoading(false));
+        }}
+      >
+        {loading ? "Opening owner wallet…" : "Connect Nightly (testnet)"}
+      </button>
+      <a className="button secondary" href="/?mode=demo">
+        Open explicitly simulated demo
+      </a>
+    </main>
+  );
+}
+
+function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
+  const live = adapter instanceof NearOwnerAdapter ? adapter : null;
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
   const [view, setView] = useState<View>("Overview");
   const [selected, setSelected] = useState("INV-1042");
@@ -299,7 +380,9 @@ export default function OwnerDashboard() {
         }
         setDialog(null);
       },
-      "Local simulation updated. No transaction was submitted.",
+      live
+        ? "Request submitted. Refresh finalized state to confirm owner actions; eligible invoices enter the durable worker queue."
+        : "Local simulation updated. No transaction was submitted.",
     );
   }
   const queue = (compact = false) => (
@@ -339,7 +422,13 @@ export default function OwnerDashboard() {
               <span className="queue-summary">
                 <Amount value={i.amount} />
                 <Badge
-                  status={codes.length ? "Needs review" : "Ready to simulate"}
+                  status={
+                    codes.length
+                      ? "Needs review"
+                      : live
+                        ? "Ready for worker"
+                        : "Ready to simulate"
+                  }
                 />
               </span>
               <Icon name="arrow" size={17} />
@@ -387,8 +476,21 @@ export default function OwnerDashboard() {
                   )}
                 </td>
                 <td>
-                  <span className="mono">{p.reference}</span>
-                  <small>Simulated receipt</small>
+                  {live && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(p.reference) ? (
+                    <a
+                      className="mono"
+                      href={`https://testnet.nearblocks.io/txns/${encodeURIComponent(p.reference)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View transaction
+                    </a>
+                  ) : (
+                    <span className="mono">{p.reference}</span>
+                  )}
+                  <small>
+                    {live ? "Testnet transaction" : "Simulated receipt"}
+                  </small>
                 </td>
               </tr>
             ))}
@@ -413,7 +515,7 @@ export default function OwnerDashboard() {
           }}
         >
           <span className="brand-mark">
-            P<span />
+            N<span />
           </span>
           Nnetics<span className="brand-period">.</span>
         </a>
@@ -449,16 +551,20 @@ export default function OwnerDashboard() {
           </div>
           <div className="local-indicator">
             <span />
-            Local simulation<span className="version">M2 preview</span>
+            {live ? "NEAR testnet" : "Local simulation"}
+            <span className="version">M3 integration</span>
           </div>
         </div>
       </aside>
       <div className="workspace-main">
         <div className="simulation-banner">
-          <span className="simulation-tag">SIMULATION</span>
+          <span className="simulation-tag">
+            {live ? "TESTNET" : "SIMULATION"}
+          </span>
           <span>
-            Synthetic data. No wallet connected. No tokens moved. Changes last
-            until you reload.
+            {live
+              ? "Live testnet data. Owner actions require wallet signatures; queued invoices may be paid by the authorized worker."
+              : "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload."}
           </span>
         </div>
         <header className="topbar">
@@ -470,19 +576,26 @@ export default function OwnerDashboard() {
           <div className="topbar-actions">
             <button
               className="icon-button"
-              aria-label="Refresh mock state"
+              aria-label={
+                live ? "Refresh finalized state" : "Refresh mock state"
+              }
               onClick={() =>
-                void run("refresh", async () => {}, "Mock state refreshed.")
+                void run(
+                  "refresh",
+                  async () => {},
+                  live ? "Finalized state refreshed." : "Mock state refreshed.",
+                )
               }
               disabled={busy.includes("refresh")}
             >
               <Icon name="refresh" size={18} />
             </button>
-            <span className="owner-label">owner-demo.testnet</span>
+            <span className="owner-label">{v.owner}</span>
             <span className="avatar owner">OW</span>
           </div>
         </header>
         <main className="main-content">
+          {live && <TestnetControls adapter={live} snapshot={s} run={run} />}
           <div className="page-heading">
             <div>
               <div className="eyebrow">YOUR OWNER WORKSPACE</div>
@@ -519,13 +632,17 @@ export default function OwnerDashboard() {
                   onClick={() => open("invoice")}
                 >
                   <Icon name="plus" size={16} />
-                  Add sample invoice
+                  {live ? "Enter structured invoice" : "Add sample invoice"}
                 </button>
               )}
             </div>
           </div>
           {error && !dialog && (
-            <div className="error-banner" role="alert" aria-label="Simulation error">
+            <div
+              className="error-banner"
+              role="alert"
+              aria-label={live ? "Testnet error" : "Simulation error"}
+            >
               {error}
               <button
                 onClick={() => {
@@ -572,7 +689,11 @@ export default function OwnerDashboard() {
             <>
               <section
                 className="stats"
-                aria-label="Simulated vault accounting"
+                aria-label={
+                  live
+                    ? "Finalized vault accounting"
+                    : "Simulated vault accounting"
+                }
               >
                 {[
                   [
@@ -593,7 +714,9 @@ export default function OwnerDashboard() {
                   [
                     "Funded payment ledger",
                     v.funded,
-                    "Synthetic deposits · storage excluded",
+                    live
+                      ? "Finalized payment ledger · storage excluded"
+                      : "Synthetic deposits · storage excluded",
                   ],
                 ].map(([label, value, hint], i) => (
                   <article key={label} className={"stat-card stat-" + i}>
@@ -629,8 +752,9 @@ export default function OwnerDashboard() {
                     {queue(true)}
                     <div className="panel-foot">
                       <span className="status-dot" />
-                      {ready.length} ready for a local simulation. Review cannot
-                      override a failed rule.
+                      {ready.length} ready for{" "}
+                      {live ? "the worker" : "a local simulation"}. Review
+                      cannot override a failed rule.
                     </div>
                   </section>
                   <section className="panel">
@@ -656,8 +780,7 @@ export default function OwnerDashboard() {
                     </div>
                     <span className="eyebrow">AUTHORITY, WITH LIMITS</span>
                     <h2>
-                      Clear boundaries.{" "}
-                      <br />
+                      Clear boundaries. <br />
                       Before every payment.
                     </h2>
                     <p>
@@ -717,7 +840,11 @@ export default function OwnerDashboard() {
                       <button
                         role="switch"
                         aria-checked={!v.paused}
-                        aria-label="Allow new simulated payments"
+                        aria-label={
+                          live
+                            ? "Allow new testnet payments"
+                            : "Allow new simulated payments"
+                        }
                         className={"switch " + (!v.paused ? "on" : "")}
                         disabled={busy.includes("pause")}
                         onClick={() =>
@@ -754,14 +881,21 @@ export default function OwnerDashboard() {
                           adapter.command(
                             v.agent
                               ? { method: "revoke_agent", args: {} }
-                              : { method: "authorize_agent", args: DEMO_AGENT },
+                              : {
+                                  method: "authorize_agent",
+                                  args: live
+                                    ? live.workerIdentity()
+                                    : DEMO_AGENT,
+                                },
                           ),
                         )
                       }
                     >
                       {v.agent
                         ? "Revoke worker authority"
-                        : "Authorize synthetic worker"}
+                        : live
+                          ? "Authorize configured testnet worker"
+                          : "Authorize synthetic worker"}
                     </button>
                   </section>
                 </aside>
@@ -916,7 +1050,7 @@ export default function OwnerDashboard() {
                 <div className="section-head">
                   <div>
                     <span className="eyebrow">REVIEW QUEUE</span>
-                    <h2>Sample invoices</h2>
+                    <h2>{live ? "Structured invoices" : "Sample invoices"}</h2>
                   </div>
                 </div>
                 {queue()}
@@ -933,14 +1067,22 @@ export default function OwnerDashboard() {
                     </div>
                     <Badge
                       status={
-                        reasons.length ? "Needs review" : "Ready to simulate"
+                        reasons.length
+                          ? "Needs review"
+                          : live
+                            ? "Ready for worker"
+                            : "Ready to simulate"
                       }
                     />
                   </div>
                   <div className="invoice-detail-body">
                     <div className="invoice-amount">
                       <Amount large value={invoice.amount} />
-                      <small>Requested payment · synthetic invoice</small>
+                      <small>
+                        {live
+                          ? "Requested payment · structured invoice"
+                          : "Requested payment · synthetic invoice"}
+                      </small>
                     </div>
                     <dl className="invoice-facts">
                       <div>
@@ -980,12 +1122,18 @@ export default function OwnerDashboard() {
                       ) : (
                         <p>
                           Exact recipient and amount match. Budget and order
-                          guards permit this local simulation.
+                          guards permit{" "}
+                          {live
+                            ? "worker eligibility review"
+                            : "this local simulation"}
+                          .
                         </p>
                       )}
                     </div>
                     <label className="source-label">
-                      Original sample invoice
+                      {live
+                        ? "Original invoice text"
+                        : "Original sample invoice"}
                     </label>
                     <pre className="invoice-source">
                       {invoice.text || "No source text supplied."}
@@ -1014,26 +1162,38 @@ export default function OwnerDashboard() {
                         onClick={() =>
                           void run(
                             "payment",
-                            () => adapter.simulatePayment(invoice.id, scenario),
-                            "Simulation finished. Inspect its outcome in payment history.",
+                            () =>
+                              live
+                                ? live.enqueueInvoice(invoice.id)
+                                : adapter.simulatePayment(invoice.id, scenario),
+                            live
+                              ? "Invoice queued. The worker reconciles finalized results before any new submission."
+                              : "Simulation finished. Inspect its outcome in payment history.",
                           )
                         }
                       >
                         {busy.includes("payment")
-                          ? "Simulation in flight…"
-                          : "Simulate payment"}
+                          ? live
+                            ? "Queueing…"
+                            : "Simulation in flight…"
+                          : live
+                            ? "Queue reviewed invoice"
+                            : "Simulate payment"}
                         <Icon name="arrow" size={15} />
                       </button>
                     </div>
                     <p className="footnote">
-                      Review acknowledgement grants no payment authority. No
-                      real transaction or signature is created.
+                      {live
+                        ? "Review acknowledgement grants no payment authority. Only finalized contract approvals authorize worker payments."
+                        : "Review acknowledgement grants no payment authority. No real transaction or signature is created."}
                     </p>
                   </div>
                 </section>
               ) : (
                 <section className="panel empty">
-                  Add a sample invoice to begin.
+                  {live
+                    ? "Enter a structured invoice to begin."
+                    : "Add a sample invoice to begin."}
                 </section>
               )}
             </div>
@@ -1042,7 +1202,11 @@ export default function OwnerDashboard() {
             <section className="panel">
               <div className="section-head">
                 <div>
-                  <span className="eyebrow">SIMULATED RECEIPTS</span>
+                  <span className="eyebrow">
+                    {live
+                      ? "FINALIZED CONTRACT ATTEMPTS"
+                      : "SIMULATED RECEIPTS"}
+                  </span>
                   <h2>Every attempt stays visible</h2>
                 </div>
                 <label className="filter-label">
@@ -1067,51 +1231,55 @@ export default function OwnerDashboard() {
               </div>
             </section>
           )}
-          <section
-            className="demo-tools"
-            aria-label="Local simulation controls"
-          >
-            <div>
-              <strong>Local simulation controls</strong>
-              <small>
-                Session-only synthetic data. Wallet connection, funding and
-                deployment are unavailable.
-              </small>
-            </div>
-            <label>
-              Next transfer
-              <select
-                aria-label="Next simulated transfer outcome"
-                value={scenario}
-                onChange={(e) =>
-                  setScenario(e.target.value as TransferScenario)
-                }
+          {!live && (
+            <section
+              className="demo-tools"
+              aria-label="Local simulation controls"
+            >
+              <div>
+                <strong>Local simulation controls</strong>
+                <small>
+                  Session-only synthetic data. Wallet connection, funding and
+                  deployment are unavailable.
+                </small>
+              </div>
+              <label>
+                Next transfer
+                <select
+                  aria-label="Next simulated transfer outcome"
+                  value={scenario}
+                  onChange={(e) =>
+                    setScenario(e.target.value as TransferScenario)
+                  }
+                >
+                  <option value="success">Confirmed success</option>
+                  <option value="failure">Confirmed failure</option>
+                  <option value="unknown">
+                    Unknown outcome · stays locked
+                  </option>
+                </select>
+              </label>
+              <button
+                className="text-button"
+                onClick={() => {
+                  adapter.failNextRequest();
+                  void run("refresh", async () => {});
+                }}
               >
-                <option value="success">Confirmed success</option>
-                <option value="failure">Confirmed failure</option>
-                <option value="unknown">Unknown outcome · stays locked</option>
-              </select>
-            </label>
-            <button
-              className="text-button"
-              onClick={() => {
-                adapter.failNextRequest();
-                void run("refresh", async () => {});
-              }}
-            >
-              Simulate load error
-            </button>
-            <button
-              className="text-button"
-              onClick={() => {
-                adapter.reset();
-                setSelected("INV-1042");
-                setNotice("Synthetic workspace reset.");
-              }}
-            >
-              Reset demo
-            </button>
-          </section>
+                Simulate load error
+              </button>
+              <button
+                className="text-button"
+                onClick={() => {
+                  adapter.reset();
+                  setSelected("INV-1042");
+                  setNotice("Synthetic workspace reset.");
+                }}
+              >
+                Reset demo
+              </button>
+            </section>
+          )}
           <footer>
             <span>Nnetics · Owner preview</span>
             <span>
@@ -1123,12 +1291,15 @@ export default function OwnerDashboard() {
       </div>
       {dialog && (
         <Modal
+          live={!!live}
           title={
             dialog === "vendor"
               ? "Manage a vendor"
               : dialog === "order"
                 ? "Approve a work order"
-                : "Add a sample invoice"
+                : live
+                  ? "Enter a structured invoice"
+                  : "Add a sample invoice"
           }
           error={error}
           busy={busy.includes("form")}
@@ -1217,8 +1388,9 @@ export default function OwnerDashboard() {
           {dialog === "invoice" && (
             <>
               <p>
-                Enter sample fields manually. No extractor is running.
-                Conflicting fields will be flagged for review.
+                Enter {live ? "invoice" : "sample"} fields manually. No
+                extractor is running. Conflicting fields will be flagged for
+                review.
               </p>
               <label>
                 Invoice reference
@@ -1258,12 +1430,16 @@ export default function OwnerDashboard() {
                 />
               </label>
               <label>
-                Original sample text
+                {live ? "Original invoice text" : "Original sample text"}
                 <textarea
                   name="text"
                   maxLength={8000}
                   rows={4}
-                  placeholder="Paste synthetic invoice text only."
+                  placeholder={
+                    live
+                      ? "Optional source text; it cannot change payment authority."
+                      : "Paste synthetic invoice text only."
+                  }
                 />
               </label>
             </>

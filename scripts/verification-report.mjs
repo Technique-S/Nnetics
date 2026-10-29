@@ -32,7 +32,9 @@ if (mode === 'stage') {
     active_stage: name, exit_code: finalCode, commit: run('git', 'rev-parse', 'HEAD'),
     github_run: process.env.GITHUB_RUN_ID ?? null, platform: run('uname', '-a'),
     node: process.version, rust: run('rustc', '--version'), cargo: run('cargo', '--version'),
-    sandbox_version: '2.13.0', sandbox_crate: '0.3.12', stages, hashes,
+    sandbox_version: process.env.NNETICS_SANDBOX_VERSION ?? '2.13.0',
+    expected_protocol: process.env.NNETICS_SANDBOX_VERSION === '2.14.0-rc.5' ? 88 : 86,
+    sandbox_crate: '0.3.12', stages, hashes,
     rust_unit_tests_passed: unit?.exit_code === 0, sandbox_tests_passed: sandbox?.exit_code === 0,
     milestone_1_accepted: false, note: 'Runtime checks are evidence for review, not automatic acceptance or a security audit.' };
   fs.writeFileSync(path.join(directory, 'run.json'), JSON.stringify(report, null, 2) + '\n');

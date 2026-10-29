@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+.testnet-controls { padding:20px; margin-bottom:20px; min-width:0; overflow-wrap:anywhere; }
+.testnet-controls p { margin-block:12px; }
+.testnet-controls label { display:block; margin-block:12px; }
+.testnet-controls input, .testnet-controls select { max-width:100%; padding:8px; border:1px solid #cddbd1; border-radius:6px; }
+.testnet-controls button { margin:4px; }
+.testnet-controls .mono { white-space:normal; }
+.loading-screen { max-width:720px; padding:40px 24px; margin:auto; }
+.loading-screen p { margin-block:18px; }
+.loading-screen .button { margin:8px; }
+
 :root {
   --canvas: #f5f6f2;
   --ink: #17322b;

@@ -3,8 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-  await expect(page).toHaveTitle("Nnetics · Owner simulation");
+  await page.goto("/?mode=demo");
+  await expect(page).toHaveTitle("Nnetics · Owner dashboard");
   await expect(page.locator("body")).toContainText("Nnetics");
   await expect(
     page.getByRole("heading", { name: "Your payment desk", exact: true }),

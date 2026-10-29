@@ -1,8 +1,55 @@
 # Payment core validation — 29 October 2026
 
-**The pre-rename Milestone 1 build passed the requested automated Linux checks. Overall milestone acceptance remains incomplete pending independent review of the bounded light-client consensus and resource assumptions.** No audited or production-ready verifier claim is made.
+**The renamed Milestone 1 build passed automated Linux checks on protocol 86. Live integration and protocol-88 acceptance remain incomplete.** Independent security review remains open; no audited or production-ready verifier claim is made.
 
-## Nnetics rename — verification boundary
+## Live integration continuation — current local result
+
+Inspected renamed source and retrieved [Linux run 40901797197](https://github.com/Technique-S/Nnetics/actions/runs/40901797197),
+commit `7d194e49c53c80884097a49ac113a1a509c4d654`, completed at 15:36:26 UTC:
+41 root TypeScript, 36 Rust unit and 15 sandbox tests passed, with no skipped/ignored
+tests. Production/four fault WASMs, Clippy and formatting passed. The downloaded
+production artifact is 420,841 bytes, SHA-256
+`1dd4f6971b13303661b29c6757a353c873368848490bdce2cd86a9cc360459f8`;
+it is retained as `artifacts/vault.wasm`. This supersedes older artifact hashes for
+deployment preparation; it is not a deployment authorization. Windows and Linux
+build hashes differ, so cross-platform bit-for-bit reproducibility is not claimed.
+
+Executed locally for the integration: **41 root tests, 26 application Node tests,
+strict TypeScript (including setup scripts), production dashboard build and 12
+desktop/mobile browser executions**, all passed. Application tests exercise actual
+SQLite persistence, duplicate/order constraints, exclusive worker locking,
+lost acknowledgements, identical-byte unknown recovery, prepare-gap interruption,
+callback-unknown/final statuses, transaction linkage and NEP-413 expiry/replay/key
+ownership rejection. A marker vector comes from actual renamed Rust sandbox
+output. Controlled transports/browser HTTP fixtures are used; these are not
+public-network acceptance tests or an independent audit.
+
+Read-only RPC preflight reported **testnet protocol 88**; the deprecated NEAR endpoint
+also returned a deprecation/429 error, and the app default was switched to the
+documented FASTNEAR testnet endpoint. The locally written contract CI matrix adds
+nearcore `2.14.0-rc.5` / protocol 88 alongside the preserved `2.13.0` / protocol 86
+baseline. Both runtime paths now assert the reported protocol. **The changed matrix
+and new owner CI workflow have not executed**. No claim of candidate Rust runtime
+execution is made; local format checks pass. Production Rust sources are unchanged.
+
+Browser failures during development: a demo-title hydration mismatch and an overly
+exact error-text locator. A stable title/named error assertion fixed these; all 12
+subsequent executions passed with a clean runner exit using a separately managed
+local server. Earlier runner-cleanup limitations remain historical below.
+
+Unmet acceptance: confirmed owner testnet identity, protocol-88 source/runtime review,
+reviewed pre-payment checkpoint, independent verifier review, real wallet challenge
+and owner transactions, recipient balance delta/transaction-link proof, real restart
+journey, and transaction authorization. Local configuration based on a withdrawn
+account hint was cleared; no account was created. Dedicated generated role keys
+are outside Git and unused. Dependency audit reports 10 low-severity transitive
+elliptic/secp256k1 advisories; no unsupported forced downgrade was applied.
+
+See [LIVE_INTEGRATION.md](LIVE_INTEGRATION.md). No public-network transaction was
+signed or sent. AI extraction remains deliberately unimplemented until the manual
+invoice workflow passes acceptance. No current integration changes have been pushed.
+
+## Historical local rename result — superseded by Linux run above
 
 The product rename updates package identifiers, verification environment variables,
 the `NNETICS_TRANSFER_V1` receipt marker and the `nnetics:repair:v1:` storage-key
@@ -10,7 +57,8 @@ namespace. Use a fresh vault for this build: upgrading an existing vault would
 require an explicitly reviewed migration, and earlier markers cannot be used as
 repair evidence by this build. No public deployment exists. The Linux results and
 WASM checksums below describe the earlier source commits, not the renamed build.
-Rust unit and sandbox execution for the renamed build remains pending Linux CI.
+Rust unit and sandbox execution was pending at this local rename stage; the later
+Linux run recorded above executed both successfully on protocol 86.
 
 Executed locally after the rename: 41 reference-policy tests and 11 owner-adapter
 tests passed; all eight desktop/mobile browser scenarios passed with explicit

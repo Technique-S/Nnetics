@@ -1,5 +1,10 @@
 # Milestone 2: local owner dashboard
 
+This document records the **historical Milestone 2 simulation baseline**. Current
+Milestone 3 integration, wallet/queue behavior and remaining limitations are in
+[LIVE_INTEGRATION.md](LIVE_INTEGRATION.md). The root URL now selects testnet mode;
+use `/?mode=demo` to reproduce the explicitly simulated dashboard described here.
+
 This is a local frontend milestone, backed exclusively by a typed, in-memory mock
 adapter. It is not the completed wallet/chain integration. All people, accounts,
 invoices, deposits and payment attempts are synthetic. Reloading the browser starts
@@ -105,7 +110,7 @@ Windows tests use installed Edge. On other supported hosts, install Playwright's
 Chromium test browser first. Browser test output lives under ignored test-results/;
 traces are retained on failure. Source formatting used Prettier 3.6.2.
 
-## Still incomplete
+## Incomplete at the Milestone 2 baseline
 
 Wallet connection, real owner authorization, chain reads/writes, authoritative chain
 clock, persistent invoice/audit storage, indexing/reconciliation cursors and a live
