@@ -1,0 +1,11 @@
+{
+  "name": "payscope",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test tests/*.test.ts",
+    "demo": "node src/demo.ts"
+  }
+}
