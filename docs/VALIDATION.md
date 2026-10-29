@@ -23,9 +23,19 @@ workload and passing tests do not replace independent security review.
 The follow-up parser guard rejects non-null future Spice commitments, and a shared
 signing gate accepts only tested protocols 86/88. Locally executed: 42 root tests,
 26 application tests, strict TypeScript, production build and 12 desktop/mobile
-browser executions passed. This follow-up is separate from the executed `80d253d`
-source; its subsequent CI must be recorded separately. Transaction flags remain
-disabled; no public-network signing occurred.
+browser executions passed. The follow-up is commit
+`30bafa3c4432bc27fa10418b8b73446dbb45c65b`. Its completed Linux execution:
+
+| Run | Executed result |
+| --- | --- |
+| [Contract matrix 40949948285](https://github.com/Technique-S/Nnetics/actions/runs/40949948285) | Protocols 86 and 88 both passed: 42 root tests, 36 Rust unit tests, 15 sandbox tests per runtime, five WASM builds, Clippy and formatting. Jobs completed 20:41:20 UTC / 20:40:14 UTC. |
+| [Owner 40949948396](https://github.com/Technique-S/Nnetics/actions/runs/40949948396) | 26 application tests, strict TypeScript, production build and 12 Chromium browser executions passed. |
+
+No tests are skipped in these suites. Logs/manifests/proofs are retained under
+ignored `artifacts/github/40949948285/`; owner log is
+`artifacts/owner-linux-40949948396.log`. Transaction flags remain disabled; no
+public-network signing occurred. Passing controlled tests does not complete the
+real testnet workflow or independent security review.
 
 ## Integration baseline and local evidence
 
@@ -216,7 +226,7 @@ Vault, WorkOrder, Payment, status variants and collection prefixes retain their 
 
 No additional environment access is needed. The user supplied [Technique-S/Nnetics](https://github.com/Technique-S/Nnetics), explicitly authorized pushing, and completed GitHub authentication. Branch pushes, Ubuntu execution and artifact retrieval succeeded. No public-network transaction was signed or deployment performed.
 
-Independent review remains necessary for the trusted bootstrap, consensus encoding/protocol assumptions and resource guarantees. The initial run exercised a small real validator set; the latest bounded-review run above additionally benchmarked synthetic 128-validator/256-approval/64-sibling/128,000-byte inputs in the VM. That finite workload is not a formal worst-case guarantee for every JSON shape or future gas schedule. The verifier supports Ed25519/protocol-86 encodings and requires timely authenticated synchronization under normal PoS/light-client assumptions, including weak subjectivity. Unsupported evidence fails closed and can leave an attempt blocked.
+Independent review remains necessary for the trusted bootstrap, consensus encoding/protocol assumptions and resource guarantees. The initial run exercised a small real validator set; the latest bounded-review runs additionally benchmarked synthetic 128-validator/256-approval/64-sibling/128,000-byte inputs in the VM. That finite workload is not a formal worst-case guarantee for every JSON shape or future gas schedule. The verifier supports bounded Ed25519/legacy header encodings, tested on protocols 86 and 88, and requires timely authenticated synchronization under normal PoS/light-client assumptions, including weak subjectivity. Unsupported evidence fails closed and can leave an attempt blocked.
 
 Old attempts lacking an initiation marker or pre-payment checkpoint remain blocked; the owner cannot install a post-incident trust root or use a migration escape hatch. Resolving such legacy history requires a separately reviewed design. Public-network provisioning, transactions and deployment still require separate approval.
 

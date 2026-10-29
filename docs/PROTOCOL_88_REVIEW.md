@@ -72,11 +72,16 @@ JSON shape is a worst case. Production WASM SHA-256 remains
 The follow-up shares an explicit tested-version allowlist (86 and 88) between
 wallet, worker and setup executor. Unknown versions fail before signing/broadcast;
 transaction authorization and checkpoint gates remain separate. The parser guard
-and allowlist follow-up passed 42 root tests, 26 application tests and strict
-TypeScript locally; its CI results must be tied to its own commit.
+and allowlist follow-up is commit `30bafa3c4432bc27fa10418b8b73446dbb45c65b`.
+[Its Linux matrix](https://github.com/Technique-S/Nnetics/actions/runs/40949948285)
+passed on protocols 86 and 88: 42 root tests, 36 Rust unit and 15 sandbox tests per
+runtime, five WASM builds, Clippy and formatting.
+[Its owner CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948396)
+passed 26 application tests, strict TypeScript, production build and 12 Chromium
+browser executions. Both result bundles are retained locally.
 
 Independent security review, trusted bootstrap/network selection, weak subjectivity,
 timely head synchronization, upgrade credentials, future header/validator formats and
 unmeasured workloads remain outside this comparison. Public signing/deployment gates
-remain in force. The normalizer hardening is a separate follow-up to the first push;
-its execution results must be recorded against its own source commit.
+remain in force. The normalizer hardening is a separately verified follow-up to the
+first push; no production Rust or contract interface changes were made.

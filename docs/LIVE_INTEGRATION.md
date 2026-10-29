@@ -201,10 +201,10 @@ inferred from permission to edit/push code.
 
 ## Executed evidence and remaining acceptance
 
-[Contract Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40947353192)
-on integration commit `80d253d` passed 41 root TypeScript, 36 Rust unit and 15 sandbox
+[Contract Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948285)
+on integration commit `30bafa3` passed 42 root TypeScript, 36 Rust unit and 15 sandbox
 tests per runtime on protocols 86 and 88, plus five WASM builds, Clippy and formatting.
-[Owner Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40947353242)
+[Owner Linux CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948396)
 passed 26 Node application tests, strict TypeScript (including scripts), a production
 build and 12 Chromium desktop/mobile browser executions. Browser live-mode tests
 use controlled HTTP fixtures; worker tests use SQLite plus a controlled transport.
