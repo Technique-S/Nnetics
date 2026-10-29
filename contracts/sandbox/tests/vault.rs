@@ -49,7 +49,9 @@ impl Desk {
                 AccessKey::function_call_access(
                     vault.id(),
                     &["execute_payment"],
-                    Some(NearToken::from_near(1)),
+                    // The pinned sandbox charges >1 NEAR in its maximum upfront
+                    // gas-cost check. Keep a finite allowance large enough for the suite.
+                    Some(NearToken::from_near(100)),
                 ),
             )
             .transact()
