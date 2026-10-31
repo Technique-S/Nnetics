@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { liveConfig } from "../../../../server/config";
+import { Provisioning } from "../../../../server/provisioning";
 import { service } from "../../../../server/service";
-import { boundedId, structuredInvoice } from "../../../../server/queue";
-import { review } from "../../../../data/owner-adapter";
+import {
+  identityService,
+  identityConfig,
+  type Workspace,
+} from "../../../../server/identity";
+import {
+  organizationSnapshot,
+  organizationMutation,
+} from "../../../../server/organization-api";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -12,21 +21,85 @@ const json = (body: unknown, status = 200) =>
 export async function GET(req: NextRequest, context: Context) {
   try {
     const path = (await context.params).path.join("/");
-    const c = liveConfig();
-    if (path === "config")
+    const identity = identityService();
+    if (path === "config") {
+      let c;
+      try {
+        c = liveConfig();
+      } catch {
+        /* Vault configuration is not wallet identity. */
+      }
       return json({
-        network: "testnet",
-        contract: c.contract,
-        owner: c.owner,
-        worker: c.worker,
-        publicKey: c.publicKey,
-        configured: c.configured,
+        network: identity.config.network,
+        walletLoginEnabled: true,
+        contract: c?.contract || "",
+        organization: c?.organization || "",
+        worker: c?.worker || "",
+        publicKey: c?.publicKey || "",
+        configured: c?.configured || false,
+        missingConfiguration: c?.missingConfiguration || [],
         transactionsEnabled:
           process.env.NNETICS_TRANSACTIONS_AUTHORIZED === "testnet-reviewed",
       });
+    }
+    const token = req.cookies.get("nnetics_identity")?.value || "";
+    if (path === "provisioning")
+      return json(
+        await new Provisioning(identity).status(
+          token,
+          req.nextUrl.searchParams.get("organization") || "",
+        ),
+      );
+    if (path === "identity") {
+      const who = await identity.authenticate(token);
+      const organizations: Workspace[] = identity.organizations(who);
+      let notice = "";
+      try {
+        const c = liveConfig();
+        if (c.configured) {
+          try {
+            const { access } = await service().auth.authorize(token);
+            organizations.unshift({
+              id: c.organization,
+              name: c.organization,
+              status: "ready",
+              role: access.role,
+            });
+          } catch (e) {
+            const message = e instanceof Error ? e.message : "";
+            if (!message.startsWith("Organization access denied"))
+              notice =
+                "Wallet login succeeded, but the configured vault workspace could not be verified. Retry workspace discovery; no vault records were loaded.";
+          }
+        }
+      } catch {
+        notice =
+          "Wallet login succeeded. Vault configuration needs developer review before a vault workspace can be used.";
+      }
+      await identity.authenticate(token);
+      return json({
+        accountId: who.account_id,
+        network: "testnet",
+        organizations,
+        notice,
+      });
+    }
+    if (path === "organization") {
+      const who = await identity.authenticate(token);
+      return json(
+        identity.organization(
+          who,
+          req.nextUrl.searchParams.get("organization") || "",
+        ),
+      );
+    }
+    const c = liveConfig();
+    const requested = req.nextUrl.searchParams.get("organization");
+    if (requested && requested !== c.organization)
+      throw new Error("Organization access denied.");
     const s = service();
-    s.auth.verify(req.cookies.get("nnetics_session")?.value || "");
-    if (path === "snapshot") return json(await s.chain.snapshot(s.queue));
+    await identity.authenticate(token);
+    if (path === "snapshot") return json(await organizationSnapshot(s, token));
     throw new Error("Unknown endpoint.");
   } catch (e) {
     return json(
@@ -37,12 +110,14 @@ export async function GET(req: NextRequest, context: Context) {
 }
 export async function POST(req: NextRequest, context: Context) {
   try {
-    const c = liveConfig();
+    const c = identityConfig();
     if (
       req.headers.get("origin") !== c.origin ||
       !req.headers.get("content-type")?.startsWith("application/json")
     )
-      throw new Error("Same-origin JSON required.");
+      throw new Error(
+        `Open Nnetics at ${c.origin}; wallet verification requires JSON requests from that exact application origin.`,
+      );
     const reader = req.body?.getReader(),
       chunks: Uint8Array[] = [];
     let size = 0;
@@ -60,59 +135,79 @@ export async function POST(req: NextRequest, context: Context) {
     const raw = Buffer.concat(chunks).toString("utf8");
     const body = JSON.parse(raw),
       path = (await context.params).path.join("/");
-    const s = service();
-    if (path === "challenge") return json(s.auth.challenge());
+    const identities = identityService();
+    const browser = identities.browser(
+      req.cookies.get("nnetics_browser")?.value || "",
+    ).cookie;
+    const cookies = {
+      httpOnly: true,
+      sameSite: "strict" as const,
+      secure: c.origin.startsWith("https:"),
+      path: "/api/live",
+    };
+    if (path === "challenge") {
+      const response = json(identities.challenge(body.accountId, browser));
+      response.cookies.set("nnetics_browser", browser, {
+        ...cookies,
+        maxAge: 2592000,
+      });
+      response.cookies.set("nnetics_identity", "", { ...cookies, maxAge: 0 });
+      response.cookies.set("nnetics_session", "", { ...cookies, maxAge: 0 });
+      return response;
+    }
     if (path === "login") {
-      const token = await s.auth.login(body);
+      const token = await identities.login(body, browser);
       const response = json({ ok: true });
-      response.cookies.set("nnetics_session", token, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: c.origin.startsWith("https:"),
-        path: "/api/live",
+      response.cookies.set("nnetics_identity", token, {
+        ...cookies,
         maxAge: 900,
       });
       return response;
     }
-    const token = req.cookies.get("nnetics_session")?.value || "";
+    const token = req.cookies.get("nnetics_identity")?.value || "";
+    if (
+      [
+        "provisioning/prepare",
+        "provisioning/dispatch",
+        "provisioning/reconcile",
+        "provisioning/retry",
+      ].includes(path)
+    ) {
+      if (typeof body.organization !== "string")
+        throw Error("Select your organization.");
+      const provisioning = new Provisioning(identities);
+      if (path.endsWith("prepare"))
+        return json(await provisioning.prepare(token, body.organization));
+      if (path.endsWith("dispatch"))
+        return json(
+          await provisioning.dispatch(
+            token,
+            body.organization,
+            String(body.digest || ""),
+          ),
+        );
+      if (path.endsWith("retry"))
+        return json(
+          await provisioning.retry(
+            token,
+            body.organization,
+            String(body.digest || ""),
+          ),
+        );
+      return json(await provisioning.reconcile(token, body.organization));
+    }
     if (path === "logout") {
-      s.auth.logout(token);
+      identities.logout(browser);
       const r = json({ ok: true });
-      r.cookies.set("nnetics_session", "", { path: "/api/live", maxAge: 0 });
+      r.cookies.set("nnetics_identity", "", { ...cookies, maxAge: 0 });
+      r.cookies.set("nnetics_session", "", { ...cookies, maxAge: 0 });
       return r;
     }
-    s.auth.verify(token);
-    if (path === "registry") {
-      if (!["vendor", "order"].includes(body.kind))
-        throw new Error("Invalid registry kind.");
-      s.queue.register(body.kind, boundedId(body.id));
-      return json({ ok: true });
-    }
-    if (path === "invoices") {
-      const invoice = structuredInvoice(body);
-      s.queue.register("order", invoice.order_id);
-      const snapshot = await s.chain.snapshot(s.queue);
-      s.queue.add(invoice, review(snapshot, { ...invoice, reviewed: false }));
-      return json({ ok: true });
-    }
-    if (path === "enqueue") {
-      const job = s.queue.get(boundedId(body.id));
-      if (!job || job.state !== "review")
-        throw new Error("Only an unsubmitted review item may be queued.");
-      const reasons = review(await s.chain.snapshot(s.queue), job.invoice);
-      if (reasons.length) throw new Error(reasons.join(", "));
-      s.queue.update(job.id, "queued");
-      return json({ ok: true });
-    }
-    if (path === "review") {
-      const job = s.queue.get(boundedId(body.id));
-      if (!job) throw new Error("Invoice not found.");
-      s.queue.db
-        .prepare("UPDATE invoices SET payload=? WHERE id=?")
-        .run(JSON.stringify({ ...job.invoice, reviewed: true }), job.id);
-      return json({ ok: true });
-    }
-    throw new Error("Unknown endpoint.");
+    if (path === "organizations")
+      return json(await identities.createOrganization(token, body.name));
+    await identities.authenticate(token);
+    const s = service();
+    return json(await organizationMutation(s, token, path, body));
   } catch (e) {
     return json(
       { error: e instanceof Error ? e.message : "Request failed" },

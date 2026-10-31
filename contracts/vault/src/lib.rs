@@ -129,6 +129,44 @@ impl Vault {
             env::signer_account_id() == env::current_account_id(),
             "INIT_DIRECT_ONLY"
         );
+        Self::initial_state(owner, budget, payment_cap)
+    }
+
+    // Factory bootstrap only: the runtime-created child, original wallet signer,
+    // and deterministic request must all agree. Existing initialization stays intact.
+    #[init]
+    pub fn new_from_factory(
+        owner: AccountId,
+        request_id: String,
+        budget: U128,
+        payment_cap: U128,
+    ) -> Self {
+        require!(
+            request_id.len() == 32
+                && request_id
+                    .bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+            "INVALID_PROVISIONING_REQUEST"
+        );
+        require!(env::signer_account_id() == owner, "INIT_OWNER_SIGNER_ONLY");
+        let hash = env::sha256(format!("{}:{}", owner, request_id).as_bytes());
+        let label = hash[..20]
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect::<String>();
+        let expected = format!("v-{}.{}", label, env::predecessor_account_id());
+        require!(
+            env::current_account_id().as_str() == expected,
+            "INIT_PARENT_REQUEST_ONLY"
+        );
+        require!(
+            owner != env::predecessor_account_id(),
+            "SEPARATE_FACTORY_REQUIRED"
+        );
+        Self::initial_state(owner, budget, payment_cap)
+    }
+
+    fn initial_state(owner: AccountId, budget: U128, payment_cap: U128) -> Self {
         require!(
             owner != env::current_account_id(),
             "SEPARATE_OWNER_REQUIRED"

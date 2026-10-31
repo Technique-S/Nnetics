@@ -21,6 +21,7 @@ const queue = new Queue(
   config.database,
   `testnet:${config.contract}:${config.codeHash}`,
 );
+queue.bindOrganization(config.organization);
 const unlock = workerLock(config.database);
 for (const id of config.vendorIds) queue.register("vendor", id);
 for (const id of config.orderIds) queue.register("order", id);

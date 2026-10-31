@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { MockOwnerAdapter, DEMO_AGENT } from "../data/mock-adapter";
+import { DEMO_AGENT } from "../data/mock-adapter";
 import { NearOwnerAdapter, api } from "../data/near-adapter";
-import type { PublicConfig } from "../data/near-adapter";
+import { Onboarding } from "./onboarding";
 import { TestnetControls } from "./testnet-controls";
+
 import {
   account,
   amountFromNear,
@@ -176,72 +177,10 @@ function Modal({
 }
 
 export default function OwnerDashboard() {
-  const [adapter, setAdapter] = useState<OwnerAdapter | null>(null);
-  const [live, setLive] = useState<NearOwnerAdapter | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (new URLSearchParams(location.search).get("mode") === "demo") {
-      setAdapter(new MockOwnerAdapter());
-      return;
-    }
-    void api<PublicConfig>("config")
-      .then(async (config) => {
-        const next = new NearOwnerAdapter(config);
-        setLive(next);
-        if (!config.configured) {
-          setError(
-            "Testnet accounts and reviewed deployment are not configured yet. Demo mode is available below.",
-          );
-          return;
-        }
-        try {
-          await next.snapshot();
-          setAdapter(next);
-        } catch (e) {
-          setError(
-            e instanceof Error ? e.message : "Connect the owner wallet.",
-          );
-        }
-      })
-      .catch((e) => setError(e.message));
-  }, []);
-  if (adapter) return <Dashboard adapter={adapter} />;
   return (
-    <main className="loading-screen">
-      <div className="brand-mark">N</div>
-      <h1>Nnetics · NEAR testnet</h1>
-      <p>
-        Connect the configured owner wallet to read the finalized vault and
-        manage its durable invoice queue. No simulated data is shown in testnet
-        mode.
-      </p>
-      <p>
-        Deployment and transaction signing remain disabled pending specific
-        authorization. Independent verifier review and trusted pre-payment
-        bootstrap remain open.
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button
-        className="button primary"
-        disabled={!live || !live.config.configured || loading}
-        onClick={() => {
-          setLoading(true);
-          setError("");
-          void live!
-            .connect()
-            .then(() => live!.snapshot())
-            .then(() => setAdapter(live))
-            .catch((e) => setError(e.message))
-            .finally(() => setLoading(false));
-        }}
-      >
-        {loading ? "Opening owner wallet…" : "Connect Nightly (testnet)"}
-      </button>
-      <a className="button secondary" href="/?mode=demo">
-        Open explicitly simulated demo
-      </a>
-    </main>
+    <Onboarding
+      renderDashboard={(adapter) => <Dashboard adapter={adapter} />}
+    />
   );
 }
 
@@ -249,7 +188,9 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
   const live = adapter instanceof NearOwnerAdapter ? adapter : null;
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
   const [view, setView] = useState<View>("Overview");
-  const [selected, setSelected] = useState("INV-1042");
+  const [selected, setSelected] = useState(
+    adapter.mode === "simulation" ? "INV-1042" : "",
+  );
   const [dialog, setDialog] = useState<DialogName>(null);
   const [busy, setBusy] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -306,7 +247,11 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
       <main className="loading-page">
         <div className="brand-mark">P</div>
         <h1>Opening your local payment desk</h1>
-        <p>Loading clearly labeled synthetic data…</p>
+        <p>
+          {adapter.mode === "simulation"
+            ? "Loading clearly labeled synthetic data…"
+            : "Loading verified NEAR testnet records…"}
+        </p>
         {error && (
           <>
             <p role="alert">{error}</p>
@@ -319,6 +264,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
     );
   const s = snapshot,
     v = s.vault;
+  const readOnly = !!live && s.access?.role !== "owner";
   const invoice = s.invoices.find((i) => i.id === selected) ?? s.invoices[0];
   const reasons = invoice ? review(s, invoice) : [];
   const ready = s.invoices.filter((i) => review(s, i).length === 0);
@@ -520,9 +466,13 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
           Nnetics<span className="brand-period">.</span>
         </a>
         <div className="workspace">
-          <span className="workspace-icon">CS</span>
+          <span className="workspace-icon">{live ? "N" : "CS"}</span>
           <div>
-            <strong>Content studio</strong>
+            <strong>
+              {live
+                ? s.access?.organization || "Verified workspace"
+                : "Content studio"}
+            </strong>
             <small>Owner workspace</small>
           </div>
           <span className="workspace-dot" />
@@ -590,7 +540,9 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
             >
               <Icon name="refresh" size={18} />
             </button>
-            <span className="owner-label">{v.owner}</span>
+            <span className="owner-label">
+              {live ? s.access?.accountId : v.owner}
+            </span>
             <span className="avatar owner">OW</span>
           </div>
         </header>
@@ -614,6 +566,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 <button
                   className="button primary"
                   onClick={() => open("vendor")}
+                  disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   Manage vendor
@@ -622,6 +575,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 <button
                   className="button primary"
                   onClick={() => open("order")}
+                  disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   New work order
@@ -630,6 +584,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 <button
                   className="button primary"
                   onClick={() => open("invoice")}
+                  disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   {live ? "Enter structured invoice" : "Add sample invoice"}
@@ -846,7 +801,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                             : "Allow new simulated payments"
                         }
                         className={"switch " + (!v.paused ? "on" : "")}
-                        disabled={busy.includes("pause")}
+                        disabled={readOnly || busy.includes("pause")}
                         onClick={() =>
                           void run("pause", () =>
                             adapter.command({
@@ -875,7 +830,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     </p>
                     <button
                       className="button secondary full"
-                      disabled={busy.includes("agent")}
+                      disabled={readOnly || busy.includes("agent")}
                       onClick={() =>
                         void run("agent", () =>
                           adapter.command(
@@ -945,7 +900,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     </div>
                     <button
                       className="button secondary full"
-                      disabled={busy.includes(vendor.id)}
+                      disabled={readOnly || busy.includes(vendor.id)}
                       onClick={() =>
                         void run(vendor.id, () =>
                           adapter.command(
@@ -1019,7 +974,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                           {o.enabled && o.status !== "Paid" ? (
                             <button
                               className="text-button danger"
-                              disabled={busy.includes(o.id)}
+                              disabled={readOnly || busy.includes(o.id)}
                               onClick={() =>
                                 void run(o.id, () =>
                                   adapter.command({
@@ -1141,7 +1096,11 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     <div className="invoice-actions">
                       <button
                         className="button secondary"
-                        disabled={busy.includes("review") || invoice.reviewed}
+                        disabled={
+                          readOnly ||
+                          busy.includes("review") ||
+                          invoice.reviewed
+                        }
                         onClick={() =>
                           void run(
                             "review",
@@ -1157,7 +1116,9 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                       <button
                         className="button primary"
                         disabled={
-                          reasons.length > 0 || busy.includes("payment")
+                          readOnly ||
+                          reasons.length > 0 ||
+                          busy.includes("payment")
                         }
                         onClick={() =>
                           void run(

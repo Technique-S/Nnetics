@@ -2,19 +2,39 @@
 
 An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
 
-## Current status: local live-integration candidate, 29 October 2026
+## Current status: fresh-user onboarding under review, 31 October 2026
+
+Real Meteor login, empty onboarding, organization persistence and private access
+denial in both directions passed with `babygoat.testnet` and `grandtheft.testnet`.
+Local self-service provisioning source includes **Create vault**, durable progress,
+a guarded factory initializer and a locked factory. These new contracts are **not
+deployed or Linux-verified yet**; deployment signing and new-workspace payment
+controls stay disabled. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md).
+Existing deployed vaults are not upgraded. Older deployment/CI results below are
+historical and do not validate this new source. No new push is authorized.
 
 Implemented in source: the Rust native-NEAR vault, account/key authorization, immutable work orders, invoice/order guards, spending reservations, asynchronous settlement and evidence-based reconciliation. Added a bounded historical receipt-proof repair path with a frozen pre-payment trust anchor. SDK unit tests, a local sandbox suite and a Linux CI workflow retain execution logs/proofs. The TypeScript reference policy, synthetic fixtures and MVP specification remain available.
 
 Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](docs/VALIDATION.md). Read [docs/PAYMENT_CORE.md](docs/PAYMENT_CORE.md) for APIs, version decisions, sandbox reproduction and callback repair limits. Passing the TypeScript tests alone does not establish contract security or chain integration.
 
-[Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review; no public-network deployment has occurred.
+[Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review. An explicitly approved paused testnet deployment has now finalized; this does not establish security or payment acceptance.
 
 Milestone 3 integration is pushed on `codex/nnetics-live-integration`: a testnet wallet adapter, finalized contract reads, owner actions, structured invoice intake, a durable SQLite queue and a restricted-key payment worker. Demo mode remains explicitly simulated. The [live integration guide](docs/LIVE_INTEGRATION.md) describes setup, restart behavior, transaction approval and remaining gates. It is not accepted as a real testnet workflow.
 
-Linux [contract CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948285) for `30bafa3` passed on protocols 86 and 88 (42 root tests, 36 Rust unit and 15 sandbox tests per runtime); [owner CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948396) passed 26 Node tests, strict TypeScript, the dashboard build and 12 browser executions. The [bounded compatibility comparison](docs/PROTOCOL_88_REVIEW.md) is not independent security approval. Real wallet/payment acceptance, account activation, reviewed bootstrap and specific transaction authorization remain open. AI extraction, legacy migration and public deployment remain absent. No public-network signing or token transfers have been performed.
+Linux [contract CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948285) for `30bafa3` passed on protocols 86 and 88 (42 root tests, 36 Rust unit and 15 sandbox tests per runtime); [owner CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948396) passed 26 Node tests, strict TypeScript, the dashboard build and 12 browser executions. The [bounded compatibility comparison](docs/PROTOCOL_88_REVIEW.md) is not independent security approval. The user approved four testnet setup transactions, all FINAL: three subaccounts and pinned vault deployment. CLI signatures verified the selected owner key; browser message login and real payment acceptance remain open. The vault is paused, no agent, zero payout funds. This setup approval is consumed and conveys no payment authorization. AI extraction, legacy migration and production deployment remain absent. See [current setup evidence](docs/BABYGOAT_TESTNET_PLAN.md); [earlier faucet history](docs/NEW_OWNER_ACCOUNT_PLAN.md) is preserved separately.
 
 ## Try the local owner dashboard
+
+Verified wallets can create private organizations without a configured vault.
+Vault provisioning is implemented locally but awaits Linux contract verification,
+factory deployment/review and explicit transaction approval.
+The selected testnet owner is now the user's CLI-created `babygoat.testnet`;
+its paused testnet vault is deployed and local configuration active. CLI setup
+control and real Meteor message login are verified; live provisioning is pending.
+See the [executed setup record](docs/BABYGOAT_TESTNET_PLAN.md).
+The [owner acceptance record](docs/OWNER_ONBOARDING_ACCEPTANCE.md) distinguishes
+local checks from blocked real-wallet verification and records the wallet/setup
+gaps. The contractor portal remains gated on owner acceptance.
 
 ```sh
 cd apps/owner
@@ -22,7 +42,7 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:3100 for testnet mode; it requires configuration and owner-wallet authentication. Open http://127.0.0.1:3100/?mode=demo for synthetic session-only data. Deployment remains disabled. Current local checks: production build, strict TypeScript, 26 application tests and 12 desktop/mobile browser executions passed. Browser/worker tests use controlled fixtures and do not establish real testnet acceptance. See [LIVE_INTEGRATION.md](docs/LIVE_INTEGRATION.md) before configuring accounts or enabling signing.
+Open http://127.0.0.1:3100 for testnet wallet login and empty onboarding; an existing organization or vault is not required to authenticate. Deployed-workspace access comes from current on-chain vault ownership or an explicit viewer grant; connecting a wallet grants neither. See [ORGANIZATION_ACCESS.md](docs/ORGANIZATION_ACCESS.md). Open http://127.0.0.1:3100/?mode=demo for synthetic session-only data. Deployment remains disabled. Browser fixtures do not establish real deployment or payment acceptance. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md) before configuring a factory or enabling signing.
 
 ## Try the foundation
 

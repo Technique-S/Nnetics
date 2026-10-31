@@ -92,6 +92,12 @@ export interface Vault {
   last_attempt: UInt;
 }
 export interface OwnerSnapshot {
+  access?: {
+    organization: string;
+    accountId: string;
+    role: "owner" | "viewer";
+    vaultOwner: string;
+  };
   mode: "simulation" | "testnet";
   blockHash?: string;
   protocolVersion?: number;

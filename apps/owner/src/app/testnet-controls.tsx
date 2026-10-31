@@ -23,6 +23,8 @@ export function TestnetControls({
   const [attempt, setAttempt] = useState("");
   const [importId, setImportId] = useState(""),
     [kind, setKind] = useState<"vendor" | "order">("order");
+  const [viewer, setViewer] = useState("");
+  const readOnly = snapshot.access?.role !== "owner";
   return (
     <section
       className="panel testnet-controls"
@@ -30,104 +32,162 @@ export function TestnetControls({
     >
       <h3>Testnet wallet & funding</h3>
       <p>
-        Owner {snapshot.vault.owner} · vault {adapter.config.contract}. Each
-        action opens your wallet. Funds for storage and payments have separate
-        ledgers.
+        Organization {snapshot.access?.organization} · signed in as{" "}
+        {snapshot.access?.accountId} ·{" "}
+        {snapshot.access?.role === "owner"
+          ? "On-chain vault owner"
+          : "Read-only viewer"}
       </p>
-      <p className="mono">Finalized block: {snapshot.blockHash}</p>
-      <p>
-        Deployment requires separate authorization. Historical verifier
-        independent review, bootstrap trust, weak subjectivity and upgrade-key
-        custody remain unresolved. Unknown outcomes stay reserved.
-      </p>
-      <label>
-        Action{" "}
-        <select
-          value={target}
-          onChange={(e) => setTarget(e.target.value as typeof target)}
-        >
-          <option value="deposit">Fund payment ledger</option>
-          <option value="fund_storage">Fund storage/operating reserve</option>
-          <option value="set_budget">Set total budget</option>
-          <option value="set_payment_cap">Set payment cap</option>
-        </select>
-      </label>
-      <label>
-        Amount (NEAR){" "}
-        <input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          inputMode="decimal"
-        />
-      </label>
-      <button
-        className="button secondary"
-        onClick={() =>
-          void run(
-            "fund",
-            () =>
-              target === "deposit" || target === "fund_storage"
-                ? adapter.fund(target, amountFromNear(amount))
-                : adapter.limits(target, amountFromNear(amount)),
-            "Wallet request submitted; refresh finalized state to confirm.",
-          )
-        }
-      >
-        Review owner transaction in wallet
-      </button>
-      <label>
-        Recorded attempt ID{" "}
-        <input
-          value={attempt}
-          onChange={(e) => setAttempt(e.target.value)}
-          inputMode="numeric"
-        />
-      </label>
-      <button
-        className="button secondary"
-        onClick={() => void run("reconcile", () => adapter.reconcile(attempt))}
-      >
-        Reconcile recorded outcome
-      </button>
       <button
         className="text-button"
         onClick={() => void run("disconnect", () => adapter.disconnect())}
       >
-        Disconnect owner wallet
+        Disconnect wallet
       </button>
-      <p>
-        The frozen contract has no vendor/order enumeration. Import existing
-        references to discover them; all displayed authority is re-read from the
-        contract.
-      </p>
-      <label>
-        Reference type{" "}
-        <select
-          value={kind}
-          onChange={(e) => setKind(e.target.value as typeof kind)}
-        >
-          <option value="order">Work order</option>
-          <option value="vendor">Vendor</option>
-        </select>
-      </label>
-      <label>
-        Existing reference{" "}
-        <input
-          value={importId}
-          onChange={(e) => setImportId(e.target.value)}
-          maxLength={64}
-        />
-      </label>
-      <button
-        className="button secondary"
-        onClick={() =>
-          void run("import", async () => {
-            await api("registry", { kind, id: importId });
-          })
-        }
+      <fieldset
+        disabled={readOnly}
+        style={{ border: 0, padding: 0, minWidth: 0 }}
       >
-        Import existing reference
-      </button>
+        <p>
+          Owner {snapshot.vault.owner} · vault {adapter.config.contract}. Each
+          action opens your wallet. Funds for storage and payments have separate
+          ledgers.
+        </p>
+        <p className="mono">Finalized block: {snapshot.blockHash}</p>
+        <p>
+          Deployment requires separate authorization. Historical verifier
+          independent review, bootstrap trust, weak subjectivity and upgrade-key
+          custody remain unresolved. Unknown outcomes stay reserved.
+        </p>
+        <label>
+          Action{" "}
+          <select
+            value={target}
+            onChange={(e) => setTarget(e.target.value as typeof target)}
+          >
+            <option value="deposit">Fund payment ledger</option>
+            <option value="fund_storage">Fund storage/operating reserve</option>
+            <option value="set_budget">Set total budget</option>
+            <option value="set_payment_cap">Set payment cap</option>
+          </select>
+        </label>
+        <label>
+          Amount (NEAR){" "}
+          <input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            inputMode="decimal"
+          />
+        </label>
+        <button
+          className="button secondary"
+          onClick={() =>
+            void run(
+              "fund",
+              () =>
+                target === "deposit" || target === "fund_storage"
+                  ? adapter.fund(target, amountFromNear(amount))
+                  : adapter.limits(target, amountFromNear(amount)),
+              "Wallet request submitted; refresh finalized state to confirm.",
+            )
+          }
+        >
+          Review owner transaction in wallet
+        </button>
+        <label>
+          Recorded attempt ID{" "}
+          <input
+            value={attempt}
+            onChange={(e) => setAttempt(e.target.value)}
+            inputMode="numeric"
+          />
+        </label>
+        <button
+          className="button secondary"
+          onClick={() =>
+            void run("reconcile", () => adapter.reconcile(attempt))
+          }
+        >
+          Reconcile recorded outcome
+        </button>
+        <label>
+          Viewer account
+          <input
+            value={viewer}
+            onChange={(e) => setViewer(e.target.value)}
+            maxLength={64}
+          />
+        </label>
+        <button
+          className="button secondary"
+          onClick={() =>
+            void run(
+              "viewer",
+              async () => {
+                await api("members", {
+                  accountId: viewer,
+                  role: "viewer",
+                  enabled: true,
+                });
+              },
+              "Read-only organization access granted.",
+            )
+          }
+        >
+          Grant viewer access
+        </button>
+        <button
+          className="button secondary"
+          onClick={() =>
+            void run(
+              "viewer",
+              async () => {
+                await api("members", {
+                  accountId: viewer,
+                  role: "viewer",
+                  enabled: false,
+                });
+              },
+              "Viewer access revoked.",
+            )
+          }
+        >
+          Revoke viewer access
+        </button>
+        <p>
+          The frozen contract has no vendor/order enumeration. Import existing
+          references to discover them; all displayed authority is re-read from
+          the contract.
+        </p>
+        <label>
+          Reference type{" "}
+          <select
+            value={kind}
+            onChange={(e) => setKind(e.target.value as typeof kind)}
+          >
+            <option value="order">Work order</option>
+            <option value="vendor">Vendor</option>
+          </select>
+        </label>
+        <label>
+          Existing reference{" "}
+          <input
+            value={importId}
+            onChange={(e) => setImportId(e.target.value)}
+            maxLength={64}
+          />
+        </label>
+        <button
+          className="button secondary"
+          onClick={() =>
+            void run("import", async () => {
+              await api("registry", { kind, id: importId });
+            })
+          }
+        >
+          Import existing reference
+        </button>
+      </fieldset>
       {snapshot.queue?.length ? (
         <ul>
           {snapshot.queue.map((j) => (

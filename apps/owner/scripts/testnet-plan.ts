@@ -38,15 +38,20 @@ export function deploymentPlan(): DeploymentPlan {
     throw new Error(
       "Create an owner testnet wallet first; configure its account ID and public key.",
     );
+  const owner = account(process.env.NNETICS_OWNER_ID || "");
+  if (!owner.endsWith(".testnet"))
+    throw new Error(
+      "Setup requires a named testnet owner; this is deployment input, not application authorization.",
+    );
   const vendor = account(process.env.NNETICS_VENDOR_ID || "");
   for (const id of [c.contract, c.worker, vendor]) {
     if (
-      !id.endsWith("." + c.owner) ||
-      id.split(".").length !== c.owner.split(".").length + 1
+      !id.endsWith("." + owner) ||
+      id.split(".").length !== owner.split(".").length + 1
     )
       throw new Error("Setup creates direct subaccounts of the owner only.");
   }
-  if (new Set([c.owner, c.contract, c.worker, vendor]).size !== 4)
+  if (new Set([owner, c.contract, c.worker, vendor]).size !== 4)
     throw new Error("Use four distinct accounts.");
   const ownerKey = PublicKey.fromString(
     process.env.NNETICS_OWNER_PUBLIC_KEY || "",
@@ -96,7 +101,7 @@ export function deploymentPlan(): DeploymentPlan {
     steps: [
       {
         name: "create-vault",
-        signer: c.owner,
+        signer: owner,
         public_key: ownerKey,
         receiver: c.contract,
         actions: [
@@ -107,7 +112,7 @@ export function deploymentPlan(): DeploymentPlan {
       },
       {
         name: "create-worker",
-        signer: c.owner,
+        signer: owner,
         public_key: ownerKey,
         receiver: c.worker,
         actions: [
@@ -125,7 +130,7 @@ export function deploymentPlan(): DeploymentPlan {
       },
       {
         name: "create-vendor",
-        signer: c.owner,
+        signer: owner,
         public_key: ownerKey,
         receiver: vendor,
         actions: [
@@ -145,7 +150,7 @@ export function deploymentPlan(): DeploymentPlan {
             type: "FunctionCall",
             method: "new",
             args: {
-              owner: c.owner,
+              owner: owner,
               budget: "100000000000000000000000",
               payment_cap: "10000000000000000000000",
             },

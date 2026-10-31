@@ -12,13 +12,15 @@ import { transferMarker } from "../src/server/marker.ts";
 import type { Payment } from "../src/data/owner-adapter.ts";
 import { assertTestedProtocol } from "../src/data/protocol.ts";
 
-test("implicit owner IDs are accepted on testnet while mainnet named owners remain disabled", () => {
+test("application configuration has no owner allowlist and retains explicit organization/network/vault settings", () => {
   const previous = process.env.NNETICS_OWNER_ID;
   try {
     process.env.NNETICS_OWNER_ID = "28".repeat(32);
-    assert.equal(liveConfig().owner, process.env.NNETICS_OWNER_ID);
+    assert.equal("owner" in liveConfig(), false);
     process.env.NNETICS_OWNER_ID = "owner.near";
-    assert.throws(() => liveConfig(), /Mainnet is disabled/);
+    assert.equal("owner" in liveConfig(), false);
+    assert.equal(liveConfig().network, "testnet");
+    assert.ok(liveConfig().contract.endsWith(".testnet"));
   } finally {
     if (previous === undefined) delete process.env.NNETICS_OWNER_ID;
     else process.env.NNETICS_OWNER_ID = previous;

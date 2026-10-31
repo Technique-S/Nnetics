@@ -1,8 +1,12 @@
 # Milestone 3: testnet integration — acceptance pending
 
 The current request changes the sequence in the original build brief: prove the
-manually entered invoice workflow before implementing AI extraction. No public
-transaction has been signed, no vault deployed, and no testnet acceptance claimed.
+manually entered invoice workflow before implementing AI extraction. One explicitly
+approved faucet-sponsored owner-account creation finalized on 30 October WAT.
+The selected `babygoat.testnet` owner then authorized four setup transactions:
+vault/worker/vendor account creation and pinned vault deployment are now FINAL.
+The vault remains paused without an agent or payout funds. No invoice payment or
+real browser-wallet message login has occurred; onboarding acceptance remains open.
 The Rust production contract and its interface are unchanged in this milestone.
 
 ## Current blockers
@@ -19,12 +23,15 @@ The Rust production contract and its interface are unchanged in this milestone.
   before the worker can start. The app does not invent a checkpoint or accept an
   owner assertion about an unknown transfer. An operator must prepare/review the
   exact `initialize_repair_checkpoint` payload separately; a bootstrap UI is absent.
-- The supplied 64-hex testnet implicit owner is not activated: finalized read-only
-  RPC returned `UNKNOWN_ACCOUNT`. It must receive testnet NEAR before use. A mainnet
-  `.near` account cannot substitute. The current setup template also needs a named
-  setup account to create direct subaccounts; it cannot create children under a
-  64-character implicit address. A sponsor/provisioning plan remains unresolved.
-  No accounts were provisioned. Generated role keys remain unused outside Git.
+- The user selected CLI-created `babygoat.testnet`; finalized reads confirm
+  10 testnet NEAR and its matching FullAccess public key. The user now reports that
+  Meteor's browser extension displays that account/balance; Nnetics message login
+  remains unexecuted with a real wallet. This supersedes `nnetics-tobylou.testnet`, whose approved faucet
+  creation is preserved as history and whose future setup plan must not run.
+  The approved vault/worker/vendor are now provisioned and the exact tested vault
+  deployed. CLI signatures verified control for setup; real Meteor login is pending.
+  Local configuration is active, payment signing stays disabled. See
+  [BABYGOAT_TESTNET_PLAN.md](BABYGOAT_TESTNET_PLAN.md) for transaction evidence.
 - Each public transaction needs specific human authorization. Environment switches
   are enforcement mechanisms, not evidence that authorization has been given.
 
@@ -47,8 +54,10 @@ balances when configuration, authentication or RPC reads fail. Use
 `http://127.0.0.1:3100/?mode=demo` for the explicitly labeled, session-only mock.
 Both modes retain the disabled deployment control.
 
-Set the testnet owner, separate vault/worker account IDs, worker public key and
-expected deployed code hash in `.env.local`. Do not enable transaction switches.
+Set `NNETICS_NETWORK=testnet`, `NNETICS_ORGANIZATION_ID`, separate vault/worker
+account IDs, worker public key and expected deployed code hash in `.env.local`.
+Application authorization has no configured owner identity. `NNETICS_OWNER_ID`
+is setup-plan input only. Do not enable transaction switches.
 The default RPC is FASTNEAR testnet. The older rpc.testnet.near.org endpoint returned
 a deprecation/429 error during preflight, so it is no longer the default.
 
@@ -76,9 +85,13 @@ schedules deprecation on 31 October 2026 and reduced functionality in October–
 That notice concerns the wallet service, not retirement of NEAR testnet. The
 [network status page](https://status.near.org/) reports testnet operational; no
 official November testnet closure was found. Neither is a future uptime guarantee.
-The MyNearWallet connector has been removed. Meteor was assessed but its current
-SDK introduced high-severity dependency advisories and was also removed. Nightly
-avoids those additional advisories; actual extension/network signing is still untested.
+The MyNearWallet connector has been removed. The stock Meteor SDK introduced
+high-severity dependency advisories and is not installed. A narrow Meteor
+extension-only **message-login** bridge is now implemented locally without that
+SDK or an on-chain access-key authorization step. **Meteor transactions remain
+unimplemented and blocked.** Real installed-extension login remains unexecuted;
+Nightly testnet compatibility was also not established. See
+[METEOR_WALLET_COMPATIBILITY.md](METEOR_WALLET_COMPATIBILITY.md).
 
 Owner IDs can be named `.testnet` accounts or 64-hex Ed25519 implicit accounts.
 The latter are account addresses, not the `ed25519:` public-key encoding. The user's
@@ -89,16 +102,20 @@ subaccounts and therefore requires a named setup account; it cannot create child
 under a 64-character implicit ID. Provisioning for an implicit owner needs a separately
 reviewed named sponsor/account-creation plan. Do not replace it with mainnet signing.
 
-The owner signs a NEP-413 challenge to access the private invoice queue. The server
-checks its exact origin/vault/owner/message/nonce, five-minute expiry,
-signature and finalized on-chain FullAccess key ownership. Nonces are consumed
-once; a hashed, HttpOnly, SameSite=Strict session expires after 15 minutes. Sessions
-are not continuously invalidated when a wallet key is removed. Owner transactions
-still require the wallet and contract authorization. Mutation endpoints enforce
+Wallets sign a NEP-413 challenge binding account, organization, network, vault,
+origin and expiry. A verified signature/full-access key creates an identity session,
+not ownership. Each protected request rechecks the key and current finalized vault
+owner. The on-chain owner has organization access and may invite read-only viewers;
+all application mutations remain owner-only. Revocation and removed keys deny the
+next request. Nonces are single-use, challenges expire after five minutes and hashed,
+HttpOnly, SameSite=Strict sessions expire after 15 minutes. Legacy sessions are
+invalidated without changing payment claims. See [ORGANIZATION_ACCESS.md](ORGANIZATION_ACCESS.md)
+for scope, permissions, tests and contract impact. Owner transactions still require
+separate authorization, the wallet and contract guards. Mutation endpoints enforce
 same-origin JSON and a streamed 20,000-byte input limit. Source invoice text is
 rendered literally, never executed or sent to a model.
 
-Reads verify `chain_id=testnet`, deployed code hash and owner. Every contract call
+Reads verify `chain_id=testnet`, deployed code hash and current vault ownership. Every contract call
 in one snapshot is pinned to the same finalized block, with exact chain timestamp
 strings. This trusts the configured RPC provider; the dashboard is not a second
 independent consensus verifier. It reads vendors/orders by known IDs because the

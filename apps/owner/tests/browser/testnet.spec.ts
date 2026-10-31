@@ -1,38 +1,85 @@
 import { test, expect } from "@playwright/test";
 import { MockOwnerAdapter } from "../../src/data/mock-adapter";
 
-test("default mode never silently falls back to simulation or enables an unconfigured wallet", async ({
+test("organization viewers can navigate but cannot invoke owner or invoice mutations", async ({
   page,
 }) => {
+  const snapshot = await new MockOwnerAdapter(0).snapshot();
+  snapshot.mode = "testnet";
+  snapshot.protocolVersion = 88;
+  snapshot.blockHash = "viewer-final-block";
+  snapshot.access = {
+    organization: "studio",
+    accountId: "viewer.testnet",
+    role: "viewer",
+    vaultOwner: snapshot.vault.owner,
+  };
+  await page.route("**/api/live/identity", (route) =>
+    route.fulfill({
+      json: {
+        accountId: snapshot.access!.accountId,
+        network: "testnet",
+        organizations: [
+          {
+            id: "studio",
+            name: "studio",
+            status: "ready",
+            role: snapshot.access!.role,
+          },
+        ],
+        notice: "",
+      },
+    }),
+  );
   await page.route("**/api/live/config", (route) =>
     route.fulfill({
       json: {
         network: "testnet",
+        organization: "studio",
         contract: "vault.owner.testnet",
-        owner: "owner.testnet",
         worker: "worker.owner.testnet",
-        publicKey: "",
-        configured: false,
-        transactionsEnabled: false,
+        publicKey: "ed25519:fixture",
+        configured: true,
+        transactionsEnabled: true,
       },
     }),
   );
+  await page.route("**/api/live/snapshot**", (route) =>
+    route.fulfill({ json: snapshot }),
+  );
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Nnetics · NEAR testnet" }),
+    page.getByText("Read-only viewer", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Connect Nightly (testnet)" }),
+    page.getByRole("button", { name: "Review owner transaction in wallet" }),
   ).toBeDisabled();
   await expect(
-    page.getByText("Your payment desk", { exact: true }),
-  ).toHaveCount(0);
+    page.getByRole("button", { name: "Grant viewer access" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Enter structured invoice" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("switch", { name: "Allow new testnet payments" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Vendors", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Manage vendor" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Disable future payments" }).first(),
+  ).toBeDisabled();
   await page
-    .getByRole("link", { name: "Open explicitly simulated demo" })
+    .getByRole("button", { name: "Invoice review", exact: false })
+    .first()
     .click();
   await expect(
-    page.getByText("Synthetic data. No wallet connected.", { exact: false }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Mark reviewed" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Queue reviewed invoice" }),
+  ).toBeDisabled();
 });
 test("controlled live adapter reads show finality and block unverified protocol-89 signing before opening wallet", async ({
   page,
@@ -42,12 +89,35 @@ test("controlled live adapter reads show finality and block unverified protocol-
   snapshot.mode = "testnet";
   snapshot.protocolVersion = 89;
   snapshot.blockHash = "controlled-final-block";
+  snapshot.access = {
+    organization: "studio",
+    accountId: snapshot.vault.owner,
+    role: "owner",
+    vaultOwner: snapshot.vault.owner,
+  };
+  await page.route("**/api/live/identity", (route) =>
+    route.fulfill({
+      json: {
+        accountId: snapshot.access!.accountId,
+        network: "testnet",
+        organizations: [
+          {
+            id: "studio",
+            name: "studio",
+            status: "ready",
+            role: snapshot.access!.role,
+          },
+        ],
+        notice: "",
+      },
+    }),
+  );
   await page.route("**/api/live/config", (route) =>
     route.fulfill({
       json: {
         network: "testnet",
         contract: "vault.owner.testnet",
-        owner: snapshot.vault.owner,
+        organization: "studio",
         worker: "worker.owner.testnet",
         publicKey: "ed25519:fixture",
         configured: true,
@@ -55,7 +125,7 @@ test("controlled live adapter reads show finality and block unverified protocol-
       },
     }),
   );
-  await page.route("**/api/live/snapshot", (route) =>
+  await page.route("**/api/live/snapshot**", (route) =>
     route.fulfill({ json: snapshot }),
   );
   await page.goto("/");

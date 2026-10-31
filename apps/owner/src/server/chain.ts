@@ -73,12 +73,18 @@ export class NearRpc {
       throw new Error("Inconsistent contract read block.");
     return JSON.parse(Buffer.from(r.result).toString("utf8")) as T;
   }
-  async snapshot(queue: Queue): Promise<OwnerSnapshot> {
-    const block = await this.finalized();
+  async snapshot(
+    queue: Queue,
+    pinned?: Awaited<ReturnType<NearRpc["finalized"]>>,
+  ): Promise<OwnerSnapshot> {
+    const block = pinned ?? (await this.finalized());
     const vault = await this.view<Vault>("get_vault", {}, block.hash);
-    if (vault.owner !== this.config.owner)
-      throw new Error("Unexpected vault owner.");
     account(vault.owner);
+    if (
+      vault.owner === this.config.contract ||
+      vault.owner === this.config.worker
+    )
+      throw new Error("Separate owner, vault and worker required.");
     for (const n of [
       vault.budget,
       vault.payment_cap,

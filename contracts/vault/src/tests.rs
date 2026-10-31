@@ -5,6 +5,63 @@ use near_sdk::{testing_env, PromiseResult, RuntimeFeesConfig};
 const NEAR: u128 = 10u128.pow(24);
 const EXPIRY: u64 = 1_000;
 
+fn factory_context(owner: &str, request: &str, signer: &str, parent: &str) -> near_sdk::VMContext {
+    let hash = env::sha256(format!("{owner}:{request}").as_bytes());
+    let label = hash[..20]
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect::<String>();
+    VMContextBuilder::new()
+        .current_account_id(account(&format!("v-{label}.v.operator.testnet")))
+        .predecessor_account_id(account(parent))
+        .signer_account_id(account(signer))
+        .account_balance(NearToken::from_near(5))
+        .prepaid_gas(Gas::from_tgas(60))
+        .build()
+}
+
+#[test]
+fn factory_initialization_binds_original_owner_and_starts_without_payment_authority() {
+    testing_env!(context("vault.testnet", 0, 0));
+    testing_env!(factory_context(
+        "owner.testnet",
+        &"a".repeat(32),
+        "owner.testnet",
+        "v.operator.testnet"
+    ));
+    let vault = Vault::new_from_factory(account("owner.testnet"), "a".repeat(32), U128(0), U128(1));
+    assert_eq!(vault.owner, account("owner.testnet"));
+    assert!(vault.paused);
+    assert!(vault.agent.is_none());
+    assert_eq!((vault.funded, vault.spent, vault.reserved), (0, 0, 0));
+}
+
+#[test]
+#[should_panic(expected = "INIT_OWNER_SIGNER_ONLY")]
+fn factory_cannot_claim_a_different_signers_vault() {
+    testing_env!(context("vault.testnet", 0, 0));
+    testing_env!(factory_context(
+        "owner.testnet",
+        &"a".repeat(32),
+        "attacker.testnet",
+        "v.operator.testnet"
+    ));
+    Vault::new_from_factory(account("owner.testnet"), "a".repeat(32), U128(0), U128(1));
+}
+
+#[test]
+#[should_panic(expected = "INIT_PARENT_REQUEST_ONLY")]
+fn unrelated_account_cannot_initialize_an_unclaimed_factory_child() {
+    testing_env!(context("vault.testnet", 0, 0));
+    testing_env!(factory_context(
+        "owner.testnet",
+        &"a".repeat(32),
+        "owner.testnet",
+        "attacker.testnet"
+    ));
+    Vault::new_from_factory(account("owner.testnet"), "a".repeat(32), U128(0), U128(1));
+}
+
 fn account(id: &str) -> AccountId {
     id.parse().unwrap()
 }

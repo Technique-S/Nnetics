@@ -5,21 +5,21 @@ export function liveConfig() {
   const contract = account(
     process.env.NNETICS_VAULT_ID || "unconfigured.testnet",
   );
-  const owner = account(
-    process.env.NNETICS_OWNER_ID || "unconfigured-owner.testnet",
-  );
+  const organization = process.env.NNETICS_ORGANIZATION_ID || "unconfigured";
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(organization))
+    throw new Error(
+      "Configure an organization ID (1–64 ASCII letters, digits, _ or -).",
+    );
+  const network = process.env.NNETICS_NETWORK || "testnet";
+  if (network !== "testnet") throw new Error("Only NEAR testnet is enabled.");
   const worker = account(
     process.env.NNETICS_WORKER_ID || "unconfigured-worker.testnet",
   );
   for (const id of [contract, worker])
     if (!id.endsWith(".testnet"))
       throw new Error("Only named testnet accounts are supported.");
-  if (!owner.endsWith(".testnet") && !/^[0-9a-f]{64}$/.test(owner))
-    throw new Error(
-      "Owner must be a named testnet account or an implicit Ed25519 account. Mainnet is disabled.",
-    );
-  if (new Set([contract, owner, worker]).size !== 3)
-    throw new Error("Separate owner, vault and worker required.");
+  if (contract === worker)
+    throw new Error("Separate vault and worker required.");
   const rpc = process.env.NNETICS_RPC_URL || "https://test.rpc.fastnear.com";
   if (new URL(rpc).protocol !== "https:")
     throw new Error("Use an HTTPS testnet RPC.");
@@ -28,22 +28,25 @@ export function liveConfig() {
     throw new Error("Configure an exact app origin.");
   const codeHash = process.env.NNETICS_EXPECTED_CODE_HASH || "";
   const publicKey = process.env.NNETICS_WORKER_PUBLIC_KEY || "";
-  const configured = Boolean(
-    process.env.NNETICS_VAULT_ID &&
-      process.env.NNETICS_OWNER_ID &&
-      process.env.NNETICS_WORKER_ID &&
-      codeHash &&
-      publicKey,
-  );
+  const missingConfiguration = [
+    "NNETICS_ORGANIZATION_ID",
+    "NNETICS_VAULT_ID",
+    "NNETICS_WORKER_ID",
+    "NNETICS_EXPECTED_CODE_HASH",
+    "NNETICS_WORKER_PUBLIC_KEY",
+  ].filter((name) => !process.env[name]);
+  const configured = missingConfiguration.length === 0;
   return {
     contract,
-    owner,
+    organization,
+    network: network as "testnet",
     worker,
     rpc,
     origin,
     codeHash,
     publicKey,
     configured,
+    missingConfiguration,
     database: path.resolve(
       /* turbopackIgnore: true */ process.env.NNETICS_DATABASE ||
         "../../artifacts/live/invoices.db",

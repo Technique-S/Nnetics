@@ -105,6 +105,16 @@ export class Queue {
       .prepare("INSERT INTO audit(description,time) VALUES (?,?)")
       .run(description, new Date().toISOString());
   }
+  bindOrganization(organization: string) {
+    this.db
+      .prepare("INSERT OR IGNORE INTO metadata VALUES ('organization',?)")
+      .run(organization);
+    const row = this.db
+      .prepare("SELECT value FROM metadata WHERE id='organization'")
+      .get() as { value: string };
+    if (row.value !== organization)
+      throw new Error("Database belongs to a different organization.");
+  }
   add(invoice: Omit<Invoice, "reviewed">, reasons: string[]) {
     const i = structuredInvoice(invoice);
     this.db

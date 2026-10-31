@@ -1,6 +1,11 @@
 import { Buffer } from "buffer";
 import { account, uint } from "./owner-adapter";
 import { assertTestedProtocol } from "./protocol";
+import {
+  meteorExtension,
+  signMeteorMessage,
+  testnetWalletAccount,
+} from "./meteor-message";
 import type {
   Invoice,
   OwnerAdapter,
@@ -16,10 +21,11 @@ import type {
 export interface PublicConfig {
   network: "testnet";
   contract: string;
-  owner: string;
+  organization: string;
   worker: string;
   publicKey: string;
   configured: boolean;
+  missingConfiguration?: string[];
   transactionsEnabled: boolean;
 }
 export async function api<T>(path: string, body?: unknown): Promise<T> {
@@ -29,6 +35,10 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: "same-origin",
     cache: "no-store",
+    keepalive: path === "logout",
+    // A verified snapshot performs several finalized RPC reads. Give the server
+    // time to finish its bounded reads rather than timing out after one RPC.
+    signal: AbortSignal.timeout(90000),
   });
   const result = await r.json();
   if (!r.ok) throw new Error(result.error || "Testnet service unavailable.");
@@ -39,7 +49,13 @@ export class NearOwnerAdapter implements OwnerAdapter {
   readonly deploymentEnabled = false as const;
   private selector: WalletSelector | null = null;
   private listeners = new Set<() => void>();
-  constructor(readonly config: PublicConfig) {}
+  private messageOnlyMeteor =
+    typeof window !== "undefined" &&
+    sessionStorage.getItem("nnetics-wallet") === "meteor";
+  constructor(
+    readonly config: PublicConfig,
+    readonly expectedAccount?: string,
+  ) {}
   async wallet() {
     if (!this.selector) {
       const [{ setupWalletSelector }, { setupNightly }] = await Promise.all([
@@ -47,7 +63,7 @@ export class NearOwnerAdapter implements OwnerAdapter {
         import("@near-wallet-selector/nightly"),
       ]);
       this.selector = await setupWalletSelector({
-        network: "testnet",
+        network: this.config.network,
         modules: [setupNightly()],
       });
     }
@@ -61,25 +77,78 @@ export class NearOwnerAdapter implements OwnerAdapter {
     const wallet = await this.wallet();
     await wallet.signIn({ contractId: this.config.contract });
     const accounts = await wallet.getAccounts();
-    if (!accounts.some((a) => a.accountId === this.config.owner))
-      throw new Error(
-        `Select owner ${this.config.owner} in Nightly with testnet enabled.`,
-      );
+    const selected = accounts[0];
+    if (!selected) throw new Error("Select a testnet wallet account.");
     const challenge = await api<{
       nonce: string;
       message: string;
       recipient: string;
-    }>("challenge", {});
+    }>("challenge", {
+      accountId: selected.accountId,
+      organization: this.config.organization,
+    });
     const signature = await wallet.signMessage({
       ...challenge,
       nonce: Buffer.from(challenge.nonce, "base64"),
     });
     if (!signature)
-      throw new Error("The wallet did not return a signed owner challenge.");
-    await api("login", { ...signature, nonce: challenge.nonce });
+      throw new Error("The wallet did not return a signed login challenge.");
+    if (signature.accountId !== selected.accountId)
+      throw new Error("Wallet account changed during login. Try again.");
+    await api("login", {
+      ...signature,
+      nonce: challenge.nonce,
+      organization: this.config.organization,
+    });
+    this.messageOnlyMeteor = false;
+    sessionStorage.setItem("nnetics-wallet", "nightly");
   }
-  snapshot() {
-    return api<OwnerSnapshot>("snapshot");
+  async connectMeteor(accountId: string, signal?: AbortSignal) {
+    if (this.config.network !== "testnet")
+      throw new Error(
+        "Switch Meteor to NEAR testnet before verifying your identity.",
+      );
+    testnetWalletAccount(accountId);
+    const extension = meteorExtension();
+    const challenge = await api<{
+      nonce: string;
+      message: string;
+      recipient: string;
+    }>("challenge", {
+      accountId,
+    });
+    const signature = await signMeteorMessage(
+      extension,
+      {
+        accountId,
+        message: challenge.message,
+        recipient: challenge.recipient,
+        nonce: Buffer.from(challenge.nonce, "base64"),
+      },
+      120_000,
+      signal,
+    );
+    if (signal?.aborted)
+      throw new Error("Wallet account changed. Verify again.");
+    await api("login", {
+      ...signature,
+      nonce: challenge.nonce,
+    });
+    this.messageOnlyMeteor = true;
+    sessionStorage.setItem("nnetics-wallet", "meteor");
+  }
+  async snapshot() {
+    const state = await api<OwnerSnapshot>(
+      "snapshot?organization=" + encodeURIComponent(this.config.organization),
+    );
+    if (
+      this.expectedAccount &&
+      state.access?.accountId !== this.expectedAccount
+    )
+      throw new Error(
+        "Wallet account changed. Clear this workspace and verify again.",
+      );
+    return state;
   }
   subscribe(listener: () => void) {
     this.listeners.add(listener);
@@ -98,17 +167,31 @@ export class NearOwnerAdapter implements OwnerAdapter {
         "Signing is disabled pending specific testnet authorization and review.",
       );
     const state = await this.snapshot(); // Verify chain, deployment code and owner before wallet opens.
+    if (
+      state.access?.role !== "owner" ||
+      state.access.organization !== this.config.organization ||
+      state.access.accountId !== state.vault.owner
+    )
+      throw new Error(
+        "Current on-chain vault ownership is required for owner actions.",
+      );
     assertTestedProtocol(state.protocolVersion);
+    if (this.messageOnlyMeteor)
+      throw new Error(
+        "Meteor supports message login only in this build. Its transaction connector still requires implementation and review; no transaction was requested.",
+      );
     const wallet = await this.wallet();
     if (
       !(await wallet.getAccounts()).some(
-        (a) => a.accountId === this.config.owner,
+        (a) => a.accountId === state.access!.accountId,
       )
     )
-      throw new Error("Connect the configured owner wallet.");
+      throw new Error(
+        "Wallet differs from the verified session. Authenticate again.",
+      );
     const { actionCreators } = await import("@near-wallet-selector/core");
     await wallet.signAndSendTransaction({
-      signerId: this.config.owner,
+      signerId: state.access.accountId,
       receiverId: this.config.contract,
       actions: [
         actionCreators.functionCall(
@@ -173,7 +256,8 @@ export class NearOwnerAdapter implements OwnerAdapter {
   }
   async disconnect() {
     await api("logout", {});
-    await (await this.wallet()).signOut();
+    if (!this.messageOnlyMeteor) await (await this.wallet()).signOut();
+    sessionStorage.removeItem("nnetics-wallet");
     location.href = "/?mode=testnet";
   }
   workerIdentity() {
