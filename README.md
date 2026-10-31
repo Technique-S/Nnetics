@@ -8,7 +8,9 @@ Real Meteor login, empty onboarding, organization persistence and private access
 denial in both directions passed with `babygoat.testnet` and `grandtheft.testnet`.
 Local self-service provisioning source includes **Create vault**, durable progress,
 a guarded factory initializer and a locked factory. These new contracts are **not
-deployed or Linux-verified yet**; deployment signing and new-workspace payment
+deployed yet**. The vault/initializer passed Linux protocol-86/88 checks; factory
+CI failed compilation and is fixed locally pending an approved rerun. Deployment
+signing and new-workspace payment
 controls stay disabled. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md).
 Existing deployed vaults are not upgraded. Older deployment/CI results below are
 historical and do not validate this new source. No new push is authorized.

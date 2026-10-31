@@ -1,5 +1,18 @@
 # Owner onboarding acceptance — not passed
 
+**Latest review:** both existing real wallets authenticated again. Babygoat
+loaded its own workspace; switching removed its private UI. Grandtheft returned
+only to its saved organization with zero record counts and was denied babygoat's
+private snapshot. Leaving the page required fresh verification, after which its
+organization returned. Original fresh-empty/organization-creation and reverse
+isolation results below are prior real checks, not reruns with a new third wallet.
+The protocol-86/88 core matrix passed 39 unit and 15 sandbox tests per runtime.
+Factory CI failed before its tests; the compile and callback-read fixes are local
+pending an approved push. No new vault has been provisioned. Cancellation,
+interruption, exact-byte retry and verified-link cases remain controlled tests,
+not live transaction acceptance. See [VALIDATION.md](VALIDATION.md) for actual
+execution results, the read-only preflight and remaining deployment gates.
+
 **Latest, 31 October:** the two-wallet identity/isolation checkpoint passed real
 Meteor testing. Both accounts authenticated. `grandtheft.testnet` started empty,
 created its own organization, returned to it after verification, and was denied

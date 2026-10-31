@@ -4,6 +4,70 @@
 
 ## 31 October — fresh-user provisioning continuation
 
+### Latest review and repair — 31 October, approximately 21:00 WAT
+
+The completed [payment-core matrix](https://github.com/Technique-S/Nnetics/actions/runs/41216056809)
+for `9d557ad` passed on both nearcore 2.13.0 / protocol 86 and 2.14.0-rc.5 /
+protocol 88: **39 Rust unit tests and 15 sandbox tests per runtime**, production
+WASM build and strict Clippy. This includes the three added initializer unit
+tests. It does not validate the factory.
+
+The [provisioning matrix](https://github.com/Technique-S/Nnetics/actions/runs/41216056725)
+failed on both runtimes during factory host compilation with E0283: redundant
+`.into()` on the two generic `Promise::function_call` method-name arguments.
+Factory unit tests and the four new provisioning sandbox tests **did not execute**.
+The local fix passes string literals directly. The same logs exposed deprecated
+unbounded `promise_result`, which would fail production Clippy; it is replaced
+with `promise_result_checked(0, 0)`, matching the pinned initializer's empty result.
+Unexpected response bytes panic and leave the outcome blocked rather than
+confirming creation or sending an incorrect refund. Three additional callback
+unit tests were written (six factory tests total). Rust formatting passed; a
+local factory test attempt failed in `getrandom` before contract compilation
+because Windows `dlltool.exe` was unavailable. No factory pass is claimed.
+Linux rerun of the fixed source requires approval to push a new commit.
+
+**Current real browser observations:** babygoat authenticated, loaded only
+`nnetics-studio`, and showed the initialized paused legacy vault owned by
+`babygoat.testnet` at finalized block
+`6cveB4tXWwVMT9NYUfD7AJwDpDzenMB5CaNBRoNGAkNw`, with no worker/payment funds.
+Switch wallet immediately removed private records and required a fresh proof.
+After the user approved Meteor, grandtheft returned only to Grandtheft workspace,
+with zero invoices/contractors/payments and no fabricated vault balance. Its
+request for `/api/live/snapshot?organization=nnetics-studio` was denied.
+Navigating away cleared access; fresh user-approved verification restored its
+saved organization. The original fresh-empty account/organization creation and
+reverse-direction API denial remain the earlier real-wallet checkpoint, not
+newly executed cases in this review. No new fresh identity was manufactured.
+Selecting Grandtheft workspace exposed the real Create vault review screen.
+Clicking Create vault returned: "Create vault is not configured: deploy and
+review the factory and vault artifacts first. No transaction was requested."
+The organization stayed unprovisioned and payment controls remained unavailable.
+
+Read-only finalized preflight at height **275646175**, block
+`HaQgYN4Jx5DtCUPGxZfDkagduLm7M8ALsrZYzuVmKSBN`: testnet protocol 88,
+storage byte price `10000000000000000000` yoctoNEAR;
+grandtheft balance `9999913398562499999999999` yoctoNEAR and two FullAccess
+keys; proposed infrastructure candidate `v.grandtheft.testnet` absent.
+This is a candidate, not an approved funder/key/deployment plan. An exact
+funding amount and approval digest require the successfully tested factory WASM.
+No signing, deployment or provisioning transaction was executed; there are no
+new transaction links. Factory callback/refund failure recovery remains blocked.
+Real cancellation/interruption/no-duplicate vault acceptance is still unverified;
+the passing Node/browser cases use controlled RPC/wallet responses.
+
+**Follow-up Linux owner result:** approved commit
+`9d557adef4dcbbba5bbdc77a1e544b79c804e675` was pushed. Its
+[owner workflow](https://github.com/Technique-S/Nnetics/actions/runs/41216056691)
+passed type checking, 49 Node tests, the production build and all 28 desktop/mobile
+browser cases, including both previously failing cancellation cases.
+The preceding Rust runs were cancelled by workflow concurrency after the push;
+they are not passing results. Replacement
+[payment-core](https://github.com/Technique-S/Nnetics/actions/runs/41216056809) and
+[provisioning](https://github.com/Technique-S/Nnetics/actions/runs/41216056725)
+protocol-86/88 matrices were still in progress at that checkpoint; the completed
+results and factory failure are recorded above. This result update
+is local until a subsequent approved publication. No deployment was performed.
+
 **Approved publication checkpoint:** commit `100fa5fa246f83d8bbe2641a97b03685b3c83c14`
 was pushed to `codex/nnetics-live-integration` on 31 October. Linux runs started:
 [owner integration](https://github.com/Technique-S/Nnetics/actions/runs/41215648701),
@@ -37,8 +101,9 @@ Node provisioning tests use real SQLite persistence and Borsh hashes with
 controlled RPC results. Browser provisioning tests mock wallet/API responses;
 they confirm transaction details and signing gates, not real deployment.
 
-**Written, not executed:** three additional vault unit tests, three factory unit
-tests and four provisioning sandbox tests. Native Windows WASM build attempts
+**Initial pre-CI checkpoint (superseded above):** three additional vault unit tests,
+three factory unit tests and four provisioning sandbox tests were written.
+Native Windows WASM build attempts
 failed in the host linker before producing a new artifact. New Rust unit/sandbox
 execution and the protocol-86/88 Linux provisioning workflow are now pending CI
 results. Earlier Linux results do not validate the added constructor or factory.

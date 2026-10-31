@@ -1,6 +1,6 @@
 use near_sdk::json_types::U128;
 use near_sdk::serde_json::json;
-use near_sdk::{env, near, AccountId, Gas, NearToken, Promise, PromiseOrValue, PromiseResult};
+use near_sdk::{env, near, AccountId, Gas, NearToken, Promise, PromiseError, PromiseOrValue};
 
 #[cfg(target_arch = "wasm32")]
 const VAULT: &[u8] = include_bytes!("../../../artifacts/vault-provisioning.wasm");
@@ -67,7 +67,7 @@ impl Factory {
             .transfer(NearToken::from_yoctonear(FUNDING))
             .deploy_contract(VAULT.to_vec())
             .function_call(
-                "new_from_factory".into(),
+                "new_from_factory",
                 json!({"owner": owner, "request_id": request_id,
                 "budget": "0", "payment_cap": payment_cap})
                 .to_string()
@@ -76,7 +76,7 @@ impl Factory {
                 Gas::from_tgas(60),
             )
             .then(Promise::new(env::current_account_id()).function_call(
-                "on_created".into(),
+                "on_created",
                 json!({"owner": owner}).to_string().into_bytes(),
                 NearToken::from_yoctonear(0),
                 Gas::from_tgas(15),
@@ -92,9 +92,11 @@ impl Factory {
             1,
             "ONE_CREATION_RESULT_REQUIRED"
         );
-        match env::promise_result(0) {
-            PromiseResult::Successful(_) => PromiseOrValue::Value(true),
-            PromiseResult::Failed => {
+        // The pinned initializer returns no bytes. Bound result copying so an
+        // unexpected successful response cannot exhaust the callback's gas.
+        match env::promise_result_checked(0, 0) {
+            Ok(_) => PromiseOrValue::Value(true),
+            Err(PromiseError::Failed) => {
                 // Failed child receipt refunds its transfer to this predecessor.
                 // Return the refund promise so FINAL includes its result. If the
                 // callback/refund itself fails, off-chain progress stays blocked.
@@ -102,6 +104,7 @@ impl Factory {
                     Promise::new(owner).transfer(NearToken::from_yoctonear(FUNDING)),
                 )
             }
+            Err(_) => env::panic_str("UNEXPECTED_INITIALIZER_RESULT"),
         }
     }
 }
@@ -122,6 +125,45 @@ mod tests {
             .account_balance(NearToken::from_near(100))
             .prepaid_gas(Gas::from_tgas(250))
             .build());
+    }
+    fn callback_context(result: near_sdk::PromiseResult) {
+        testing_env!(
+            VMContextBuilder::new()
+                .current_account_id("v.operator.testnet".parse().unwrap())
+                .predecessor_account_id("v.operator.testnet".parse().unwrap())
+                .account_balance(NearToken::from_near(100))
+                .prepaid_gas(Gas::from_tgas(15))
+                .build(),
+            near_sdk::test_vm_config(),
+            near_sdk::RuntimeFeesConfig::test(),
+            Default::default(),
+            vec![result]
+        );
+    }
+    #[test]
+    fn successful_empty_initialization_returns_confirmation_without_refund() {
+        callback_context(near_sdk::PromiseResult::Successful(vec![]));
+        assert!(matches!(
+            Factory::default().on_created("alice.testnet".parse().unwrap()),
+            PromiseOrValue::Value(true)
+        ));
+        assert!(get_created_receipts().is_empty());
+    }
+    #[test]
+    fn failed_initialization_returns_refund_promise_to_owner() {
+        callback_context(near_sdk::PromiseResult::Failed);
+        let result = Factory::default().on_created("alice.testnet".parse().unwrap());
+        assert!(matches!(&result, PromiseOrValue::Promise(_)));
+        drop(result);
+        let receipts = get_created_receipts();
+        assert_eq!(receipts.len(), 1);
+        assert_eq!(receipts[0].receiver_id.as_str(), "alice.testnet");
+    }
+    #[test]
+    #[should_panic(expected = "UNEXPECTED_INITIALIZER_RESULT")]
+    fn unexpected_success_payload_cannot_confirm_or_refund_creation() {
+        callback_context(near_sdk::PromiseResult::Successful(vec![1]));
+        Factory::default().on_created("alice.testnet".parse().unwrap());
     }
     #[test]
     fn distinct_wallets_get_distinct_children_and_same_request_is_deterministic() {

@@ -5,6 +5,17 @@
 transaction path still require Linux execution, review and explicit testnet
 deployment approval. No existing deployed vault is upgraded by this work.
 
+**Latest CI review:** the existing core plus additive vault initializer passed
+39 unit / 15 sandbox tests per runtime on protocols 86 and 88 in
+[run 41216056809](https://github.com/Technique-S/Nnetics/actions/runs/41216056809).
+The factory did not compile in
+[run 41216056725](https://github.com/Technique-S/Nnetics/actions/runs/41216056725):
+ambiguous method-name `.into()` calls. These are fixed locally, and the deprecated
+callback result read is now bounded to the initializer's empty response. Six
+factory unit tests are written; none executed successfully yet. Factory production
+build, Clippy and all four provisioning sandbox cases remain unverified pending
+an approved push/rerun. There is no tested factory artifact for deployment approval.
+
 ## Contract change identified before implementation
 
 The original `new` constructor requires both predecessor and signer to equal the
@@ -148,6 +159,8 @@ review and disabled signing; they are not a real deployment pass.
 Rust formatting and shell syntax checks passed. Local Windows WASM build attempts
 failed while linking host build scripts: the available GNU linker wrapper received
 GCC-style arguments and the generic LLD driver rejected them. No new WASM or Rust
-unit/sandbox execution is claimed. Supported Linux CI, new artifact hashes,
-independent contract review and specific deployment transactions remain pending.
+factory unit/sandbox execution is claimed. The existing core and added vault
+initializer have since passed Linux CI as recorded above. Corrected factory Linux
+CI, factory artifact hashes, independent review and specific deployment
+transactions remain pending.
 See [VALIDATION.md](VALIDATION.md) for final executed counts.
