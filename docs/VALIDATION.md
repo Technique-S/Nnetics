@@ -4,6 +4,23 @@
 
 ## 31 October — fresh-user provisioning continuation
 
+**Approved publication checkpoint:** commit `100fa5fa246f83d8bbe2641a97b03685b3c83c14`
+was pushed to `codex/nnetics-live-integration` on 31 October. Linux runs started:
+[owner integration](https://github.com/Technique-S/Nnetics/actions/runs/41215648701),
+[payment core](https://github.com/Technique-S/Nnetics/actions/runs/41215648664), and
+[vault provisioning](https://github.com/Technique-S/Nnetics/actions/runs/41215648629).
+Owner integration completed with a browser-test failure: type checking, all 49
+Node tests and the production build passed; 26 of 28 Playwright cases passed.
+Both failures were the same cancellation-test race on desktop/mobile: the test
+rejected the cancelled first wallet request before the asynchronous second
+challenge had registered its replacement request. The local test now waits for
+the second wallet request before rejecting it. Six repeated targeted executions
+and the full 28-case browser suite passed locally after this test-only fix.
+Linux verification of this correction requires a separately approved follow-up
+push. Payment-core and provisioning matrix results are still pending at this
+checkpoint. Publication approval excludes signing, deployment, activation and
+payments; provisioning remains disabled.
+
 **Real Meteor identity checkpoint passed:** `babygoat.testnet` and
 `grandtheft.testnet` authenticated. Grandtheft started with zero records and no
 organizations, created its private organization, and recovered it on a fresh
@@ -23,8 +40,8 @@ they confirm transaction details and signing gates, not real deployment.
 **Written, not executed:** three additional vault unit tests, three factory unit
 tests and four provisioning sandbox tests. Native Windows WASM build attempts
 failed in the host linker before producing a new artifact. New Rust unit/sandbox
-execution and the protocol-86/88 Linux provisioning workflow remain pending push
-approval. Earlier Linux results do not validate the added constructor or factory.
+execution and the protocol-86/88 Linux provisioning workflow are now pending CI
+results. Earlier Linux results do not validate the added constructor or factory.
 
 Local source now includes Create vault, deterministic requests, durable pre-wallet
 hashes, fixed-byte retry/reconciliation, guarded initialization and unique vault
@@ -33,8 +50,8 @@ start paused, without keys, worker or payment funds. Payment controls stay gated
 Callback/refund failure and unavailable historical outcomes remain blocked; no
 administrator claim/override was added. See [VAULT_PROVISIONING.md](VAULT_PROVISIONING.md).
 
-No new public-network transaction, deployment, activation, payment or GitHub push
-occurred. The unsigned factory-plan generator is written/tested, but a concrete
+No new public-network transaction, deployment, activation or payment occurred.
+The unsigned factory-plan generator is written/tested, but a concrete
 deployment digest cannot be approved until Linux supplies reviewed artifacts and
 a fresh funder/key/balance/protocol/storage-price preflight. Full vault onboarding,
 Milestone 1 review and live-payment acceptance remain incomplete.

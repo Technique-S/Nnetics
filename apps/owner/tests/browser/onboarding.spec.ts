@@ -300,6 +300,17 @@ test("message login waits for approval, and editing the pending account cancels 
   ).toBeVisible();
   expect(f.loginCalls()).toBe(0);
   await page.getByRole("button", { name: "Sign message to sign in" }).click();
+  // The challenge request is asynchronous. Reject the second wallet request,
+  // rather than racing its registration and rejecting the cancelled first one.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as { meteorProbe: { requests: number } })
+            .meteorProbe.requests,
+      ),
+    )
+    .toBe(2);
   await page.evaluate(() =>
     (
       window as unknown as { meteorProbe: { decline: () => void } }
