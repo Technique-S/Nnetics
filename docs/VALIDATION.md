@@ -6,6 +6,39 @@
 
 ### Latest review and repair — 31 October, approximately 21:00 WAT
 
+Approved fix commit `07181a0174fedf5e16a011723ffa8586a70f3dfc` was pushed.
+Replacement runs: [owner](https://github.com/Technique-S/Nnetics/actions/runs/41237147471),
+[core](https://github.com/Technique-S/Nnetics/actions/runs/41237147470),
+[provisioning](https://github.com/Technique-S/Nnetics/actions/runs/41237147482).
+Owner and core workflows passed. The provisioning workflow compiled production
+factory WASM, passed strict production Clippy and **six factory unit tests per
+runtime**, then executed all four new sandbox cases. **Protocol 88 passed all
+four; protocol 86 failed all four** at native-balance equality assertions. The
+overall matrix failed; this is not full provisioning acceptance. No signing/deployment approval is implied by
+publication approval.
+
+On protocol 86 the initialized vault balance was
+`5000022042370816800000000` yoctoNEAR (callback-fault build:
+`5000022044197335200000000`) after the 5-NEAR transfer. The failed-init case's
+factory changed from `9995409801278984000000000` to
+`9996190423024709300000000` yoctoNEAR. NEAR credits contract execution rewards;
+the protocol-86 tests incorrectly required balances to exclude them. Protocol 88
+passed those original equality assertions; no identical reward behavior is
+assumed across runtimes. See the official
+[nearcore gas guide](https://near.github.io/nearcore/architecture/how/gas.html).
+The local test correction checks successful receipt-linked Transfer actions for
+exactly 5 NEAR to the vault/refunded owner, excludes system gas-refund receipts,
+checks native balances within a separate sub-0.01-NEAR reward/fee envelope, and
+requires a duplicate create request to leave the existing vault balance exactly
+unchanged. Failed initialization must still remove the account/code, return a
+successful exact 5-NEAR refund receipt, and preserve zero payout accounting.
+Rust formatting passed. This correction has **not** run in Linux yet and requires
+another approved push. Factory contract source is unchanged from `07181a0`.
+Protocol-88 production artifact SHA-256 hashes from the passed job:
+factory `8475786608c34a68317d2ada08cd3dd2e65ff23dc176e2377ac54db5b4f52bbb`;
+vault `dc4cf64736110a33cce94531e2e00ba4510bcebbbb240bee6ecdacacf778560f`.
+These are not deployment authorization or independent security review.
+
 The completed [payment-core matrix](https://github.com/Technique-S/Nnetics/actions/runs/41216056809)
 for `9d557ad` passed on both nearcore 2.13.0 / protocol 86 and 2.14.0-rc.5 /
 protocol 88: **39 Rust unit tests and 15 sandbox tests per runtime**, production
@@ -24,7 +57,8 @@ confirming creation or sending an incorrect refund. Three additional callback
 unit tests were written (six factory tests total). Rust formatting passed; a
 local factory test attempt failed in `getrandom` before contract compilation
 because Windows `dlltool.exe` was unavailable. No factory pass is claimed.
-Linux rerun of the fixed source requires approval to push a new commit.
+The compile/callback fix subsequently passed as described above. Only the new
+balance/receipt test correction is pending rerun.
 
 **Current real browser observations:** babygoat authenticated, loaded only
 `nnetics-studio`, and showed the initialized paused legacy vault owned by
@@ -35,9 +69,13 @@ After the user approved Meteor, grandtheft returned only to Grandtheft workspace
 with zero invoices/contractors/payments and no fabricated vault balance. Its
 request for `/api/live/snapshot?organization=nnetics-studio` was denied.
 Navigating away cleared access; fresh user-approved verification restored its
-saved organization. The original fresh-empty account/organization creation and
-reverse-direction API denial remain the earlier real-wallet checkpoint, not
-newly executed cases in this review. No new fresh identity was manufactured.
+saved organization. The original fresh-empty account and organization creation
+remain the earlier real-wallet checkpoint, not newly
+executed cases in this review. No new fresh identity was manufactured.
+The reverse switch was then re-executed: user-approved babygoat login recovered
+only nnetics-studio, and its request for Grandtheft organization
+`e3600323-ad40-43c4-a31d-7d53abc4833e` was denied. Its finalized legacy-vault read
+used block `EeXq7is4iSvgA6Byn7QRXnRApbo2hcs2pLzRm3XM26J4`.
 Selecting Grandtheft workspace exposed the real Create vault review screen.
 Clicking Create vault returned: "Create vault is not configured: deploy and
 review the factory and vault artifacts first. No transaction was requested."

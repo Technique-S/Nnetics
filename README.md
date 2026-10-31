@@ -9,7 +9,10 @@ denial in both directions passed with `babygoat.testnet` and `grandtheft.testnet
 Local self-service provisioning source includes **Create vault**, durable progress,
 a guarded factory initializer and a locked factory. These new contracts are **not
 deployed yet**. The vault/initializer passed Linux protocol-86/88 checks; factory
-CI failed compilation and is fixed locally pending an approved rerun. Deployment
+CI now passes compilation, Clippy and six unit tests; four sandbox cases passed
+on protocol 88 and failed on protocol 86 on balance assertions that omitted
+execution rewards. Their local receipt-based
+correction awaits an approved Linux rerun. Deployment
 signing and new-workspace payment
 controls stay disabled. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md).
 Existing deployed vaults are not upgraded. Older deployment/CI results below are

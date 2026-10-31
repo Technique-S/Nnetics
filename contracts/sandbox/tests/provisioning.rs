@@ -9,6 +9,56 @@ use serde_json::{json, Value};
 use std::path::PathBuf;
 
 const NEAR: u128 = 10u128.pow(24);
+// Execution rewards are credited to contracts separately from attached funding.
+// Exact funding/refunds are checked against successful on-chain action receipts.
+async fn exact_transfer(
+    chain: &Worker<Sandbox>,
+    outcome: &ExecutionFinalResult,
+    predecessor: &str,
+    receiver: &str,
+) -> Result<()> {
+    let mut matches = 0;
+    for receipt in outcome.receipt_outcomes() {
+        if receipt.executor_id.as_str() != receiver || !receipt.is_success() {
+            continue;
+        }
+        let response: Value = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(20))
+            .build()?
+            .post(chain.rpc_addr())
+            .json(
+                &json!({"jsonrpc":"2.0","id":"funding","method":"EXPERIMENTAL_receipt",
+                "params":{"receipt_id":receipt.transaction_hash.to_string()}}),
+            )
+            .send()
+            .await?
+            .error_for_status()?
+            .json()
+            .await?;
+        ensure!(
+            response["error"].is_null(),
+            "Receipt lookup failed: {response}"
+        );
+        let r = &response["result"];
+        ensure!(r["receipt_id"] == receipt.transaction_hash.to_string());
+        if r["predecessor_id"] != predecessor || r["receiver_id"] != receiver {
+            continue;
+        }
+        if let Some(actions) = r["receipt"]["Action"]["actions"].as_array() {
+            for action in actions {
+                if let Some(transfer) = action.get("Transfer") {
+                    ensure!(transfer["deposit"] == (5 * NEAR).to_string());
+                    matches += 1;
+                }
+            }
+        }
+    }
+    ensure!(
+        matches == 1,
+        "Expected one exact successful five-NEAR transfer, got {matches}"
+    );
+    Ok(())
+}
 fn artifact(name: &str) -> Result<Vec<u8>> {
     std::fs::read(
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -93,17 +143,24 @@ async fn check(
     );
     ensure!(vault["funded"] == "0" && vault["spent"] == "0" && vault["reserved"] == "0");
     ensure!(chain.view_access_keys(&id).await?.is_empty());
-    ensure!(chain.view_account(&id).await?.balance.as_yoctonear() == 5 * NEAR);
+    let balance = chain.view_account(&id).await?.balance.as_yoctonear();
+    ensure!(balance >= 5 * NEAR && balance < 5 * NEAR + NEAR / 100);
     Ok(())
 }
 #[tokio::test]
 async fn named_and_implicit_wallets_create_separate_initialized_locked_vaults() -> Result<()> {
     let (chain, factory, owner) = setup("factory").await?;
     let request = "a".repeat(32);
-    ensure!(create(&owner, &factory, &request)
-        .await?
-        .receipt_failures()
-        .is_empty());
+    let created = create(&owner, &factory, &request).await?;
+    ensure!(created.receipt_failures().is_empty());
+    hash_context();
+    exact_transfer(
+        &chain,
+        &created,
+        factory.id().as_str(),
+        target(&owner, &request, &factory).as_str(),
+    )
+    .await?;
     check(&chain, &owner, &factory, &request).await?;
     let sk = SecretKey::from_random(KeyType::ED25519);
     let pk: near_sdk::PublicKey = sk.public_key().to_string().parse()?;
@@ -118,10 +175,16 @@ async fn named_and_implicit_wallets_create_separate_initialized_locked_vaults() 
         .await?
         .into_result()?;
     let implicit = Account::from_secret_key(implicit_id, sk, &chain);
-    ensure!(create(&implicit, &factory, &request)
-        .await?
-        .receipt_failures()
-        .is_empty());
+    let created = create(&implicit, &factory, &request).await?;
+    ensure!(created.receipt_failures().is_empty());
+    hash_context();
+    exact_transfer(
+        &chain,
+        &created,
+        factory.id().as_str(),
+        target(&implicit, &request, &factory).as_str(),
+    )
+    .await?;
     check(&chain, &implicit, &factory, &request).await?;
     hash_context();
     ensure!(target(&owner, &request, &factory) != target(&implicit, &request, &factory));
@@ -154,12 +217,25 @@ async fn concurrent_requests_and_lost_responses_cannot_create_or_fund_another_va
             == 1
     );
     check(&chain, &owner, &factory, &request).await?;
+    hash_context();
+    let id = target(&owner, &request, &factory);
+    let balance_before_retry = chain.view_account(&id).await?.balance;
+    let successful = if a.receipt_failures().is_empty() {
+        &a
+    } else {
+        &b
+    };
+    exact_transfer(&chain, successful, factory.id().as_str(), id.as_str()).await?;
     // A restarted client that lost the result repeats the same request identifier.
     ensure!(!create(&owner, &factory, &request)
         .await?
         .receipt_failures()
         .is_empty());
     check(&chain, &owner, &factory, &request).await?;
+    ensure!(
+        chain.view_account(&id).await?.balance == balance_before_retry,
+        "Duplicate creation changed the existing vault balance"
+    );
     Ok(())
 }
 #[tokio::test]
@@ -176,22 +252,24 @@ async fn failed_initialization_rolls_back_account_code_and_funding_and_returns_r
     let owner_before = owner.view_account().await?.balance.as_yoctonear();
     let outcome = create(&owner, &factory, &request).await?;
     ensure!(!outcome.receipt_failures().is_empty());
+    exact_transfer(&chain, &outcome, factory.id().as_str(), owner.id().as_str()).await?;
     hash_context();
     ensure!(chain
         .view_account(&target(&owner, &request, &factory))
         .await
         .is_err());
+    let after = factory
+        .as_account()
+        .view_account()
+        .await?
+        .balance
+        .as_yoctonear();
     ensure!(
-        factory
-            .as_account()
-            .view_account()
-            .await?
-            .balance
-            .as_yoctonear()
-            == before
+        after >= before && after < before + NEAR / 100,
+        "Factory retained creation funding rather than only execution rewards"
     );
     ensure!(
-        owner.view_account().await?.balance.as_yoctonear() > owner_before - NEAR,
+        owner.view_account().await?.balance.as_yoctonear() > owner_before - NEAR / 100,
         "Five-NEAR creation funding was not refunded"
     );
     Ok(())
@@ -201,10 +279,16 @@ async fn callback_failure_does_not_remove_initialized_vault_or_allow_reinitializ
 {
     let (chain, factory, owner) = setup("factory-fault-created-callback").await?;
     let request = "d".repeat(32);
-    ensure!(!create(&owner, &factory, &request)
-        .await?
-        .receipt_failures()
-        .is_empty());
+    let created = create(&owner, &factory, &request).await?;
+    ensure!(!created.receipt_failures().is_empty());
+    hash_context();
+    exact_transfer(
+        &chain,
+        &created,
+        factory.id().as_str(),
+        target(&owner, &request, &factory).as_str(),
+    )
+    .await?;
     check(&chain, &owner, &factory, &request).await?;
     hash_context();
     let id = target(&owner, &request, &factory);

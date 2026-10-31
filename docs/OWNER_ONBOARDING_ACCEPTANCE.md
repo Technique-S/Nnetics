@@ -13,6 +13,17 @@ interruption, exact-byte retry and verified-link cases remain controlled tests,
 not live transaction acceptance. See [VALIDATION.md](VALIDATION.md) for actual
 execution results, the read-only preflight and remaining deployment gates.
 
+**Subsequent approved rerun `07181a0`:** core/owner CI passed again. Factory
+compilation, production Clippy and six unit tests passed per protocol. Four
+provisioning sandbox tests passed on protocol 88; all four failed on protocol 86
+on balance assertions that omitted contract execution rewards. The local correction checks
+exact transfer/refund receipts and unchanged duplicate balances; its Linux rerun
+is pending approval. The reverse real-wallet switch was also rechecked: babygoat
+returned only to its own workspace and was denied Grandtheft's organization API.
+The real Create vault action safely reported missing reviewed factory deployment
+and requested no transaction. The [draft transaction sequence](FRESH_USER_TESTNET_PLAN.md)
+is not an approval-ready deployment plan until the full provisioning suite passes.
+
 **Latest, 31 October:** the two-wallet identity/isolation checkpoint passed real
 Meteor testing. Both accounts authenticated. `grandtheft.testnet` started empty,
 created its own organization, returned to it after verification, and was denied

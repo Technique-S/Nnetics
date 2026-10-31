@@ -16,6 +16,16 @@ factory unit tests are written; none executed successfully yet. Factory producti
 build, Clippy and all four provisioning sandbox cases remain unverified pending
 an approved push/rerun. There is no tested factory artifact for deployment approval.
 
+**Rerun update:** approved `07181a0` passed factory production build/strict Clippy
+and six unit tests on both protocols. Four sandbox tests passed on protocol 88;
+all four failed on protocol 86 on balances that did not account for execution rewards. The local
+correction verifies exact successful Transfer receipts for funding/refund, a
+separate small reward/fee envelope, and exact unchanged vault balance on duplicate
+creation. Its Linux rerun is pending approval; the factory contract has no further
+source changes. No deployment approval is requested from a failing suite.
+The [draft testnet sequence](FRESH_USER_TESTNET_PLAN.md) records the proposed
+factory and Grandtheft request without authorizing execution.
+
 ## Contract change identified before implementation
 
 The original `new` constructor requires both predecessor and signer to equal the
