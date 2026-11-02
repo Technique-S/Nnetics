@@ -153,7 +153,8 @@ test("load failures recover and untrusted invoice text stays literal", async ({
     .getByRole("button", { name: "Add sample invoice", exact: true })
     .click();
   const modal = page.getByRole("dialog");
-  await modal.getByLabel("Invoice reference").fill("INV-XSS");
+  await expect(modal.getByLabel("Invoice reference")).toHaveCount(0);
+  await expect(modal.getByText("Currency: NEAR · Testnet")).toBeVisible();
   await modal
     .getByLabel("Original sample text")
     .fill('<img src="https://invalid.example" onerror="window.injected=1">');
@@ -163,4 +164,14 @@ test("load failures recover and untrusted invoice text stays literal", async ({
     '<img src="https://invalid.example" onerror="window.injected=1">',
   );
   expect(await page.locator("pre img").count()).toBe(0);
+});
+
+test("owner-entered invoices receive durable server references and reject source currencies",async({page})=>{
+ await page.getByRole("button",{name:"Add sample invoice",exact:true}).click();const modal=page.getByRole("dialog");
+ await expect(modal.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
+ await modal.getByLabel("Original sample text").fill("Amount: 1 USDC");await modal.getByRole("button",{name:"Save simulated change"}).click();
+ await expect(modal.getByRole("alert")).toContainText("Currency conflict");await expect(modal).toBeVisible();
+ await modal.getByLabel("Original sample text").fill("Article delivered. Amount: 1 NEAR");await modal.getByRole("button",{name:"Save simulated change"}).click();await expect(modal).not.toBeVisible();
+ const saved=await(await page.request.get("/api/demo/owner-invoices")).json();expect(saved).toHaveLength(1);expect(saved[0].id).toMatch(/^CTR-\d+-INV-0001$/);
+ await expect(page.locator(".invoice-detail")).toContainText(saved[0].id);await page.reload();await page.getByRole("navigation",{name:"Owner dashboard"}).getByRole("button",{name:/^Invoice review/}).click();await expect(page.getByRole("button",{name:new RegExp(saved[0].id)})).toBeVisible();
 });

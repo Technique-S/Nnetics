@@ -4,15 +4,36 @@ An invoice payment desk for small Web3 content teams. An owner approves a vendor
 
 ## Current status: fresh-user onboarding under review, 31 October 2026
 
+**2 November persistent contractor backend:** the default private contractor
+portal now uses organization-authorized HTTP APIs and persistent SQLite storage,
+with signed wallet verification, owner approval/review and durable invoice/status
+history. A local production-app restart acceptance run passes with controlled
+wallet/RPC fixtures; real Meteor contractor acceptance remains unverified.
+Extraction is deterministic parsing, with no AI provider. Payment execution stays
+gated. See [PERSISTENT_CONTRACTOR_PORTAL.md](docs/PERSISTENT_CONTRACTOR_PORTAL.md).
+
+**2 November contractor mock:** an isolated owner/invitation/contractor workflow
+is available at `/demo/contractors`, also linked from the simulated owner dashboard.
+It includes text-first billing/uploads/clarification, invoice statuses, revocable
+private links and owner-approved simulated wallet requests. It performs no live
+wallet proof, deployment or payment. See [CONTRACTOR_PORTAL.md](docs/CONTRACTOR_PORTAL.md)
+for the journey, access boundaries and validation. The existing transaction expiry
+monitor continues separately; live provisioning remains incomplete.
+Contractor and owner-entered invoices now receive durable server-generated
+references with idempotent retries. Entry is fixed to **NEAR · Testnet**;
+conflicting source currencies require clarification without conversion.
+
 Real Meteor login, empty onboarding, organization persistence and private access
 denial in both directions passed with `babygoat.testnet` and `grandtheft.testnet`.
 Local self-service provisioning source includes **Create vault**, durable progress,
 a guarded factory initializer and a locked factory. These new contracts are **not
 deployed yet**. The vault/initializer passed Linux protocol-86/88 checks; factory
-CI now passes compilation, Clippy and six unit tests; four sandbox cases passed
-on protocol 88 and failed on protocol 86 on balance assertions that omitted
-execution rewards. Their local receipt-based
-correction awaits an approved Linux rerun. Deployment
+CI for `c655800` passes compilation, Clippy, six factory unit tests and four
+provisioning sandbox tests **per protocol (86 and 88)**. The receipt-based
+correction passed both runtimes. Real provisioning and recovery remain unverified.
+The reduced unsigned plan requires 11.3324 testnet NEAR in deposits plus fees;
+see [the funding breakdown and transaction plan](docs/FRESH_USER_TESTNET_PLAN.md).
+Deployment
 signing and new-workspace payment
 controls stay disabled. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md).
 Existing deployed vaults are not upgraded. Older deployment/CI results below are
@@ -31,15 +52,16 @@ Linux [contract CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948
 ## Try the local owner dashboard
 
 Verified wallets can create private organizations without a configured vault.
-Vault provisioning is implemented locally but awaits Linux contract verification,
-factory deployment/review and explicit transaction approval.
+Vault provisioning is implemented and passed Linux contract verification; it
+awaits funding, factory deployment/review and explicit transaction approval.
 The selected testnet owner is now the user's CLI-created `babygoat.testnet`;
 its paused testnet vault is deployed and local configuration active. CLI setup
 control and real Meteor message login are verified; live provisioning is pending.
 See the [executed setup record](docs/BABYGOAT_TESTNET_PLAN.md).
 The [owner acceptance record](docs/OWNER_ONBOARDING_ACCEPTANCE.md) distinguishes
 local checks from blocked real-wallet verification and records the wallet/setup
-gaps. The contractor portal remains gated on owner acceptance.
+gaps. The live contractor portal remains gated on owner acceptance; its explicitly
+simulated adapter is now available for local review.
 
 ```sh
 cd apps/owner

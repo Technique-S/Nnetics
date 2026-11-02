@@ -1,0 +1,2382 @@
+[
+  {
+    "width": 1440,
+    "name": "login",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "overview",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "Within your cumulative authority",
+        "size": "10px"
+      },
+      {
+        "text": "1 unresolved attempt",
+        "size": "10px"
+      },
+      {
+        "text": "Only conclusively successful transfers",
+        "size": "10px"
+      },
+      {
+        "text": "Synthetic deposits · storage excluded",
+        "size": "10px"
+      },
+      {
+        "text": "NEXT UP",
+        "size": "8px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "NO",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "THE PAPER TRAIL",
+        "size": "8px"
+      },
+      {
+        "text": "Work & recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount",
+        "size": "9px"
+      },
+      {
+        "text": "Outcome",
+        "size": "9px"
+      },
+      {
+        "text": "Reference",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1039",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0001",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1040",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Unknown outcome · funds locked",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0002",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1041",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0003",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "AUTHORITY, WITH LIMITS",
+        "size": "8px"
+      },
+      {
+        "text": "Uncommitted",
+        "size": "7px"
+      },
+      {
+        "text": "Cumulative budget",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Per-payment cap",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Vendor slots",
+        "size": "10px"
+      },
+      {
+        "text": "Open within approved authority",
+        "size": "9px"
+      },
+      {
+        "text": "worker-demo.testnet",
+        "size": "9px"
+      },
+      {
+        "text": "Revocation stops future initiation. It cannot cancel a transfer already sent.",
+        "size": "10px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "vendors",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "Editorial",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Design",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Video",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "vendors-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "Editorial",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Design",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Video",
+        "size": "9px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "work-orders",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "ONE ORDER. ONE PAYMENT.",
+        "size": "8px"
+      },
+      {
+        "text": "3",
+        "size": "10px"
+      },
+      {
+        "text": "Order IDs are never reused",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "9px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount & expiry",
+        "size": "9px"
+      },
+      {
+        "text": "Status",
+        "size": "9px"
+      },
+      {
+        "text": "Authority",
+        "size": "9px"
+      },
+      {
+        "text": "article-001 · Ada Brooks",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Closed",
+        "size": "10px"
+      },
+      {
+        "text": "design-002 · Miles Chen",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "video-003 · Noor Okafor",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "work-orders-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "ONE ORDER. ONE PAYMENT.",
+        "size": "8px"
+      },
+      {
+        "text": "3",
+        "size": "10px"
+      },
+      {
+        "text": "Order IDs are never reused",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "9px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount & expiry",
+        "size": "9px"
+      },
+      {
+        "text": "Status",
+        "size": "9px"
+      },
+      {
+        "text": "Authority",
+        "size": "9px"
+      },
+      {
+        "text": "article-001 · Ada Brooks",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Closed",
+        "size": "10px"
+      },
+      {
+        "text": "design-002 · Miles Chen",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "video-003 · Noor Okafor",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "invoice-review",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "REVIEW QUEUE",
+        "size": "8px"
+      },
+      {
+        "text": "NO",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1042",
+        "size": "8px"
+      },
+      {
+        "text": "Requested payment · synthetic invoice",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Original sample invoice",
+        "size": "10px"
+      },
+      {
+        "text": "SAMPLE INVOICE · Noor Okafor\nCampaign video edit · video-003\nAmount: 3 NEAR\nRecipient: edi",
+        "size": "10px"
+      },
+      {
+        "text": "Review acknowledgement grants no payment authority. No real transaction or signature is cr",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "invoice-review-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "REVIEW QUEUE",
+        "size": "8px"
+      },
+      {
+        "text": "NO",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1042",
+        "size": "8px"
+      },
+      {
+        "text": "Requested payment · synthetic invoice",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Original sample invoice",
+        "size": "10px"
+      },
+      {
+        "text": "SAMPLE INVOICE · Noor Okafor\nCampaign video edit · video-003\nAmount: 3 NEAR\nRecipient: edi",
+        "size": "10px"
+      },
+      {
+        "text": "Review acknowledgement grants no payment authority. No real transaction or signature is cr",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "payment-history",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "PAYMENT DESK",
+        "size": "10px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "M3 integration",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "9px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "9px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "10px"
+      },
+      {
+        "text": "SIMULATED RECEIPTS",
+        "size": "8px"
+      },
+      {
+        "text": "Work & recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount",
+        "size": "9px"
+      },
+      {
+        "text": "Outcome",
+        "size": "9px"
+      },
+      {
+        "text": "Reference",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1039",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0001",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1040",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Unknown outcome · funds locked",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0002",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1041",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0003",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "An unknown outcome stays pending and reserved. A refresh or timeout does not authorize a r",
+        "size": "10px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "10px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "10px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "owner-portal-empty",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "owner-portal-populated",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "contractor-unavailable",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "contractor-submit",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "Description",
+        "size": "10px"
+      },
+      {
+        "text": "Fixed recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Attachment",
+        "size": "10px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "contractor-my-payments",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 1440,
+    "name": "contractor-wallet-details",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "login",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "overview",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "Within your cumulative authority",
+        "size": "8px"
+      },
+      {
+        "text": "1 unresolved attempt",
+        "size": "8px"
+      },
+      {
+        "text": "Only conclusively successful transfers",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic deposits · storage excluded",
+        "size": "8px"
+      },
+      {
+        "text": "NEXT UP",
+        "size": "8px"
+      },
+      {
+        "text": "2",
+        "size": "10px"
+      },
+      {
+        "text": "NO",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "THE PAPER TRAIL",
+        "size": "8px"
+      },
+      {
+        "text": "Work & recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount",
+        "size": "9px"
+      },
+      {
+        "text": "Outcome",
+        "size": "9px"
+      },
+      {
+        "text": "Reference",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1039",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0001",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1040",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Unknown outcome · funds locked",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0002",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1041",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0003",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "AUTHORITY, WITH LIMITS",
+        "size": "8px"
+      },
+      {
+        "text": "Uncommitted",
+        "size": "7px"
+      },
+      {
+        "text": "Cumulative budget",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Per-payment cap",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Vendor slots",
+        "size": "10px"
+      },
+      {
+        "text": "Open within approved authority",
+        "size": "9px"
+      },
+      {
+        "text": "worker-demo.testnet",
+        "size": "9px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "vendors",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "Editorial",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Design",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Video",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "vendors-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "Editorial",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Design",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Video",
+        "size": "8px"
+      },
+      {
+        "text": "Recipient for new orders",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "work-orders",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "ONE ORDER. ONE PAYMENT.",
+        "size": "8px"
+      },
+      {
+        "text": "3",
+        "size": "10px"
+      },
+      {
+        "text": "Order IDs are never reused",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "9px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount & expiry",
+        "size": "9px"
+      },
+      {
+        "text": "Status",
+        "size": "9px"
+      },
+      {
+        "text": "Authority",
+        "size": "9px"
+      },
+      {
+        "text": "article-001 · Ada Brooks",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Closed",
+        "size": "10px"
+      },
+      {
+        "text": "design-002 · Miles Chen",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "video-003 · Noor Okafor",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "work-orders-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "ONE ORDER. ONE PAYMENT.",
+        "size": "8px"
+      },
+      {
+        "text": "3",
+        "size": "10px"
+      },
+      {
+        "text": "Order IDs are never reused",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "9px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount & expiry",
+        "size": "9px"
+      },
+      {
+        "text": "Status",
+        "size": "9px"
+      },
+      {
+        "text": "Authority",
+        "size": "9px"
+      },
+      {
+        "text": "article-001 · Ada Brooks",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Closed",
+        "size": "10px"
+      },
+      {
+        "text": "design-002 · Miles Chen",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "video-003 · Noor Okafor",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "16 Nov 2026",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "invoice-review",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "REVIEW QUEUE",
+        "size": "8px"
+      },
+      {
+        "text": "NO",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1042",
+        "size": "8px"
+      },
+      {
+        "text": "Requested payment · synthetic invoice",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "video-003",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice recipient",
+        "size": "10px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "10px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Original sample invoice",
+        "size": "10px"
+      },
+      {
+        "text": "SAMPLE INVOICE · Noor Okafor\nCampaign video edit · video-003\nAmount: 3 NEAR\nRecipient: edi",
+        "size": "10px"
+      },
+      {
+        "text": "Review acknowledgement grants no payment authority. No real transaction or signature is cr",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "invoice-review-dialog",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "REVIEW QUEUE",
+        "size": "8px"
+      },
+      {
+        "text": "NO",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1042 · video-003",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "MC",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1043 · design-002",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "size": "9px"
+      },
+      {
+        "text": "INV-1042",
+        "size": "8px"
+      },
+      {
+        "text": "Requested payment · synthetic invoice",
+        "size": "10px"
+      },
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "video-003",
+        "size": "10px"
+      },
+      {
+        "text": "Invoice recipient",
+        "size": "10px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Approved recipient",
+        "size": "10px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "Original sample invoice",
+        "size": "10px"
+      },
+      {
+        "text": "SAMPLE INVOICE · Noor Okafor\nCampaign video edit · video-003\nAmount: 3 NEAR\nRecipient: edi",
+        "size": "10px"
+      },
+      {
+        "text": "Review acknowledgement grants no payment authority. No real transaction or signature is cr",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      },
+      {
+        "text": "LOCAL SIMULATION",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "payment-history",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "2",
+        "size": "9px"
+      },
+      {
+        "text": "SIMULATION",
+        "size": "8px"
+      },
+      {
+        "text": "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload.",
+        "size": "9px"
+      },
+      {
+        "text": "Workspace",
+        "size": "10px"
+      },
+      {
+        "text": "/",
+        "size": "10px"
+      },
+      {
+        "text": "OW",
+        "size": "9px"
+      },
+      {
+        "text": "YOUR OWNER WORKSPACE",
+        "size": "8px"
+      },
+      {
+        "text": "Deployment disabled",
+        "size": "8px"
+      },
+      {
+        "text": "SIMULATED RECEIPTS",
+        "size": "8px"
+      },
+      {
+        "text": "Work & recipient",
+        "size": "9px"
+      },
+      {
+        "text": "Amount",
+        "size": "9px"
+      },
+      {
+        "text": "Outcome",
+        "size": "9px"
+      },
+      {
+        "text": "Reference",
+        "size": "9px"
+      },
+      {
+        "text": "writer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1039",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0001",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "designer-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1040",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "Unknown outcome · funds locked",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0002",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "editor-demo.testnet",
+        "size": "10px"
+      },
+      {
+        "text": "INV-1041",
+        "size": "9px"
+      },
+      {
+        "text": "NEAR",
+        "size": "9px"
+      },
+      {
+        "text": "SIM-0003",
+        "size": "10px"
+      },
+      {
+        "text": "Simulated receipt",
+        "size": "9px"
+      },
+      {
+        "text": "An unknown outcome stays pending and reserved. A refresh or timeout does not authorize a r",
+        "size": "9px"
+      },
+      {
+        "text": "Local simulation controls",
+        "size": "10px"
+      },
+      {
+        "text": "Session-only synthetic data. Wallet connection, funding and deployment are unavailable.",
+        "size": "9px"
+      },
+      {
+        "text": "Simulate load error",
+        "size": "9px"
+      },
+      {
+        "text": "Reset demo",
+        "size": "9px"
+      },
+      {
+        "text": "Nnetics · Owner preview",
+        "size": "8px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "owner-portal-empty",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "owner-portal-populated",
+    "title": "Nnetics · Owner dashboard",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "contractor-unavailable",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "contractor-submit",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [
+      {
+        "text": "Work order",
+        "size": "10px"
+      },
+      {
+        "text": "Description",
+        "size": "10px"
+      },
+      {
+        "text": "Fixed recipient",
+        "size": "10px"
+      },
+      {
+        "text": "Attachment",
+        "size": "10px"
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "contractor-my-payments",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "name": "contractor-wallet-details",
+    "title": "Nnetics · Contractor demo",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "smallText": [],
+    "overflow": []
+  }
+]

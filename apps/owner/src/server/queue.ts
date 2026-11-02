@@ -1,6 +1,8 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
+import { nextReference, previousSubmission, referenceTables } from "./invoice-references.ts";
+import { requireNear } from "../data/invoice-currency.ts";
 import { account, uint } from "../data/owner-adapter.ts";
 import type { Invoice } from "../data/owner-adapter.ts";
 
@@ -76,7 +78,7 @@ export class Queue {
     fs.mkdirSync(path.dirname(filename), { recursive: true });
     this.db = new DatabaseSync(filename);
     this.db
-      .exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
+      .exec(`PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
       CREATE TABLE IF NOT EXISTS metadata (id TEXT PRIMARY KEY, value TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS invoices (id TEXT PRIMARY KEY, order_id TEXT NOT NULL, payload TEXT NOT NULL, state TEXT NOT NULL, reason TEXT NOT NULL DEFAULT '', signed TEXT, hash TEXT, attempt TEXT);
       CREATE UNIQUE INDEX IF NOT EXISTS claimed_order ON invoices(order_id) WHERE state IN ('queued','preparing','submitted','pending','paid','blocked','failed');
@@ -84,6 +86,7 @@ export class Queue {
       CREATE TABLE IF NOT EXISTS challenges (nonce TEXT PRIMARY KEY, message TEXT NOT NULL, expires INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, expires INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY, description TEXT NOT NULL, time TEXT NOT NULL);`);
+    referenceTables(this.db);
     this.db
       .prepare("INSERT OR IGNORE INTO metadata VALUES ('scope',?)")
       .run(scope);
@@ -131,6 +134,24 @@ export class Queue {
     this.audit(
       `Structured invoice ${i.id}: ${reasons.length ? "review required" : "queued"}`,
     );
+  }
+  submitGenerated(invoice: Omit<Invoice,"reviewed">, reasons: string[]) {
+    const input = structuredInvoice(invoice);
+    requireNear(input.asset,input.text);
+    const {id:token,...fields}=input, fingerprint=JSON.stringify(fields), scope=input.vendor_id;
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      const previous=previousSubmission(this.db,scope,token,fingerprint);
+      if(previous) { const existing=this.get(previous)!; this.db.exec("COMMIT"); return existing.invoice; }
+      const existing=this.all().find(j=>j.order_id===input.order_id);
+      if(existing && this.db.prepare("SELECT 1 FROM invoice_submissions WHERE scope=? AND invoice=? AND fingerprint=?").get(scope,existing.id,fingerprint)) {this.db.exec("COMMIT");return existing.invoice;}
+      if(existing) throw Error("This work order already has an invoice. Open its status instead.");
+      const generated={...input,id:nextReference(this.db,scope)};
+      this.add(generated,reasons);
+      this.db.prepare("INSERT INTO invoice_submissions VALUES (?,?,?,?)").run(scope,token,fingerprint,generated.id);
+      this.db.exec("COMMIT");
+      return {...generated,reviewed:false};
+    } catch(e) {this.db.exec("ROLLBACK");throw e;}
   }
   all(): Job[] {
     return (

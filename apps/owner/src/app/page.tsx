@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { requireNear } from "../data/invoice-currency";
 import { DEMO_AGENT } from "../data/mock-adapter";
 import { NearOwnerAdapter, api } from "../data/near-adapter";
+import {PersistentContractorOwner} from "./contractor-owner";
 import { Onboarding } from "./onboarding";
 import { TestnetControls } from "./testnet-controls";
 
@@ -186,6 +188,7 @@ export default function OwnerDashboard() {
 
 function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
   const live = adapter instanceof NearOwnerAdapter ? adapter : null;
+  const [showContractors,setShowContractors]=useState(false);
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
   const [view, setView] = useState<View>("Overview");
   const [selected, setSelected] = useState(
@@ -234,7 +237,9 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
       setBusy((old) => old.filter((x) => x !== key));
     }
   }
+  const invoiceSubmission = useRef("");
   function open(name: DialogName) {
+    invoiceSubmission.current = crypto.randomUUID();
     setError(null);
     setDialog(name);
   }
@@ -262,6 +267,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
         )}
       </main>
     );
+  if(showContractors && live && snapshot) return <><button className="button secondary" onClick={()=>setShowContractors(false)}>Back to vault dashboard</button><PersistentContractorOwner organization={snapshot.access?.organization || live.config.organization}/></>;
   const s = snapshot,
     v = s.vault;
   const readOnly = !!live && s.access?.role !== "owner";
@@ -312,7 +318,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
         if (dialog === "invoice") {
           const order = s.orders.find((o) => o.id === field("order_id"))!;
           const draft: Omit<Invoice, "reviewed"> = {
-            id: field("invoice_id"),
+            id: invoiceSubmission.current || (invoiceSubmission.current = crypto.randomUUID()),
             order_id: order.id,
             vendor_id: order.vendor_id,
             recipient: account(field("recipient")),
@@ -320,8 +326,13 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
             asset: "NEAR",
             text: field("text"),
           };
-          await adapter.addInvoice(draft);
-          setSelected(draft.id);
+          requireNear(draft.asset,draft.text);
+          if (!live) {
+            const response=await fetch("/api/demo/owner-invoices",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(draft)});
+            const saved=await response.json();
+            if(!response.ok) throw Error(saved.error || "Invoice submission failed.");
+            await adapter.addInvoice(saved);setSelected(saved.id);
+          } else {await adapter.addInvoice(draft);setSelected("");}
           setView("Invoice review");
         }
         setDialog(null);
@@ -478,7 +489,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
           <span className="workspace-dot" />
         </div>
         <span className="nav-caption">PAYMENT DESK</span>
-        <nav aria-label="Owner dashboard">
+        <nav aria-label="Owner dashboard">{live && <button onClick={()=>setShowContractors(true)}>Contractor billing</button>}
           {views.map((name) => (
             <button
               key={name}
@@ -492,6 +503,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               )}
             </button>
           ))}
+          {!live && <a className="button secondary" href="/demo/contractors">Contractor portal demo</a>}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
@@ -514,7 +526,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
           <span>
             {live
               ? "Live testnet data. Owner actions require wallet signatures; queued invoices may be paid by the authorized worker."
-              : "Synthetic data. No wallet connected. No tokens moved. Changes last until you reload."}
+              : "Synthetic data. No wallet connected. No tokens moved. Saved invoices persist; other demo changes reset on reload."}
           </span>
         </div>
         <header className="topbar">
@@ -1353,15 +1365,8 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 extractor is running. Conflicting fields will be flagged for
                 review.
               </p>
-              <label>
-                Invoice reference
-                <input
-                  name="invoice_id"
-                  required
-                  maxLength={64}
-                  placeholder="INV-1044"
-                />
-              </label>
+              <p>Invoice reference assigned automatically on successful submission.</p>
+              <p>Currency: NEAR · Testnet</p>
               <label>
                 Claimed work order
                 <select name="order_id" defaultValue={defaultOrder.id}>

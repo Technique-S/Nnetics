@@ -1,10 +1,553 @@
-# Validation record — through 31 October 2026
+# Validation record — through 2 November 2026
+
+### Push preparation and read-only checkpoint — 2 November, 15:39 UTC
+
+The user explicitly authorized pushing all recent changes. Publication covers
+the persistent/demo contractor source, tests, documentation, setup plans and
+the separately prepared synthetic interface audit; it grants no deployment or
+payment authority. Prior "local/unpushed" notes below describe their original
+execution checkpoints. Local databases, credentials, outboxes, disposable test
+keys and generated acceptance artifacts remain ignored and excluded.
+
+Read-only FastNEAR finalized height **275918730**, block
+`7i1hawnVpd2kQ5QKd83FHDh5FvR9VQbH414Zrm9zpftt`: original transaction remains
+UNKNOWN_TRANSACTION, old key nonce **275527848000002**, balance
+**11999868762049999999999999 yoctoNEAR**, factory and customer targets absent.
+Validity remains **86400 blocks** and canonical reference hash remains
+`GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y`. **42,669 blocks** remain to
+first conservative expired height 275961399. No replacement preparation,
+signing or broadcast. Monitor remains active. Full ignored evidence:
+`artifacts/local-checks/transaction-watch-1793633962574.json`.
+
+### Scheduled read-only checkpoint — 2 November, 11:58 UTC
+
+Finalized testnet height **275895545**, block
+`7LnC1F45gza29TswrmNjikHaoowuGn9o2kPH4ZDtVkFv`: original hash remains
+UNKNOWN_TRANSACTION; old FullAccess nonce **275527848000002**, balance
+**11999868762049999999999999 yoctoNEAR** and absent factory/customer targets
+are unchanged. Protocol 88, validity **86400 blocks** and canonical reference
+275874998 hash `GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y` are unchanged.
+**65,854 blocks** remain to first conservative expired height 275961399.
+Original outbox preserved; no replacement preparation/signing/broadcast.
+Monitor retained with no actionable change. Full ignored local evidence:
+`artifacts/local-checks/transaction-watch-1793620698154.json`.
+
+## 2 November — persistent private contractor backend
+
+Implemented actual HTTP/SQLite storage behind existing verified owner identity
+and organization authorization. Default `/contractor` uses the persistent adapter;
+demo now requires `?mode=demo`. No demo data migration, contract change, transaction
+signing, deployment, worker activation, payment or GitHub push occurred. See
+[PERSISTENT_CONTRACTOR_PORTAL.md](PERSISTENT_CONTRACTOR_PORTAL.md) for exact use,
+authorization, storage, states, parsing and limitations.
+
+### Actually executed locally
+
+| Check | Result |
+| --- | --- |
+| Node regression suite | **69/69 passed**, including six new backend cases: real Ed25519/NEP-413 verification, replay/expiry/key removal, organization/contractor isolation, immediate revocation, restart, source preservation, wallet changes, linked-owner changes and demo/database separation |
+| Production build and TypeScript | Passed, including the nested persistent contractor API route |
+| Desktop/mobile regression suite | **42/42 passed** after persistent adapter integration; demo URLs were made explicit |
+| Actual app-process restart acceptance | **Passed** via `npm run test:contractor-acceptance`; production Next.js stopped and restarted with the same database files |
+
+The restart run created an authorized contractor profile/link, verified a signed
+wallet request, approved its wallet/work order, submitted through its private link
+using only work text and requested amount, and rendered the same invoice in the
+owner panel. Before/after restart, the profile, approved wallet, immutable order,
+original whitespace-preserving text, invoice ID/reference and **Under review**
+state persisted in actual HTTP reads and owner/contractor browser views. Retry
+returned the same invoice; a different claim on its order failed. A foreign-currency
+source remained **Needs clarification**, could not be approved, and subsequent
+clarification preserved the original source/reference. Unrelated organization
+reads and revoked capabilities were denied. No Paid state or transaction link
+was fabricated.
+
+Final restart artifact directory:
+`artifacts/contractor-acceptance/1793619889823/` — `result.json` reports passed,
+with `owner-before-restart.png`, `owner-after-restart.png`,
+`contractor-after-restart.png` and process logs. Its first invoice reference is
+`CTR-0001-INV-0001`, status Under review, transaction URL null.
+The harness uses disposable wallet keys and a controlled HTTPS RPC upstream;
+actual SQLite, HTTP, application process, browser views and cryptographic checks
+are exercised. **Real Meteor extension/public-testnet contractor acceptance was
+not executed**, and no real user message signature was requested. Earlier real
+two-wallet owner acceptance is preserved separately.
+
+Initial failures, corrected: Node strip-only execution rejected new TypeScript
+parameter properties (replaced with explicit fields); one test accidentally reused
+an idempotency key for a different order (the guard correctly rejected it; fixed
+fixture key); the first two restart harness attempts reused an owner browser with
+stale verification state after focus/restart. The harness now closes that owner
+context and establishes a fresh signed owner session after restart, preserving the
+existing logout/session guards. These attempts are not counted as passing runs.
+
+**Extraction: deterministic labeled parsing only. No AI provider, AI extraction,
+OCR or mocked AI output.** Live billing work orders remain off-chain records;
+contract work-order linkage, live payment evidence reconciliation and production
+deployment/security acceptance remain incomplete. No persistent API can mark an
+invoice Paid or initiate a transfer. Payment execution and provisioning gates
+remain unchanged; local passing tests do not complete Milestone 1.
+
+### Separate deployment reconciliation
+
+Read-only FastNEAR checkpoint at approximately 11:38 UTC: finalized height
+**275893381**, block `79eb2r7bnhd7PMkKLRXZjoepdErLcMr76XHzmkRGVrxJ`.
+Original infrastructure hash remains UNKNOWN_TRANSACTION; old key nonce
+275527848000002 and balance 11999868762049999999999999 yoctoNEAR are unchanged.
+Factory/customer targets remain absent; validity is still 86400 blocks. First
+conservative expired height remains **275961399** (68,018 blocks away). Original
+outbox/conditional approvals and recurring read-only monitor remain intact.
+No replacement was prepared, signed or broadcast. Full ignored evidence:
+`artifacts/local-checks/transaction-watch-1793619501028.json`.
+
+### Scheduled read-only checkpoint — 2 November, 11:14 UTC
+
+Finalized testnet height **275890945**, block
+`51pR6SCmEZaG6r5aMbjGRLcxTFcYH2QK4UCJj2tibbQG`: original hash still
+UNKNOWN_TRANSACTION; old FullAccess key nonce **275527848000002** and balance
+**11999868762049999999999999 yoctoNEAR** unchanged. Factory and customer target
+remain absent. Protocol 88, validity **86400 blocks** and canonical reference
+hash `GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y` at 275874998 are unchanged.
+**70,454 blocks** remain to first conservative expired height 275961399.
+Original outbox preserved; no replacement preparation, signing or broadcast.
+Monitor retained with no actionable change. Full ignored local evidence:
+`artifacts/local-checks/transaction-watch-1793618092851.json`.
+
+## 2 November — automatic invoice references and fixed testnet currency
+
+Contractor and owner-entered invoice forms no longer request an invoice number.
+Successful server submission allocates a durable contractor-specific sequence
+and stores the invoice/reference/idempotency claim atomically. Exact retries
+return the saved record; changed payloads under an existing submission key fail,
+and different submissions cannot claim the same approved work order. Clarification
+preserves the invoice ID/reference. Owner entry applies the same allocator in its
+authorized organization queue (live) or isolated persistent demo queue (mock).
+Saved references appear through existing invoice/detail/history rendering.
+
+Both forms display **Currency: NEAR · Testnet**. Server submission enforces NEAR
+and rejects recognized conflicting source currencies before persisting an invoice;
+the contractor preview flags the conflict instead of presenting the amount as
+converted NEAR. No conversion, contract change, deployment, signing, payment or
+GitHub push occurred. The original deployment outbox and reconciliation gate are
+unchanged; earlier real-wallet acceptance evidence is preserved.
+
+Actually executed locally: **63/63 Node tests passed**, including four new cases
+for permanent/idempotent sequences, source-currency rejection, restart behavior
+and independent concurrent SQLite writers. The first expanded Node run exposed
+a constructor WAL lock race; installing `busy_timeout` before WAL setup fixed it.
+The final production build and its TypeScript check passed. An earlier build
+failed on unbranded account/amount values in the new test fixture; fixture values
+now use the existing validated constructors.
+
+A subsequent expansion of recognized currency codes initially matched ordinary
+lowercase words such as “all” as ISO codes (**55/63 Node tests passed**). ISO codes
+now require uppercase outside explicit currency/amount labels, while common
+unambiguous codes and currency names remain case-insensitive. Ordinary invoice
+prose is retained in the regression fixture; the corrected Node run passed **63/63**.
+
+Initial browser run: **38/42 passed**. New currency tests needed to bring the
+contractor tab to the foreground/wait for the approved work order and locate the
+owner error inside the active dialog. Those test synchronization/locator fixes
+are in place; the final full rerun passed **42/42 desktop/mobile browser tests**.
+After broadening currency-code coverage and correcting the persistence banner,
+the follow-up full run passed **41/42**: the desktop isolation test read the first
+contractor's still-displayed link before the second link response completed.
+The test now waits for a different link and asserts “Hello, Designer.” before
+checking that contractor's empty records. No authorization guard was changed.
+The corrected full invite/review/isolation journey then passed **2/2 targeted
+desktop/mobile executions**. Thus all 42 browser scenarios have executed
+successfully; the last full invocation was 41/42 followed by that 2/2 rerun,
+not a claimed fresh 42/42 invocation. The final build/typecheck and Node 63/63
+results above are for the final application source. Manual browser inspection
+confirmed the removed reference input, automatic-reference explanation and fixed
+currency label; screenshot: `artifacts/contractor-auto-reference-preview.png`.
+These are mock/local integration results, not real-wallet or payment acceptance.
+
+### Scheduled read-only checkpoint — 2 November, 10:38 UTC
+
+Finalized testnet height **275887114**, block
+`HKdE8CF4xnR6R2qPXXma8vksSwQthKjEqtEUJf55g7AM`: original hash remains
+UNKNOWN_TRANSACTION; old FullAccess nonce **275527848000002**, owner balance
+**11999868762049999999999999 yoctoNEAR**, and absent factory/customer targets
+are unchanged. Protocol 88 still reports validity **86400 blocks**, and reference
+275874998 retains canonical hash `GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y`.
+**74,285 blocks** remain to first conservative expired height 275961399.
+Original outbox preserved; no replacement prepared, signed or broadcast.
+Monitor retained; no actionable change. Full ignored local evidence:
+`artifacts/local-checks/transaction-watch-1793615899116.json`.
+
+### User-requested read-only checkpoint — 2 November, 10:27 UTC
+
+Finalized testnet height **275885969**, block
+`EkaCen8fmZjanahbQVo4GqscxB6JaaXPqZtc9kjykEYN`: original transaction
+still UNKNOWN_TRANSACTION; old key nonce **275527848000002** and owner balance
+**11999868762049999999999999 yoctoNEAR** unchanged. Factory and customer target
+both remain absent. Protocol 88, validity 86400 and canonical reference hash
+remain unchanged. **75,430 blocks** remain to first conservative expired height
+275961399. No replacement preparation/signing/broadcast; original outbox retained.
+Full ignored local evidence:
+`artifacts/local-checks/transaction-watch-1793615232595.json`.
+
+### Scheduled read-only checkpoint — 2 November, 10:07 UTC
+
+FastNEAR testnet finalized height **275884057**, block
+`GGJun5Tz6ywkTtGpCFLwWVU8m7j8aWEBCiNXqgHUY2Fq`, still precedes
+the first conservative expired height **275961399** (77,342 blocks remain).
+Protocol 88 still reports transaction validity **86400 blocks**; canonical
+reference height 275874998 still hashes to
+`GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y`.
+Original transaction remains UNKNOWN_TRANSACTION. At that same finalized block,
+the old FullAccess key nonce remains **275527848000002**, Grandtheft's balance
+remains **11999868762049999999999999 yoctoNEAR**, and both factory and customer
+vault remain absent. No replacement preparation, signing or broadcast occurred;
+the original outbox is preserved. Monitor remains active with no actionable
+change. Full local RPC evidence:
+`artifacts/local-checks/transaction-watch-1793614035755.json` (ignored).
+
+## 2 November — contractor mock portal, separate from live acceptance
+
+The user explicitly authorized this mock implementation while the original
+infrastructure transaction stays under read-only monitoring. The new portal is
+available at `/demo/contractors` for demo owners and private `/contractor#…`
+capabilities for contractors, with typed HTTP mock adapters and a separate
+durable SQLite store. All screens label simulated data and simulated wallet
+proof. No real wallet receives synthetic records. No chain client/signer or
+payment/deployment method exists in this adapter/API. Contract code/interface,
+live owner/organization guards and approved transaction plans are unchanged.
+
+Implemented and exercised: owner-created profiles/private links; initial
+simulated wallet request and owner approval; immutable approved work orders;
+text-first bills, bounded TXT/PDF/PNG/JPEG attachments, formatted preview and
+missing-detail clarification; mismatch review without rule overrides; contractor
+invoice/status views; owner-requested clarification and corrected resubmission;
+owner-approved wallet changes affecting only future orders; link replacement /
+revocation invalidating sessions and pending wallet approvals. Binary uploads
+are attachment-only; no OCR/AI or live contractor proof was added. See
+[CONTRACTOR_PORTAL.md](CONTRACTOR_PORTAL.md) for limits and reproduction.
+
+### Actually executed locally on Windows
+
+| Check | Final result |
+| --- | --- |
+| Owner application `npm test` | **59 passed, zero failures**: prior 49 plus 10 contractor domain/security cases |
+| Type checking / production build | Passed; final build emitted no tracing warning |
+| Full desktop/mobile `npm run test:browser` | **38 passed, zero failures**, including 10 new contractor executions and prior 28 owner/onboarding cases |
+| Domain restart/duplicate/isolation tests | Executed: durable invoice claims and revocation survive SQLite restart; unrelated owners/contractors denied |
+| Browser race / access tests | Executed: concurrent submissions yield exactly one accepted invoice; invalid fragment changes and delayed old responses cannot revive access |
+| Live flags | `NNETICS_PROVISIONING_ENABLED` and `NNETICS_TRANSACTIONS_AUTHORIZED` remain disabled |
+
+Initial targeted browser run: **4/8 passed**. Two failures per viewport exposed
+an unhandled same-page URL-fragment invitation switch and a test locator collision
+with Next's route announcer. The switch now clears/fences private state before
+exchange, and failed exchanges invalidate prior server sessions; the locator was
+scoped to the actual error. The next full run passed **36/38**, exposing a loading
+state that never completed when revoked access incremented the response
+generation during initial refresh. The error path now explicitly exits loading
+and remains denied. A delayed-snapshot regression was added. The final full
+**38/38** run passed after that fix. These failures were not suppressed or counted
+as passing attempts. The initial build's broad filesystem-tracing warning was
+resolved by the same explicit dynamic-path tracing annotation used elsewhere.
+
+The paid-history link case is a controlled display fixture with an allowlisted
+testnet explorer URL, clearly labeled simulated; it is **not** a real transaction
+or payout result. New submitted demo invoices have no transaction. All real
+contractor signatures, live payment reconciliation and production invitation
+deployment remain **unimplemented/unverified**. Prior real two-wallet owner
+checks are preserved, not rerun or replaced by mock results. No Rust changes or
+new Rust/Linux executions were needed for this portal; `c655800` CI results below
+remain historical evidence for those exact contract artifacts only. Passing these
+tests is not independent security review and does not complete Milestone 1 or
+live onboarding.
+
+The existing `nnetics-transaction-expiry` heartbeat was inspected and retained.
+An additional read-only checkpoint while the browser suite ran returned finalized
+height **275883550**, block `DQzqwPEbYxHFo2DtT3RnNYDMbsHVqdXgMtkJQEnkJqLH`,
+and UNKNOWN_TRANSACTION for the original recorded hash. It is below the expiry
+gate. No signing, deployment, top-up, payment, authority change or GitHub push
+occurred. Portal source, tests and documentation remain local/unpushed.
+
+## 2 November — funded, Meteor verified, factory wallet policy blocked
+
+**Read-only watch requested and scheduled:** the user instructed continued
+checks until confirmation or conclusive expiry, then continuation under existing
+conditional approvals. A thread heartbeat `nnetics-transaction-expiry` is ACTIVE,
+every 30 minutes, quiet while the state is unchanged; it surfaces confirmation,
+expiry, failure or required user action and pauses after conclusive resolution
+and resumed reconciliation. It does not authorize extra transactions or bypass
+the owner-run signing handoff.
+
+Latest read-only checkpoint: finalized height **275880026**, block
+`Dkpdkn7L4DmLzSmZsCLR4J6JYjxuowkh3QU6Rk6wgqdp`, timestamp
+`1793611699405285506` ns. Original hash remains UNKNOWN_TRANSACTION; old key nonce
+275527848000002, owner balance 11.999868762049999999999999 NEAR and absent factory
+are unchanged. Canonical block 275874998 returned hash
+`GNSR9Np2gfHsUuajUJTk4h7EWJ9xxYbfiVGvCpS47B1y`, timestamp
+`1793608767828873875` ns. Across 5028 blocks the observed mean is
+**0.5830502012 seconds/block**. There are **81373 blocks** to the first conservative
+expired height **275961399**. Estimated remaining wait: **13h 10m 45s**, suggesting
+**2 November around 23:39 WAT (Africa/Lagos)**. This is an observed-rate estimate,
+not a clock-time expiry guarantee. Finalized height strictly greater than
+275961398 and the subsequent hash/nonce/balance/target/reference/validity checks
+remain authoritative. No signature or submission occurred in this checkpoint.
+
+**CLI follow-up:** user confirmed Grandtheft is available in the local CLI.
+The user subsequently **approved the conditional CLI amendment** digest below.
+Post-approval finalized height **275876528**, block
+`6tVfCF8EUkbb7aqWC9E2g2M6y3hHmhxtubBC7D3Hyq6i`, still precedes the expiry gate;
+old key nonce 275527848000002 and balance 11.999868762049999999999999 NEAR are
+unchanged, factory absent. Both approved JSON digests were recomputed successfully.
+No replacement was signed or submitted. Approval is retained, but does not waive
+conclusive-resolution/expiry conditions. No further approval is needed for the
+same exact amendment once those conditions are satisfied.
+
+Read-only official CLI help and secure-keychain public-key lookup returned
+`ed25519:6vkGFeDZ2Z8M6mfubE4mYQpdr2d3M7eULrHWuonseBhZ`; no secret export or
+signing occurred. This differs from the Meteor proof key. A separate
+[owner-run handoff amendment](CLI_FACTORY_HANDOFF_PLAN.md), digest
+`bca85c64ac11e4a0a14808d290980c47db89353fa2450930f34022291cc91ae8`, preserves
+the exact original action list but changes infrastructure key-control proof to
+verified CLI signing. It requires explicit approval and conclusive resolution
+before replacement signing. Protocol config reports validity period **86400
+blocks**; original reference 275874998 gives a conservative finalized expiry gate
+**above 275961398**. Latest observed finalized height 275876027 was below it.
+No replacement transaction was prepared/signed. The CLI template has help-checked
+action syntax only; full signing/broadcast remains unexecuted.
+
+Finalized preflight height **275873788**, block
+`8rDvxVmMwnofRKseBpvybzNV4GrH5qbsEK2y1QoX724Y`, confirmed:
+Babygoat **9.878461305613026399999998 NEAR**, Grandtheft
+**11.999868762049999999999999 NEAR**. Grandtheft alone covers the unchanged
+approved plan's **11.6346437084553175 NEAR** combined upfront requirement.
+The separate Babygoat-to-Grandtheft transfer proposal is unnecessary and was
+**not executed**. Both targets remain absent; testnet protocol 88 / nearcore
+2.14.0-rc.5 and all relevant observed fee/storage parameters match the plan.
+The older official RPC returned a deprecation/-429 error, so reads used the
+already configured FastNEAR endpoint. No application RPC code was changed.
+
+The local app was restarted. The first fresh Meteor message was not verified
+because the server's restricted process could not reach RPC. A read-only Node
+probe with network access passed, and the server was restarted with that access.
+No signature check or authentication rule was weakened. A new user-approved
+NEP-413 message **successfully authenticated Grandtheft** with FullAccess key
+`ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX`.
+The real UI returned only Grandtheft workspace with zero invoices, contractors
+and payments and no linked vault. Previous two-wallet isolation results remain
+preserved; no new reverse-switch test is claimed in this continuation.
+
+The existing application bridge handles only the bounded small customer call.
+A separate local, exact-plan factory review tool was added at
+`apps/owner/scripts/factory-wallet-review.mjs`. It is not a generic payment or
+organization authorization path: pinned digest/artifact/signer/three actions,
+fresh verified public identity metadata, finalized key/network/funding/fee/target
+preflight, localhost-only review, exact origin/body checks and an exclusive fsynced
+outbox before the wallet request; no server signing/broadcasting or key export.
+Syntax check and actual **read-only live preflight** passed at height 275874557.
+These do not establish independent security review or successful wallet support.
+No contract source changed; no new Linux CI was run for this local tool.
+
+The tool prepared exactly the approved CreateAccount / 6.3324 NEAR Transfer /
+pinned DeployContract transaction, receiver `v.grandtheft.testnet`:
+
+- Original transaction hash: `HafBR1uMZJFfN3U1v7x72s1LQiFCDkPoE6KqS5dhBSyk`.
+- Nonce: `275527848000003`; prepared against finalized height **275874998**.
+- Exact bytes/hash/public key are retained in ignored local artifact
+  `artifacts/live/approved-factory-infrastructure.json`; never replace/delete it
+  merely to obtain a fresh nonce.
+- The user reported Meteor's **Contract deployment blocked** protection: apps
+  cannot submit this DeployContract action. This is a real wallet-policy failure,
+  not a contract rejection or gas/storage failure. The review UI timed out without
+  an authoritative success response. Its server was stopped; do not retry this
+  unsupported deployment through the app or disable the wallet protection.
+
+The first FINAL lookup timed out. A subsequent `tx` lookup with `wait_until:NONE`
+returned **UNKNOWN_TRANSACTION**. At finalized height **275875473**, block
+`3bc5MnKeS64uTyW1qJtVZewnq7F1SzeRknsELZvZp5ou`, Grandtheft's balance is still
+`11999868762049999999999999` yoctoNEAR, key nonce still `275527848000002`, and
+factory is absent. **Observed on-chain cost: zero** at that checkpoint. This is
+not a finalized failed transaction/refund, nor proof that a not-yet-expired signed
+transaction could never arrive later. Unknown outcome remains blocked; no fresh
+transaction was generated or submitted. An owner-run CLI path must reconcile or
+reuse the original exact transaction, or conclusively establish expiry before
+preparing any replacement. No CLI signing was attempted. Installed official CLI
+version was read-only confirmed as **near-cli-rs 0.30.1**; the user's available
+Grandtheft CLI public key still needs confirmation. Never request private keys
+or seed phrases. A changed signing-key/proof condition requires explicit review.
+
+| Area | Actual status |
+| --- | --- |
+| CI | `c655800` core/provisioning protocols 86/88 and owner passes preserved |
+| Funding / approved action scope | Passed; no consolidation transfer needed |
+| Current real Meteor identity | Grandtheft login passed; its saved empty workspace returned |
+| Factory deployment | Wallet-policy blocked; unknown hash, absent target, no observed cost |
+| Customer provisioning / owner verification / linking | Not executed; factory absent |
+| Live refresh/resume / interruption recovery | Not passed; infrastructure outbox preserved, no fresh retry; customer recovery still unexecuted |
+
+There is **no confirmed deployment transaction link**. The
+[attempted hash lookup](https://testnet.nearblocks.io/txns/HafBR1uMZJFfN3U1v7x72s1LQiFCDkPoE6KqS5dhBSyk)
+is an unknown attempt, not execution evidence. No worker activation, checkpoint,
+payment, unpause or GitHub push occurred. All documentation and the local review
+tool remain unpushed. Milestone 1 and full onboarding remain incomplete.
+
+## 1 November 2026 — funded continuation preflight, no execution
+
+**Existing-balance alternative:** after the user reported an unresponsive faucet,
+the two owner wallets were queried together at finalized height 275771829, block
+`2ruRBWBX33LPpjuVzLeKqFPEcR9M4rtjbb9Uzod8A1CU`. Babygoat has
+`5878461305613026399999998` yoctoNEAR; Grandtheft remains at
+`6999868762049999999999999`. Combined liquid funds suffice. A separate
+[unsigned 4.64-NEAR transfer proposal](EXISTING_BALANCE_TOPUP_PLAN.md) would move
+funds only from Babygoat's owner wallet to Grandtheft, with at most 0.00025 NEAR
+upfront fee allowance. It would leave Babygoat about 1.2382 NEAR and fund the
+unchanged provisioning plan. Digest:
+`00cf57533b4c52f4401c664881e4107594d579c827ea55f359ef257f0f7aea9e`.
+It requires **separate approval** because the original approval excluded top-ups.
+No transfer has executed. This does not resolve the current browser debugger /
+fresh Meteor proof blocker. No working application/contract code changes.
+
+The user reported funding and instructed execution within approved plan digest
+`0f569790060daca8ffb0f51a8aebd9c5ae80b94e1cde253ec1db32f99cabfa6a`.
+The digest and both local artifact SHA-256 hashes were rechecked and are unchanged.
+No working application or contract code was changed.
+
+FastNEAR finalized height **275771283**, block
+`7doapANajxEB95Rrhcx74E5rngcyy1axJhJVzmnbghXP`, reported testnet protocol 88,
+nearcore `2.14.0-rc.5`, commit
+`b7b4737cab46f17a6daa2ed694d7aebbd204363a`. The storage price, block gas price,
+minimum receipt purchase price and relevant action fee parameters match the
+approved plan. Both proposed factory and vault accounts are absent. Both listed
+Grandtheft FullAccess keys remain present (the first key nonce advanced to
+`275527848000002`; no inference is made about the purpose of that transaction).
+
+Grandtheft balance is now **6999868762049999999999999** yoctoNEAR
+(**6.999868762049999999999999 NEAR**), locked zero, storage 264 bytes. The official
+`https://rpc.testnet.near.org` independently confirmed the same amount at finalized
+height **275771459**, block
+`CHtpjzKqqESeTEdgMhNtwMYGYqMWtiZPQW21yVrQRwQt`.
+Required deposits and both upfront fee allowances remain
+**11.6346437084553175 NEAR**. The current shortfall is
+**4.634774946405317500000001 NEAR** (rounded incoming amount 4.64 NEAR at the
+same parameters). No funding transaction was supplied/verified in this continuation.
+The user has been asked for its public hash/link or recipient to resolve the
+mismatch. Do not assume the reported top-up reached this account.
+
+The local production server was not running; it was restarted on localhost:3100
+without a code/build change. Brave inventory was reachable, but opening/binding
+the acceptance tab timed out and then returned **Debugger unattached**. Therefore
+the current Meteor account/network and fresh wallet-control proof are **not
+verified**. No login or transaction-signing request was sent to Meteor.
+
+| Area | Result in this continuation |
+| --- | --- |
+| CI | Previously confirmed `c655800` owner/core/provisioning passes remain valid; no code change or new rerun |
+| Two real-wallet checks | Earlier passes preserved; not represented as fresh execution |
+| Plan/artifacts/network/target preflight | Passed; exact approved actions remain unchanged |
+| Funding and current Meteor identity | Blocked: insufficient finalized funds and browser debugger unavailable |
+| Live provisioning / initialized owner / organization link | Not executed; no new transaction links or deployment costs |
+| Live refresh/resume / interruption recovery | Not executed; controlled-test passes remain distinct |
+
+Conditional transaction approval is retained, but its funding and fresh-wallet
+conditions must pass before either transaction is signed. No faucet/top-up,
+deployment, payment, authority activation or GitHub push occurred. The approved
+JSON remains immutable. Live onboarding acceptance and Milestone 1 stay incomplete.
 
 **The integration build passed automated Linux checks on protocols 86 and 88. Milestone 1 and live-payment acceptance remain incomplete.** Independent security review remains open; no audited or production-ready verifier claim is made.
 
 ## 31 October — fresh-user provisioning continuation
 
-### Latest review and repair — 31 October, approximately 21:00 WAT
+### Approved receipt-test rerun — `c655800`
+
+Commit `c6558002ee848e909b74ad499560292e4045999f` was pushed with explicit
+publication/CI approval. It changes provisioning tests and documentation only;
+contract source is unchanged from `07181a0`. Initial status checks failed with
+TLS/DNS errors. Connectivity subsequently recovered: all three workflows
+completed successfully. No working code was changed to address network failures.
+
+| Executed Linux workflow | Actual result |
+| --- | --- |
+| [Core](https://github.com/Technique-S/Nnetics/actions/runs/41239039000) | Protocols 86/88 passed; production build and strict Clippy |
+| [Provisioning](https://github.com/Technique-S/Nnetics/actions/runs/41239039050) | Per protocol: 39 vault unit, 15 core sandbox, 6 factory unit, **4 provisioning sandbox**, zero failures; production build/Clippy |
+| [Owner](https://github.com/Technique-S/Nnetics/actions/runs/41239039001) | Typecheck, **49 Node tests**, production build and **28 browser cases passed** |
+
+Provisioning jobs `124648850647` (88) and `124648850799` (86) explicitly log
+39/15/6/4 passing counts and identical production hashes. The corrected exact
+funding/refund receipt checks and unchanged duplicate balances **executed and
+passed on both protocols**. These are local sandbox and controlled browser/RPC
+tests, not real-network provisioning or independent security review.
+
+Retained provisioning artifact IDs: `13057545176` (protocol 88, archive digest
+`36fb81e20affdc25a30c4dc1c63b9fc83b2e719371f3a69096ca567aa53c0330`) and
+`13057275680` (protocol 86, archive digest
+`0da38f643d9a6d12b75cbf2251250b9fc2789d054fa92594b2535f17c7ae5712`).
+
+The earlier successful protocol-88 run's artifacts were downloaded and hashed
+locally. Factory: 629144 bytes, SHA-256
+`8475786608c34a68317d2ada08cd3dd2e65ff23dc176e2377ac54db5b4f52bbb`;
+vault: 427238 bytes, SHA-256
+`dc4cf64736110a33cce94531e2e00ba4510bcebbbb240bee6ecdacacf778560f`.
+The earlier proposed factory deposit was 6.8324 NEAR, including a discretionary
+0.5 NEAR reserve. The [itemized, reduced unsigned plan](FRESH_USER_TESTNET_PLAN.md)
+removes that reserve while retaining the 4096-byte storage allowance and fixed
+5-NEAR customer deposit. Deposits become **11.3324 NEAR**, with payment funds zero.
+The exact-storage boundary has not been newly measured in the VM; further
+reductions are not proposed. Contract code and application behavior are unchanged.
+
+### Refreshed funding preflight and separate live acceptance status
+
+Finalized height **275659894**, block
+`AHXCpUGBqkpHLJ4gbXyB2ETqCg9oMPTMTFsdAgaNQXEG`: protocol 88;
+Grandtheft **9999913398562499999999999** yoctoNEAR, locked zero,
+storage 264 bytes; two existing FullAccess keys; `v.grandtheft.testnet` absent.
+Storage byte price `10000000000000000000`, block gas price `100000000`, minimum
+receipt gas purchase price `1000000000`. Pinned official nearcore commit
+`b7b4737cab46f17a6daa2ed694d7aebbd204363a`,
+[cost formula](https://github.com/near/nearcore/blob/b7b4737cab46f17a6daa2ed694d7aebbd204363a/runtime/runtime/src/config.rs#L483),
+was inspected before calculating upfront allowances. The signer buys receipt gas
+at the minimum price even when the block price is lower; do not use 250 Tgas times
+block price alone. The account-creation charge is covered within that purchase,
+not an extra 0.014 NEAR on top. The pinned verifier's <=770-byte storage exemption
+applies to Grandtheft's unchanged 264-byte account.
+
+Combined upfront fee allowance: **0.3022437084553175 NEAR**. Reduced deposits plus
+both allowances: **11.6346437084553175 NEAR**. No execution refund credit assumed.
+Refreshed shortfall: **1.634730309892817500000001 NEAR**; a rounded incoming
+**1.64 testnet NEAR** covers it at these parameters. This is not an actual final
+fee claim; final burned/refunded values require execution evidence. The app's
+generic 5.1 NEAR minimum does not fully estimate protocol-88 prepaid fees; the
+transaction plan uses the larger computed requirement. No application edit was
+made; pricing/balance checks must pass immediately before execution.
+
+Machine-readable plan: [FRESH_USER_TESTNET_PLAN.json](FRESH_USER_TESTNET_PLAN.json),
+digest `0f569790060daca8ffb0f51a8aebd9c5ae80b94e1cde253ec1db32f99cabfa6a`.
+It proposes exactly two testnet transactions, excludes top-up/faucet actions and
+requires fresh Meteor proof of one listed on-chain key, funding and explicit
+approval before execution. No new signing, deployment or provisioning transaction
+has occurred; **no new transaction links exist**.
+
+**Conditional approval received:** the user approved the above digest and its
+two transactions, subject to funding, fresh Meteor proof and unchanged preflight.
+Top-up/faucet actions remain excluded. A post-approval finalized balance check at
+height **275662458**, block `4p1rYsThzY1FDJUnKuR39opKW2oLiGzSGWxx5e28qXmP`,
+returned the same `9999913398562499999999999` yoctoNEAR. The account remains
+unfunded for the complete plan, so no signing/deployment was attempted. Approval
+is retained; no repeat deployment approval is needed if its conditions and exact
+plan remain satisfied. A changed price/action/hash/scope requires review.
+
+| Acceptance area | Actual live result |
+| --- | --- |
+| Two-wallet login / organization isolation / reverse switching | Earlier real Meteor passes preserved; neither identity, organization nor session rules changed |
+| Provisioning / finalized owner / link | **Not executed live**; blocked on funding, explicit transaction approval and confirmed signing transport |
+| Refresh / interruption recovery of dispatched provisioning | **Not executed live**; controlled tests and sandbox lost-response/duplicate tests passed |
+| Cancellation | Controlled browser cases passed; live cancellation during provisioning remains unverified |
+
+After authorization, cancel before signing, then dispatch only one customer create
+transaction, interrupt its return and reconcile its recorded hash after fresh
+login/refresh. Unknown outcomes stay blocked; do not send an extra duplicate or
+fault transaction. Confirm finalized pinned code, no keys, expected owner/state
+before the unique organization link. Callback/refund failure recovery, independent
+verifier review and bootstrap trust remain unresolved. Payment controls stay
+disabled. Full onboarding and Milestone 1 remain incomplete.
+
+### Earlier review and repair — 31 October, approximately 21:00 WAT
 
 Approved fix commit `07181a0174fedf5e16a011723ffa8586a70f3dfc` was pushed.
 Replacement runs: [owner](https://github.com/Technique-S/Nnetics/actions/runs/41237147471),

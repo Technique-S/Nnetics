@@ -176,6 +176,12 @@ export class MockOwnerAdapter implements OwnerAdapter {
   async snapshot() {
     await sleep(this.delay);
     this.check();
+    if (typeof window !== "undefined") {
+      const response=await fetch("/api/demo/owner-invoices",{cache:"no-store"});
+      if(!response.ok) throw Error("Unable to load saved demo invoices. Retry refresh.");
+      const saved=await response.json() as Invoice[];
+      for(const invoice of saved) if(!this.state.invoices.some(i=>i.id===invoice.id)) this.state.invoices.unshift(invoice);
+    }
     return structuredClone(this.state);
   }
   failNextRequest() {
@@ -291,8 +297,7 @@ export class MockOwnerAdapter implements OwnerAdapter {
     uint(draft.amount);
     if (draft.text.length > 8000)
       throw new Error("Keep sample invoice text within 8,000 characters.");
-    if (this.state.invoices.some((i) => i.id === draft.id))
-      throw new Error("This invoice reference already exists.");
+    if (this.state.invoices.some((i) => i.id === draft.id)) return;
     this.state.invoices.unshift({ ...draft, reviewed: false });
     this.emit("Sample invoice added for review.");
   }

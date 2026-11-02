@@ -1,0 +1,131 @@
+{
+  "plan": {
+    "version": 1,
+    "network": "testnet",
+    "purpose": "One fresh-user vault, paused with zero payment funds; cancellation before signing and interruption/resume of the same create request",
+    "signer": "grandtheft.testnet",
+    "permitted_existing_full_access_keys": [
+      "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+      "ed25519:6vkGFeDZ2Z8M6mfubE4mYQpdr2d3M7eULrHWuonseBhZ"
+    ],
+    "key_selection": "Only a currently on-chain listed FullAccess key proven by a fresh Meteor login; no key export or new key installation",
+    "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+    "transactions": [
+      {
+        "id": "infrastructure",
+        "signer": "grandtheft.testnet",
+        "receiver": "v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "CreateAccount"
+          },
+          {
+            "type": "Transfer",
+            "deposit": "6332400000000000000000000"
+          },
+          {
+            "type": "DeployContract",
+            "code_bytes": 629144,
+            "code_sha256": "8475786608c34a68317d2ada08cd3dd2e65ff23dc176e2377ac54db5b4f52bbb"
+          }
+        ],
+        "upfront_fee_allowance_yocto": "51324415742682000000000"
+      },
+      {
+        "id": "customer-vault",
+        "signer": "grandtheft.testnet",
+        "receiver": "v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "create_vault",
+            "args_utf8": "{\"request_id\":\"0657dc10a1c5acb5e4e930476ce98df8\"}",
+            "args_base64": "eyJyZXF1ZXN0X2lkIjoiMDY1N2RjMTBhMWM1YWNiNWU0ZTkzMDQ3NmNlOThkZjgifQ==",
+            "deposit": "5000000000000000000000000",
+            "gas": "250000000000000"
+          }
+        ],
+        "upfront_fee_allowance_yocto": "250919292712635500000000"
+      }
+    ],
+    "expected_vault": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+    "expected_vault_sha256": "dc4cf64736110a33cce94531e2e00ba4510bcebbbb240bee6ecdacacf778560f",
+    "expected_initial_state": {
+      "owner": "grandtheft.testnet",
+      "paused": true,
+      "agent": null,
+      "budget": "0",
+      "payment_cap": "10000000000000000000000",
+      "funded": "0",
+      "spent": "0",
+      "reserved": "0",
+      "last_attempt": "0"
+    },
+    "access_keys_on_factory_and_vault": [],
+    "funding_policy": {
+      "factory_code_and_overhead_bytes": 633240,
+      "overhead_allowance_bytes": 4096,
+      "factory_discretionary_operating_reserve": "0",
+      "customer_fixed_contract_deposit": "5000000000000000000000000",
+      "payment_funding": "0",
+      "change_from_default_plan": "Remove only the discretionary 0.5 NEAR factory reserve; retain the existing storage allowance and tested contract artifacts"
+    },
+    "preflight": {
+      "height": 275659894,
+      "block_hash": "AHXCpUGBqkpHLJ4gbXyB2ETqCg9oMPTMTFsdAgaNQXEG",
+      "protocol": 88,
+      "account_amount": "9999913398562499999999999",
+      "account_storage_bytes": 264,
+      "storage_amount_per_byte": "10000000000000000000",
+      "block_gas_price": "100000000",
+      "min_gas_purchase_price": "1000000000",
+      "factory_absent": true
+    },
+    "fee_calculation": {
+      "source_commit": "b7b4737cab46f17a6daa2ed694d7aebbd204363a",
+      "source_path": "runtime/runtime/src/config.rs",
+      "rule": "send gas * block price + receipt gas * max(block price, min purchase price); Ed25519 verification surcharge zero; no delegate actions",
+      "infrastructure_send_gas": "30907871502460",
+      "infrastructure_receipt_gas": "48233628592436",
+      "customer_send_gas": "310968206615",
+      "customer_receipt_gas": "250888195891974",
+      "combined_upfront_allowance": "302243708455317500000000",
+      "notice": "Upfront allowance, not final expenditure. Do not add account-creation charge again. Execution/price refunds require final receipts.",
+      "refund_credit_assumed_for_funding": "0"
+    },
+    "funding_summary": {
+      "deposits": "11332400000000000000000000",
+      "required_with_both_upfront_allowances": "11634643708455317500000000",
+      "shortfall_with_both_upfront_allowances": "1634730309892817500000001",
+      "rounded_incoming_topup": "1640000000000000000000000",
+      "topup_source": "Unselected; no faucet or funding transaction authorized by this plan"
+    },
+    "execution_conditions": [
+      "Explicit approval of this plan digest; no signing or broadcast while approval is absent",
+      "Funding received; fresh finalized testnet/protocol/key/balance/target checks and fresh wallet-control proof",
+      "Storage byte price unchanged; block gas price <= 100000000; minimum gas purchase price <= 1000000000; fee schedule unchanged; otherwise reprice and obtain revised approval",
+      "Infrastructure transaction FINAL before customer call; verify exact pinned factory code, embedded vault hash, immutable configuration and no keys",
+      "Record exact unsigned transaction bytes/hash/nonce before wallet request; unknown outcome must reconcile before any retry",
+      "Customer call only through reviewed Create vault flow; transaction hash must remain the same across interruption/resume",
+      "Link only after FINAL success, complete receipt checks and finalized expected vault code/no keys/owner/state",
+      "Do not deliberately cause on-chain failure or broadcast an additional duplicate transaction under this approval"
+    ],
+    "unresolved": [
+      "Independent historical-verifier security review incomplete",
+      "Checkpoint bootstrap trust unresolved; payment controls disabled",
+      "Factory callback/refund failure has no automatic recovery; unknown outcomes remain blocked",
+      "Reduced factory reserve is source-derived, not a separately VM-measured minimum-storage boundary",
+      "Deployment transport and real Meteor key must be confirmed before signing"
+    ],
+    "excluded": [
+      "Top-up or faucet request",
+      "Payments",
+      "Unpause",
+      "Worker/key activation",
+      "Checkpoint installation",
+      "Contract changes",
+      "GitHub push"
+    ]
+  },
+  "digest": "0f569790060daca8ffb0f51a8aebd9c5ae80b94e1cde253ec1db32f99cabfa6a"
+}

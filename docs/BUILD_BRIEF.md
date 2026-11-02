@@ -2,6 +2,14 @@
 
 Status: implementation baseline, 29 October 2026. Product decisions below are lead-developer defaults within the agreed MVP.
 
+2 November user-directed parallel work: build an explicitly simulated contractor
+portal while the approved infrastructure transaction remains under read-only
+expiry monitoring. The mock adds owner-created profiles/revocable private links,
+text-first bills and bounded attachments (no OCR/AI), invoice/status review and
+owner-approved simulated wallet changes. It does not enable live deployment or
+payments, alter contract guards or count as live owner/contractor acceptance.
+See [CONTRACTOR_PORTAL.md](CONTRACTOR_PORTAL.md).
+
 Current user-directed sequence: Milestone 3 first integrates the live testnet owner
 dashboard and durable worker with manually entered structured invoices. Real
 exactly-once payment/duplicate/mismatch/restart acceptance must pass before AI

@@ -1,5 +1,20 @@
 # Owner onboarding acceptance — not passed
 
+**Current `c655800` result:** all three Linux workflows passed. Both protocols
+passed 39 vault unit, 15 core sandbox, 6 factory unit and 4 provisioning sandbox
+tests; owner build/typecheck/Node suite and 28 browser cases passed. The original
+real two-wallet identity/isolation passes remain preserved. No real provisioning,
+finalized link or interrupted-provisioning recovery has executed. Funding,
+specific transaction approval and confirmed signing transport are still required.
+The [reduced unsigned plan](FRESH_USER_TESTNET_PLAN.md) itemizes deposits and fees;
+the refreshed funding shortfall with both upfront allowances is
+1.634730309892817500000001 NEAR. The user subsequently approved the exact reduced
+two-transaction plan conditionally. The post-approval balance is unchanged, so
+funding remains a blocker. No top-up/faucet action is authorized and no deployment
+has executed. The approval is retained pending funding and fresh Meteor proof.
+The following checkpoints are historical; see [VALIDATION.md](VALIDATION.md)
+for the latest executed results. Passing CI is not independent security review.
+
 **Latest review:** both existing real wallets authenticated again. Babygoat
 loaded its own workspace; switching removed its private UI. Grandtheft returned
 only to its saved organization with zero record counts and was denied babygoat's

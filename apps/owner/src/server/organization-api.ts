@@ -40,7 +40,8 @@ export async function organizationMutation(
     const invoice = structuredInvoice(body);
     const snapshot = await s.chain.snapshot(s.queue, block);
     s.queue.register("order", invoice.order_id);
-    s.queue.add(invoice, review(snapshot, { ...invoice, reviewed: false }));
+    const saved = s.queue.submitGenerated(invoice, review(snapshot, { ...invoice, reviewed: false }));
+    return {ok:true, invoice:saved};
   } else if (path === "enqueue") {
     const job = s.queue.get(boundedId(body.id));
     if (!job || job.state !== "review")

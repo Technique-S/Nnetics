@@ -1,5 +1,17 @@
 # Meteor extension compatibility — 30 October 2026
 
+**2 November real result:** fresh Grandtheft NEP-413 login passed again.
+A separate exact-plan local infrastructure review requested CreateAccount,
+6.3324 NEAR Transfer and pinned DeployContract to `v.grandtheft.testnet`.
+Meteor blocked it with **Contract deployment blocked** (apps cannot deploy code).
+The app transport request timed out; RPC subsequently reported the recorded hash
+as unknown, with unchanged balance/nonce and absent target at finalized height
+275875473. Do not disable this wallet protection or treat SDK documentation as
+proof that this wallet version permits DeployContract. The review server is
+stopped, outbox preserved, no fresh retry. Factory setup needs an owner-run
+supported deployment path; the customer's later `create_vault` is a FunctionCall,
+but its live wallet support remains unverified. See [VALIDATION.md](VALIDATION.md).
+
 **31 October update:** real NEP-413 login passed for `babygoat.testnet` and
 `grandtheft.testnet`, including returning organization discovery and private API
 denial in both directions. Slow RPC exposed a short aggregate timeout and

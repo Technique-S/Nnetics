@@ -1,0 +1,51 @@
+{
+  "plan": {
+    "version": 1,
+    "network": "testnet",
+    "purpose": "Consolidate existing owner-wallet liquid funds for the separately approved paused provisioning test; no faucet",
+    "signer": "babygoat.testnet",
+    "permitted_existing_full_access_keys": [
+      "ed25519:6FgF6MAZLhMWehiS6W7Bzg2Z7PdEw4LtiRdPfi6fp25R",
+      "ed25519:7k3VsFcQyPR1w3TouKRirQgKfjgeypkAMXQtQjPE5e91",
+      "ed25519:EcXpsAWQyN6hCN6BmPKiYPWWRNZWHZMVBtvGZDwAdzwo"
+    ],
+    "receiver": "grandtheft.testnet",
+    "actions": [
+      {
+        "type": "Transfer",
+        "deposit": "4640000000000000000000000"
+      }
+    ],
+    "maximum_upfront_fee_allowance": "250000000000000000000",
+    "calculated_upfront_fee_at_preflight": "245500818750000000000",
+    "preflight": {
+      "height": 275771829,
+      "block_hash": "2ruRBWBX33LPpjuVzLeKqFPEcR9M4rtjbb9Uzod8A1CU",
+      "source_amount": "5878461305613026399999998",
+      "source_storage_bytes": 346,
+      "source_locked": "0",
+      "recipient_amount": "6999868762049999999999999",
+      "block_gas_price": "100000000",
+      "min_gas_purchase_price": "1000000000",
+      "send_gas": "223182562500",
+      "receipt_gas": "223182562500"
+    },
+    "conditions": [
+      "Explicit approval of this digest before signing or submission",
+      "Fresh finalized testnet, account/key, balance and unchanged fee checks; computed fee must not exceed the allowance",
+      "Use only an existing currently FullAccess key listed above, with verified signer control; do not export any secret or install keys",
+      "Record exact transaction bytes/hash/nonce before signing; reconcile unknown outcome before retry",
+      "Wait for FINAL transfer receipt and refresh recipient balance before the approved provisioning sequence"
+    ],
+    "related_provisioning_plan_digest": "0f569790060daca8ffb0f51a8aebd9c5ae80b94e1cde253ec1db32f99cabfa6a",
+    "excluded": [
+      "Vault, worker or vendor account funds",
+      "Access-key changes",
+      "Contract changes",
+      "Payments, worker activation or unpause",
+      "Faucet request",
+      "GitHub push"
+    ]
+  },
+  "digest": "00cf57533b4c52f4401c664881e4107594d579c827ea55f359ef257f0f7aea9e"
+}

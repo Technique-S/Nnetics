@@ -158,7 +158,25 @@ Application settings are `NNETICS_FACTORY_ID`, `NNETICS_FACTORY_CODE_HASH` and
 reviewed factory is deployed and verified. No new account, artifact digest,
 funding approval or deployment is inferred from the older consumed setup approval.
 
-## Current execution limits
+## Current executed result — `c655800`
+
+The [provisioning matrix](https://github.com/Technique-S/Nnetics/actions/runs/41239039050)
+passed on protocols 86 and 88: 39 vault unit, 15 core sandbox, 6 factory unit and
+4 provisioning sandbox tests per runtime, production WASM and strict Clippy.
+The owner workflow passed its build, typecheck, Node suite and 28 browser cases.
+Both protocol jobs emitted identical factory/vault artifact hashes. The earlier
+protocol-86 reward assertion failure is resolved by exact receipt checks; no
+contract change was needed. The following Windows failures are historical.
+
+Real provisioning, verified organization linking and interrupted-transaction
+recovery remain unexecuted. The [reduced unsigned plan](FRESH_USER_TESTNET_PLAN.md)
+removes the discretionary 0.5 NEAR factory reserve, retains its storage allowance,
+and preserves the fixed 5 NEAR customer deposit. Payment funds remain zero.
+The exact reduced plan has conditional user approval; funding and fresh Meteor
+proof/confirmed signing transport remain required. Do not enable the live factory until deployed code/config/no-key checks
+pass. Independent verifier review and bootstrap trust remain unresolved.
+
+## Earlier execution limits
 
 Local Node tests exercise SQLite restart/concurrency, real Borsh hash checking,
 owner/organization isolation, reviewed plan gating, finality, wrong keys/code/owner,

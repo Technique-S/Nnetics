@@ -1,0 +1,58 @@
+{
+  "plan": {
+    "version": 1,
+    "network": "testnet",
+    "purpose": "Owner-run CLI deployment after the Meteor-blocked attempt is conclusively resolved; wallet protection stays enabled",
+    "signer": "grandtheft.testnet",
+    "public_key": "ed25519:6vkGFeDZ2Z8M6mfubE4mYQpdr2d3M7eULrHWuonseBhZ",
+    "receiver": "v.grandtheft.testnet",
+    "actions": [
+      {
+        "type": "CreateAccount"
+      },
+      {
+        "type": "Transfer",
+        "deposit": "6332400000000000000000000"
+      },
+      {
+        "type": "DeployContract",
+        "code_bytes": 629144,
+        "code_sha256": "8475786608c34a68317d2ada08cd3dd2e65ff23dc176e2377ac54db5b4f52bbb"
+      }
+    ],
+    "maximum_upfront_fee_allowance": "51324415742682000000000",
+    "replaces_only": "Infrastructure signing route/key-control proof from the original plan; the customer create_vault call remains under its original approval",
+    "original_plan_digest": "0f569790060daca8ffb0f51a8aebd9c5ae80b94e1cde253ec1db32f99cabfa6a",
+    "old_attempt": {
+      "hash": "HafBR1uMZJFfN3U1v7x72s1LQiFCDkPoE6KqS5dhBSyk",
+      "public_key": "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+      "nonce": "275527848000003",
+      "reference_height": 275874998,
+      "observed_validity_period_blocks": 86400,
+      "conservative_finalized_expiry_height_exclusive": 275961398,
+      "outbox": "artifacts/live/approved-factory-infrastructure.json"
+    },
+    "conditions": [
+      "Explicit approval of this signing route/key-proof amendment before signing",
+      "Do not sign or broadcast a replacement while the old attempt is unknown and potentially valid",
+      "If old attempt is FINAL success, verify existing factory and skip replacement entirely",
+      "Otherwise require conclusive FINAL failure with absent target, or finalized expiry with original hash unknown, unchanged old key nonce and absent target; a finalized nonce that already invalidates the old transaction can also resolve it after inspection",
+      "Do not send a nonce-bump or key-change transaction to force resolution under this plan",
+      "After resolution, refresh tested protocol, storage/fee schedule, signer key, balance and target absence; retain enough balance for the original customer call",
+      "Prepare one fresh exact unsigned transaction in a separate exclusive fsynced CLI outbox; preserve the original outbox",
+      "User runs official near-cli-rs 0.30.1 offline with existing secure-keychain key to save the signed transaction to a file; no key export",
+      "Cryptographically verify CLI signature against exact prepared bytes, key, nonce and hash before any broadcast",
+      "Persist the signed outbox, then submit exactly once and wait for FINAL; unknown outcomes block fresh retries",
+      "Verify finalized factory code hash, embedded vault hash, immutable configuration and absence of keys before the original customer call"
+    ],
+    "excluded": [
+      "Disabling or evading Meteor protection",
+      "Key export, key installation or key revocation",
+      "Changing contract code, funding amount, initializer or target",
+      "Top-up or faucet requests",
+      "Payments, worker activation, checkpoints or unpause",
+      "GitHub push"
+    ]
+  },
+  "digest": "bca85c64ac11e4a0a14808d290980c47db89353fa2450930f34022291cc91ae8"
+}

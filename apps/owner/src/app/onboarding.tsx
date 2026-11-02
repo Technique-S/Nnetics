@@ -7,6 +7,7 @@ import {
   initializeMeteorExtension,
   testnetWalletAccount,
 } from "../data/meteor-message";
+import {PersistentContractorOwner} from "./contractor-owner";
 import { VaultOnboarding } from "./vault-onboarding";
 
 interface Workspace {
@@ -251,8 +252,7 @@ export function Onboarding({
             <h1>{selectedDraft ? selectedDraft.name : "Your workspace"}</h1>
             <p>Live testnet identity. No simulated records or balances.</p>
             <p>{who.notice}</p>
-            {selectedDraft ||
-            !who.organizations.some((org) => org.status === "ready") ? (
+            {selectedDraft ? <p>Your organization’s saved billing records appear below. Payment controls remain gated.</p> : who.organizations.length === 0 ? (
               <section aria-label="Account record counts">
                 <p>Invoices: 0</p>
                 <p>Contractors: 0</p>
@@ -311,10 +311,7 @@ export function Onboarding({
               ))
             )}
             {selectedDraft && (
-              <VaultOnboarding
-                key={selectedDraft.id}
-                organization={selectedDraft.id}
-              />
+              <><VaultOnboarding key={selectedDraft.id} organization={selectedDraft.id}/><PersistentContractorOwner key={`billing-${selectedDraft.id}`} organization={selectedDraft.id}/></>
             )}
             <form
               onSubmit={async (e) => {
