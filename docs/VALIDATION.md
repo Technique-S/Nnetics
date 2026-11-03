@@ -1,5 +1,41 @@
 # Validation record — through 3 November 2026
 
+### Executed pinned Linux readiness and final instance selection - 3 November 2026
+
+Approved publication of eb3cb7b1607f80dd3e166e8a4921df10af8cbce4 completed.
+Hosted readiness https://github.com/Technique-S/Nnetics/actions/runs/41712048423
+PASSED on Ubuntu / Node 24.22.1: 96 tests, build/TypeScript and both Docker-capped
+production workloads. At 512 MiB/0.5 CPU/no swap: peak server RSS 173.47 MiB,
+cgroup peak 150.10 MiB, no OOM, exit 0. At 2048 MiB/1 CPU: RSS 249.38 MiB,
+cgroup peak 284.11 MiB, no OOM, exit 0. Three-contractor/invoice fixture workload,
+1 MiB uploads, four readers, about one minute each; 4,388/4,428 requests, 5 ms p95.
+Synthetic service restarts retained sessions, links, invoices and retry guards.
+These are production-server fixture measurements, not real Render/live RPC load
+or a long-term capacity claim. The final proposed tier is 0.5c-512mb with 1 GB disk,
+$7.25/month before extras, compared with $25.25/month for the prior proposal.
+
+Payment core and vault provisioning Linux CI also passed on this source. Owner CI
+https://github.com/Technique-S/Nnetics/actions/runs/41712048351 failed two browser
+cancellation cases (87 passed/1 skipped): busy UI preceded actual first Meteor
+request registration on Linux. Waiting for that real fixture request fixes the
+test assumption; 20 repeated local desktop/mobile cases passed. App auth guards
+are unchanged. A follow-up publication/CI is needed before calling the release
+accepted. The approved push/CI did not authorize hosting creation or deployment.
+
+Expanded rollback preparation prevents old snapshots reviving revoked links,
+viewer grants or wallet approvals. Rollback copies explicitly reset those access
+capabilities while preserving immutable order recipients, billing history and the
+Paid claim/hash. Normal migration and restarts keep valid links. The real backup
+was restored in a second private rollback rehearsal; all original source records
+remain untouched. Final 96 local tests and build passed. User-confirmed real
+Grandtheft refresh after actual service restart required no wallet signature.
+Actual hosted-domain and Render disk restart acceptance still await rollout.
+
+Metrics: artifacts/hosting-preparation/linux-memory/; logs and private-copy checks
+remain ignored. No database contents, tokens or keys were pushed. Worker stopped,
+vault paused and authorization revoked; no additional transaction or payment.
+Passing author checks remain distinct from independent security review.
+
 ### Pre-rollout memory, private backup and restart checks - 3 November 2026
 
 Executed Windows Node 24.18.0 production-server synthetic measurement:

@@ -312,6 +312,9 @@ test("message login waits for approval, and editing the pending account cancels 
   await expect(
     page.getByRole("button", { name: "Awaiting wallet approval / verifying…" }),
   ).toBeDisabled();
+  // Busy starts before the HTTP challenge finishes. Establish that the first
+  // Meteor request really exists before testing cancellation of a pending proof.
+  await expect.poll(()=>page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);
   expect(f.loginCalls()).toBe(0);
   await page.getByLabel("Testnet wallet account ID").fill("second.testnet");
   await expect(

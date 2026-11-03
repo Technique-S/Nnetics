@@ -52,7 +52,7 @@ export function exportSnapshot({sources,destination,evidenceRoot,quiesced=false,
   const manifest={version:1,createdAt:new Date().toISOString(),quiesced:true,credentialsIncluded:false,sessionsCleared:true,payment,entries};
   fs.writeFileSync(path.join(stage,'manifest.json'),JSON.stringify(manifest,null,2),{mode:0o600,flag:'wx'});fs.renameSync(stage,target);return manifest;
 }
-export function restoreSnapshot({source,destination,quiesced=false,expected=pins}){
+export function restoreSnapshot({source,destination,quiesced=false,expected=pins,rollback=false}){
   assert.equal(quiesced,true,'Maintenance mode and all workers stopped are required');
   const root=path.resolve(source),manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));
   assert.equal(manifest.version,1);assert.equal(manifest.sessionsCleared,true);assert.equal(manifest.quiesced,true);
@@ -62,6 +62,26 @@ export function restoreSnapshot({source,destination,quiesced=false,expected=pins
   verifyPaid(path.join(root,'invoices.db'),expected);
   const {target,stage}=stageFor(destination);
   for(const entry of manifest.entries){const output=path.join(stage,entry.file);fs.mkdirSync(path.dirname(output),{recursive:true,mode:0o700});fs.copyFileSync(path.join(root,entry.file),output,fs.constants.COPYFILE_EXCL);fs.chmodSync(output,0o600);}
+  if(rollback){
+    // An older snapshot must not resurrect a revoked link, wallet approval or viewer.
+    // Immutable work orders, invoice history and payment claims are never altered.
+    const paymentDb=new DatabaseSync(path.join(stage,'invoices.db'));
+    try{if(paymentDb.prepare("SELECT 1 FROM sqlite_master WHERE name='organization_members'").get())paymentDb.exec('DELETE FROM organization_members');}finally{paymentDb.close();}
+    const contractorDb=new DatabaseSync(path.join(stage,'contractors.db'));
+    try{
+      contractorDb.exec('BEGIN IMMEDIATE');
+      if(contractorDb.prepare("SELECT 1 FROM sqlite_master WHERE name='demo_links'").get())contractorDb.exec('UPDATE demo_links SET revoked=1');
+      if(contractorDb.prepare("SELECT 1 FROM sqlite_master WHERE name='demo_profiles'").get())for(const row of contractorDb.prepare('SELECT id,payload FROM demo_profiles').all()){
+        const profile=JSON.parse(row.payload);profile.generation++;profile.walletVersion++;profile.linkActive=false;profile.pendingWallet=null;profile.wallet=null;
+        contractorDb.prepare('UPDATE demo_profiles SET payload=? WHERE id=?').run(JSON.stringify(profile),row.id);
+      }
+      contractorDb.exec('COMMIT');
+    }finally{contractorDb.close();}
+    verifyPaid(path.join(stage,'invoices.db'),expected);
+    const updated={...manifest,restoredAt:new Date().toISOString(),rollbackAccessReset:true,sourceManifestSha256:sha(fs.readFileSync(path.join(root,'manifest.json'))),entries:manifest.entries.map(entry=>({...entry,sha256:sha(fs.readFileSync(path.join(stage,entry.file)))}))};
+    fs.writeFileSync(path.join(stage,'manifest.json'),JSON.stringify(updated,null,2),{mode:0o600,flag:'wx'});
+    fs.renameSync(stage,target);return updated;
+  }
   fs.copyFileSync(path.join(root,'manifest.json'),path.join(stage,'manifest.json'),fs.constants.COPYFILE_EXCL);
   fs.renameSync(stage,target);return manifest;
 }
@@ -70,7 +90,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
   assert.equal(confirmation,mode==='capture'?'--lock-writers':'--quiesced','Explicit offline/maintenance or lock confirmation required');
   if(mode==='capture')captureSnapshot({sources:{'invoices.db':path.join(source,'grandtheft-payments.db'),'identities.db':path.join(source,'identities.db'),'contractors.db':path.join(source,'contractors.db')},destination,evidenceRoot:path.resolve(source,'../payment-acceptance')});
   else if(mode==='export'||mode==='backup')exportSnapshot({sources:{'invoices.db':path.join(source,mode==='export'?'grandtheft-payments.db':'invoices.db'),'identities.db':path.join(source,'identities.db'),'contractors.db':path.join(source,'contractors.db')},destination,evidenceRoot:mode==='export'?path.resolve(source,'../payment-acceptance'):path.join(source,'evidence'),quiesced:true});
-  else if(mode==='restore')restoreSnapshot({source,destination,quiesced:true});
-  else throw Error('Use: node deploy/snapshot.mjs export|backup|restore SOURCE NEW_DESTINATION --quiesced');
-  console.log('Private snapshot verified; existing payment state preserved. No transactions sent.');
+  else if(mode==='restore'||mode==='rollback')restoreSnapshot({source,destination,quiesced:true,rollback:mode==='rollback'});
+  else throw Error('Use: node deploy/snapshot.mjs export|backup|restore|rollback SOURCE NEW_DESTINATION --quiesced, or capture SOURCE NEW_DESTINATION --lock-writers');
+  console.log(mode==='rollback'?'Rollback copy verified; restored access revoked, immutable payment history preserved. No transactions sent.':'Private snapshot verified; existing payment state preserved. No transactions sent.');
 }

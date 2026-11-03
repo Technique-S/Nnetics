@@ -8,7 +8,7 @@ review exception was limited to that consumed testnet payment, not future payout
 
 ## Recommended service and budget
 
-Use one **Render native Node web service**, Frankfurt, `1c-2g` (1 CPU / 2 GB),
+Use one **Render native Node web service**, Frankfurt, `0.5c-512mb` (0.5 CPU / 512 MB),
 Node **24.22.1**, and a **1 GB persistent disk mounted at `/var/data`**. Deploy
 from the repository root using `render.yaml`; leave automatic deploys and previews
 off. Native Node avoids introducing a container build requirement. Existing package
@@ -17,18 +17,20 @@ versions and npm lockfile are retained; this is not a database/contract rewrite.
 | Item | Monthly USD estimate |
 | --- | ---: |
 | Hobby workspace | $0 |
-| One 1c-2g web service | $25 |
+| One 0.5c-512mb web service | $7 |
 | 1 GB persistent disk | $0.25 |
 | Payment worker | $0: not provisioned or running |
 | Render subdomain and managed TLS | $0 |
-| Base estimate | **$25.25/month**, before tax/overages |
+| Base estimate | **$7.25/month**, before tax/overages |
 
-A 512 MB `0.5c-512mb` instance is an estimated $7/month plus disk ($7.25 total),
-but memory capacity has not been measured for this app; it is not the prepared
-default. Off-provider encrypted backups, optional domain registration, traffic and
-build-minute overages are additional. No paid RPC or AI provider is required for
-this MVP. Confirm the actual Render checkout before provisioning: this is a budget,
-not a guaranteed bill. Do not upgrade to a paid workspace plan accidentally.
+The 512 MB tier passed the bounded Linux workload below. The 1c-2g alternative is
+$25/month plus the same disk, **$25.25/month**, an $18/month increase. Start with the
+smaller tier for this three-contractor testnet MVP, monitor actual Render memory,
+and require a separate approved upgrade if sustained usage exceeds 70% or an OOM
+occurs. This is not a long-term capacity guarantee. Off-provider encrypted backups,
+optional future domain registration, traffic and build-minute overages are extra.
+No paid RPC, AI service, custom domain or paid workspace upgrade is required. Confirm
+the actual Render checkout; these USD amounts exclude taxes/overages.
 
 Official sources checked on 3 November 2026:
 [pricing](https://render.com/pricing),
@@ -85,7 +87,7 @@ workspace; it does not change ordinary wallet login or grant owner permissions.
 
 | Variable | Required hosted value/purpose |
 | --- | --- |
-| NODE_VERSION | 24.22.1; pinned security patch, Linux CI still required |
+| NODE_VERSION | 24.22.1; pinned security patch, Linux runtime check passed; final release checks required |
 | NODE_ENV / NEXT_TELEMETRY_DISABLED | production / 1 |
 | PORT | Supplied by Render; launcher binds 0.0.0.0 on that port |
 | NNETICS_HOSTED_MAINTENANCE | **1 initially**; change to 0 only after import/preflight/approval |
@@ -416,7 +418,7 @@ On the running Linux maintenance service, with every writer stopped, the planned
 commands are:
 
 ```sh
-node deploy/snapshot.mjs restore /PRIVATE/TRUSTED/BUNDLE /var/data/nnetics/restore-UNIQUE --quiesced
+node deploy/snapshot.mjs rollback /PRIVATE/TRUSTED/BUNDLE /var/data/nnetics/restore-UNIQUE --quiesced
 # Check manifest SHA256 out of band, verify expected Paid job, and inspect integrity.
 # The next two moves use fixed sibling directories on the same persistent mount.
 test ! -e /var/data/nnetics/quarantine-UNIQUE
@@ -432,3 +434,61 @@ single Paid job and final chain state before app mode can start. Failure or
 ambiguity leaves maintenance on. A restored snapshot clears old sessions, so users
 sign in once; ordinary service restarts do not. The local restore rehearsal passed;
 these Render rollback moves have not been executed and are not authorization.
+
+
+## Executed Linux results and final 512 MB candidate
+
+[Hosted readiness run 41712048423](https://github.com/Technique-S/Nnetics/actions/runs/41712048423)
+for commit eb3cb7b1607f80dd3e166e8a4921df10af8cbce4 **passed** on Ubuntu with
+Node **24.22.1**: 96 backend tests, production build/TypeScript, constrained memory
+runs and restart checks. The earlier notes saying Linux was unavailable/pending
+are historical preparation stages, superseded by this run after explicit push/CI
+approval. No hosted service or payment was created by that approval.
+
+| Resource limit | Peak server RSS | Peak charged cgroup memory | OOM / exit |
+| --- | ---: | ---: | --- |
+| 512 MiB, 0.5 CPU, no swap | 173.47 MiB | 150.10 MiB | No / 0 |
+| 2048 MiB, 1 CPU, no swap | 249.38 MiB | 284.11 MiB | No / 0 |
+
+Both runs used the production Next build and Node 24.22.1, a mounted fixture disk,
+three contractors/invoices, 1 MiB uploads and four concurrent readers for about
+one minute. They completed 4,388 / 4,428 measured requests respectively (5 ms p95
+fixture HTTP latency). RSS counts shared resident pages differently from charged
+cgroup usage; both are reported, not treated as interchangeable. Allocator/GC
+behavior also varies with available memory. These are bounded synthetic runs,
+not real Render metrics, live RPC load, many-organizations capacity or a soak.
+Docker image digest: node@sha256:be8204d4bd327363357f532187b752ff62759c31bedf98e9e18fc08c9cbd605c.
+
+The smaller tier meets the stated 20% headroom requirement and is the final
+proposed configuration at **$7.25/month**. render.yaml now selects 0.5c-512mb.
+Host startup settings, pinned payment, absent keys and disabled transaction/worker
+flags are unchanged. Use the assigned HTTPS address initially. In maintenance,
+a temporary https://deployment-pending.invalid origin can be used until the exact
+Render URL is allocated; replace it with the actual assigned URL and verify it
+before maintenance=0 or any wallet login. It is not a callback address to publish.
+
+The separate [owner CI 41712048351](https://github.com/Technique-S/Nnetics/actions/runs/41712048351)
+passed Node tests/build but failed two desktop/mobile browser cancellation cases
+(87 passed, 1 skipped). The test treated the busy button as proof that Meteor's
+first request was registered; on faster Linux it could cancel the HTTP challenge
+before any wallet request existed, leaving one total request instead of two. The
+test now waits for the first actual wallet request before editing the account.
+Twenty local repeated cases passed. No application auth behavior was weakened.
+The follow-up release needs an authorized push and fresh owner CI before rollout.
+Payment core and vault provisioning CI on the first commit both passed; they are
+sandbox verification, not public deployment or independent security review.
+
+Rollback review found a separate access risk: restoring an old database could
+resurrect a link, viewer grant or approved wallet revoked after that snapshot.
+The new **rollback** mode explicitly revokes restored invitations, clears viewer
+grants and resets contractor wallet approvals/pending requests and generations.
+It keeps immutable order recipients, original invoice history and the exact Paid
+job unchanged. Owners must issue fresh links and approve contractor wallets again
+after a rollback; this does **not** happen on ordinary restarts or initial migration.
+A real private-copy rollback rehearsal and expanded fixture tests passed. The
+source/live databases were not modified by it. Final local tests/build passed.
+
+Publish the reviewed follow-up commit and require its CI results before accepting
+the release. Actual Render import, assigned-domain login and disk redeploy checks
+remain rollout acceptance, not already executed. Hosting approval never authorizes
+another payment, worker activation, unpause, new keys or checkpoint installation.
