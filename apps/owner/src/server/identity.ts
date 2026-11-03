@@ -5,6 +5,13 @@ import { DatabaseSync } from "node:sqlite";
 import { PublicKey } from "near-api-js";
 import { nep413Digest, walletAccount } from "./auth.ts";
 
+// A transport outage is not evidence that the wallet's key was removed.
+export class IdentityVerificationUnavailable extends Error {
+  readonly retryable = true;
+}
+export const IDENTITY_SESSION_MS = 5 * 60 * 60 * 1000; // no earlier idle logout than the five-hour cap
+export const IDENTITY_ABSOLUTE_MS = 5 * 60 * 60 * 1000;
+
 export function identityConfig() {
   const network = process.env.NNETICS_NETWORK || "testnet";
   if (network !== "testnet")
@@ -40,6 +47,7 @@ export interface Workspace {
   role: "creator" | "owner" | "viewer";
 }
 export class IdentityAuth {
+  now = () => Date.now();
   readonly db: DatabaseSync;
   readonly config: ReturnType<typeof identityConfig>;
   constructor(config: ReturnType<typeof identityConfig>) {
@@ -53,6 +61,16 @@ export class IdentityAuth {
       CREATE TABLE IF NOT EXISTS identity_sessions (token TEXT PRIMARY KEY, browser TEXT NOT NULL, generation INTEGER NOT NULL, account TEXT NOT NULL, public_key TEXT NOT NULL, expires INTEGER NOT NULL, context TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS identity_organizations (id TEXT PRIMARY KEY, name TEXT NOT NULL, creator TEXT NOT NULL, network TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS organization_vaults (organization TEXT PRIMARY KEY, vault TEXT NOT NULL UNIQUE, owner TEXT NOT NULL, payload TEXT NOT NULL);`);
+    const columns = (table: string) => new Set((this.db.prepare(`PRAGMA table_info(${table})`).all() as {name:string}[]).map(c=>c.name));
+    const sessions=columns("identity_sessions"),challenges=columns("identity_challenges");
+    // Old sessions have no authenticated absolute-age origin: require one fresh
+    // proof rather than silently granting them a new lifetime. Billing is untouched.
+    for(const [name,type] of [["created","INTEGER NOT NULL DEFAULT 0"],["absolute_expires","INTEGER NOT NULL DEFAULT 0"]])
+      if(!sessions.has(name))this.db.exec(`ALTER TABLE identity_sessions ADD COLUMN ${name} ${type}`);
+    for(const [name,type] of [["purpose","TEXT NOT NULL DEFAULT 'login'"],["session","TEXT"]])
+      if(!challenges.has(name))this.db.exec(`ALTER TABLE identity_challenges ADD COLUMN ${name} ${type}`);
+    // Existing sessions never gain a later absolute deadline under this policy.
+    this.db.prepare('UPDATE identity_sessions SET absolute_expires=MIN(absolute_expires,created+?),expires=MIN(expires,created+?) WHERE created>0').run(IDENTITY_ABSOLUTE_MS,IDENTITY_ABSOLUTE_MS);
   }
   hash(value: string) {
     return crypto.createHash("sha256").update(value).digest("hex");
@@ -104,15 +122,32 @@ export class IdentityAuth {
         .get(browser.id) as { generation: number }
     ).generation;
     const nonce = crypto.randomBytes(32).toString("base64"),
-      expires = Date.now() + 300000;
-    const message = `Nnetics wallet identity login\nAccount: ${id}\nNetwork: testnet\nOrigin: ${this.config.origin}\nExpires: ${new Date(expires).toISOString()}\nThis off-chain signature verifies identity for 15 minutes. It grants no organization membership, vault ownership or transaction approval.`;
+      expires = this.now() + 300000;
+    const message = `Nnetics wallet identity login\nAccount: ${id}\nNetwork: testnet\nOrigin: ${this.config.origin}\nExpires: ${new Date(expires).toISOString()}\nSession limits: 5 hours idle, 5 hours absolute (five hours from sign-in). Only verified foreground activity renews idle time. Key validity and organization authority are rechecked. This grants no organization membership, vault ownership or transaction approval.`;
     this.db
       .prepare("DELETE FROM identity_challenges WHERE expires<=?")
-      .run(Date.now());
+      .run(this.now());
     this.db
-      .prepare("INSERT INTO identity_challenges VALUES (?,?,?,?,?,?,?)")
+      .prepare("INSERT INTO identity_challenges (nonce,browser,generation,account,message,expires,context) VALUES (?,?,?,?,?,?,?)")
       .run(nonce, browser.id, generation, id, message, expires, this.context());
     return { nonce, message, recipient: this.config.origin };
+  }
+  resumeChallenge(token:string,browserCookie:string) {
+    const who=this.verify(token),browser=this.browser(browserCookie);
+    const session=this.db.prepare("SELECT browser,generation FROM identity_sessions WHERE token=?").get(this.hash(token)) as {browser:string;generation:number};
+    if(session.browser!==browser.id)throw Error("Wallet session belongs to another browser. Sign in again.");
+    const nonce=crypto.randomBytes(32).toString("base64"),expires=this.now()+300000;
+    const message=`Nnetics optional selected-wallet check\nNetwork: testnet\nOrigin: ${this.config.origin}\nExpires: ${new Date(expires).toISOString()}\nThe dashboard session belongs to ${who.account_id}. Confirm the account selected in Meteor. An unchanged account retains the existing session deadline. A different verified account signs out the previous session and requires a separate sign-in; this check never transfers its permissions. No transaction or payment authorization.`;
+    this.db.prepare("INSERT INTO identity_challenges (nonce,browser,generation,account,message,expires,context,purpose,session) VALUES (?,?,?,?,?,?,?,?,?)").run(nonce,browser.id,session.generation,"*",message,expires,this.context(),"resume",this.hash(token));
+    return {nonce,message,recipient:this.config.origin};
+  }
+  discoveryChallenge(browserCookie:string) {
+    const browser=this.browser(browserCookie);this.logout(browser.cookie);
+    const generation=(this.db.prepare('SELECT generation FROM identity_browsers WHERE id=?').get(browser.id) as {generation:number}).generation;
+    const nonce=crypto.randomBytes(32).toString('base64'),expires=this.now()+300000;
+    const message=`Nnetics wallet identity login\nNetwork: testnet\nOrigin: ${this.config.origin}\nExpires: ${new Date(expires).toISOString()}\nVerify the testnet account selected in Meteor using its current on-chain FullAccess key. Session limit: five hours from sign-in; activity cannot extend that deadline. This off-chain proof grants no organization membership, vault ownership, key installation, transaction or payment approval.`;
+    this.db.prepare('INSERT INTO identity_challenges (nonce,browser,generation,account,message,expires,context,purpose) VALUES (?,?,?,?,?,?,?,?)').run(nonce,browser.id,generation,'*',message,expires,this.context(),'discover');
+    return {nonce,message,recipient:this.config.origin};
   }
   async rpc<T>(method: string, params: unknown): Promise<T> {
     const r = await fetch(this.config.rpc, {
@@ -122,15 +157,17 @@ export class IdentityAuth {
       signal: AbortSignal.timeout(20000),
       cache: "no-store",
     }).catch(() => {
-      throw new Error(
-        "Cannot reach NEAR testnet verification. Check your connection and retry with a fresh login message.",
+      throw new IdentityVerificationUnavailable(
+        "Cannot reach NEAR testnet verification. Check your connection and retry verification; an existing session has not been revoked.",
       );
     });
     if (!r.ok)
-      throw new Error(
-        "Testnet verification RPC is unavailable. Retry login; no access was granted.",
+      throw new IdentityVerificationUnavailable(
+        "Testnet verification RPC is temporarily unavailable. Retry verification; no new access was granted.",
       );
-    const body = await r.json();
+    const body = await r.json().catch(() => {
+      throw new IdentityVerificationUnavailable("Invalid verification RPC response. Retry verification.");
+    });
     if (
       body.error &&
       ["UNKNOWN_ACCOUNT", "UNKNOWN_ACCESS_KEY"].includes(body.error.cause?.name)
@@ -139,11 +176,11 @@ export class IdentityAuth {
         "Account or signing key was not found on testnet. Select the activated account ID shown in Meteor, enable testnet and retry. An implicit address is a different account from its named account.",
       );
     if (body.error)
-      throw new Error(
+      throw new IdentityVerificationUnavailable(
         "NEAR testnet RPC could not verify the account. Retry with a fresh message; no access was granted.",
       );
     if (!body.result)
-      throw new Error("Incomplete testnet verification response. Retry login.");
+      throw new IdentityVerificationUnavailable("Incomplete testnet verification response. Retry verification.");
     return body.result as T;
   }
   async keyBlock(identity: Identity) {
@@ -151,6 +188,8 @@ export class IdentityAuth {
       this.rpc<{ chain_id: string }>("status", []),
       this.rpc<{ header: { hash: string } }>("block", { finality: "final" }),
     ]);
+    if(typeof status.chain_id!=="string" || typeof block.header?.hash!=="string" || !block.header.hash)
+      throw new IdentityVerificationUnavailable("Incomplete network verification response. Retry verification; your session is retained.");
     if (status.chain_id !== "testnet")
       throw new Error(
         "Wrong RPC network. Configure NEAR testnet; mainnet login is disabled.",
@@ -164,13 +203,15 @@ export class IdentityAuth {
         block_id: block.header.hash,
       },
     );
-    if (key.block_hash !== block.header.hash || key.permission !== "FullAccess")
+    if(key.block_hash!==block.header.hash || key.permission===undefined)
+      throw new IdentityVerificationUnavailable("Inconclusive key verification response. Retry verification; your session is retained.");
+    if (key.permission !== "FullAccess")
       throw new Error(
         "The signing key is removed, restricted or inconsistent. Reconnect the current testnet FullAccess wallet and verify again.",
       );
     return block.header.hash;
   }
-  async login(input: Record<string, unknown>, browserCookie: string) {
+  async login(input: Record<string, unknown>, browserCookie: string, resumeToken?: string) {
     if (
       typeof input.nonce !== "string" ||
       typeof input.accountId !== "string" ||
@@ -185,17 +226,23 @@ export class IdentityAuth {
       .prepare(
         "SELECT * FROM identity_challenges WHERE nonce=? AND browser=? AND expires>? AND context=?",
       )
-      .get(input.nonce, browser.id, Date.now(), this.context()) as
-      | { account: string; message: string; generation: number }
+      .get(input.nonce, browser.id, this.now(), this.context()) as
+      | { account: string; message: string; generation: number;purpose:string;session:string|null }
       | undefined;
     if (
       !c ||
-      c.account !== input.accountId ||
+      (c.account !== input.accountId && !(["resume","discover"].includes(c.purpose) && c.account==="*")) ||
       !input.publicKey.startsWith("ed25519:")
     )
       throw new Error(
         "Expired, mismatched or replayed login. Request a fresh message for the selected account.",
       );
+    walletAccount(input.accountId);
+    if((c.purpose==="resume")!==!!resumeToken)throw Error("Wallet proof purpose does not match this login endpoint.");
+    if(c.purpose==="resume") {
+      if(!resumeToken||c.session!==this.hash(resumeToken))throw Error("Resume proof does not belong to this session.");
+      this.verify(resumeToken);
+    }
     const sig = Buffer.from(input.signature, "base64");
     if (
       sig.length !== 64 ||
@@ -212,7 +259,7 @@ export class IdentityAuth {
       account_id: input.accountId,
       public_key: input.publicKey,
     });
-    const token = crypto.randomBytes(32).toString("hex");
+    let token = crypto.randomBytes(32).toString("hex");
     this.db.exec("BEGIN IMMEDIATE");
     try {
       const current = this.db
@@ -224,22 +271,41 @@ export class IdentityAuth {
           .prepare(
             "DELETE FROM identity_challenges WHERE nonce=? AND browser=? AND expires>? AND context=?",
           )
-          .run(input.nonce, browser.id, Date.now(), this.context()).changes !==
+          .run(input.nonce, browser.id, this.now(), this.context()).changes !==
           1
       )
         throw new Error(
           "Login was superseded, expired or replayed. Verify the selected account again.",
         );
+      if(c.purpose==="resume") {
+        const previous=this.verify(resumeToken!);
+        if(previous.account_id===input.accountId) {
+          token=resumeToken!;
+          this.db.prepare("UPDATE identity_sessions SET public_key=?, expires=MIN(absolute_expires,?) WHERE token=?").run(input.publicKey,this.now()+IDENTITY_SESSION_MS,this.hash(token));
+          this.db.exec("COMMIT");
+          return token;
+        }
+        // A cryptographically detected change revokes all previous browser
+        // sessions/challenges, including those held by another tab.
+        this.db.prepare("UPDATE identity_browsers SET generation=generation+1 WHERE id=?").run(browser.id);
+        this.db.prepare("DELETE FROM identity_sessions WHERE browser=?").run(browser.id);
+        this.db.prepare("DELETE FROM identity_challenges WHERE browser=?").run(browser.id);
+        this.db.exec("COMMIT");
+        return ""; // A detected change invalidates A; it never creates a session for B.
+      }
+      const generation=(this.db.prepare("SELECT generation FROM identity_browsers WHERE id=?").get(browser.id) as {generation:number}).generation;
       this.db
-        .prepare("INSERT INTO identity_sessions VALUES (?,?,?,?,?,?,?)")
+        .prepare("INSERT INTO identity_sessions (token,browser,generation,account,public_key,expires,context,created,absolute_expires) VALUES (?,?,?,?,?,?,?,?,?)")
         .run(
           this.hash(token),
           browser.id,
-          c.generation,
+          generation,
           input.accountId,
           input.publicKey,
-          Date.now() + 900000,
+          this.now() + IDENTITY_SESSION_MS,
           this.context(),
+          this.now(),
+          this.now()+IDENTITY_ABSOLUTE_MS,
         );
       this.db.exec("COMMIT");
     } catch (e) {
@@ -252,26 +318,39 @@ export class IdentityAuth {
     const row = /^[a-f0-9]{64}$/.test(token)
       ? (this.db
           .prepare(
-            `SELECT s.account AS account_id,s.public_key FROM identity_sessions s JOIN identity_browsers b ON b.id=s.browser AND b.generation=s.generation WHERE s.token=? AND s.expires>? AND s.context=?`,
+            `SELECT s.account AS account_id,s.public_key FROM identity_sessions s JOIN identity_browsers b ON b.id=s.browser AND b.generation=s.generation WHERE s.token=? AND s.expires>? AND s.absolute_expires>? AND s.created>0 AND s.context=?`,
           )
-          .get(this.hash(token), Date.now(), this.context()) as
+          .get(this.hash(token), this.now(), this.now(), this.context()) as
           | Identity
           | undefined)
       : undefined;
     if (!row)
       throw new Error(
-        "Wallet verification required. Sign a fresh login message; the previous session is expired or switched.",
+        "Wallet verification required. Your session ended (5 hours idle, 5 hours absolute (five hours from sign-in)), was signed out or switched. Sign a fresh message; no payment is requested.",
       );
     return row;
+  }
+  sessionInfo(token:string) {
+    const who=this.verify(token),row=this.db.prepare("SELECT expires,absolute_expires FROM identity_sessions WHERE token=?").get(this.hash(token)) as {expires:number;absolute_expires:number};
+    return {accountId:who.account_id,idleExpires:row.expires,absoluteExpires:row.absolute_expires,serverTime:this.now(),idleLimitMs:IDENTITY_SESSION_MS,absoluteLimitMs:IDENTITY_ABSOLUTE_MS};
+  }
+  async renew(token:string,browserCookie:string) {
+    await this.authenticate(token);
+    const browser=this.browser(browserCookie),row=this.db.prepare("SELECT browser FROM identity_sessions WHERE token=?").get(this.hash(token)) as {browser:string};
+    if(row.browser!==browser.id)throw Error("Session browser changed. Verify again.");
+    this.verify(token); // latency/parallel logout must not revive expired authority
+    this.db.prepare("UPDATE identity_sessions SET expires=MIN(absolute_expires,?) WHERE token=?").run(this.now()+IDENTITY_SESSION_MS,this.hash(token));
+    return this.sessionInfo(token);
   }
   async authenticate(token: string) {
     const identity = this.verify(token);
     try {
       await this.keyBlock(identity);
     } catch (e) {
-      this.db
-        .prepare("DELETE FROM identity_sessions WHERE token=?")
-        .run(this.hash(token));
+      if (!(e instanceof IdentityVerificationUnavailable))
+        this.db
+          .prepare("DELETE FROM identity_sessions WHERE token=?")
+          .run(this.hash(token));
       throw e;
     }
     this.verify(token);

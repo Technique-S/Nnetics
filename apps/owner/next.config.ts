@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import path from "node:path";
 const config: NextConfig = {
+  // Isolate deployment verification builds from the running local acceptance app.
+  distDir: process.env.NNETICS_BUILD_DIRECTORY === ".next-hosting" ? ".next-hosting" : ".next",
   outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
   poweredByHeader: false,
   serverExternalPackages: ["near-api-js"],

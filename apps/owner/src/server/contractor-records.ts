@@ -6,6 +6,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { amountFromNear, formatNear } from "../data/owner-adapter.ts";
 import { testnetWalletAccount } from "../data/meteor-message.ts";
+import {sourceQuestions,sourceOrderQuestions} from "./billing-extraction.ts";
 import type { BillAttachment, BillFields, ContractorBill, ContractorCommand, ContractorOrder, ContractorProfile, ContractorSnapshot, OwnerPortalCommand, PortalSnapshot } from "../data/contractor-adapter.ts";
 const hash = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
 const secret = () => crypto.randomBytes(32).toString("hex");
@@ -165,6 +166,8 @@ export class ContractorRecordStore {
                 throw Error("Invalid review action.");
             if (input.decision === "approve" && bill.reasons.length)
                 throw Error("Payment-critical mismatches must be clarified; review cannot override the work order.");
+            if(this.mode==="persistent"&&input.decision==="approve"&&sourceOrderQuestions(bill.text,bill.orderId,this.rows<ContractorOrder>("demo_orders",org,bill.contractorId)).length)
+                throw Error("Billing text and selected work order conflict. Request clarification; approval cannot override or reassign the invoice claim.");
             this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id, JSON.stringify(bill));
             bill.status = input.decision === "begin-review" ? "Under review" : input.decision === "approve" ? "Approved" : input.decision === "clarify" ? "Needs clarification" : "Rejected";
             bill.ownerNote = input.decision === "begin-review" ? "Owner review started. No payment initiated." : input.decision === "approve" ? "Approved for review only. Payment execution is disabled." : text(input.note, 1000, "review note");
@@ -284,6 +287,7 @@ export class ContractorRecordStore {
         const recipient = f.recipient?.trim() || order.recipient;
         const reasons: string[] = [];
         if(this.mode === "persistent" && currencyConflict(body)) reasons.push("Currency conflict in source text. Clarification is required; no amount was converted to NEAR.");
+        if(this.mode === "persistent")reasons.push(...sourceQuestions(body,amount).filter(q=>!q.startsWith("Which currency")),...sourceOrderQuestions(body,orderId,this.rows<ContractorOrder>("demo_orders",org,p.id)));
         if (amount !== order.amount)
             reasons.push("Amount differs from approved work order.");
         if (asset !== "NEAR")
@@ -295,7 +299,7 @@ export class ContractorRecordStore {
             const a = this.attachment(input.attachmentId, org, p.id);
             attachment = { id: input.attachmentId, name: a.name, mime: a.mime, size: a.bytes.length };
         }
-        let bill: ContractorBill = { id: id(), contractorId: p.id, reference, orderId, amount, asset, recipient, text: body, originalText: body, description, status: this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
+        let bill: ContractorBill = { id: id(), contractorId: p.id, reference, orderId, orderReference:order.reference, amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
         if (input.action === "clarify-invoice") {
             if (!old || old.status !== "Needs clarification" || old.orderId !== orderId)
                 throw Error("Only a requested clarification of the same invoice and work order is allowed.");

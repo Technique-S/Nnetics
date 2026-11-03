@@ -1,4 +1,4 @@
-// Demo-only DTOs. No chain client, signing or payment execution interface.
+// Shared billing DTOs. Payment execution remains server-side and separately gated.
 export interface WalletRequest {
     id: string;
     account: string;
@@ -39,6 +39,10 @@ export interface BillAttachment {
     size: number;
 }
 export interface ContractorBill extends BillFields {
+    orderReference?:string;
+    extractionId?:string;
+    extractionMode?:"ai"|"deterministic";
+    payment?:{state:string;reason:string;orderId:string;transactionUrl:string|null;confirmed:boolean};
     reference: string;
     id: string;
     contractorId: string;
@@ -65,6 +69,10 @@ export interface ContractorSnapshot {
     invoices: ContractorBill[];
 }
 export type OwnerPortalCommand = {
+    action:"queue-invoice";
+    invoiceId:string;
+    orderId:string;
+} | {
     action: "create-profile";
     name: string;
 } | {
@@ -100,6 +108,8 @@ export type ContractorCommand = {
     text: string;
     description: string;
     attachmentId?: string;
+    extractionId?:string;
+    extractionConfirmed?:boolean;
 };
 export function parseBill(text: string): Partial<BillFields> {
     // Deliberately deterministic labels, never AI or executable instructions.
@@ -122,6 +132,7 @@ export interface ContractorPortalAdapter {
     snapshot(): Promise<ContractorSnapshot>;
     command(input: ContractorCommand): Promise<{
         challenge?: string;
+        invoice?:ContractorBill;
     }>;
     upload(file: File): Promise<BillAttachment>;
 }
@@ -141,9 +152,10 @@ export class PersistentContractorAdapter implements ContractorPortalAdapter {
  readonly mode="persistent" as const;
  async enter(token:string){await persistentRequest("enter",{token});}
  snapshot(){return persistentRequest<ContractorSnapshot>("contractor");}
- command(input:ContractorCommand){return persistentRequest<{challenge?:string}>("contractor",input);}
+ command(input:ContractorCommand){return persistentRequest<{challenge?:string;invoice?:ContractorBill}>("contractor",input);}
  challenge(account:string){return persistentRequest<WalletChallenge>("wallet/challenge",{account});}
  proof(input:WalletChallenge&{accountId:string;publicKey:string;signature:string}){return persistentRequest("wallet/proof",input);}
+ extract(text:string,useAI:boolean,publicTextConfirmed:boolean){return persistentRequest<import("./billing-extraction").BillingPreview>("extract",{text,useAI,publicTextConfirmed});}
  async upload(file:File){const form=new FormData();form.set("file",file);const r=await fetch("/api/live/contractors/upload",{method:"POST",body:form,credentials:"same-origin"});const data=await r.json();if(!r.ok)throw Error(data.error||"Upload failed.");return data as BillAttachment;}
 }
 export class PersistentContractorOwnerAdapter implements ContractorOwnerAdapter {
@@ -167,6 +179,7 @@ export class MockContractorAdapter implements ContractorPortalAdapter {
     snapshot() { return request<ContractorSnapshot>("contractor"); }
     command(input: ContractorCommand) { return request<{
         challenge?: string;
+        invoice?:ContractorBill;
     }>("contractor", input); }
     async upload(file: File) {
         const form = new FormData();

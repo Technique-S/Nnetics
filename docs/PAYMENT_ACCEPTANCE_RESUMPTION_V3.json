@@ -1,0 +1,260 @@
+{
+  "plan": {
+    "version": 3,
+    "status": "AWAITING_EXPLICIT_RESUMPTION_APPROVAL_NOT_AUTHORIZED",
+    "amends_digest": "978219497f70b4c76cf87b367eb032192c12566d074488566c40eece43301edf",
+    "reason": "V2 stopped on stale owner UI target; its one activation and containment transactions were consumed. Context guards fixed and regression tested.",
+    "network": "testnet",
+    "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+    "vault": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+    "vault_code_hash": "Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ",
+    "invoice": {
+      "id": "498f003c-7a11-458f-b3c6-f9d230c245b9",
+      "reference": "CTR-0001-INV-0002",
+      "billing_order_id": "3742ad13-9edd-41b7-b51c-e0d6f4c480e1",
+      "recipient": "babygoat.testnet",
+      "amount_near": "0.001",
+      "original_text_sha256": "3251533cf0fc9b4d6ae282841f760f5d0790cdc5618c535cd490aa867c78e669"
+    },
+    "worker": {
+      "account": "worker.grandtheft.testnet",
+      "public_key": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA",
+      "full_access_keys": 0,
+      "method": "execute_payment",
+      "allowance_yocto": "270000000000000000000000",
+      "local_custody": "Private external ACL-protected key file; never committed/exported"
+    },
+    "checkpoint": {
+      "collected_at": "2026-11-03T08:51:26.129Z",
+      "providers": [
+        "https://test.rpc.fastnear.com",
+        "https://archival-rpc.testnet.near.org"
+      ],
+      "head_hash": "Gk91ppKatpsQhi62mK9CE1WKfFMFA7BH1EDt3vBSnnpD",
+      "height": 276003652,
+      "epoch_id": "7PcaksxBUN51wmmFZhvjekLnwqgVBaVHGWPxuufR8eiR",
+      "next_epoch_id": "8WAqnvvCuGgz1NpmUWnwzDh5K6G1mDpJKb6TV6BEJuMy",
+      "current_validators": 20,
+      "next_validators": 20,
+      "approved_stake": "485068636219083381968489046251863",
+      "total_stake": "605470350102881057467127247937208",
+      "args_bytes": 7234,
+      "args_sha256": "e38bed03aadd216a2472fb92064cf77ee54aecc86f405f22259c6f6607731027",
+      "checks": {
+        "canonical_header": true,
+        "provider_agreement": true,
+        "next_set_commitment": true,
+        "current_quorum": true
+      },
+      "trust_note": "Current ordered validators and initial checkpoint still require explicit trusted-bootstrap review; provider agreement and an implementation-author check are not independent security review.",
+      "requires_independent_review": false,
+      "requires_owner_trusted_bootstrap_approval": true,
+      "independent_review_status": "NONE: all Nnetics implementation and evidence checks were performed by Codex as implementation author; no third-party security verdict exists",
+      "exception_scope": "Owner may expressly accept absence of independent review ONLY for this single 0.001-NEAR testnet acceptance, not production or another payment",
+      "operator_correction": "Fastnear maintains the legacy near.org archival endpoint; those original two URLs are not independent operators",
+      "corroboration": {
+        "intear": {
+          "endpoint": "https://testnet-rpc.intea.rs",
+          "canonical_hash": true,
+          "ordered_current_validators": true
+        },
+        "drpc": {
+          "endpoint": "https://near-testnet.drpc.org",
+          "canonical_hash": true,
+          "ordered_current_validators": false,
+          "limitation": "method unavailable"
+        },
+        "limitation": "Separately listed service operators corroborate responses, not disjoint infrastructure, genesis-to-head trust or independent security review"
+      }
+    },
+    "testnet_risk_acceptance": {
+      "independent_review_absent": true,
+      "initial_root_trusted_by_owner": true,
+      "initial_current_set_not_authenticated_on_chain": true,
+      "quorum_is_conditional_on_supplied_set": true,
+      "weak_subjectivity_not_solved": true,
+      "exact_input_vm_not_executed": true,
+      "gas_storage_failure_may_consume_bounded_fees": true,
+      "unknown_transfer_requires_proof_reconciliation": true,
+      "residual_worker_balance_may_be_locked": true,
+      "mainnet_and_production_excluded": true
+    },
+    "transactions": [
+      {
+        "id": "authorize_agent",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "authorize_agent",
+            "args": {
+              "account_id": "worker.grandtheft.testnet",
+              "public_key": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA"
+            },
+            "args_base64": "eyJhY2NvdW50X2lkIjoid29ya2VyLmdyYW5kdGhlZnQudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5Oko5eUZBdGtwZGdzSjJFM04zTUFORkZIUWYzazlETmtYc0Joc0pVb3RIZkZBIn0=",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "set_paused",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_paused",
+            "args": {
+              "paused": false
+            },
+            "args_base64": "eyJwYXVzZWQiOmZhbHNlfQ==",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "execute_payment",
+        "signer": "worker.grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "execute_payment",
+            "args": {
+              "order_id": "ACCEPTANCE-001",
+              "invoice_id": "CTR-0001-INV-0002",
+              "recipient": "babygoat.testnet",
+              "amount": "1000000000000000000000"
+            },
+            "args_base64": "eyJvcmRlcl9pZCI6IkFDQ0VQVEFOQ0UtMDAxIiwiaW52b2ljZV9pZCI6IkNUUi0wMDAxLUlOVi0wMDAyIiwicmVjaXBpZW50IjoiYmFieWdvYXQudGVzdG5ldCIsImFtb3VudCI6IjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAifQ==",
+            "deposit": "0",
+            "gas": "250000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "251000000000000000000000"
+      },
+      {
+        "id": "pause-after-payment",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_paused",
+            "args": {
+              "paused": true
+            },
+            "args_base64": "eyJwYXVzZWQiOnRydWV9",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "revoke_agent",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "revoke_agent",
+            "args": {},
+            "args_base64": "e30=",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      }
+    ],
+    "existing_job": {
+      "id": "CTR-0001-INV-0002",
+      "order_id": "ACCEPTANCE-001",
+      "state": "review",
+      "hash": null,
+      "attempt": null,
+      "preserve_existing_only": true
+    },
+    "completed_setup": "Do not recreate worker, install/reset checkpoint, register vendor/order, deposit funds, or set budget/cap. Existing V2 artifacts remain immutable.",
+    "fee_ceilings": {
+      "additional_owner_fees": "44000000000000000000000",
+      "additional_owner_deposits": "4",
+      "additional_funding": "0",
+      "worker_payment_fee": "251000000000000000000000",
+      "worker_key_allowance": "270000000000000000000000",
+      "original_v2_owner_fee_ceiling": "210000000000000000000000",
+      "require_combined_actual_prior_and_new_caps_within_v2_ceiling": true
+    },
+    "pre_execution_requirements": [
+      "Explicit approval must name this revised digest and accept the testnet-only independent-review exception AND exact trusted checkpoint/ordered sets. Preparation is not authorization.",
+      "Before any resumption signature, re-read finalized testnet/protocol-88 canonical head and ordered set for this exact pinned checkpoint from Fastnear and separately listed Intear; recheck header hash, current-prefix signatures >2/3, next-set commitment, epoch encoding and normalization. Corroboration does not replace owner trust.",
+      "Before every resumption signature, its timestamp must be nonfuture and at most 24 hours old relative to fresh finalized chain time. If unavailable, inconsistent, stale, unsupported or changed, STOP; no checkpoint substitution under this digest.",
+      "Before any transaction signature refresh code/no-key ownership, signer nonce/key permission, approved target/args/deposit/gas and fees. Do not exceed any existing per-step cap or funding ceiling; preserve owner storage and cleanup fee allowance.",
+      "Owner must still authorize the organization and INV-0002 must still be Approved with original-text hash, immutable billing order, 0.001 NEAR and Babygoat recipient unchanged.",
+      "Before agent/unpause, require exactly one held durable job mapped to the matching FINAL approved ACCEPTANCE-001 chain order; active Babygoat vendor; enabled unexpired order; exactly 0.001 funded/budget/cap; exact restricted worker key and no FullAccess key.",
+      "Before unpause/payment verify the stored recovery checkpoint equals the approved head, remains within the 24-hour window, and a supported current/next-epoch signed-update path can be obtained and checked off chain. No epoch skipping or post-attempt root reset. If an on-chain advance is required before this payment, STOP for an amendment; no advance_repair_head transaction is authorized here.",
+      "Record fresh recipient pre-balance immediately before execution; isolate unrelated balance changes. The preparation snapshot is not acceptance evidence.",
+      "Run only this one scoped durable worker job using its process lock and exact persisted signed outbox. Unknown or interrupted outcome is reconciled before any retry; never sign a replacement while unknown."
+    ],
+    "gates": [
+      "Testnet-only owner decision may accept documented absence of independent review; no independent review is claimed. Initial trusted root approval and all contract checks remain mandatory.",
+      "No signing/broadcast until explicit revised-digest approval; all current preparation is unauthorized for transactions.",
+      "Fresh checkpoint validity and all pre_execution_requirements must pass; any change to action/amount/permission/checkpoint/gas ceiling/expiry requires a revised plan and approval.",
+      "Exactly one held job before activation. Exactly one FINAL native 0.001 transfer, expected recipient balance delta, correct Paid attempt/order/invoice accounting and transaction linkage are required before both screens show Paid.",
+      "Immediately after verified payment use the listed pause and revoke transactions, verify paused=true/agent=null/reserved=0/spent=0.001, then repeat linkage/restart app and worker to prove the same terminal job remains without a new signed attempt.",
+      "On any fault halt worker/signing, retain original evidence and reservation. The same listed pause/revoke operations are permitted early for containment, at most once each; no extra retry transaction is authorized even on failure. Unknown outcomes reconcile the same hash; a fresh failed-step retry requires separate approval.",
+      "Unknown outcome is not success/failure. No balance-only or owner assertion may finalize accounting. If recovery needs proof updates/repair transactions not in this plan, stop for a separately approved recovery plan."
+    ],
+    "stop_conditions": [
+      "Wrong network/protocol/code/owner/key or unverified organization binding",
+      "Checkpoint stale/future/disagreement/quorum/encoding/commitment failure",
+      "Initial checkpoint already differs; any prior attempt or payment; nonce conflict",
+      "Invoice/order/recipient/amount/status/original-text drift or duplicate queue claim",
+      "Balance/storage/fee allowance insufficient or any cap exceeded",
+      "Expired order, missing vendor or recovery head cannot sync within authorized actions",
+      "Wallet or CLI changes exact prepared bytes; unexplained transaction hash or ambiguous broadcast",
+      "Callback/receipt/transfer failure or unknown; conflicting balance evidence; missing matching transaction link",
+      "Approval window/required trust consent absent; attempted production or AI path"
+    ],
+    "closure": {
+      "after_verified_payment": [
+        "pause-after-payment",
+        "revoke_agent"
+      ],
+      "early_containment_permitted": true,
+      "each_step_maximum_executions": 1,
+      "verify": {
+        "paused": true,
+        "agent": null,
+        "spent": "1000000000000000000000",
+        "reserved": "0"
+      },
+      "retry_test": "Local repeated queue/link requests and process restarts only, with no deliberately broadcast duplicate payment"
+    },
+    "expiry": {
+      "checkpoint_max_age_hours": 24,
+      "checkpoint_timestamp_ns": "1793682686057769230",
+      "checkpoint_valid_until_ns": "1793769086057769230",
+      "order_expires_at_ns": "1793868854014909735",
+      "earliest_deadline_applies": true
+    },
+    "sequence": [
+      "Fresh authenticated corrected UI/adapter/backend/queue/worker and chain alignment; one held job",
+      "Reauthorize exact existing restricted worker",
+      "Unpause after fresh validity/eligibility checks",
+      "Owner releases the SAME held job; execute it ONCE using scoped worker lock/outbox; snapshot recipient immediately beforehand",
+      "Verify native transfer + isolated recipient delta + FINAL attempt/accounting/linkage and matching Paid statuses",
+      "Immediately pause and revoke, verify state",
+      "Local repeat linkage/queue and app/worker restart checks retain same terminal job; no duplicate transaction"
+    ],
+    "preparation_evidence": "artifacts/payment-acceptance/resumption-fresh-verification-1793711349969.json",
+    "approval_granted": false
+  },
+  "digest": "9ea7cb9e479d5df6c6cd79793aeb1ea53fb34e6b76a8fc139895afa4b06a27d8"
+}

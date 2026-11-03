@@ -182,3 +182,12 @@ test("Meteor refuses mainnet IDs and invalid nonces before opening the extension
   );
   assert.equal(f.sent.length, 0);
 });
+
+test('foreground wallet discovery omits the old account and accepts only a valid selected testnet identity',async()=>{
+ const f=fixture(),{accountId:_,...input}=f.input;
+ const request=signMeteorMessage(f.extension,input,1000);
+ assert.equal('accountId' in (f.sent[0].inputs as object),false);
+ f.respond({status:'closed_success',payload:{...f.signature,accountId:'different.testnet'}});
+ assert.equal((await request).accountId,'different.testnet');
+ const bad=signMeteorMessage(f.extension,input,1000);f.respond({status:'closed_success',payload:{...f.signature,accountId:'owner.near'}});await assert.rejects(()=>bad,/mainnet|unsupported/);
+});

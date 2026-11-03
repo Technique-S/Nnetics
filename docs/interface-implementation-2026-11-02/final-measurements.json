@@ -1,0 +1,146 @@
+[
+  {
+    "width": 320,
+    "overview": {
+      "scrollWidth": 320,
+      "navHeight": 52.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 282,
+        "scroll": 282
+      },
+      {
+        "client": 282,
+        "scroll": 282
+      },
+      {
+        "client": 282,
+        "scroll": 282
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "overview": {
+      "scrollWidth": 390,
+      "navHeight": 52.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 352,
+        "scroll": 352
+      },
+      {
+        "client": 352,
+        "scroll": 352
+      },
+      {
+        "client": 352,
+        "scroll": 352
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "overview": {
+      "scrollWidth": 768,
+      "navHeight": 254.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 511,
+        "scroll": 511
+      },
+      {
+        "client": 511,
+        "scroll": 511
+      },
+      {
+        "client": 511,
+        "scroll": 511
+      }
+    ]
+  },
+  {
+    "width": 820,
+    "overview": {
+      "scrollWidth": 820,
+      "navHeight": 254.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 563,
+        "scroll": 563
+      },
+      {
+        "client": 563,
+        "scroll": 563
+      },
+      {
+        "client": 563,
+        "scroll": 563
+      }
+    ]
+  },
+  {
+    "width": 1080,
+    "overview": {
+      "scrollWidth": 1080,
+      "navHeight": 254.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 823,
+        "scroll": 823
+      },
+      {
+        "client": 823,
+        "scroll": 823
+      },
+      {
+        "client": 823,
+        "scroll": 823
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "overview": {
+      "scrollWidth": 1440,
+      "navHeight": 254.390625,
+      "smallText": 0,
+      "amberColor": "rgb(120, 88, 32)",
+      "tableColor": "rgb(100, 114, 107)"
+    },
+    "vendors": [
+      {
+        "client": 363,
+        "scroll": 363
+      },
+      {
+        "client": 363,
+        "scroll": 363
+      },
+      {
+        "client": 363,
+        "scroll": 363
+      }
+    ]
+  }
+]

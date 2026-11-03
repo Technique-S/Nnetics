@@ -1,0 +1,134 @@
+{
+  "results": [
+    {
+      "width": 320,
+      "name": "vendors-breakpoint",
+      "scrollWidth": 320,
+      "checkbox": [],
+      "over": [
+        {
+          "client": 282,
+          "scroll": 282
+        },
+        {
+          "client": 282,
+          "scroll": 282
+        },
+        {
+          "client": 282,
+          "scroll": 282
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "name": "vendors-breakpoint",
+      "scrollWidth": 768,
+      "checkbox": [],
+      "over": [
+        {
+          "client": 511,
+          "scroll": 511
+        },
+        {
+          "client": 511,
+          "scroll": 511
+        },
+        {
+          "client": 511,
+          "scroll": 511
+        }
+      ]
+    },
+    {
+      "width": 820,
+      "name": "vendors-breakpoint",
+      "scrollWidth": 820,
+      "checkbox": [],
+      "over": [
+        {
+          "client": 563,
+          "scroll": 563
+        },
+        {
+          "client": 563,
+          "scroll": 563
+        },
+        {
+          "client": 563,
+          "scroll": 563
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "name": "organizations",
+      "scrollWidth": 1440,
+      "checkbox": [],
+      "over": []
+    },
+    {
+      "width": 1440,
+      "name": "vault-prepared",
+      "scrollWidth": 1440,
+      "checkbox": [
+        {
+          "width": 20,
+          "display": "block"
+        }
+      ],
+      "over": []
+    },
+    {
+      "width": 390,
+      "name": "organizations",
+      "scrollWidth": 390,
+      "checkbox": [],
+      "over": []
+    },
+    {
+      "width": 390,
+      "name": "vault-prepared",
+      "scrollWidth": 390,
+      "checkbox": [
+        {
+          "width": 20,
+          "display": "block"
+        }
+      ],
+      "over": []
+    }
+  ],
+  "contrast": [
+    {
+      "name": "amber badge",
+      "fg": "785820",
+      "bg": "fcf5e3",
+      "ratio": "6.01"
+    },
+    {
+      "name": "table heading",
+      "fg": "64726b",
+      "bg": "fafbf7",
+      "ratio": "4.86"
+    },
+    {
+      "name": "footnote",
+      "fg": "64726b",
+      "bg": "ffffff",
+      "ratio": "5.05"
+    },
+    {
+      "name": "preview dt",
+      "fg": "64726b",
+      "bg": "fffdf8",
+      "ratio": "4.96"
+    },
+    {
+      "name": "primary button",
+      "fg": "ffffff",
+      "bg": "1b6650",
+      "ratio": "6.86"
+    }
+  ]
+}

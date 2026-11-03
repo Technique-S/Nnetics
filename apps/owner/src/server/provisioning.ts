@@ -41,6 +41,7 @@ export function vaultAccount(
   return `v-${crypto.createHash("sha256").update(`${owner}:${requestId}`).digest("hex").slice(0, 40)}.${factory}`;
 }
 interface Intent {
+  preparedHash?: string;
   organization: string;
   owner: string;
   requestId: string;
@@ -103,9 +104,9 @@ export class Provisioning {
     const body = await response.json();
     if (body.error?.cause?.name === "UNKNOWN_ACCOUNT") return undefined as T;
     if (body.error)
-      throw Error(
+      throw Object.assign(Error(
         "Provisioning outcome is unknown. Retry reconciliation; no new vault or authority was granted.",
-      );
+      ), { rpcCode: body.error.cause?.name });
     if (!body.result) throw Error("Incomplete provisioning evidence.");
     return body.result;
   }
@@ -419,11 +420,26 @@ export class Provisioning {
       throw e;
     }
   }
-  async reconcile(token: string, organization: string) {
+  async reconcile(token: string, organization: string, walletHash?: string) {
     const who = await this.identities.authenticate(token);
     this.own(who, organization);
-    const intent = this.read(organization);
+    let intent = this.read(organization);
     if (!intent?.hash) return this.public(intent);
+    const original = { ...intent };
+    const replacing = !!walletHash && walletHash !== intent.hash;
+    if (replacing) {
+      if (intent.state !== "awaiting_chain" || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletHash!))
+        throw Error("Only a pending owner request can reconcile a wallet transaction hash.");
+      try {
+        await this.rpc("tx", {tx_hash:intent.hash,sender_account_id:intent.owner,wait_until:"NONE"});
+        throw Error("Recorded transaction is known; reconcile its existing hash.");
+      } catch (e) {
+        if ((e as {rpcCode?:string}).rpcCode !== "UNKNOWN_TRANSACTION") throw e;
+      }
+      // Same key + nonce and every approved action must match below. A FINAL
+      // success consumes that nonce, so the old hash cannot later execute too.
+      intent = {...intent, hash:walletHash, preparedHash:intent.hash};
+    }
     if (intent.owner !== who.account_id)
       throw Error("Provisioning identity mismatch.");
     if (
@@ -451,7 +467,10 @@ export class Provisioning {
           "Transaction outcome remains unknown. The recorded intent stays blocked; retry reconciliation or the exact same transaction only.",
       };
     }
-    if (tx.final_execution_status !== "FINAL") return this.public(intent);
+    if (tx.final_execution_status !== "FINAL") {
+      if(replacing)throw Error("Wallet transaction must be FINAL before reconciliation.");
+      return this.public(intent);
+    }
     const t = tx.transaction,
       call = t?.actions?.[0]?.FunctionCall;
     if (
@@ -500,6 +519,7 @@ export class Provisioning {
       (r: any) => "Failure" in r.outcome.status,
     );
     if (!account && tx.status?.SuccessValue === "") {
+      if (replacing) throw Error("Wallet hash repair requires complete successful creation.");
       // The pinned factory returns the refund promise on failed creation. FINAL
       // plus its empty successful result conclusively completes that refund.
       intent.state = "failed";
@@ -515,12 +535,14 @@ export class Provisioning {
       !account ||
       failures ||
       Buffer.from(tx.status?.SuccessValue || "", "base64").toString() !== "true"
-    )
+    ) {
+      if(replacing)throw Error("Wallet transaction has not conclusively initialized the vault.");
       return {
         ...this.public(intent),
         message:
           "Creation, callback or refund did not conclusively succeed. No vault linked; keep this intent blocked for review.",
       };
+    }
     const [keys, vault] = await Promise.all([
       this.rpc("query", {
         request_type: "view_access_key_list",
@@ -553,6 +575,14 @@ export class Provisioning {
       "Finalized initialization and expected owner verified. Payments remain disabled pending review and separate authority setup.";
     this.identities.db.exec("BEGIN IMMEDIATE");
     try {
+      const current=this.read(organization);
+      if(current?.hash!==original.hash||current?.state!==original.state)
+        throw Error("Provisioning changed during reconciliation. Refresh before retrying.");
+      if(replacing){
+        this.identities.db.prepare("INSERT OR IGNORE INTO vault_provisioning_history VALUES (?,?,?)")
+          .run(original.hash!,organization,JSON.stringify(original));
+        delete intent.unsigned; // Never dispatch the original bytes under a new hash.
+      }
       this.identities.db
         .prepare("INSERT OR IGNORE INTO organization_vaults VALUES (?,?,?,?)")
         .run(organization, intent.vault, intent.owner, JSON.stringify(intent));

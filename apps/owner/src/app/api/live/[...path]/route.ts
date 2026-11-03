@@ -5,6 +5,7 @@ import { service } from "../../../../server/service";
 import {
   identityService,
   identityConfig,
+  IdentityVerificationUnavailable,
   type Workspace,
 } from "../../../../server/identity";
 import {
@@ -43,6 +44,10 @@ export async function GET(req: NextRequest, context: Context) {
       });
     }
     const token = req.cookies.get("nnetics_identity")?.value || "";
+    if(path==="session") {
+      await identity.authenticate(token);
+      return json(identity.sessionInfo(token));
+    }
     if (path === "provisioning")
       return json(
         await new Provisioning(identity).status(
@@ -76,12 +81,13 @@ export async function GET(req: NextRequest, context: Context) {
         notice =
           "Wallet login succeeded. Vault configuration needs developer review before a vault workspace can be used.";
       }
-      await identity.authenticate(token);
+      identity.verify(token);
       return json({
         accountId: who.account_id,
         network: "testnet",
         organizations,
         notice,
+        session: identity.sessionInfo(token),
       });
     }
     if (path === "organization") {
@@ -103,8 +109,8 @@ export async function GET(req: NextRequest, context: Context) {
     throw new Error("Unknown endpoint.");
   } catch (e) {
     return json(
-      { error: e instanceof Error ? e.message : "Request failed" },
-      400,
+      { error: e instanceof Error ? e.message : "Request failed", retryable: e instanceof IdentityVerificationUnavailable },
+      e instanceof IdentityVerificationUnavailable ? 503 : 400,
     );
   }
 }
@@ -146,7 +152,7 @@ export async function POST(req: NextRequest, context: Context) {
       path: "/api/live",
     };
     if (path === "challenge") {
-      const response = json(identities.challenge(body.accountId, browser));
+      const response = json(body.discover===true?identities.discoveryChallenge(browser):identities.challenge(body.accountId, browser));
       response.cookies.set("nnetics_browser", browser, {
         ...cookies,
         maxAge: 2592000,
@@ -160,11 +166,29 @@ export async function POST(req: NextRequest, context: Context) {
       const response = json({ ok: true });
       response.cookies.set("nnetics_identity", token, {
         ...cookies,
-        maxAge: 900,
+        maxAge: Math.max(0,Math.floor((identities.sessionInfo(token).absoluteExpires-Date.now())/1000)),
       });
       return response;
     }
     const token = req.cookies.get("nnetics_identity")?.value || "";
+    if(path==="session/challenge")return json(identities.resumeChallenge(token,browser));
+    if(path==="session/resume") {
+      const previous=identities.verify(token).account_id;
+      const resumed=await identities.login(body,browser,token);
+      if(!resumed){
+        const response=json({accountId:body.accountId,accountChanged:true,authenticationRequired:true});
+        response.cookies.set("nnetics_identity","",{...cookies,maxAge:0});
+        return response;
+      }
+      const info=identities.sessionInfo(resumed);
+      const response=json({...info,accountChanged:previous!==info.accountId});
+      response.cookies.set("nnetics_identity",resumed,{...cookies,maxAge:Math.max(0,Math.floor((info.absoluteExpires-Date.now())/1000))});
+      return response;
+    }
+    if(path==="session/renew") {
+      if(body.active!==true)throw Error("Explicit foreground activity required for renewal.");
+      return json(await identities.renew(token,browser));
+    }
     if (
       [
         "provisioning/prepare",
@@ -194,7 +218,9 @@ export async function POST(req: NextRequest, context: Context) {
             String(body.digest || ""),
           ),
         );
-      return json(await provisioning.reconcile(token, body.organization));
+      if(body.transactionHash!==undefined && typeof body.transactionHash!=="string")
+        throw Error("Enter a public wallet transaction hash.");
+      return json(await provisioning.reconcile(token, body.organization,body.transactionHash));
     }
     if (path === "logout") {
       identities.logout(browser);
@@ -210,8 +236,8 @@ export async function POST(req: NextRequest, context: Context) {
     return json(await organizationMutation(s, token, path, body));
   } catch (e) {
     return json(
-      { error: e instanceof Error ? e.message : "Request failed" },
-      400,
+      { error: e instanceof Error ? e.message : "Request failed", retryable: e instanceof IdentityVerificationUnavailable },
+      e instanceof IdentityVerificationUnavailable ? 503 : 400,
     );
   }
 }

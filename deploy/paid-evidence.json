@@ -1,0 +1,15 @@
+{
+  "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+  "owner": "grandtheft.testnet",
+  "vault": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+  "codeHash": "Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ",
+  "worker": "worker.grandtheft.testnet",
+  "publicKey": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA",
+  "id": "CTR-0001-INV-0002",
+  "order": "ACCEPTANCE-001",
+  "amount": "1000000000000000000000",
+  "recipient": "babygoat.testnet",
+  "hash": "6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1",
+  "payloadSha256": "0adf081499aa3b9fab4d40c097fbd7ff4d097b0efd7dc90ed09251497301be67",
+  "signedSha256": "955adaf6dee3ceaf8c3a91dbdf42871892ac91924e0f6fc844e4bbb919dada9a"
+}

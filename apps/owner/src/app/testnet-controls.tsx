@@ -59,6 +59,7 @@ export function TestnetControls({
           independent review, bootstrap trust, weak subjectivity and upgrade-key
           custody remain unresolved. Unknown outcomes stay reserved.
         </p>
+        <section aria-label="Funding and limits"><h3>Funding and limits</h3>
         <label>
           Action{" "}
           <select
@@ -94,6 +95,7 @@ export function TestnetControls({
         >
           Review owner transaction in wallet
         </button>
+        </section><section aria-label="Payment reconciliation"><h3>Payment reconciliation</h3>
         <label>
           Recorded attempt ID{" "}
           <input
@@ -110,6 +112,7 @@ export function TestnetControls({
         >
           Reconcile recorded outcome
         </button>
+        </section><section aria-label="Viewer access"><h3>Viewer access</h3>
         <label>
           Viewer account
           <input
@@ -154,6 +157,7 @@ export function TestnetControls({
         >
           Revoke viewer access
         </button>
+        </section><section aria-label="Existing references"><h3>Existing references</h3>
         <p>
           The frozen contract has no vendor/order enumeration. Import existing
           references to discover them; all displayed authority is re-read from
@@ -187,6 +191,7 @@ export function TestnetControls({
         >
           Import existing reference
         </button>
+        </section>
       </fieldset>
       {snapshot.queue?.length ? (
         <ul>

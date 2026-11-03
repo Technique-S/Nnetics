@@ -179,6 +179,24 @@ async function prepared(f: ReturnType<typeof fixture>) {
   const plan = await f.p.prepare("session", "organization-one");
   return f.p.dispatch("session", "organization-one", plan.planDigest!);
 }
+
+test("owner wallet-hash reconciliation preserves original evidence and requires the same key/nonce/full call and finalized initialized vault",async()=>{
+ const f=fixture();try{
+  await prepared(f);const original=f.p.read("organization-one")!,candidate=baseEncode(new Uint8Array(32).fill(19)),rpc=f.p.rpc.bind(f.p);
+  f.set({outcome:"success",exists:true,mutate:t=>({...t,transaction:{...t.transaction,hash:candidate}})});
+  f.p.rpc=async(method,params)=>{if(method==="tx"&&(params as any).tx_hash===original.hash)throw Object.assign(Error("unknown"),{rpcCode:"UNKNOWN_TRANSACTION"});return rpc(method,params);};
+  for(const change of [(t:any)=>t.transaction.nonce++, (t:any)=>t.transaction.public_key="wrong",(t:any)=>t.transaction.signer_id="other.testnet",(t:any)=>t.transaction.actions[0].FunctionCall.deposit="1",(t:any)=>t.transaction.actions[0].FunctionCall.args="e30=",(t:any)=>t.receipts_outcome[1].outcome.status={Failure:{}}]){
+   f.set({mutate:t=>{t.transaction.hash=candidate;change(t);return t;}});
+   let result;try{result=await f.p.reconcile("session","organization-one",candidate);}catch{/* Rejected evidence must leave the recorded request untouched. */}
+   if(result)assert.notEqual(result.state,"verified");
+   assert.equal(f.p.read("organization-one")!.hash,original.hash);
+  }
+  f.set({mutate:t=>{t.transaction.hash=candidate;return t;}});
+  const result=await f.p.reconcile("session","organization-one",candidate);assert.equal(result.state,"verified");
+  const saved=f.p.read("organization-one")!;assert.equal(saved.hash,candidate);assert.equal(saved.preparedHash,original.hash);assert.equal(saved.unsigned,undefined);
+  const history=f.identities.db.prepare("SELECT payload FROM vault_provisioning_history WHERE hash=?").get(original.hash!) as {payload:string};assert.equal(JSON.parse(history.payload).unsigned,original.unsigned);
+ }finally{f.close();}
+});
 test("factory deployment plan pins both artifacts and creates a locked direct subaccount without signing", () => {
   const input = {
     funder: "operator.testnet",

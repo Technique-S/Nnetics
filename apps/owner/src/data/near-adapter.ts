@@ -1,6 +1,7 @@
 import { Buffer } from "buffer";
 import { account, uint } from "./owner-adapter";
 import { assertTestedProtocol } from "./protocol";
+import {assertSameLiveContext} from "./config-context";
 import {
   meteorExtension,
   signMeteorMessage,
@@ -28,7 +29,10 @@ export interface PublicConfig {
   missingConfiguration?: string[];
   transactionsEnabled: boolean;
 }
-export async function api<T>(path: string, body?: unknown): Promise<T> {
+export class LiveApiError extends Error {
+  constructor(message: string, readonly retryable = false, readonly status = 0) { super(message); }
+}
+export async function api<T>(path: string, body?: unknown, signal?:AbortSignal): Promise<T> {
   const r = await fetch("/api/live/" + path, {
     method: body === undefined ? "GET" : "POST",
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
@@ -38,11 +42,27 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     keepalive: path === "logout",
     // A verified snapshot performs several finalized RPC reads. Give the server
     // time to finish its bounded reads rather than timing out after one RPC.
-    signal: AbortSignal.timeout(90000),
+    signal: signal?AbortSignal.any([signal,AbortSignal.timeout(90000)]):AbortSignal.timeout(90000),
+  }).catch(() => { throw new LiveApiError("Testnet verification connection timed out or is unavailable. Retry verification.", true); });
+  const result = await r.json().catch(() => {
+    // A proxy/restart can return HTML instead of JSON. This is not evidence that
+    // a signing key/session was revoked. Status 0 also prevents replaying a login
+    // whose upstream outcome could already have committed.
+    throw new LiveApiError("The testnet service returned an unreadable response. Retry verification; private actions remain blocked.",true);
   });
-  const result = await r.json();
-  if (!r.ok) throw new Error(result.error || "Testnet service unavailable.");
+  if (!r.ok) throw new LiveApiError(result.error || "Testnet service unavailable.", result.retryable === true, r.status);
   return result as T;
+}
+// Explicit, optional action only. No automatic focus/navigation caller.
+export async function checkMeteorIdentity(signal?: AbortSignal) {
+  const challenge=await api<{nonce:string;message:string;recipient:string}>("session/challenge",{});
+  // The pinned official SignMessage input makes accountId optional. Omitting it
+  // lets Meteor select the current identity instead of forcing the old account.
+  const signature=await signMeteorMessage(meteorExtension(),{
+    message:challenge.message,recipient:challenge.recipient,nonce:Buffer.from(challenge.nonce,"base64"),
+  },240_000,signal);
+  if(signal?.aborted)throw Error("Wallet verification cancelled. Verify again.");
+  return api<{accountId:string;accountChanged:boolean;authenticationRequired?:boolean}>("session/resume",{...signature,nonce:challenge.nonce});
 }
 export class NearOwnerAdapter implements OwnerAdapter {
   readonly mode = "testnet" as const;
@@ -51,7 +71,7 @@ export class NearOwnerAdapter implements OwnerAdapter {
   private listeners = new Set<() => void>();
   private messageOnlyMeteor =
     typeof window !== "undefined" &&
-    sessionStorage.getItem("nnetics-wallet") === "meteor";
+    (sessionStorage.getItem("nnetics-wallet") ?? localStorage.getItem("nnetics-wallet")) !== "nightly";
   constructor(
     readonly config: PublicConfig,
     readonly expectedAccount?: string,
@@ -102,45 +122,62 @@ export class NearOwnerAdapter implements OwnerAdapter {
     });
     this.messageOnlyMeteor = false;
     sessionStorage.setItem("nnetics-wallet", "nightly");
+    localStorage.setItem("nnetics-wallet", "nightly");
   }
-  async connectMeteor(accountId: string, signal?: AbortSignal) {
+  async connectMeteor(accountId?: string, signal?: AbortSignal, stage?:(message:string)=>void) {
     if (this.config.network !== "testnet")
       throw new Error(
         "Switch Meteor to NEAR testnet before verifying your identity.",
       );
-    testnetWalletAccount(accountId);
+    if(accountId!==undefined)testnetWalletAccount(accountId);
     const extension = meteorExtension();
+    stage?.("Preparing the testnet sign-in message…");
     const challenge = await api<{
       nonce: string;
       message: string;
       recipient: string;
-    }>("challenge", {
-      accountId,
-    });
+    }>("challenge", accountId===undefined?{discover:true}:{accountId},signal);
+    stage?.("Approve the off-chain message in Meteor…");
     const signature = await signMeteorMessage(
       extension,
       {
-        accountId,
+        ...(accountId===undefined?{}:{accountId}),
         message: challenge.message,
         recipient: challenge.recipient,
         nonce: Buffer.from(challenge.nonce, "base64"),
       },
-      120_000,
+      240_000,
       signal,
     );
     if (signal?.aborted)
       throw new Error("Wallet account changed. Verify again.");
-    await api("login", {
+    const proof = {
       ...signature,
       nonce: challenge.nonce,
-    });
+    };
+    stage?.("Checking your signed proof on NEAR testnet…");
+    try {
+      await api("login", proof,signal);
+    } catch (e) {
+      // Only an explicit pre-session verification failure may reuse this proof.
+      // A lost/ambiguous HTTP response is not permission to replay a login.
+      if (!(e instanceof LiveApiError) || !e.retryable || e.status !== 503) throw e;
+      await new Promise(resolve => setTimeout(resolve, 750));
+      if (signal?.aborted) throw new Error("Wallet account changed. Verify again.");
+      await api("login", proof,signal);
+    }
     this.messageOnlyMeteor = true;
     sessionStorage.setItem("nnetics-wallet", "meteor");
+    localStorage.setItem("nnetics-wallet", "meteor"); // connector hint only; never authority
+    stage?.(`Signed in as ${signature.accountId}. Loading your workspace…`);
+    return signature.accountId;
   }
   async snapshot() {
+    assertSameLiveContext(this.config,await api<PublicConfig>("config"));
     const state = await api<OwnerSnapshot>(
       "snapshot?organization=" + encodeURIComponent(this.config.organization),
     );
+    assertSameLiveContext(this.config,await api<PublicConfig>("config"));
     if (
       this.expectedAccount &&
       state.access?.accountId !== this.expectedAccount
@@ -255,9 +292,13 @@ export class NearOwnerAdapter implements OwnerAdapter {
     throw new Error("Fault injection is available only in demo mode.");
   }
   async disconnect() {
+    localStorage.setItem("nnetics-signout-required", "1");
+    const channel = new BroadcastChannel("nnetics-identity");
+    channel.postMessage("lock");channel.close();
     await api("logout", {});
     if (!this.messageOnlyMeteor) await (await this.wallet()).signOut();
     sessionStorage.removeItem("nnetics-wallet");
+    localStorage.removeItem("nnetics-wallet");
     location.href = "/?mode=testnet";
   }
   workerIdentity() {

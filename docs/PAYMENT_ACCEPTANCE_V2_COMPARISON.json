@@ -1,0 +1,15 @@
+{
+  "original_digest": "b4b70ad2cfee6722a0fe74e02f549b6cb124b54ab3ab282575d14c17f0f2b63b",
+  "revised_digest": "978219497f70b4c76cf87b367eb032192c12566d074488566c40eece43301edf",
+  "transaction_count": 12,
+  "transactions_exactly_unchanged": true,
+  "invoice_worker_accounts_funding_fees_gas_expiry_checkpoint_payload_unchanged": true,
+  "policy_changes": [
+    "One testnet-only independent-review exception, explicitly unapproved",
+    "Owner-trusted initial checkpoint consent retained",
+    "Fresh 24-hour validity, corroboration and preflight conditions",
+    "Immediate pause/revoke and same-terminal-job restart checks",
+    "Bounded containment and stop conditions; no additional recovery transaction permission"
+  ],
+  "authorization_granted": false
+}

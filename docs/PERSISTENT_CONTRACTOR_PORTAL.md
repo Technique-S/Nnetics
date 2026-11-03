@@ -6,6 +6,12 @@ explicitly separate; no demo records are copied into real organizations. This
 does not deploy contracts, authorize a worker, initiate a payment or complete
 public-testnet payment acceptance.
 
+The later [extraction and queue integration](CONTRACTOR_EXTRACTION_AND_QUEUE.md)
+adds optional server-side OpenRouter suggestions and owner-controlled, held queue
+linkage. [Payment acceptance](CONTRACTOR_PAYMENT_ACCEPTANCE_PLAN.md) remains gated
+and unexecuted. The real provider currently returns HTTP 429; deterministic
+fallback is explicitly labeled.
+
 ## Use the running application
 
 1. Open `http://127.0.0.1:3100/`, verify your activated testnet account through
@@ -32,7 +38,9 @@ public-testnet payment acceptance.
 7. Submission allocates a permanent server reference such as `CTR-0001-INV-0001`.
    The owner sees the same invoice in the selected organization's panel. Review
    can start, request clarification, approve or reject; the contractor sees the
-   resulting state. Approval never initiates payment.
+   resulting state. Approval never initiates payment. With verified provisioning
+   and matching adapter configuration, the owner can separately link an approved
+   bill to one matching finalized chain order; the imported queue job stays held.
 8. Restart the application using the same database paths. Reverify owner identity
    when required; records do not depend on keeping an owner browser session alive.
    A contractor's unexpired, unrevoked capability session can reload its records.
@@ -86,10 +94,12 @@ the invoice ID/reference and original recipient.
   currency), or an owner clarification request. Owner approval cannot override it.
 - **Under review:** the owner explicitly started review.
 - **Approved / Rejected:** billing-review decisions, independent of payment.
-- **Payment:** not initiated while this integration is gated. The backend exposes
-  no command to set Paid, enqueue payment or supply a transaction link. The live
-  UI suppresses an unverified Paid label/link. Confirmed chain evidence and live
-  contractor payment reconciliation remain unimplemented; no Paid result is claimed.
+- **Payment:** not initiated while this integration is gated. An owner-only
+  command can import a verified one-order linkage into the held durable queue.
+  The backend exposes no command to set Paid or supply an arbitrary transaction
+  link. The live UI requires fresh finalized payment state and verified transaction
+  linkage before Paid/a link. This read path is implemented but public-testnet
+  payment acceptance remains unverified; no Paid result is claimed.
 
 The exact original submitted text, including whitespace, is stored permanently
 as `originalText`. Clarifications update current text and append history without
@@ -99,10 +109,13 @@ as conflicted, never converted or displayed as a settled NEAR amount. Explicit
 non-NEAR structured assets are rejected. Missing required work/amount/order details
 block submission with instructions in the preview.
 
-**Extraction is deterministic parsing, not a real AI provider or mock AI response.**
-The optional formatter recognizes explicit work-order/amount/wallet labels and
-rejects contradictory labels. Free text is untrusted literal data. PDF/images are
-private attachments only, with no OCR; TXT can populate the draft. Existing format,
+**Extraction now supports an optional real OpenRouter adapter.** Its configured
+model is `nvidia/nemotron-3.5-super-vl:free`; actual synthetic calls returned HTTP
+429, so successful real-model extraction remains unverified. Local deterministic
+parsing and provider-failure fallback are explicitly labeled. Extraction requires
+confirmation and cannot approve work or payment. The labeled formatter also
+remains available. Free text is untrusted literal data. PDF/images are private
+attachments only, with no OCR; TXT can populate the draft. Existing format,
 body-size and download authorization limits remain enforced.
 
 ## Executed verification
@@ -130,7 +143,10 @@ The passing result, logs and screenshots are retained in ignored local artifacts
 Controlled wallet/RPC fixtures are not real Meteor or public-testnet acceptance.
 Local tests are not independent security review. Back up and persist the SQLite
 files for continued use; multi-host storage, production invitation delivery,
-production security review and on-chain work-order/payment linkage are not added.
+production security review and public-testnet payment acceptance remain incomplete.
+On-chain work-order/payment linkage now has a guarded, held import path, limited
+to the app's explicitly configured organization/vault; it does not provision or
+activate additional workers automatically.
 
 ## Explicit demo
 

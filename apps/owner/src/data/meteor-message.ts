@@ -11,7 +11,7 @@ export interface MeteorSignedMessage {
   signature: string;
 }
 export interface MeteorMessage {
-  accountId: string;
+  accountId?: string;
   message: string;
   recipient: string;
   nonce: Uint8Array;
@@ -60,7 +60,7 @@ export function signMeteorMessage(
 ): Promise<MeteorSignedMessage> {
   if (signal?.aborted)
     throw new Error("Wallet account changed. Request a new login message.");
-  testnetWalletAccount(input.accountId);
+  if(input.accountId!==undefined)testnetWalletAccount(input.accountId);
   if (input.nonce.length !== 32 || !input.message || !input.recipient)
     throw new Error("Invalid wallet login challenge.");
   const pending = dispatcher(extension);
@@ -126,7 +126,8 @@ export function signMeteorMessage(
           | undefined;
         if (
           !payload ||
-          payload.accountId !== input.accountId ||
+          typeof payload.accountId!=="string" ||
+          (input.accountId!==undefined && payload.accountId !== input.accountId) ||
           typeof payload.publicKey !== "string" ||
           !/^ed25519:[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(payload.publicKey) ||
           typeof payload.signature !== "string" ||
@@ -134,6 +135,9 @@ export function signMeteorMessage(
         ) {
           stop("Meteor returned an invalid or different wallet identity.");
           return;
+        }
+        try { testnetWalletAccount(payload.accountId); } catch {
+          stop("Meteor selected an unsupported or mainnet account. Select NEAR testnet and retry."); return;
         }
         status = "closed_success";
         finish(undefined, {

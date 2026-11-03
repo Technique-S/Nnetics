@@ -160,6 +160,23 @@ export class Queue {
         .all() as unknown as Row[]
     ).map(job);
   }
+  importReviewed(invoice:Omit<Invoice,"reviewed">) {
+    const input=structuredInvoice(invoice);requireNear(input.asset,input.text);
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      const prior=this.get(input.id);
+      if(prior){
+        const {reviewed:_,...saved}=prior.invoice;
+        if(JSON.stringify(saved)!==JSON.stringify(input))throw Error("Invoice queue binding differs; investigate before retry.");
+        this.db.exec("COMMIT");return prior;
+      }
+      if(this.all().some(j=>j.order_id===input.order_id))throw Error("This approved work order already has a durable invoice claim.");
+      this.add(input,["Contractor invoice reviewed; execution gated. Explicit owner queue release and transaction authorization still required."]);
+      this.db.prepare("UPDATE invoices SET payload=? WHERE id=?").run(JSON.stringify({...input,reviewed:true}),input.id);
+      this.register("order",input.order_id);
+      this.db.exec("COMMIT");return this.get(input.id)!;
+    }catch(e){this.db.exec("ROLLBACK");throw e;}
+  }
   get(id: string): Job | undefined {
     const r = this.db.prepare("SELECT * FROM invoices WHERE id=?").get(id) as
       | Row

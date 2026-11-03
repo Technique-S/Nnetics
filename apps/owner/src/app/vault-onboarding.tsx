@@ -39,6 +39,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [reviewed, setReviewed] = useState(false);
+  const [walletHash,setWalletHash]=useState("");
   useEffect(() => {
     let current = true;
     void api<Progress>(
@@ -61,6 +62,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
       const p = await api<Progress>("provisioning/" + action, {
         organization,
         digest: progress?.planDigest,
+        ...(action==="reconcile"&&walletHash.trim()?{transactionHash:walletHash.trim()}:{}),
       });
       setProgress(p);
       if (action === "retry") setReviewed(false);
@@ -194,6 +196,8 @@ export function VaultOnboarding({ organization }: { organization: string }) {
           </>
         )}
       {progress?.hash && (
+        <div>
+        {progress.state==="awaiting_chain"&&<label>Wallet transaction hash (only if different)<input value={walletHash} onChange={e=>setWalletHash(e.target.value)} /><span>Read-only verification of the same approved signer, key, nonce and call. Does not send or retry a transaction.</span></label>}
         <button
           className="button secondary"
           disabled={busy}
@@ -201,6 +205,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
         >
           Resume / reconcile provisioning
         </button>
+        </div>
       )}
       {progress?.state === "failed" && (
         <button

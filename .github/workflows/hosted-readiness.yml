@@ -1,0 +1,68 @@
+name: Hosted MVP readiness (no deployment)
+on:
+  push:
+    paths:
+      - deploy/**
+      - render.yaml
+      - apps/owner/**
+      - .github/workflows/hosted-readiness.yml
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  hosted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+      - run: npm ci --include=dev
+        working-directory: apps/owner
+      - run: npm test
+        working-directory: apps/owner
+      - run: npm run build
+        working-directory: apps/owner
+        env:
+          NNETICS_HOSTED_MAINTENANCE: '1'
+          NNETICS_APP_ORIGIN: https://hosted-readiness.invalid
+          NNETICS_TRANSACTIONS_AUTHORIZED: ''
+          NNETICS_PROVISIONING_ENABLED: ''
+      - name: Measure production under 512 MiB and 2 GiB Linux limits
+        shell: bash
+        run: |
+          mkdir -p artifacts/hosting-measurements artifacts/hosting-benchmark-fixtures
+          docker pull node:24.22.1-bookworm-slim
+          docker image inspect --format '{{json .RepoDigests}}' node:24.22.1-bookworm-slim > artifacts/hosting-measurements/runtime-image.json
+          for memory in 512 2048; do
+            cpu=0.5
+            if [ "$memory" = 2048 ]; then cpu=1; fi
+            name="nnetics-memory-$memory"
+            set +e
+            docker run --name "$name" --user "$(id -u):$(id -g)" \
+              --memory="${memory}m" --memory-swap="${memory}m" --cpus="$cpu" \
+              --mount type=bind,source="$PWD",target=/app --workdir /app \
+              --mount type=bind,source="$PWD/artifacts/hosting-benchmark-fixtures",target=/state \
+              -e NNETICS_MEASURE_STATE_ROOT=/state -e NNETICS_MEASURE_CGROUP=1 \
+              -e NNETICS_MEASURE_SECONDS=60 \
+              -e "NNETICS_MEASURE_OUTPUT=/app/artifacts/hosting-measurements/${memory}.json" \
+              node:24.22.1-bookworm-slim node deploy/measure.mjs
+            result=$?
+            set -e
+            docker inspect --format '{{json .State}}' "$name" > "artifacts/hosting-measurements/${memory}-state.json"
+            echo "{\"limitMiB\":$memory,\"exitCode\":$result}" > "artifacts/hosting-measurements/${memory}-exit.json"
+            docker rm "$name"
+            if [ "$memory" = 2048 ] && [ "$result" != 0 ]; then exit "$result"; fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hosted-readiness-measurements
+          path: artifacts/hosting-measurements/*.json
+          if-no-files-found: warn
+          retention-days: 7
+      # No server key, secrets, private database, signing, provisioning or deployment.

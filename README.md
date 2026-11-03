@@ -2,6 +2,14 @@
 
 An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
 
+**3 November hosting preparation:** a maintenance-first Render configuration,
+private SQLite migration/backup tools and hosted acceptance checklist are prepared
+locally in [HOSTED_DEPLOYMENT.md](docs/HOSTED_DEPLOYMENT.md). No hosted service or
+push is authorized by that preparation. The existing INV-0002 testnet payment is
+confirmed; the vault remains paused, worker authorization revoked, and execution
+disabled. Later entries in [VALIDATION.md](docs/VALIDATION.md) supersede historical
+status statements below. Hosted rollout and pinned-runtime Linux checks remain open.
+
 ## Current status: fresh-user onboarding under review, 31 October 2026
 
 **2 November persistent contractor backend:** the default private contractor

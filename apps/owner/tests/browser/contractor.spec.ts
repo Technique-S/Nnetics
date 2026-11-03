@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
-const origin = "http://127.0.0.1:3100";
+const origin = process.env.NNETICS_BROWSER_BASE_URL || "http://127.0.0.1:3100";
 async function start(page: Page, name = "Writer") {
     await page.goto("/demo/contractors");
     await page.getByRole("button", { name: "Start contractor demo" }).click();
@@ -20,7 +20,7 @@ test("owner invite → contractor upload and clarification → owner review, wal
     test.setTimeout(100000);
     const link = await start(page), ctx = await browser.newContext({ baseURL: origin, viewport: page.viewportSize()! }), contractor = await ctx.newPage();
     await contractor.goto(link);
-    await expect(contractor.getByRole("heading", { name: "Hello, Writer." })).toBeVisible();
+    await expect(contractor.getByRole("heading", { name: "Writer · Billing" })).toBeVisible();
     await expect(contractor.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
     await expect(contractor.getByLabel("Invoice reference",{exact:true})).toHaveCount(0);
     await expect(contractor.getByText("Simulated data", { exact: false })).toBeVisible();
@@ -74,7 +74,7 @@ test("owner invite → contractor upload and clarification → owner review, wal
     const secondLink = await page.getByLabel("Private invitation link · shown once").inputValue();
     const otherCtx = await browser.newContext({ baseURL: origin, viewport: page.viewportSize()! }), other = await otherCtx.newPage();
     await other.goto(secondLink);
-    await expect(other.getByRole("heading",{name:"Hello, Designer."})).toBeVisible();
+    await expect(other.getByRole("heading",{name:"Designer · Billing"})).toBeVisible();
     await other.getByRole("button", { name: "My payments", exact: true }).click();
     await expect(other.getByText("No submitted invoices yet.")).toBeVisible();
     await expect(other.getByText(reference, { exact: true })).toHaveCount(0);
@@ -139,7 +139,7 @@ test("conflicting invoice labels require clarification; uploaded markup cannot b
 });
 test("late snapshots cannot restore the prior contractor after an invalid link switch", async ({page,browser}) => {
     const link=await start(page),ctx=await browser.newContext({baseURL:origin}),contractor=await ctx.newPage();
-    await contractor.goto(link);await expect(contractor.getByRole("heading",{name:"Hello, Writer."})).toBeVisible();
+    await contractor.goto(link);await expect(contractor.getByRole("heading",{name:"Writer · Billing"})).toBeVisible();
     await contractor.getByRole("button",{name:"My payments",exact:true}).click();
     let captured=false,release!:()=>void;
     const gate=new Promise<void>(resolve=>{release=resolve;});
@@ -153,7 +153,7 @@ test("late snapshots cannot restore the prior contractor after an invalid link s
     await expect(contractor.getByRole("heading",{name:"Private access unavailable"})).toBeVisible();
     release();await contractor.unrouteAll({behavior:"wait"});
     await expect(contractor.getByRole("heading",{name:"Private access unavailable"})).toBeVisible();
-    await expect(contractor.getByRole("heading",{name:"Hello, Writer."})).toHaveCount(0);await ctx.close();
+    await expect(contractor.getByRole("heading",{name:"Writer · Billing"})).toHaveCount(0);await ctx.close();
 });
 test("transaction links are conditional, allowlisted and explicitly simulated", async ({ page }) => {
     await page.route("**/api/demo/contractors/contractor", route => route.fulfill({ json: { mode: "simulation", profile: { id: "fixture", name: "Fixture contractor", generation: 1, linkActive: true, wallet: "fixture.testnet", walletVersion: 1, pendingWallet: null }, orders: [], invoices: [{ id: "fixture-bill", contractorId: "fixture", reference: "SIMULATED-PAID", orderId: "fixture-order", amount: "1", asset: "NEAR", recipient: "fixture.testnet", text: "Synthetic display fixture", description: "Simulated history only", status: "Paid", reasons: [], ownerNote: "", attachment: null, transactionUrl: "https://testnet.nearblocks.io/txns/" + "A".repeat(44), submittedAt: "2026-11-02T00:00:00Z" }] } }));
@@ -171,7 +171,7 @@ test("pasted currency conflicts block NEAR submission until the source is clarif
  await contractor.bringToFront(); await contractor.getByRole("button",{name:"Submit a bill",exact:true}).click();
  await expect(contractor.getByLabel("Approved work order",{exact:true})).toContainText("CURRENCY-WO");
  await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 USD\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByLabel("Work description",{exact:true}).fill("Article");
- await expect(contractor.getByText(/Currency conflict: clarify/)).toBeVisible();await expect(contractor.getByRole("button",{name:"Submit bill for review"})).toBeDisabled();
+ await expect(contractor.locator("#submission-guidance")).toContainText("Currency conflict: clarify");await expect(contractor.getByRole("button",{name:"Submit bill for review"})).toBeDisabled();
  await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 NEAR\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByRole("button",{name:"Submit bill for review"}).click();
  await expect(contractor.getByText(/^CTR-\d+-INV-0001$/,{exact:true})).toBeVisible();
  const saved=(await(await contractor.request.get("/api/demo/contractors/contractor")).json()).invoices[0];

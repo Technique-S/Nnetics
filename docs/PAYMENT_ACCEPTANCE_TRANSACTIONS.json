@@ -1,0 +1,800 @@
+{
+  "plan": {
+    "version": 1,
+    "status": "BLOCKED_PENDING_CHECKPOINT_REVIEW_NOT_AUTHORIZED",
+    "network": "testnet",
+    "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+    "invoice": {
+      "id": "498f003c-7a11-458f-b3c6-f9d230c245b9",
+      "reference": "CTR-0001-INV-0002",
+      "billing_order_id": "3742ad13-9edd-41b7-b51c-e0d6f4c480e1",
+      "recipient": "babygoat.testnet",
+      "amount_near": "0.001",
+      "original_text_sha256": "3251533cf0fc9b4d6ae282841f760f5d0790cdc5618c535cd490aa867c78e669"
+    },
+    "worker": {
+      "account": "worker.grandtheft.testnet",
+      "public_key": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA",
+      "full_access_keys": 0,
+      "method": "execute_payment",
+      "allowance_yocto": "270000000000000000000000",
+      "local_custody": "Private external ACL-protected key file; never committed/exported"
+    },
+    "checkpoint": {
+      "collected_at": "2026-11-03T08:51:26.129Z",
+      "providers": [
+        "https://test.rpc.fastnear.com",
+        "https://archival-rpc.testnet.near.org"
+      ],
+      "head_hash": "Gk91ppKatpsQhi62mK9CE1WKfFMFA7BH1EDt3vBSnnpD",
+      "height": 276003652,
+      "epoch_id": "7PcaksxBUN51wmmFZhvjekLnwqgVBaVHGWPxuufR8eiR",
+      "next_epoch_id": "8WAqnvvCuGgz1NpmUWnwzDh5K6G1mDpJKb6TV6BEJuMy",
+      "current_validators": 20,
+      "next_validators": 20,
+      "approved_stake": "485068636219083381968489046251863",
+      "total_stake": "605470350102881057467127247937208",
+      "args_bytes": 7234,
+      "args_sha256": "e38bed03aadd216a2472fb92064cf77ee54aecc86f405f22259c6f6607731027",
+      "checks": {
+        "canonical_header": true,
+        "provider_agreement": true,
+        "next_set_commitment": true,
+        "current_quorum": true
+      },
+      "trust_note": "Current ordered validators and initial checkpoint still require explicit trusted-bootstrap review; provider agreement and an implementation-author check are not independent security review.",
+      "requires_independent_review": true,
+      "requires_owner_trusted_bootstrap_approval": true
+    },
+    "transactions": [
+      {
+        "id": "create-restricted-worker",
+        "signer": "grandtheft.testnet",
+        "receiver": "worker.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "CreateAccount"
+          },
+          {
+            "type": "Transfer",
+            "deposit": "300000000000000000000000"
+          },
+          {
+            "type": "AddKey",
+            "public_key": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA",
+            "nonce": "0",
+            "permission": {
+              "FunctionCall": {
+                "receiver_id": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+                "method_names": [
+                  "execute_payment"
+                ],
+                "allowance": "270000000000000000000000"
+              }
+            }
+          }
+        ],
+        "maximum_upfront_fee_yocto": "10000000000000000000000"
+      },
+      {
+        "id": "initialize_repair_checkpoint",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "initialize_repair_checkpoint",
+            "args": {
+              "checkpoint": {
+                "head": {
+                  "prev_block_hash": [
+                    15,
+                    94,
+                    241,
+                    97,
+                    30,
+                    19,
+                    255,
+                    213,
+                    115,
+                    94,
+                    108,
+                    163,
+                    211,
+                    222,
+                    59,
+                    114,
+                    146,
+                    31,
+                    170,
+                    205,
+                    98,
+                    13,
+                    48,
+                    61,
+                    140,
+                    133,
+                    16,
+                    32,
+                    91,
+                    32,
+                    54,
+                    210
+                  ],
+                  "inner_rest_hash": [
+                    65,
+                    79,
+                    216,
+                    119,
+                    13,
+                    131,
+                    117,
+                    216,
+                    173,
+                    131,
+                    137,
+                    110,
+                    149,
+                    76,
+                    214,
+                    150,
+                    139,
+                    181,
+                    157,
+                    87,
+                    51,
+                    69,
+                    154,
+                    172,
+                    83,
+                    175,
+                    45,
+                    78,
+                    170,
+                    83,
+                    230,
+                    108
+                  ],
+                  "inner_lite": {
+                    "height": "276003652",
+                    "epoch_id": [
+                      94,
+                      241,
+                      33,
+                      206,
+                      236,
+                      189,
+                      140,
+                      5,
+                      85,
+                      159,
+                      214,
+                      151,
+                      7,
+                      0,
+                      198,
+                      28,
+                      216,
+                      140,
+                      103,
+                      197,
+                      153,
+                      201,
+                      223,
+                      144,
+                      20,
+                      50,
+                      17,
+                      144,
+                      174,
+                      107,
+                      27,
+                      238
+                    ],
+                    "next_epoch_id": [
+                      111,
+                      122,
+                      199,
+                      139,
+                      132,
+                      34,
+                      55,
+                      44,
+                      126,
+                      233,
+                      179,
+                      171,
+                      219,
+                      63,
+                      249,
+                      75,
+                      61,
+                      230,
+                      152,
+                      24,
+                      116,
+                      88,
+                      214,
+                      22,
+                      216,
+                      5,
+                      172,
+                      46,
+                      114,
+                      2,
+                      88,
+                      8
+                    ],
+                    "prev_state_root": [
+                      3,
+                      47,
+                      2,
+                      164,
+                      42,
+                      74,
+                      57,
+                      41,
+                      3,
+                      88,
+                      170,
+                      254,
+                      104,
+                      191,
+                      99,
+                      102,
+                      189,
+                      153,
+                      151,
+                      139,
+                      52,
+                      131,
+                      92,
+                      131,
+                      239,
+                      30,
+                      125,
+                      67,
+                      87,
+                      110,
+                      110,
+                      240
+                    ],
+                    "outcome_root": [
+                      86,
+                      7,
+                      10,
+                      201,
+                      236,
+                      74,
+                      193,
+                      188,
+                      87,
+                      195,
+                      199,
+                      39,
+                      8,
+                      49,
+                      207,
+                      212,
+                      2,
+                      247,
+                      175,
+                      33,
+                      189,
+                      46,
+                      106,
+                      192,
+                      99,
+                      79,
+                      37,
+                      214,
+                      202,
+                      35,
+                      132,
+                      154
+                    ],
+                    "timestamp": "1793682686057769230",
+                    "next_bp_hash": [
+                      221,
+                      74,
+                      252,
+                      91,
+                      104,
+                      19,
+                      155,
+                      24,
+                      233,
+                      123,
+                      222,
+                      126,
+                      183,
+                      79,
+                      229,
+                      72,
+                      189,
+                      50,
+                      106,
+                      197,
+                      202,
+                      37,
+                      225,
+                      175,
+                      185,
+                      191,
+                      73,
+                      79,
+                      73,
+                      140,
+                      58,
+                      157
+                    ],
+                    "block_merkle_root": [
+                      115,
+                      124,
+                      134,
+                      241,
+                      235,
+                      172,
+                      65,
+                      211,
+                      224,
+                      223,
+                      98,
+                      192,
+                      44,
+                      254,
+                      253,
+                      190,
+                      185,
+                      43,
+                      24,
+                      74,
+                      243,
+                      104,
+                      174,
+                      245,
+                      219,
+                      127,
+                      220,
+                      190,
+                      120,
+                      28,
+                      252,
+                      39
+                    ]
+                  }
+                },
+                "current_bps": [
+                  {
+                    "account_id": "node1",
+                    "public_key": "ed25519:Bujixku9RDeJ11nBtDBtdwBprR9Pf3px5aSLCuXb3Gqw",
+                    "stake": "110695333843693047390715216282711"
+                  },
+                  {
+                    "account_id": "node2",
+                    "public_key": "ed25519:7uiJ5aexeiv2nUjcvVbYKHJJ8oDaekkvVd6zMtbXopi4",
+                    "stake": "99902584527255085273269836192701"
+                  },
+                  {
+                    "account_id": "kiln.pool.f863973.m0",
+                    "public_key": "ed25519:Bq8fe1eUgDRexX2CYDMhMMQBiN13j8vTAVFyTNhEfh1W",
+                    "stake": "96858617793045458467455522981153"
+                  },
+                  {
+                    "account_id": "node3",
+                    "public_key": "ed25519:J1W1qNCP3qz2RqmHVnkkt18LKNTM7bqTv8TyaYUkkyv",
+                    "stake": "91409526076958617344339225247956"
+                  },
+                  {
+                    "account_id": "node0",
+                    "public_key": "ed25519:Fhu82caSHHwNsahdcG9Y9wMvmuYzgJ7kWhUrig2JAt6N",
+                    "stake": "85154604241413375064788090165827"
+                  },
+                  {
+                    "account_id": "aurora.pool.f863973.m0",
+                    "public_key": "ed25519:9c7mczZpNzJz98V1sDeGybfD4gMybP4JKHotH8RrrHTm",
+                    "stake": "23543096090752217031182678704192"
+                  },
+                  {
+                    "account_id": "01node.pool.f863973.m0",
+                    "public_key": "ed25519:3iNqnvBgxJPXCxu6hNdvJso1PEAc1miAD35KQMBCA3aL",
+                    "stake": "20717329976781824026003002069370"
+                  },
+                  {
+                    "account_id": "stakely_v2.pool.f863973.m0",
+                    "public_key": "ed25519:7BanKZKGvFjK5Yy83gfJ71vPhqRwsDDyVHrV2FMJCUWr",
+                    "stake": "13943076838412239122867061242484"
+                  },
+                  {
+                    "account_id": "legends.pool.f863973.m0",
+                    "public_key": "ed25519:AhQ6sUifJYgjqarXSAzdDZU9ZixpUesP9JEH1Vr7NbaF",
+                    "stake": "11749418949576664379870367794029"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-07.testnet",
+                    "public_key": "ed25519:DKK9jPGUE4Fwv2u7xbk2WwT4XWWQMhbW58bkbPFvaVs2",
+                    "stake": "4761348274669726614645850962641"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-05.testnet",
+                    "public_key": "ed25519:3JFkCdByyVNQvxxBkzf3oFxNg6nKTBLJrSD4eXWpD298",
+                    "stake": "4761215228829162316727144002461"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-06.testnet",
+                    "public_key": "ed25519:AgeQRvisrFQ4ahHX9ryxLBBta6pmSkbhwxU9qBKpCu1E",
+                    "stake": "4760890790556595884221423355608"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-02.testnet",
+                    "public_key": "ed25519:8481xfsDGZmerHnnXaVNMUZaZ5SMWCu3c4WMCiSmJpZn",
+                    "stake": "4760858363524663707595279462873"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-08.testnet",
+                    "public_key": "ed25519:9BaUqbDRjk1eWKumfBtNeHbaNiuzqr68Az6iBtA9Yw5P",
+                    "stake": "4760770054530201006632580730213"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-03.testnet",
+                    "public_key": "ed25519:GufmNVjwU64joePeoRPb3fnnsSY3FGughossHciB5cmh",
+                    "stake": "4760428218516831901635889758145"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-09.testnet",
+                    "public_key": "ed25519:9adX5jXzecHc5SBkbvh7dsigDXafE8s8huyB29qv2KxC",
+                    "stake": "4757816551385297535411930194509"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-13.testnet",
+                    "public_key": "ed25519:DepzEqpfSD7eK4aPx9UHSERW7Do5o24gwd2G26n4bngx",
+                    "stake": "4757664739919494188796356745783"
+                  },
+                  {
+                    "account_id": "ni.pool.f863973.m0",
+                    "public_key": "ed25519:GfCfFkLk2twbAWdsS3tr7C2eaiHN3znSfbshS5e8NqBS",
+                    "stake": "4514615116261010589841931175266"
+                  },
+                  {
+                    "account_id": "ts.pool.f863973.m0",
+                    "public_key": "ed25519:2gync69ncuf7cZ2XpXbY4oG5zUD3XfRPYL1Fb1aPmdeZ",
+                    "stake": "4463803725903607000408378978883"
+                  },
+                  {
+                    "account_id": "lunanova2.pool.f863973.m0",
+                    "public_key": "ed25519:9Jv6e9Kye4wM9EL1XJvXY8CYsLi1HLdRKnTzXBQY44w9",
+                    "stake": "4437350700895938620719481890403"
+                  }
+                ],
+                "next_bps": [
+                  {
+                    "account_id": "node1",
+                    "public_key": "ed25519:Bujixku9RDeJ11nBtDBtdwBprR9Pf3px5aSLCuXb3Gqw",
+                    "stake": "110703889909840201421607366108288"
+                  },
+                  {
+                    "account_id": "node2",
+                    "public_key": "ed25519:7uiJ5aexeiv2nUjcvVbYKHJJ8oDaekkvVd6zMtbXopi4",
+                    "stake": "99910306380487795340935959263474"
+                  },
+                  {
+                    "account_id": "kiln.pool.f863973.m0",
+                    "public_key": "ed25519:Bq8fe1eUgDRexX2CYDMhMMQBiN13j8vTAVFyTNhEfh1W",
+                    "stake": "96866104366416087972850316775089"
+                  },
+                  {
+                    "account_id": "node3",
+                    "public_key": "ed25519:J1W1qNCP3qz2RqmHVnkkt18LKNTM7bqTv8TyaYUkkyv",
+                    "stake": "91416591469188237692761804029138"
+                  },
+                  {
+                    "account_id": "node0",
+                    "public_key": "ed25519:Fhu82caSHHwNsahdcG9Y9wMvmuYzgJ7kWhUrig2JAt6N",
+                    "stake": "85161186166787511039941475930226"
+                  },
+                  {
+                    "account_id": "aurora.pool.f863973.m0",
+                    "public_key": "ed25519:9c7mczZpNzJz98V1sDeGybfD4gMybP4JKHotH8RrrHTm",
+                    "stake": "23544915826783238147588206259471"
+                  },
+                  {
+                    "account_id": "01node.pool.f863973.m0",
+                    "public_key": "ed25519:3iNqnvBgxJPXCxu6hNdvJso1PEAc1miAD35KQMBCA3aL",
+                    "stake": "20718931298531519998664460653998"
+                  },
+                  {
+                    "account_id": "stakely_v2.pool.f863973.m0",
+                    "public_key": "ed25519:7BanKZKGvFjK5Yy83gfJ71vPhqRwsDDyVHrV2FMJCUWr",
+                    "stake": "13944154552201808252955118258269"
+                  },
+                  {
+                    "account_id": "legends.pool.f863973.m0",
+                    "public_key": "ed25519:AhQ6sUifJYgjqarXSAzdDZU9ZixpUesP9JEH1Vr7NbaF",
+                    "stake": "11750327106067526298991433645223"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-07.testnet",
+                    "public_key": "ed25519:DKK9jPGUE4Fwv2u7xbk2WwT4XWWQMhbW58bkbPFvaVs2",
+                    "stake": "4761716297506581115020141812390"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-05.testnet",
+                    "public_key": "ed25519:3JFkCdByyVNQvxxBkzf3oFxNg6nKTBLJrSD4eXWpD298",
+                    "stake": "4761583241382394437144176269062"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-06.testnet",
+                    "public_key": "ed25519:AgeQRvisrFQ4ahHX9ryxLBBta6pmSkbhwxU9qBKpCu1E",
+                    "stake": "4761258778032751813996970706162"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-02.testnet",
+                    "public_key": "ed25519:8481xfsDGZmerHnnXaVNMUZaZ5SMWCu3c4WMCiSmJpZn",
+                    "stake": "4761226348494410193235192172886"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-08.testnet",
+                    "public_key": "ed25519:9BaUqbDRjk1eWKumfBtNeHbaNiuzqr68Az6iBtA9Yw5P",
+                    "stake": "4761138032674207221427480809692"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-03.testnet",
+                    "public_key": "ed25519:GufmNVjwU64joePeoRPb3fnnsSY3FGughossHciB5cmh",
+                    "stake": "4760796170239023932326108049406"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-09.testnet",
+                    "public_key": "ed25519:9adX5jXzecHc5SBkbvh7dsigDXafE8s8huyB29qv2KxC",
+                    "stake": "4758184301241738266150473412740"
+                  },
+                  {
+                    "account_id": "yoon-testnet-validator-13.testnet",
+                    "public_key": "ed25519:DepzEqpfSD7eK4aPx9UHSERW7Do5o24gwd2G26n4bngx",
+                    "stake": "4758032478041845521114858629271"
+                  },
+                  {
+                    "account_id": "ni.pool.f863973.m0",
+                    "public_key": "ed25519:GfCfFkLk2twbAWdsS3tr7C2eaiHN3znSfbshS5e8NqBS",
+                    "stake": "4514964068147439825405670843558"
+                  },
+                  {
+                    "account_id": "ts.pool.f863973.m0",
+                    "public_key": "ed25519:2gync69ncuf7cZ2XpXbY4oG5zUD3XfRPYL1Fb1aPmdeZ",
+                    "stake": "4464148750382969871268373166109"
+                  },
+                  {
+                    "account_id": "lunanova2.pool.f863973.m0",
+                    "public_key": "ed25519:9Jv6e9Kye4wM9EL1XJvXY8CYsLi1HLdRKnTzXBQY44w9",
+                    "stake": "4437693680719899367639307271602"
+                  }
+                ]
+              }
+            },
+            "args_base64": "eyJjaGVja3BvaW50Ijp7ImhlYWQiOnsicHJldl9ibG9ja19oYXNoIjpbMTUsOTQsMjQxLDk3LDMwLDE5LDI1NSwyMTMsMTE1LDk0LDEwOCwxNjMsMjExLDIyMiw1OSwxMTQsMTQ2LDMxLDE3MCwyMDUsOTgsMTMsNDgsNjEsMTQwLDEzMywxNiwzMiw5MSwzMiw1NCwyMTBdLCJpbm5lcl9yZXN0X2hhc2giOls2NSw3OSwyMTYsMTE5LDEzLDEzMSwxMTcsMjE2LDE3MywxMzEsMTM3LDExMCwxNDksNzYsMjE0LDE1MCwxMzksMTgxLDE1Nyw4Nyw1MSw2OSwxNTQsMTcyLDgzLDE3NSw0NSw3OCwxNzAsODMsMjMwLDEwOF0sImlubmVyX2xpdGUiOnsiaGVpZ2h0IjoiMjc2MDAzNjUyIiwiZXBvY2hfaWQiOls5NCwyNDEsMzMsMjA2LDIzNiwxODksMTQwLDUsODUsMTU5LDIxNCwxNTEsNywwLDE5OCwyOCwyMTYsMTQwLDEwMywxOTcsMTUzLDIwMSwyMjMsMTQ0LDIwLDUwLDE3LDE0NCwxNzQsMTA3LDI3LDIzOF0sIm5leHRfZXBvY2hfaWQiOlsxMTEsMTIyLDE5OSwxMzksMTMyLDM0LDU1LDQ0LDEyNiwyMzMsMTc5LDE3MSwyMTksNjMsMjQ5LDc1LDYxLDIzMCwxNTIsMjQsMTE2LDg4LDIxNCwyMiwyMTYsNSwxNzIsNDYsMTE0LDIsODgsOF0sInByZXZfc3RhdGVfcm9vdCI6WzMsNDcsMiwxNjQsNDIsNzQsNTcsNDEsMyw4OCwxNzAsMjU0LDEwNCwxOTEsOTksMTAyLDE4OSwxNTMsMTUxLDEzOSw1MiwxMzEsOTIsMTMxLDIzOSwzMCwxMjUsNjcsODcsMTEwLDExMCwyNDBdLCJvdXRjb21lX3Jvb3QiOls4Niw3LDEwLDIwMSwyMzYsNzQsMTkzLDE4OCw4NywxOTUsMTk5LDM5LDgsNDksMjA3LDIxMiwyLDI0NywxNzUsMzMsMTg5LDQ2LDEwNiwxOTIsOTksNzksMzcsMjE0LDIwMiwzNSwxMzIsMTU0XSwidGltZXN0YW1wIjoiMTc5MzY4MjY4NjA1Nzc2OTIzMCIsIm5leHRfYnBfaGFzaCI6WzIyMSw3NCwyNTIsOTEsMTA0LDE5LDE1NSwyNCwyMzMsMTIzLDIyMiwxMjYsMTgzLDc5LDIyOSw3MiwxODksNTAsMTA2LDE5NywyMDIsMzcsMjI1LDE3NSwxODUsMTkxLDczLDc5LDczLDE0MCw1OCwxNTddLCJibG9ja19tZXJrbGVfcm9vdCI6WzExNSwxMjQsMTM0LDI0MSwyMzUsMTcyLDY1LDIxMSwyMjQsMjIzLDk4LDE5Miw0NCwyNTQsMjUzLDE5MCwxODUsNDMsMjQsNzQsMjQzLDEwNCwxNzQsMjQ1LDIxOSwxMjcsMjIwLDE5MCwxMjAsMjgsMjUyLDM5XX19LCJjdXJyZW50X2JwcyI6W3siYWNjb3VudF9pZCI6Im5vZGUxIiwicHVibGljX2tleSI6ImVkMjU1MTk6QnVqaXhrdTlSRGVKMTFuQnREQnRkd0JwclI5UGYzcHg1YVNMQ3VYYjNHcXciLCJzdGFrZSI6IjExMDY5NTMzMzg0MzY5MzA0NzM5MDcxNTIxNjI4MjcxMSJ9LHsiYWNjb3VudF9pZCI6Im5vZGUyIiwicHVibGljX2tleSI6ImVkMjU1MTk6N3VpSjVhZXhlaXYyblVqY3ZWYllLSEpKOG9EYWVra3ZWZDZ6TXRiWG9waTQiLCJzdGFrZSI6Ijk5OTAyNTg0NTI3MjU1MDg1MjczMjY5ODM2MTkyNzAxIn0seyJhY2NvdW50X2lkIjoia2lsbi5wb29sLmY4NjM5NzMubTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpCcThmZTFlVWdEUmV4WDJDWURNaE1NUUJpTjEzajh2VEFWRnlUTmhFZmgxVyIsInN0YWtlIjoiOTY4NTg2MTc3OTMwNDU0NTg0Njc0NTU1MjI5ODExNTMifSx7ImFjY291bnRfaWQiOiJub2RlMyIsInB1YmxpY19rZXkiOiJlZDI1NTE5OkoxVzFxTkNQM3F6MlJxbUhWbmtrdDE4TEtOVE03YnFUdjhUeWFZVWtreXYiLCJzdGFrZSI6IjkxNDA5NTI2MDc2OTU4NjE3MzQ0MzM5MjI1MjQ3OTU2In0seyJhY2NvdW50X2lkIjoibm9kZTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpGaHU4MmNhU0hId05zYWhkY0c5WTl3TXZtdVl6Z0o3a1doVXJpZzJKQXQ2TiIsInN0YWtlIjoiODUxNTQ2MDQyNDE0MTMzNzUwNjQ3ODgwOTAxNjU4MjcifSx7ImFjY291bnRfaWQiOiJhdXJvcmEucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6OWM3bWN6WnBOekp6OThWMXNEZUd5YmZENGdNeWJQNEpLSG90SDhScnJIVG0iLCJzdGFrZSI6IjIzNTQzMDk2MDkwNzUyMjE3MDMxMTgyNjc4NzA0MTkyIn0seyJhY2NvdW50X2lkIjoiMDFub2RlLnBvb2wuZjg2Mzk3My5tMCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OjNpTnFudkJneEpQWEN4dTZoTmR2SnNvMVBFQWMxbWlBRDM1S1FNQkNBM2FMIiwic3Rha2UiOiIyMDcxNzMyOTk3Njc4MTgyNDAyNjAwMzAwMjA2OTM3MCJ9LHsiYWNjb3VudF9pZCI6InN0YWtlbHlfdjIucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6N0JhbktaS0d2RmpLNVl5ODNnZko3MXZQaHFSd3NERHlWSHJWMkZNSkNVV3IiLCJzdGFrZSI6IjEzOTQzMDc2ODM4NDEyMjM5MTIyODY3MDYxMjQyNDg0In0seyJhY2NvdW50X2lkIjoibGVnZW5kcy5wb29sLmY4NjM5NzMubTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpBaFE2c1VpZkpZZ2pxYXJYU0F6ZERaVTlaaXhwVWVzUDlKRUgxVnI3TmJhRiIsInN0YWtlIjoiMTE3NDk0MTg5NDk1NzY2NjQzNzk4NzAzNjc3OTQwMjkifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTA3LnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpES0s5alBHVUU0Rnd2MnU3eGJrMld3VDRYV1dRTWhiVzU4YmtiUEZ2YVZzMiIsInN0YWtlIjoiNDc2MTM0ODI3NDY2OTcyNjYxNDY0NTg1MDk2MjY0MSJ9LHsiYWNjb3VudF9pZCI6Inlvb24tdGVzdG5ldC12YWxpZGF0b3ItMDUudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OjNKRmtDZEJ5eVZOUXZ4eEJremYzb0Z4Tmc2bktUQkxKclNENGVYV3BEMjk4Iiwic3Rha2UiOiI0NzYxMjE1MjI4ODI5MTYyMzE2NzI3MTQ0MDAyNDYxIn0seyJhY2NvdW50X2lkIjoieW9vbi10ZXN0bmV0LXZhbGlkYXRvci0wNi50ZXN0bmV0IiwicHVibGljX2tleSI6ImVkMjU1MTk6QWdlUVJ2aXNyRlE0YWhIWDlyeXhMQkJ0YTZwbVNrYmh3eFU5cUJLcEN1MUUiLCJzdGFrZSI6IjQ3NjA4OTA3OTA1NTY1OTU4ODQyMjE0MjMzNTU2MDgifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTAyLnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTo4NDgxeGZzREdabWVySG5uWGFWTk1VWmFaNVNNV0N1M2M0V01DaVNtSnBabiIsInN0YWtlIjoiNDc2MDg1ODM2MzUyNDY2MzcwNzU5NTI3OTQ2Mjg3MyJ9LHsiYWNjb3VudF9pZCI6Inlvb24tdGVzdG5ldC12YWxpZGF0b3ItMDgudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OjlCYVVxYkRSamsxZVdLdW1mQnROZUhiYU5pdXpxcjY4QXo2aUJ0QTlZdzVQIiwic3Rha2UiOiI0NzYwNzcwMDU0NTMwMjAxMDA2NjMyNTgwNzMwMjEzIn0seyJhY2NvdW50X2lkIjoieW9vbi10ZXN0bmV0LXZhbGlkYXRvci0wMy50ZXN0bmV0IiwicHVibGljX2tleSI6ImVkMjU1MTk6R3VmbU5WandVNjRqb2VQZW9SUGIzZm5uc1NZM0ZHdWdob3NzSGNpQjVjbWgiLCJzdGFrZSI6IjQ3NjA0MjgyMTg1MTY4MzE5MDE2MzU4ODk3NTgxNDUifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTA5LnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTo5YWRYNWpYemVjSGM1U0JrYnZoN2RzaWdEWGFmRThzOGh1eUIyOXF2Mkt4QyIsInN0YWtlIjoiNDc1NzgxNjU1MTM4NTI5NzUzNTQxMTkzMDE5NDUwOSJ9LHsiYWNjb3VudF9pZCI6Inlvb24tdGVzdG5ldC12YWxpZGF0b3ItMTMudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OkRlcHpFcXBmU0Q3ZUs0YVB4OVVIU0VSVzdEbzVvMjRnd2QyRzI2bjRibmd4Iiwic3Rha2UiOiI0NzU3NjY0NzM5OTE5NDk0MTg4Nzk2MzU2NzQ1NzgzIn0seyJhY2NvdW50X2lkIjoibmkucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6R2ZDZkZrTGsydHdiQVdkc1MzdHI3QzJlYWlITjN6blNmYnNoUzVlOE5xQlMiLCJzdGFrZSI6IjQ1MTQ2MTUxMTYyNjEwMTA1ODk4NDE5MzExNzUyNjYifSx7ImFjY291bnRfaWQiOiJ0cy5wb29sLmY4NjM5NzMubTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOToyZ3luYzY5bmN1ZjdjWjJYcFhiWTRvRzV6VUQzWGZSUFlMMUZiMWFQbWRlWiIsInN0YWtlIjoiNDQ2MzgwMzcyNTkwMzYwNzAwMDQwODM3ODk3ODg4MyJ9LHsiYWNjb3VudF9pZCI6Imx1bmFub3ZhMi5wb29sLmY4NjM5NzMubTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTo5SnY2ZTlLeWU0d005RUwxWEp2WFk4Q1lzTGkxSExkUktuVHpYQlFZNDR3OSIsInN0YWtlIjoiNDQzNzM1MDcwMDg5NTkzODYyMDcxOTQ4MTg5MDQwMyJ9XSwibmV4dF9icHMiOlt7ImFjY291bnRfaWQiOiJub2RlMSIsInB1YmxpY19rZXkiOiJlZDI1NTE5OkJ1aml4a3U5UkRlSjExbkJ0REJ0ZHdCcHJSOVBmM3B4NWFTTEN1WGIzR3F3Iiwic3Rha2UiOiIxMTA3MDM4ODk5MDk4NDAyMDE0MjE2MDczNjYxMDgyODgifSx7ImFjY291bnRfaWQiOiJub2RlMiIsInB1YmxpY19rZXkiOiJlZDI1NTE5Ojd1aUo1YWV4ZWl2Mm5VamN2VmJZS0hKSjhvRGFla2t2VmQ2ek10YlhvcGk0Iiwic3Rha2UiOiI5OTkxMDMwNjM4MDQ4Nzc5NTM0MDkzNTk1OTI2MzQ3NCJ9LHsiYWNjb3VudF9pZCI6ImtpbG4ucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6QnE4ZmUxZVVnRFJleFgyQ1lETWhNTVFCaU4xM2o4dlRBVkZ5VE5oRWZoMVciLCJzdGFrZSI6Ijk2ODY2MTA0MzY2NDE2MDg3OTcyODUwMzE2Nzc1MDg5In0seyJhY2NvdW50X2lkIjoibm9kZTMiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpKMVcxcU5DUDNxejJScW1IVm5ra3QxOExLTlRNN2JxVHY4VHlhWVVra3l2Iiwic3Rha2UiOiI5MTQxNjU5MTQ2OTE4ODIzNzY5Mjc2MTgwNDAyOTEzOCJ9LHsiYWNjb3VudF9pZCI6Im5vZGUwIiwicHVibGljX2tleSI6ImVkMjU1MTk6Rmh1ODJjYVNISHdOc2FoZGNHOVk5d012bXVZemdKN2tXaFVyaWcySkF0Nk4iLCJzdGFrZSI6Ijg1MTYxMTg2MTY2Nzg3NTExMDM5OTQxNDc1OTMwMjI2In0seyJhY2NvdW50X2lkIjoiYXVyb3JhLnBvb2wuZjg2Mzk3My5tMCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OjljN21jelpwTnpKejk4VjFzRGVHeWJmRDRnTXliUDRKS0hvdEg4UnJySFRtIiwic3Rha2UiOiIyMzU0NDkxNTgyNjc4MzIzODE0NzU4ODIwNjI1OTQ3MSJ9LHsiYWNjb3VudF9pZCI6IjAxbm9kZS5wb29sLmY4NjM5NzMubTAiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTozaU5xbnZCZ3hKUFhDeHU2aE5kdkpzbzFQRUFjMW1pQUQzNUtRTUJDQTNhTCIsInN0YWtlIjoiMjA3MTg5MzEyOTg1MzE1MTk5OTg2NjQ0NjA2NTM5OTgifSx7ImFjY291bnRfaWQiOiJzdGFrZWx5X3YyLnBvb2wuZjg2Mzk3My5tMCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OjdCYW5LWktHdkZqSzVZeTgzZ2ZKNzF2UGhxUndzRER5VkhyVjJGTUpDVVdyIiwic3Rha2UiOiIxMzk0NDE1NDU1MjIwMTgwODI1Mjk1NTExODI1ODI2OSJ9LHsiYWNjb3VudF9pZCI6ImxlZ2VuZHMucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6QWhRNnNVaWZKWWdqcWFyWFNBemREWlU5Wml4cFVlc1A5SkVIMVZyN05iYUYiLCJzdGFrZSI6IjExNzUwMzI3MTA2MDY3NTI2Mjk4OTkxNDMzNjQ1MjIzIn0seyJhY2NvdW50X2lkIjoieW9vbi10ZXN0bmV0LXZhbGlkYXRvci0wNy50ZXN0bmV0IiwicHVibGljX2tleSI6ImVkMjU1MTk6REtLOWpQR1VFNEZ3djJ1N3hiazJXd1Q0WFdXUU1oYlc1OGJrYlBGdmFWczIiLCJzdGFrZSI6IjQ3NjE3MTYyOTc1MDY1ODExMTUwMjAxNDE4MTIzOTAifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTA1LnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTozSkZrQ2RCeXlWTlF2eHhCa3pmM29GeE5nNm5LVEJMSnJTRDRlWFdwRDI5OCIsInN0YWtlIjoiNDc2MTU4MzI0MTM4MjM5NDQzNzE0NDE3NjI2OTA2MiJ9LHsiYWNjb3VudF9pZCI6Inlvb24tdGVzdG5ldC12YWxpZGF0b3ItMDYudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OkFnZVFSdmlzckZRNGFoSFg5cnl4TEJCdGE2cG1Ta2Jod3hVOXFCS3BDdTFFIiwic3Rha2UiOiI0NzYxMjU4Nzc4MDMyNzUxODEzOTk2OTcwNzA2MTYyIn0seyJhY2NvdW50X2lkIjoieW9vbi10ZXN0bmV0LXZhbGlkYXRvci0wMi50ZXN0bmV0IiwicHVibGljX2tleSI6ImVkMjU1MTk6ODQ4MXhmc0RHWm1lckhublhhVk5NVVphWjVTTVdDdTNjNFdNQ2lTbUpwWm4iLCJzdGFrZSI6IjQ3NjEyMjYzNDg0OTQ0MTAxOTMyMzUxOTIxNzI4ODYifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTA4LnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTo5QmFVcWJEUmprMWVXS3VtZkJ0TmVIYmFOaXV6cXI2OEF6NmlCdEE5WXc1UCIsInN0YWtlIjoiNDc2MTEzODAzMjY3NDIwNzIyMTQyNzQ4MDgwOTY5MiJ9LHsiYWNjb3VudF9pZCI6Inlvb24tdGVzdG5ldC12YWxpZGF0b3ItMDMudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5Okd1Zm1OVmp3VTY0am9lUGVvUlBiM2ZubnNTWTNGR3VnaG9zc0hjaUI1Y21oIiwic3Rha2UiOiI0NzYwNzk2MTcwMjM5MDIzOTMyMzI2MTA4MDQ5NDA2In0seyJhY2NvdW50X2lkIjoieW9vbi10ZXN0bmV0LXZhbGlkYXRvci0wOS50ZXN0bmV0IiwicHVibGljX2tleSI6ImVkMjU1MTk6OWFkWDVqWHplY0hjNVNCa2J2aDdkc2lnRFhhZkU4czhodXlCMjlxdjJLeEMiLCJzdGFrZSI6IjQ3NTgxODQzMDEyNDE3MzgyNjYxNTA0NzM0MTI3NDAifSx7ImFjY291bnRfaWQiOiJ5b29uLXRlc3RuZXQtdmFsaWRhdG9yLTEzLnRlc3RuZXQiLCJwdWJsaWNfa2V5IjoiZWQyNTUxOTpEZXB6RXFwZlNEN2VLNGFQeDlVSFNFUlc3RG81bzI0Z3dkMkcyNm40Ym5neCIsInN0YWtlIjoiNDc1ODAzMjQ3ODA0MTg0NTUyMTExNDg1ODYyOTI3MSJ9LHsiYWNjb3VudF9pZCI6Im5pLnBvb2wuZjg2Mzk3My5tMCIsInB1YmxpY19rZXkiOiJlZDI1NTE5OkdmQ2ZGa0xrMnR3YkFXZHNTM3RyN0MyZWFpSE4zem5TZmJzaFM1ZThOcUJTIiwic3Rha2UiOiI0NTE0OTY0MDY4MTQ3NDM5ODI1NDA1NjcwODQzNTU4In0seyJhY2NvdW50X2lkIjoidHMucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6Mmd5bmM2OW5jdWY3Y1oyWHBYYlk0b0c1elVEM1hmUlBZTDFGYjFhUG1kZVoiLCJzdGFrZSI6IjQ0NjQxNDg3NTAzODI5Njk4NzEyNjgzNzMxNjYxMDkifSx7ImFjY291bnRfaWQiOiJsdW5hbm92YTIucG9vbC5mODYzOTczLm0wIiwicHVibGljX2tleSI6ImVkMjU1MTk6OUp2NmU5S3llNHdNOUVMMVhKdlhZOENZc0xpMUhMZFJLblR6WEJRWTQ0dzkiLCJzdGFrZSI6IjQ0Mzc2OTM2ODA3MTk4OTkzNjc2MzkzMDcyNzE2MDIifV19fQ==",
+            "deposit": "1",
+            "gas": "100000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "101000000000000000000000"
+      },
+      {
+        "id": "register_vendor",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "register_vendor",
+            "args": {
+              "vendor_id": "babygoat-acceptance",
+              "recipient": "babygoat.testnet"
+            },
+            "args_base64": "eyJ2ZW5kb3JfaWQiOiJiYWJ5Z29hdC1hY2NlcHRhbmNlIiwicmVjaXBpZW50IjoiYmFieWdvYXQudGVzdG5ldCJ9",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "approve_work_order",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "approve_work_order",
+            "args": {
+              "order_id": "ACCEPTANCE-001",
+              "vendor_id": "babygoat-acceptance",
+              "amount": "1000000000000000000000",
+              "expires_at_ns": "1793868854014909735"
+            },
+            "args_base64": "eyJvcmRlcl9pZCI6IkFDQ0VQVEFOQ0UtMDAxIiwidmVuZG9yX2lkIjoiYmFieWdvYXQtYWNjZXB0YW5jZSIsImFtb3VudCI6IjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJleHBpcmVzX2F0X25zIjoiMTc5Mzg2ODg1NDAxNDkwOTczNSJ9",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "deposit",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "deposit",
+            "args": {},
+            "args_base64": "e30=",
+            "deposit": "1000000000000000000000",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "set_budget",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_budget",
+            "args": {
+              "budget": "1000000000000000000000"
+            },
+            "args_base64": "eyJidWRnZXQiOiIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0=",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "set_payment_cap",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_payment_cap",
+            "args": {
+              "payment_cap": "1000000000000000000000"
+            },
+            "args_base64": "eyJwYXltZW50X2NhcCI6IjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAifQ==",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "authorize_agent",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "authorize_agent",
+            "args": {
+              "account_id": "worker.grandtheft.testnet",
+              "public_key": "ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA"
+            },
+            "args_base64": "eyJhY2NvdW50X2lkIjoid29ya2VyLmdyYW5kdGhlZnQudGVzdG5ldCIsInB1YmxpY19rZXkiOiJlZDI1NTE5Oko5eUZBdGtwZGdzSjJFM04zTUFORkZIUWYzazlETmtYc0Joc0pVb3RIZkZBIn0=",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "set_paused",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_paused",
+            "args": {
+              "paused": false
+            },
+            "args_base64": "eyJwYXVzZWQiOmZhbHNlfQ==",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "execute_payment",
+        "signer": "worker.grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "execute_payment",
+            "args": {
+              "order_id": "ACCEPTANCE-001",
+              "invoice_id": "CTR-0001-INV-0002",
+              "recipient": "babygoat.testnet",
+              "amount": "1000000000000000000000"
+            },
+            "args_base64": "eyJvcmRlcl9pZCI6IkFDQ0VQVEFOQ0UtMDAxIiwiaW52b2ljZV9pZCI6IkNUUi0wMDAxLUlOVi0wMDAyIiwicmVjaXBpZW50IjoiYmFieWdvYXQudGVzdG5ldCIsImFtb3VudCI6IjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAifQ==",
+            "deposit": "0",
+            "gas": "250000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "251000000000000000000000"
+      },
+      {
+        "id": "pause-after-payment",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "set_paused",
+            "args": {
+              "paused": true
+            },
+            "args_base64": "eyJwYXVzZWQiOnRydWV9",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      },
+      {
+        "id": "revoke_agent",
+        "signer": "grandtheft.testnet",
+        "receiver": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+        "actions": [
+          {
+            "type": "FunctionCall",
+            "method_name": "revoke_agent",
+            "args": {},
+            "args_base64": "e30=",
+            "deposit": "1",
+            "gas": "10000000000000"
+          }
+        ],
+        "maximum_upfront_fee_yocto": "11000000000000000000000"
+      }
+    ],
+    "storage_funding": {
+      "additional_transfer": "0",
+      "vault_available_over_storage_and_operating_reserve": "624760000000000000000000",
+      "maximum_previously_measured_bootstrap_storage_bytes": 31327,
+      "limitation": "Actual checkpoint storage is not yet measured in the exact deployed VM. 100 Tgas exceeds the measured 40.864 Tgas maximum bootstrap workload; this is not an execution guarantee."
+    },
+    "preflight": {
+      "height": 276026808,
+      "block": "De7QzMm9xWBypPZfesC5vCkGbtmjeB9JZW2MRGN8N1Tw",
+      "owner_balance": "640533128772182399999999",
+      "recipient_balance": "9878461305613026399999998",
+      "owner_storage_retained": "2640000000000000000000",
+      "owner_deposits": "301000000000000000000009",
+      "owner_maximum_fees": "210000000000000000000000",
+      "owner_maximum_total": "513640000000000000000009",
+      "order_expiry_ns": "1793868854014909735"
+    },
+    "gates": [
+      "Independent verifier review and initial validator-set bootstrap trust must be resolved explicitly, not inferred from quorum against the supplied set",
+      "No signing until explicit plan digest approval; current request authorizes preparation/key generation only",
+      "Fresh preflight/code/key/fee checks before each outbox; unknown outcomes block retries",
+      "One held durable job before activation; same approved invoice/order only",
+      "One successful native transfer plus recipient balance delta and finalized matching contract/receipt evidence before Paid",
+      "After restart/repeated linkage retain same terminal job, then pause/revoke; no deliberate second on-chain payment"
+    ],
+    "exclusions": [
+      "AI extraction",
+      "Owner authority for worker",
+      "FullAccess worker key",
+      "Key export",
+      "Extra payments",
+      "Automatic replacement of unknown transactions"
+    ]
+  },
+  "digest": "b4b70ad2cfee6722a0fe74e02f549b6cb124b54ab3ab282575d14c17f0f2b63b"
+}

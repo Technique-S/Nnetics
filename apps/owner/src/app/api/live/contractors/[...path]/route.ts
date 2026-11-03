@@ -43,6 +43,7 @@ export async function POST(req:NextRequest,context:Context){
   if(path==="enter"){entering=true;backend.logoutContractor(session);return cookie(json({mode:"persistent"}),await backend.enterVerifiedLink(input.token));}
   if(path==="owner") return json(await backend.ownerWrite(req.cookies.get("nnetics_identity")?.value||"",String(input.organization||""),input as OwnerPortalCommand));
   if(path==="contractor")return json(await backend.write(session,input as ContractorCommand));
+  if(path==="extract")return json(await backend.extraction(session,input));
   if(path==="wallet/challenge")return json(await backend.walletChallenge(session,input.account));
   if(path==="wallet/proof")return json(await backend.walletProof(session,input));
   if(path==="logout"){backend.logoutContractor(session);return cookie(json({ok:true}),"");}

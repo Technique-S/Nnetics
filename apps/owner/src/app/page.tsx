@@ -4,6 +4,7 @@ import type { FormEvent, ReactNode } from "react";
 import { requireNear } from "../data/invoice-currency";
 import { DEMO_AGENT } from "../data/mock-adapter";
 import { NearOwnerAdapter, api } from "../data/near-adapter";
+import {LiveContextChanged} from "../data/config-context";
 import {PersistentContractorOwner} from "./contractor-owner";
 import { Onboarding } from "./onboarding";
 import { TestnetControls } from "./testnet-controls";
@@ -200,23 +201,29 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
   const [notice, setNotice] = useState("");
   const [scenario, setScenario] = useState<TransferScenario>("success");
   const [historyFilter, setHistoryFilter] = useState("All outcomes");
+  const contextInvalid=useRef(false);
   async function refresh() {
     try {
       const next = await adapter.snapshot();
+      if(contextInvalid.current)return;
       setSnapshot((old) =>
         !old || next.revision >= old.revision ? next : old,
       );
     } catch (e) {
+      if(live){setSnapshot(null);setDialog(null);setSelected("");}
+      if(e instanceof LiveContextChanged)contextInvalid.current=true;
       setError(
         e instanceof Error ? e.message : "Unable to load the simulation.",
       );
     }
   }
   useEffect(() => {
+    contextInvalid.current=false;
     void refresh();
-    return adapter.subscribe(() => {
+    const unsubscribe=adapter.subscribe(() => {
       void refresh();
     });
+    return ()=>{contextInvalid.current=true;unsubscribe();};
   }, [adapter]); // Adapter is fixed for this session.
   async function run(
     key: string,
@@ -396,7 +403,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
     </div>
   );
   const history = (compact = false) => (
-    <div className="table-scroll">
+    <><p className="scroll-hint">Scroll horizontally for all columns</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable payment records">
       <table>
         <thead>
           <tr>
@@ -458,7 +465,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
       ).length === 0 && (
         <div className="empty">No attempts match this outcome.</div>
       )}
-    </div>
+    </div></>
   );
   return (
     <div className="app-shell">
@@ -488,7 +495,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
           </div>
           <span className="workspace-dot" />
         </div>
-        <span className="nav-caption">PAYMENT DESK</span>
+        <span className="nav-caption">Payment desk</span>
         <nav aria-label="Owner dashboard">{live && <button onClick={()=>setShowContractors(true)}>Contractor billing</button>}
           {views.map((name) => (
             <button
@@ -504,7 +511,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
             </button>
           ))}
           {!live && <a className="button secondary" href="/demo/contractors">Contractor portal demo</a>}
-        </nav>
+        </nav><p className="nav-hint">Scroll the sections to see more</p>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
             <Icon name="shield" />
@@ -562,7 +569,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
           {live && <TestnetControls adapter={live} snapshot={s} run={run} />}
           <div className="page-heading">
             <div>
-              <div className="eyebrow">YOUR OWNER WORKSPACE</div>
+              <div className="eyebrow">Owner workspace</div>
               <h1>{view === "Overview" ? "Your payment desk" : view}</h1>
               <p>{subtitle[view]}</p>
             </div>
@@ -703,7 +710,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                   <section className="panel">
                     <div className="section-head">
                       <div>
-                        <span className="eyebrow">NEXT UP</span>
+                        <span className="eyebrow">Next up</span>
                         <h2>
                           Invoices at your desk{" "}
                           <span className="count">{s.invoices.length}</span>
@@ -727,7 +734,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                   <section className="panel">
                     <div className="section-head">
                       <div>
-                        <span className="eyebrow">THE PAPER TRAIL</span>
+                        <span className="eyebrow">Payment records</span>
                         <h2>Recent payment attempts</h2>
                       </div>
                       <button
@@ -745,7 +752,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     <div className="guardrail-icon">
                       <Icon name="shield" size={25} />
                     </div>
-                    <span className="eyebrow">AUTHORITY, WITH LIMITS</span>
+                    <span className="eyebrow">Payment limits</span>
                     <h2>
                       Clear boundaries. <br />
                       Before every payment.
@@ -945,7 +952,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
             <section className="panel">
               <div className="section-head">
                 <div>
-                  <span className="eyebrow">ONE ORDER. ONE PAYMENT.</span>
+                  <span className="eyebrow">One order, one payment</span>
                   <h2>
                     Approved work{" "}
                     <span className="count">{s.orders.length}</span>
@@ -953,7 +960,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 </div>
                 <span className="subtle">Order IDs are never reused</span>
               </div>
-              <div className="table-scroll">
+              <><p className="scroll-hint">Scroll horizontally for all columns</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable payment records">
                 <table>
                   <thead>
                     <tr>
@@ -1008,7 +1015,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </div></>
             </section>
           )}
           {view === "Invoice review" && (
@@ -1016,7 +1023,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               <section className="panel review-queue">
                 <div className="section-head">
                   <div>
-                    <span className="eyebrow">REVIEW QUEUE</span>
+                    <span className="eyebrow">Review queue</span>
                     <h2>{live ? "Structured invoices" : "Sample invoices"}</h2>
                   </div>
                 </div>
@@ -1177,8 +1184,8 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                 <div>
                   <span className="eyebrow">
                     {live
-                      ? "FINALIZED CONTRACT ATTEMPTS"
-                      : "SIMULATED RECEIPTS"}
+                      ? "Finalized contract attempts"
+                      : "Simulated receipts"}
                   </span>
                   <h2>Every attempt stays visible</h2>
                 </div>
@@ -1212,7 +1219,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               <div>
                 <strong>Local simulation controls</strong>
                 <small>
-                  Session-only synthetic data. Wallet connection, funding and
+                  Saved invoices persist; other demo changes reset on reload. Wallet connection, funding and
                   deployment are unavailable.
                 </small>
               </div>

@@ -1,5 +1,64 @@
 # Owner-run CLI factory handoff — conditionally approved, not executed
 
+**Factory deployment complete — 3 November 2026, 00:08 WAT:** the user saved
+the offline CLI signature; exact-byte verification passed; the agent submitted
+the one approved transaction once after fresh preflight. FINAL success:
+https://testnet.nearblocks.io/txns/3KHBKLzkE9sUvUXUWPWTxWEdwaGjndCEcTttxSASz6Rq.
+Actual fee 0.0141941500094896 NEAR; transfer 6.3324 NEAR. Downloaded deployed
+code, no keys and get_config embedded hash/funding/version passed finalized checks.
+Remaining Grandtheft balance 5.653274612040510399999999 NEAR. The command below
+is now historical: **do not run it again**. Customer vault creation remains
+pending through the original approved UI flow. See VALIDATION.md for evidence.
+
+**Prepared owner handoff — 3 November 2026, 00:01 WAT (2 November, 23:01 UTC):**
+The fresh Grandtheft Meteor proof and finalized preflight passed. Both targets are
+absent; the expired original hash remains unknown with unchanged old-key nonce.
+Testnet protocol 88, validity 86400, storage and both transaction fee calculations
+match approval. Grandtheft balance: **11.999868762049999999999999 NEAR**.
+CLI-key current nonce: **275527013000001**; prepared nonce **275527013000002**.
+Finalized reference: height **275964882**,
+`2L7eDef5ZqRuRVcoMFw8n8GoNaGUAWTJAkf4XppSyoyw`.
+Prepared transaction hash: **3KHBKLzkE9sUvUXUWPWTxWEdwaGjndCEcTttxSASz6Rq**.
+Both artifact byte/hash checks passed. Actions/deposit/code/target are unchanged;
+only the already-approved CLI signing key and fresh nonce/reference are used.
+
+Deposits 11.3324 NEAR + both approved upfront fee allowances
+0.3022437084553175 NEAR + retained owner storage reserve 0.00264 NEAR =
+**11.6372837084553175 NEAR** required. Remaining after these allowances:
+**0.362585053594682499999999 NEAR**. The storage reserve is retained in the owner
+account, not an additional transfer. No funding increase or new transaction scope.
+
+Exclusive unsigned outbox:
+`artifacts/live/approved-factory-cli-infrastructure.json` (fsynced; original outbox
+preserved). Owner-run offline command file:
+`artifacts/live/sign-approved-factory.ps1`. Expected signed output:
+`artifacts/live/approved-factory-cli-infrastructure.cli-signed.json`.
+Run that command file once in PowerShell; it saves the signed transaction using
+the existing Windows keychain and does **not** broadcast. Do not export/import
+keys, replace `save-to-file` with `send`, or rerun after ambiguous failure. Report
+only completion/non-secret error; do not paste the signed file into chat.
+
+The agent must next run `apps/owner/scripts/factory-cli-verify.mjs` to reconstruct
+the approved actions, compare exact unsigned bytes and verify the Ed25519
+signature before broadcasting the same persisted transaction. This verification
+tool never broadcasts. The existing signature regression test passed 1/1 after
+preparation. Official CLI 0.30.1 version and complete offline/save-to-file syntax
+were rechecked using installed command help and the official CLI guide:
+https://github.com/near/near-cli-rs/blob/main/docs/GUIDE.en.md.
+No signature, broadcast, deployment success or vault creation is claimed yet.
+
+**Latest reconciliation, 2 November 2026 at 22:28:18.927 UTC:** the original
+attempt is conclusively expired without inclusion. Finalized height 275961459
+exceeds the conservative boundary 275961398; validity remains 86400 and the
+canonical reference is unchanged. Original hash remains UNKNOWN_TRANSACTION,
+old nonce is unchanged, balance is 11.999868762049999999999999 NEAR and both
+targets are absent. Evidence: `artifacts/local-checks/transaction-watch-1793658498929.json`.
+The original outbox remains intact. The expiry monitor is paused. The following
+earlier checkpoints are historical; the unknown-and-potentially-valid gate has
+now resolved. Fresh owner proof and the remaining full preflight are still needed
+before preparing the exclusive owner-run offline-signing handoff. No replacement
+has been prepared or signed, and no provisioning success is claimed.
+
 The user explicitly approved amendment digest
 `bca85c64ac11e4a0a14808d290980c47db89353fa2450930f34022291cc91ae8`.
 Approval is retained; do not request it again if the exact scope and conditions

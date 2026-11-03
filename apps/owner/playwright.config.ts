@@ -1,4 +1,6 @@
 import { defineConfig } from "@playwright/test";
+const baseURL=process.env.NNETICS_BROWSER_BASE_URL || "http://127.0.0.1:3100";
+const serverURL=new URL(baseURL);
 export default defineConfig({
   testDir: "./tests/browser",
   timeout: 45_000,
@@ -6,7 +8,7 @@ export default defineConfig({
   workers: 1,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL,
     headless: true,
     channel: process.platform === "win32" ? "msedge" : undefined,
     trace: "retain-on-failure",
@@ -23,8 +25,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run start",
-    url: "http://127.0.0.1:3100",
+    command: `npm run start -- --hostname ${serverURL.hostname} --port ${serverURL.port || "3100"}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
     env: { NEXT_TELEMETRY_DISABLED: "1" },

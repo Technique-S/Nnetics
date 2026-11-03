@@ -1,0 +1,60 @@
+# Preparation only. Creating/syncing this Blueprint incurs charges and needs approval.
+previews:
+  generation: "off"
+services:
+  - type: web
+    name: nnetics-testnet
+    runtime: node
+    plan: 1c-2g
+    region: frankfurt
+    branch: codex/nnetics-live-integration
+    autoDeployTrigger: "off"
+    numInstances: 1
+    buildCommand: cd apps/owner && npm ci --include=dev && npm run build
+    startCommand: node deploy/start.mjs
+    healthCheckPath: /api/health
+    disk:
+      name: nnetics-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 24.22.1
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: NNETICS_HOSTED_MAINTENANCE
+        value: "1"
+      - key: NNETICS_APP_ORIGIN
+        sync: false
+      - key: NNETICS_NETWORK
+        value: testnet
+      - key: NNETICS_ORGANIZATION_ID
+        value: e3600323-ad40-43c4-a31d-7d53abc4833e
+      - key: NNETICS_VAULT_ID
+        value: v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet
+      - key: NNETICS_EXPECTED_CODE_HASH
+        value: Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ
+      - key: NNETICS_WORKER_ID
+        value: worker.grandtheft.testnet
+      - key: NNETICS_WORKER_PUBLIC_KEY
+        value: ed25519:J9yFAtkpdgsJ2E3N3MANFFHQf3k9DNkXsBhsJUotHfFA
+      - key: NNETICS_RPC_URL
+        value: https://test.rpc.fastnear.com
+      - key: NNETICS_DATABASE
+        value: /var/data/nnetics/live/invoices.db
+      - key: NNETICS_IDENTITY_DATABASE
+        value: /var/data/nnetics/live/identities.db
+      - key: NNETICS_CONTRACTOR_DATABASE
+        value: /var/data/nnetics/live/contractors.db
+      - key: NNETICS_DEMO_PORTAL_DB
+        value: /var/data/nnetics/demo/contractors.db
+      - key: NNETICS_VENDOR_IDS
+        value: babygoat-acceptance
+      - key: NNETICS_ORDER_IDS
+        value: ACCEPTANCE-001
+      - key: NNETICS_TRANSACTIONS_AUTHORIZED
+        value: ""
+      - key: NNETICS_PROVISIONING_ENABLED
+        value: ""

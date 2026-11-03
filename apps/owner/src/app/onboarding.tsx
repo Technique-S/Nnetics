@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { NearOwnerAdapter, api, type PublicConfig } from "../data/near-adapter";
+import { NearOwnerAdapter, LiveApiError, checkMeteorIdentity, api, type PublicConfig } from "../data/near-adapter";
 import { MockOwnerAdapter } from "../data/mock-adapter";
 import type { OwnerAdapter } from "../data/owner-adapter";
 import {
@@ -21,18 +21,19 @@ interface IdentityView {
   network: "testnet";
   organizations: Workspace[];
   notice: string;
+  session?: {idleExpires:number;absoluteExpires:number;serverTime?:number};
 }
 function markUnverified(value: boolean) {
   try {
-    if (value) localStorage.setItem("nnetics-unverified", "1");
-    else localStorage.removeItem("nnetics-unverified");
+    if (value) localStorage.setItem("nnetics-signout-required", "1");
+    else localStorage.removeItem("nnetics-signout-required");
   } catch {
     /* Storage availability must never prevent clearing private state. */
   }
 }
 function verificationRequired() {
   try {
-    return localStorage.getItem("nnetics-unverified") === "1";
+    return localStorage.getItem("nnetics-signout-required") === "1";
   } catch {
     return true;
   }
@@ -52,27 +53,39 @@ export function Onboarding({
   const [error, setError] = useState(""),
     [organizationName, setOrganizationName] = useState("");
   const [selectedDraft, setSelectedDraft] = useState<Workspace | null>(null);
+  const [verificationIssue, setVerificationIssue] = useState("");
+  const [restoreAvailable, setRestoreAvailable] = useState(false);
+  const [restoring, setRestoring] = useState(true);
+  const [walletNotice,setWalletNotice]=useState("");
+  const [loginStage,setLoginStage]=useState("");
+  const lastRenewal=useRef(0),renewing=useRef(false);
+  const identityRef=useRef<IdentityView|null>(null);identityRef.current=who;
   const epoch = useRef(0),
     pending = useRef<AbortController | null>(null),
     broadcast = useRef<BroadcastChannel | null>(null);
   const revocation = useRef<Promise<unknown>>(Promise.resolve());
-  function clearLocal() {
-    markUnverified(true);
+  function clearLocal(revokeBrowser=true) {
+    if(revokeBrowser)markUnverified(true);
+    setWalletNotice("");
     epoch.current++;
     pending.current?.abort();
     pending.current = null;
     setWho(null);
+    setVerificationIssue("");
+    setRestoreAvailable(false);
     setActive(null);
     setSelectedDraft(null);
     setOrganizationName("");
     setBusy(false);
+    setLoginStage("");
     sessionStorage.removeItem("nnetics-wallet");
+    localStorage.removeItem("nnetics-wallet");
   }
   function lock(
     reason = "Wallet switched. Verify the selected account again.",
     notify = true,
   ) {
-    clearLocal();
+    clearLocal(notify);
     setError(reason);
     if (notify) {
       broadcast.current?.postMessage("lock");
@@ -84,52 +97,67 @@ export function Onboarding({
       );
     }
   }
-  async function overview(expected?: string, autoOpen = false) {
+  async function overview(expected?: string, autoOpen = false, signal?:AbortSignal) {
     const mine = epoch.current;
-    const identity = await api<IdentityView>("identity");
+    const fresh=await api<PublicConfig>("config",undefined,signal);
+    const identity = await api<IdentityView>("identity",undefined,signal);
     if (mine !== epoch.current) return;
     if (expected && identity.accountId !== expected)
       throw new Error(
         "The wallet identity changed. Switch wallet and verify again.",
       );
-    markUnverified(false);
+    markUnverified(false);lastRenewal.current=Date.now();
+    setVerificationIssue("");
+    setRestoreAvailable(false);
     setWho(identity);
-    if (
-      autoOpen &&
-      identity.organizations.length === 1 &&
-      identity.organizations[0].status === "ready" &&
-      config
-    )
-      setActive(
-        new NearOwnerAdapter(
-          { ...config, organization: identity.organizations[0].id },
-          identity.accountId,
-        ),
-      );
+    if(autoOpen && fresh.configured && identity.organizations.some(o=>o.id===fresh.organization && o.status==='ready'))
+      setActive(new NearOwnerAdapter(fresh,identity.accountId));
   }
   useEffect(() => {
     if (new URLSearchParams(location.search).get("mode") === "demo") {
+      setRestoring(false);
       setDemo(new MockOwnerAdapter());
       return;
     }
     broadcast.current = new BroadcastChannel("nnetics-identity");
-    broadcast.current.onmessage = () =>
-      lock("Wallet verification changed in another tab. Verify again.", false);
+    broadcast.current.onmessage = event=>{
+      if(event.data==='lock')lock('The authenticated session was signed out or changed in another tab. Sign in to continue.',false);
+    };
+    let cachedAccount:string|undefined;
+    const pagehide=(event:PageTransitionEvent)=>{
+      if(!event.persisted || !identityRef.current)return;
+      cachedAccount=identityRef.current.accountId;
+      epoch.current++;pending.current?.abort();pending.current=null;setBusy(false);
+      setActive(null);setSelectedDraft(null);setWho({accountId:cachedAccount,network:'testnet',organizations:[],notice:''});
+      setVerificationIssue('Refreshing the saved session…');
+    };
+    const pageshow=(event:PageTransitionEvent)=>{
+      if(!event.persisted||!cachedAccount)return;
+      void overview(cachedAccount,true).catch(e=>{
+        if(e instanceof LiveApiError&&e.retryable)setVerificationIssue(e.message);
+        else lock((e as Error).message,false);
+      });
+    };
+    window.addEventListener('pagehide',pagehide);window.addEventListener('pageshow',pageshow);
+    // Obsolete per-tab proof markers are not credentials or logout requests.
+    sessionStorage.removeItem('nnetics-foreground-required');sessionStorage.removeItem('nnetics-verified-document');
     void api<PublicConfig>("config")
       .then((c) => setConfig(c))
-      .catch((e) =>
-        setError(
+      .catch((e) => {
+        setRestoring(false);setError(
           `Cannot load testnet login configuration: ${e.message}. Check the server and retry.`,
-        ),
-      );
+        );
+      });
     return () => {
       pending.current?.abort();
       broadcast.current?.close();
+      window.removeEventListener('pagehide',pagehide);window.removeEventListener('pageshow',pageshow);
     };
   }, []);
   useEffect(() => {
     if (!config) return;
     if (verificationRequired()) {
+      setRestoring(false);
       revocation.current = api("logout", {});
       revocation.current.catch(() =>
         setError(
@@ -138,57 +166,76 @@ export function Onboarding({
       );
       return;
     }
-    void overview(undefined, true).catch(() => {
-      /* A new/legacy browser must verify identity first. */
-    });
+    void restoreSession().catch((e) => {
+      if (e instanceof LiveApiError && e.retryable) {
+        setRestoreAvailable(true);
+        setError("Saved-session verification is temporarily unavailable. Retry it before signing another message.");
+      }
+      else setError(e instanceof Error ? e.message : "Your session could not be restored. Sign in again.");
+    }).finally(()=>setRestoring(false));
   }, [config]);
+  async function restoreSession() { await overview(undefined,true); }
   useEffect(() => {
-    if (!who) return;
-    // Meteor's published injected transport has no account-change subscription.
-    // Conservatively lock on leaving the page, including opening wallet UI. Never
-    // retain private records while the user switches the extension's account.
-    const blur = () =>
-      lock("Wallet/page focus changed. Verify your current wallet again.");
-    const hidden = () => {
-      if (document.hidden) blur();
+    if(!who)return;
+    let stopped=false,running=false,lastCheck=0,timer:ReturnType<typeof setTimeout>;
+    const failure=(e:unknown)=>{
+      if(e instanceof LiveApiError && e.retryable)setVerificationIssue(e.message+' Private records and actions are blocked until silent verification succeeds; your session is retained.');
+      else lock(e instanceof Error?e.message:'Session verification failed. Sign in again.');
     };
-    window.addEventListener("blur", blur);
-    document.addEventListener("visibilitychange", hidden);
-    let stopped = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const refreshIdentity = () => {
-      const mine = epoch.current;
-      void api<IdentityView>("identity")
-        .then((next) => {
-          if (mine !== epoch.current) return;
-          if (next.accountId !== who.accountId)
-            lock("Wallet identity changed. Verify again.", false);
-          else setWho(next);
-        })
-        .catch((e) => {
-          if (mine === epoch.current)
-            lock(
-              `Wallet verification could not be refreshed: ${e instanceof Error ? e.message : "Unknown verification error"}. Sign in again.`,
-            );
-        })
-        .finally(() => {
-          if (!stopped && mine === epoch.current)
-            timer = setTimeout(refreshIdentity, 10000);
-        });
+    const refresh=async()=>{
+      if(stopped||running)return;running=true;clearTimeout(timer);const mine=epoch.current;
+      try{const next=await api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session');if(mine!==epoch.current)return;
+        if(next.accountId!==who.accountId)lock('The authenticated account changed in another tab. Sign in to continue.',false);
+        else {setVerificationIssue('');setWho(previous=>previous?{...previous,session:next}:previous);}
+      }catch(e){if(mine===epoch.current)failure(e);}
+      finally{running=false;lastCheck=Date.now();if(!stopped&&mine===epoch.current)timer=setTimeout(refresh,30000);}
     };
-    timer = setTimeout(refreshIdentity, 10000);
-    return () => {
-      stopped = true;
-      clearTimeout(timer);
-      window.removeEventListener("blur", blur);
-      document.removeEventListener("visibilitychange", hidden);
+    const returned=()=>{if(!document.hidden&&Date.now()-lastCheck>3000)void refresh();};
+    timer=setTimeout(refresh,30000);
+    window.addEventListener('focus',returned);document.addEventListener('visibilitychange',returned);
+    const activity=(e:Event)=>{
+      if(!e.isTrusted||document.hidden||!document.hasFocus()||renewing.current||Date.now()-lastRenewal.current<60000)return;
+      renewing.current=true;const mine=epoch.current;
+      void api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session/renew',{active:true}).then(next=>{
+        if(mine!==epoch.current)return;
+        if(next.accountId!==who.accountId)lock('The authenticated account changed. Sign in again.',false);
+        else {lastRenewal.current=Date.now();setVerificationIssue('');setWho(previous=>previous?{...previous,session:next}:previous);}
+      }).catch(e=>{if(mine===epoch.current)failure(e);}).finally(()=>{renewing.current=false;});
     };
-  }, [who?.accountId]);
-  async function signIn() {
-    if (!config) return;
-    const chosen = account.trim();
+    window.addEventListener('pointerdown',activity);window.addEventListener('keydown',activity);
+    return()=>{stopped=true;clearTimeout(timer);window.removeEventListener('focus',returned);document.removeEventListener('visibilitychange',returned);window.removeEventListener('pointerdown',activity);window.removeEventListener('keydown',activity);};
+  },[who?.accountId]);
+  useEffect(()=>{
+    const limits=who?.session;if(!limits)return;
+    const duration=Math.min(limits.idleExpires,limits.absoluteExpires)-(limits.serverTime??Date.now());
+    if(!Number.isFinite(duration))return;
+    const mine=epoch.current,timer=setTimeout(()=>{if(mine===epoch.current)lock('Your five-hour session has expired. Verify your wallet again; no payment is requested.');},Math.max(0,duration));
+    return()=>clearTimeout(timer);
+  },[who?.accountId,who?.session]);
+  async function checkSelectedWallet() {
+    if(busy)return;const mine=epoch.current,controller=new AbortController();pending.current=controller;setBusy(true);setWalletNotice('');
     try {
-      testnetWalletAccount(chosen);
+      initializeMeteorExtension();const next=await checkMeteorIdentity(controller.signal);
+      if(mine!==epoch.current)return;
+      if(next.accountChanged){
+        markUnverified(true);broadcast.current?.postMessage('lock');clearLocal(false);
+        setError('Meteor verified a different account ('+next.accountId+'). The previous session was signed out. Connect to Meteor to authenticate the new account; no permissions were transferred.');
+      }else setWalletNotice('Meteor confirmed '+next.accountId+'. Your existing session and five-hour deadline are unchanged.');
+    }catch(e){if(mine===epoch.current)setWalletNotice('The wallet check was inconclusive. Your session remains tied to '+who?.accountId+'. '+(e as Error).message);}
+    finally{if(mine===epoch.current){pending.current=null;setBusy(false);}}
+  }
+  function showVerifiedLoading(accountId:string) {
+    markUnverified(false);
+    // A known verified identity can be shown immediately; no organization,
+    // records, owner role or payment controls are inferred from it.
+    setWho({accountId,network:'testnet',organizations:[],notice:''});
+    setVerificationIssue('Wallet verified. Loading your authorized workspace…');
+  }
+  async function signIn(discover=false) {
+    if (!config) return;
+    const chosen = discover ? undefined : account.trim();
+    try {
+      if(chosen!==undefined)testnetWalletAccount(chosen);
     } catch (e) {
       setError((e as Error).message);
       return;
@@ -199,24 +246,35 @@ export function Onboarding({
       controller = new AbortController();
     pending.current = controller;
     setBusy(true);
+    setLoginStage("Connecting to Meteor…");
     setError("");
+    let signedIn=false;
     try {
+      initializeMeteorExtension();setReady(true);
       await revocation.current;
       await api("logout", {});
       if (mine !== epoch.current) return;
-      await new NearOwnerAdapter(config).connectMeteor(
+      markUnverified(false);
+      const verifiedAccount=await new NearOwnerAdapter(config).connectMeteor(
         chosen,
         controller.signal,
+        message=>{if(mine===epoch.current)setLoginStage(message);},
       );
       if (mine !== epoch.current) return;
-      await overview(chosen, true);
+      signedIn=true;markUnverified(false);
+      if(mine!==epoch.current)return;
+      showVerifiedLoading(verifiedAccount);
+      await overview(verifiedAccount, true,controller.signal);
     } catch (e) {
-      if (mine === epoch.current)
+      if (mine === epoch.current) {
+        if(signedIn)setRestoreAvailable(true);
+        if(signedIn)setVerificationIssue(`Your message was accepted. Workspace loading could not finish: ${(e as Error).message}. Retry verification without another wallet signature.`);
         setError(
           e instanceof Error
-            ? e.message
+            ? (signedIn?"Your message was accepted. Workspace loading could not finish; retry the saved session. ":"")+e.message + (e.message.includes("Meteor extension")?" Open this site in the browser profile containing Meteor, enable its site access, unlock it and retry.":"")
             : "Wallet login failed. Retry with a fresh message.",
         );
+      }
     } finally {
       if (mine === epoch.current) {
         pending.current = null;
@@ -229,10 +287,12 @@ export function Onboarding({
     return (
       <>
         <header className="identity-bar" aria-label="Verified wallet">
-          <span>NEAR testnet · Verified wallet: {who.accountId}</span>
+          <span>Signed in as {who.accountId} · NEAR testnet</span>
           <button className="button secondary" onClick={() => lock()}>
             Switch wallet
           </button>
+          <button className="button secondary" onClick={()=>lock("You signed out. Verify a wallet to sign in again.")}>Sign out</button>
+          <button className="button secondary" disabled={busy} onClick={()=>void checkSelectedWallet()}>Check selected Meteor account (optional)</button>
           {active && (
             <button
               className="button secondary"
@@ -245,9 +305,18 @@ export function Onboarding({
             </button>
           )}
         </header>
-        {active ? (
-          renderDashboard(active)
-        ) : (
+        <p className="wallet-session-notice">This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p>
+        {walletNotice && <p role="status">{walletNotice}</p>}
+        {verificationIssue ? (
+            <main className="loading-screen">
+              <h1>{busy?'Loading your workspace':'Verification temporarily unavailable'}</h1>
+              <p role="alert">{verificationIssue}</p>
+              <button className="button" disabled={busy} onClick={() => void overview(who.accountId).catch(e => {
+                if(e instanceof LiveApiError && e.retryable) setVerificationIssue(e.message);
+                else lock((e as Error).message);
+              })}>Retry verification</button>
+            </main>
+          ) : active ? renderDashboard(active) : (
           <main className="loading-screen" aria-label="Wallet onboarding">
             <h1>{selectedDraft ? selectedDraft.name : "Your workspace"}</h1>
             <p>Live testnet identity. No simulated records or balances.</p>
@@ -282,8 +351,10 @@ export function Onboarding({
                     setError("");
                     try {
                       if (org.status === "ready" && config) {
+                        const fresh=await api<PublicConfig>("config");
+                        if(!fresh.configured||fresh.organization!==org.id)throw Error("Workspace configuration changed. Reload login configuration before opening this vault.");
                         const adapter = new NearOwnerAdapter(
-                          { ...config, organization: org.id },
+                          fresh,
                           who.accountId,
                         );
                         await adapter.snapshot();
@@ -351,6 +422,7 @@ export function Onboarding({
         )}
       </>
     );
+  if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p></main>;
   let accountValid = false;
   try {
     testnetWalletAccount(account.trim());
@@ -370,31 +442,28 @@ export function Onboarding({
         Other wallet connectors are not supported by this onboarding flow.
       </p>
       {error && <p role="alert">{error}</p>}
+      {restoreAvailable && <button className="button secondary" onClick={() => {
+        setError("");
+        void restoreSession().catch(e => {
+          setError((e as Error).message);
+          if (!(e instanceof LiveApiError && e.retryable)) setRestoreAvailable(false);
+        });
+      }}>Retry saved session</button>}
       <section aria-label="Meteor connection">
         <button
-          className="button secondary"
-          disabled={busy}
-          onClick={() => {
-            try {
-              initializeMeteorExtension();
-              setReady(true);
-              setError("");
-            } catch (e) {
-              setReady(false);
-              setError(
-                (e as Error).message +
-                  " Open this site in the browser profile containing Meteor, enable its site access, unlock it and reconnect.",
-              );
-            }
-          }}
+          className="button primary"
+          disabled={!config || busy}
+          onClick={() => void signIn(true)}
         >
-          {ready ? "Recheck Meteor connection" : "Connect to Meteor"}
+          {busy ? loginStage||"Connecting…" : "Connect to Meteor"}
         </button>
         <p role="status">
-          {ready
-            ? "Meteor extension initialized. Sign a fresh message to verify the selected account."
-            : "Connecting does not sign a message or grant access."}
+          {busy ? loginStage : ready
+            ? "Meteor is available. Connect opens an off-chain identity message for the account selected in your wallet. No transaction, funds or keys."
+            : "Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested."}
         </p>
+        <details>
+          <summary>Use a specific testnet account (optional)</summary>
         <label>
           Testnet wallet account ID
           <input
@@ -414,7 +483,7 @@ export function Onboarding({
         )}
         <button
           className="button primary"
-          disabled={!config || !ready || !accountValid || busy}
+          disabled={!config || !accountValid || busy}
           onClick={() => void signIn()}
         >
           {busy
@@ -431,6 +500,7 @@ export function Onboarding({
         >
           Switch wallet / retry verification
         </button>
+        </details>
         {!config && (
           <button
             className="button secondary"
