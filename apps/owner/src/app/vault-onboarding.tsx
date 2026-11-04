@@ -82,7 +82,8 @@ export function VaultOnboarding({ organization }: { organization: string }) {
     }
   }
   return (
-    <section aria-label="Create vault">
+    <section aria-label="Create vault" className="vault-onboarding">
+      <ol className="provisioning-steps" aria-label="Vault setup progress"><li aria-current={!progress?.state || progress.state === "prepared" ? "step" : undefined}>Review</li><li aria-current={progress?.state === "awaiting_chain" ? "step" : undefined}>Wallet approval</li><li aria-current={progress?.state === "verified" ? "step" : undefined}>Verify on chain</li></ol>
       <h2>
         {progress?.state === "verified" ? "Verified vault" : "Create vault"}
       </h2>
@@ -124,15 +125,16 @@ export function VaultOnboarding({ organization }: { organization: string }) {
             <dd>5 testnet NEAR</dd>
             <dt>Prepaid gas</dt>
             <dd>250 Tgas (fees additional)</dd>
-            <dt>Vault code hash</dt>
+            <dt>State</dt>
+            <dd>{progress.state}</dd>
+          </dl>
+          <details className="verification-details"><summary>Artifact verification details</summary><dl>            <dt>Vault code hash</dt>
             <dd>{progress.vaultCodeHash}</dd>
             <dt>Factory code hash</dt>
             <dd>{progress.factoryCodeHash}</dd>
             <dt>Plan SHA-256</dt>
             <dd>{progress.planDigest}</dd>
-            <dt>State</dt>
-            <dd>{progress.state}</dd>
-          </dl>
+</dl></details>
           <p>
             Creation installs no access keys. Initialization binds this owner
             and starts paused, without a worker or funded payment ledger. These

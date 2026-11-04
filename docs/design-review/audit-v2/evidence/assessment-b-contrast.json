@@ -1,0 +1,1369 @@
+[
+  {
+    "name": "owner-Overview",
+    "low": [
+      {
+        "text": "NO",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 297,
+          "y": 626.125,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "MC",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 297,
+          "y": 715.015625,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "0 ready for the worker. Review cannot override a failed rule.",
+        "tag": "DIV",
+        "class": "panel-foot",
+        "color": "rgb(107, 126, 98)",
+        "background": [
+          251,
+          252,
+          248,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.259,
+        "rect": {
+          "x": 273,
+          "y": 776.46875,
+          "width": 816,
+          "height": 49
+        }
+      },
+      {
+        "text": "Failed",
+        "tag": "SPAN",
+        "class": "badge red",
+        "color": "rgb(160, 94, 78)",
+        "background": [
+          251,
+          239,
+          234,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.431,
+        "rect": {
+          "x": 648.546875,
+          "y": 1242.421875,
+          "width": 58.296875,
+          "height": 22.390625
+        }
+      },
+      {
+        "text": "Payment limits",
+        "tag": "SPAN",
+        "class": "eyebrow",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1139,
+          "y": 590.6875,
+          "width": 244,
+          "height": 18
+        }
+      },
+      {
+        "text": "Every request stays tied to an immutable, owner-approved work order.",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(108, 125, 98)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.924,
+        "rect": {
+          "x": 1139,
+          "y": 726.625,
+          "width": 244,
+          "height": 43.1875
+        }
+      },
+      {
+        "text": "Spent",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1139,
+          "y": 805.8125,
+          "width": 40.359375,
+          "height": 18
+        }
+      },
+      {
+        "text": "Reserved",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1191.359375,
+          "y": 805.8125,
+          "width": 60.359375,
+          "height": 18
+        }
+      },
+      {
+        "text": "Uncommitted",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1263.71875,
+          "y": 805.8125,
+          "width": 70.6875,
+          "height": 18
+        }
+      },
+      {
+        "text": "Cumulative budget",
+        "tag": "DT",
+        "class": "",
+        "color": "rgb(109, 122, 100)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.034,
+        "rect": {
+          "x": 1139,
+          "y": 844.8125,
+          "width": 100.0625,
+          "height": 18
+        }
+      },
+      {
+        "text": "NEAR",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1348.453125,
+          "y": 846.8125,
+          "width": 34.546875,
+          "height": 14
+        }
+      },
+      {
+        "text": "Per-payment cap",
+        "tag": "DT",
+        "class": "",
+        "color": "rgb(109, 122, 100)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.034,
+        "rect": {
+          "x": 1139,
+          "y": 876.8125,
+          "width": 91.390625,
+          "height": 18
+        }
+      },
+      {
+        "text": "NEAR",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1348.453125,
+          "y": 878.8125,
+          "width": 34.546875,
+          "height": 14
+        }
+      },
+      {
+        "text": "Vendor slots",
+        "tag": "DT",
+        "class": "",
+        "color": "rgb(109, 122, 100)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.034,
+        "rect": {
+          "x": 1139,
+          "y": 908.8125,
+          "width": 66.046875,
+          "height": 18
+        }
+      },
+      {
+        "text": "Paused",
+        "tag": "SMALL",
+        "class": "",
+        "color": "rgb(100, 114, 107)",
+        "background": [
+          240,
+          242,
+          237,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.477,
+        "rect": {
+          "x": 1139,
+          "y": 990.8125,
+          "width": 122.734375,
+          "height": 18
+        }
+      },
+      {
+        "text": "Revoked",
+        "tag": "SPAN",
+        "class": "badge red",
+        "color": "rgb(160, 94, 78)",
+        "background": [
+          251,
+          239,
+          234,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.431,
+        "rect": {
+          "x": 1137,
+          "y": 1133.125,
+          "width": 73.0625,
+          "height": 22.390625
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Contractors",
+    "low": [
+      {
+        "text": "Invite a contractor, review their wallet, then approve a fixed work order. These are your organization’s persistent billing records. Work-order approval here is",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 272,
+          "y": 302.375,
+          "width": 640,
+          "height": 63
+        }
+      },
+      {
+        "text": "Revoke access",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 465.171875,
+          "y": 715.875,
+          "width": 128.9375,
+          "height": 44
+        }
+      },
+      {
+        "text": "Reject bill",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 1193.21875,
+          "y": 1101.375,
+          "width": 94.703125,
+          "height": 44
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Vendors",
+    "low": [
+      {
+        "text": "Recipient changes apply to future orders. Existing work orders retain their approved recipient. Three permanent vendor slots are available.",
+        "tag": "SPAN",
+        "class": "",
+        "color": "rgb(98, 119, 87)",
+        "background": [
+          238,
+          243,
+          231,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.332,
+        "rect": {
+          "x": 320,
+          "y": 927.578125,
+          "width": 733.515625,
+          "height": 18
+        }
+      },
+      {
+        "text": "AB",
+        "tag": "SPAN",
+        "class": "avatar vendor-avatar color-0",
+        "color": "rgb(135, 112, 78)",
+        "background": [
+          237,
+          228,
+          212,
+          1
+        ],
+        "size": "22px",
+        "ratio": 3.735,
+        "rect": {
+          "x": 297,
+          "y": 1010.578125,
+          "width": 58,
+          "height": 58
+        }
+      },
+      {
+        "text": "Vendor ID:",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 297,
+          "y": 1161.078125,
+          "width": 314,
+          "height": 18
+        }
+      },
+      {
+        "text": "writer",
+        "tag": "STRONG",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 357.046875,
+          "y": 1163.078125,
+          "width": 29.34375,
+          "height": 14
+        }
+      },
+      {
+        "text": "Vendor ID:",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 683,
+          "y": 1161.078125,
+          "width": 314,
+          "height": 18
+        }
+      },
+      {
+        "text": "designer",
+        "tag": "STRONG",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 743.046875,
+          "y": 1163.078125,
+          "width": 46.03125,
+          "height": 14
+        }
+      },
+      {
+        "text": "NO",
+        "tag": "SPAN",
+        "class": "avatar vendor-avatar color-2",
+        "color": "rgb(106, 99, 135)",
+        "background": [
+          227,
+          228,
+          238,
+          1
+        ],
+        "size": "22px",
+        "ratio": 4.429,
+        "rect": {
+          "x": 1069,
+          "y": 1010.578125,
+          "width": 58,
+          "height": 58
+        }
+      },
+      {
+        "text": "Vendor ID:",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 1069,
+          "y": 1161.078125,
+          "width": 314,
+          "height": 18
+        }
+      },
+      {
+        "text": "editor",
+        "tag": "STRONG",
+        "class": "",
+        "color": "rgb(120, 131, 115)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 3.968,
+        "rect": {
+          "x": 1129.046875,
+          "y": 1163.078125,
+          "width": 30.03125,
+          "height": 14
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Work orders",
+    "low": [],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Invoice review",
+    "low": [
+      {
+        "text": "NO",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 292,
+          "y": 419.6875,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "MC",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 292,
+          "y": 533.078125,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "tag": "DIV",
+        "class": "panel-foot",
+        "color": "rgb(107, 126, 98)",
+        "background": [
+          251,
+          252,
+          248,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.259,
+        "rect": {
+          "x": 273,
+          "y": 622.96875,
+          "width": 474.5625,
+          "height": 49
+        }
+      },
+      {
+        "text": "Original invoice text",
+        "tag": "LABEL",
+        "class": "source-label",
+        "color": "rgb(113, 129, 104)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.165,
+        "rect": {
+          "x": 797.5625,
+          "y": 778.78125,
+          "width": 585.4375,
+          "height": 18
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Payment history",
+    "low": [
+      {
+        "text": "Outcome",
+        "tag": "LABEL",
+        "class": "filter-label",
+        "color": "rgb(117, 130, 107)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.068,
+        "rect": {
+          "x": 1219.3125,
+          "y": 330.6875,
+          "width": 163.6875,
+          "height": 32
+        }
+      },
+      {
+        "text": "Failed",
+        "tag": "SPAN",
+        "class": "badge red",
+        "color": "rgb(160, 94, 78)",
+        "background": [
+          251,
+          239,
+          234,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.431,
+        "rect": {
+          "x": 788.125,
+          "y": 688.140625,
+          "width": 58.296875,
+          "height": 22.390625
+        }
+      },
+      {
+        "text": "An unknown outcome stays pending and reserved. A refresh or timeout does not authorize a retry.",
+        "tag": "DIV",
+        "class": "panel-foot",
+        "color": "rgb(107, 126, 98)",
+        "background": [
+          251,
+          252,
+          248,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.259,
+        "rect": {
+          "x": 273,
+          "y": 749.6875,
+          "width": 1134,
+          "height": 49
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Vault",
+    "low": [],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Access",
+    "low": [],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-Recovery",
+    "low": [],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "owner-invoice-modal",
+    "low": [
+      {
+        "text": "NO",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 292,
+          "y": 419.6875,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "MC",
+        "tag": "SPAN",
+        "class": "avatar small",
+        "color": "rgb(126, 105, 78)",
+        "background": [
+          238,
+          229,
+          216,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.19,
+        "rect": {
+          "x": 292,
+          "y": 533.078125,
+          "width": 35,
+          "height": 35
+        }
+      },
+      {
+        "text": "Invoice text is untrusted data. No AI extraction is running.",
+        "tag": "DIV",
+        "class": "panel-foot",
+        "color": "rgb(107, 126, 98)",
+        "background": [
+          251,
+          252,
+          248,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.259,
+        "rect": {
+          "x": 273,
+          "y": 622.96875,
+          "width": 474.5625,
+          "height": 49
+        }
+      },
+      {
+        "text": "Original invoice text",
+        "tag": "LABEL",
+        "class": "source-label",
+        "color": "rgb(113, 129, 104)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.165,
+        "rect": {
+          "x": 797.5625,
+          "y": 778.78125,
+          "width": 585.4375,
+          "height": 18
+        }
+      },
+      {
+        "text": "NEAR TESTNET",
+        "tag": "SPAN",
+        "class": "eyebrow",
+        "color": "rgb(107, 123, 103)",
+        "background": [
+          252,
+          253,
+          249,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.417,
+        "rect": {
+          "x": 475,
+          "y": 100.109375,
+          "width": 310.59375,
+          "height": 18
+        }
+      },
+      {
+        "text": "Enter invoice fields manually. No extractor is running. Conflicting fields will be flagged for review.",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(111, 126, 101)",
+        "background": [
+          252,
+          253,
+          249,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.24,
+        "rect": {
+          "x": 475,
+          "y": 192.109375,
+          "width": 490,
+          "height": 43.1875
+        }
+      },
+      {
+        "text": "Invoice reference assigned automatically on successful submission.",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(111, 126, 101)",
+        "background": [
+          252,
+          253,
+          249,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.24,
+        "rect": {
+          "x": 475,
+          "y": 251.296875,
+          "width": 490,
+          "height": 21.59375
+        }
+      },
+      {
+        "text": "Currency: NEAR · Testnet",
+        "tag": "P",
+        "class": "",
+        "color": "rgb(111, 126, 101)",
+        "background": [
+          252,
+          253,
+          249,
+          1
+        ],
+        "size": "12px",
+        "ratio": 4.24,
+        "rect": {
+          "x": 475,
+          "y": 288.890625,
+          "width": 490,
+          "height": 21.59375
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "contractor-submit",
+    "low": [
+      {
+        "text": "Send a clear bill. Follow its review. Keep your wallet details up to date.",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 168,
+          "y": 257.890625,
+          "width": 640,
+          "height": 21
+        }
+      },
+      {
+        "text": "My payments",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 293.234375,
+          "y": 308.890625,
+          "width": 126.703125,
+          "height": 50
+        }
+      },
+      {
+        "text": "Wallet details",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 423.9375,
+          "y": 308.890625,
+          "width": 126.953125,
+          "height": 50
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Contractor demo",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "contractor-My payments",
+    "low": [
+      {
+        "text": "Send a clear bill. Follow its review. Keep your wallet details up to date.",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 168,
+          "y": 257.890625,
+          "width": 640,
+          "height": 21
+        }
+      },
+      {
+        "text": "Submit a bill",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 168,
+          "y": 308.890625,
+          "width": 121.234375,
+          "height": 50
+        }
+      },
+      {
+        "text": "Wallet details",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 423.9375,
+          "y": 308.890625,
+          "width": 126.953125,
+          "height": 50
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Contractor demo",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "contractor-Wallet details",
+    "low": [
+      {
+        "text": "Send a clear bill. Follow its review. Keep your wallet details up to date.",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 168,
+          "y": 257.890625,
+          "width": 640,
+          "height": 21
+        }
+      },
+      {
+        "text": "Submit a bill",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 168,
+          "y": 308.890625,
+          "width": 121.234375,
+          "height": 50
+        }
+      },
+      {
+        "text": "My payments",
+        "tag": "BUTTON",
+        "class": "_9FanIq_tab ",
+        "color": "rgb(99, 118, 106)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.476,
+        "rect": {
+          "x": 293.234375,
+          "y": 308.890625,
+          "width": 126.703125,
+          "height": 50
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Contractor demo",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "demo-owner",
+    "low": [
+      {
+        "text": "Invite a contractor, review their wallet, then approve a fixed work order. Every change here belongs to this isolated demo workspace.",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 168,
+          "y": 248.6875,
+          "width": 640,
+          "height": 42
+        }
+      },
+      {
+        "text": "Revoke access",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 361.171875,
+          "y": 641.1875,
+          "width": 128.9375,
+          "height": 44
+        }
+      },
+      {
+        "text": "Reject bill",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 1073.21875,
+          "y": 1005.6875,
+          "width": 94.703125,
+          "height": 44
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "signin",
+    "low": [],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": null,
+        "nested": false
+      }
+    ]
+  },
+  {
+    "name": "draft",
+    "low": [
+      {
+        "text": "Invite a contractor, review their wallet, then approve a fixed work order. These are your organization’s persistent billing records. Work-order approval here is",
+        "tag": "P",
+        "class": "_9FanIq_muted",
+        "color": "rgb(104, 119, 111)",
+        "background": [
+          246,
+          246,
+          242,
+          1
+        ],
+        "size": "14px",
+        "ratio": 4.349,
+        "rect": {
+          "x": 292,
+          "y": 1066.859375,
+          "width": 640,
+          "height": 63
+        }
+      },
+      {
+        "text": "Revoke access",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 485.171875,
+          "y": 1554.359375,
+          "width": 128.9375,
+          "height": 44
+        }
+      },
+      {
+        "text": "Reject bill",
+        "tag": "BUTTON",
+        "class": "_9FanIq_button _9FanIq_danger",
+        "color": "rgb(161, 63, 49)",
+        "background": [
+          27,
+          102,
+          80,
+          1
+        ],
+        "size": "14px",
+        "ratio": 1.068,
+        "rect": {
+          "x": 782,
+          "y": 2063.359375,
+          "width": 94.703125,
+          "height": 44
+        }
+      }
+    ],
+    "overflow": 0,
+    "title": "Nnetics · Owner dashboard",
+    "main": [
+      {
+        "label": "Wallet onboarding",
+        "nested": false
+      },
+      {
+        "label": null,
+        "nested": true
+      }
+    ]
+  }
+]

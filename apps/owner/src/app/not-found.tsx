@@ -1,0 +1,1 @@
+export default function NotFound(){return <main className="loading-screen signin-surface"><a className="entry-brand" href="/">Nnetics<span>.</span></a><h1>Page not found</h1><p>This address is unavailable. Return to your workspace, or use the private invitation link provided by the owner.</p><a className="button primary" href="/">Return to workspace</a></main>;}

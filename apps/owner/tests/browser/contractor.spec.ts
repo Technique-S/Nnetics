@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
+test.beforeEach(async({page})=>{page.on("dialog",dialog=>dialog.accept());});
 const origin = process.env.NNETICS_BROWSER_BASE_URL || "http://127.0.0.1:3100";
 async function start(page: Page, name = "Writer") {
     await page.goto("/demo/contractors");
@@ -34,6 +35,7 @@ test("owner invite → contractor upload and clarification → owner review, wal
     await expect(page.getByText("WO-ARTICLE · One article")).toBeVisible();
     await contractor.bringToFront();
     await contractor.getByRole("button", { name: "Submit a bill", exact: true }).click();
+    await contractor.getByText("Attachments and extraction (optional)",{exact:true}).click();
     await contractor.getByLabel("Attach an invoice", { exact: true }).setInputFiles({ name: "article.txt", mimeType: "text/plain", buffer: Buffer.from("Invoice: INV-ARTICLE\nWork order: WO-ARTICLE\nAmount: 2 NEAR\nArticle delivered.") });
     await expect(contractor.getByText("article.txt ·", { exact: false })).toBeVisible();
     await contractor.getByRole("button", { name: "Format labeled details" }).click();

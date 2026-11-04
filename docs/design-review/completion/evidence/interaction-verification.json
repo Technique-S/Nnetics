@@ -1,0 +1,19 @@
+{
+  "initial": 248,
+  "intermediate": 109.53125,
+  "reversed": 248,
+  "sidebarBefore": {
+    "x": 0,
+    "y": 0,
+    "width": 248,
+    "height": 900
+  },
+  "sidebarAfterHelp": {
+    "x": 0,
+    "y": 0,
+    "width": 248,
+    "height": 900
+  },
+  "mobileExpandedAccurate": true,
+  "errors": []
+}

@@ -1,0 +1,226 @@
+[
+  {
+    "name": "provision-prepared-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 146
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 1597
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-awaiting_chain-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 146
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 1821
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-failed-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 146
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 1620
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-verified-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 146
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 1560
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-prepared-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 170
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 2287
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-awaiting_chain-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 170
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 2556
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-failed-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 170
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 2268
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "provision-verified-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Content studio",
+        "y": 170
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 2208
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "dialog-vendors",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Vendors",
+        "y": 130
+      }
+    ],
+    "panel": 570.390625,
+    "stylesheets": 2,
+    "identityOccluded": true,
+    "errors": []
+  },
+  {
+    "name": "dialog-work-orders",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Work orders",
+        "y": 130
+      }
+    ],
+    "panel": 570.390625,
+    "stylesheets": 2,
+    "identityOccluded": true,
+    "errors": []
+  },
+  {
+    "name": "dialog-invoice-review",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Invoice review",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": true,
+    "errors": []
+  },
+  {
+    "name": "default-not-found",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "404",
+        "y": 426
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  }
+]

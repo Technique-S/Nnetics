@@ -1,0 +1,59 @@
+[
+  {
+    "name": "touch-navigation",
+    "heading": "Payment history",
+    "drawerOpen": 0
+  },
+  {
+    "name": "touch-table-horizontal-pan",
+    "before": {
+      "left": 0,
+      "max": 184
+    },
+    "after": {
+      "left": 184,
+      "max": 184
+    }
+  },
+  {
+    "name": "loading-motion-reduce",
+    "hasText": 1,
+    "skeletonCount": 3,
+    "animations": []
+  },
+  {
+    "name": "loading-motion-no-preference",
+    "hasText": 1,
+    "skeletonCount": 3,
+    "animations": [
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      },
+      {
+        "name": "skeleton-breathe",
+        "playState": "running"
+      }
+    ]
+  }
+]

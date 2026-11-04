@@ -1,4 +1,5 @@
 "use client";
+import {LoadingSkeleton} from "./loading-skeleton";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NearOwnerAdapter, LiveApiError, checkMeteorIdentity, api, type PublicConfig } from "../data/near-adapter";
 import { MockOwnerAdapter } from "../data/mock-adapter";
@@ -41,7 +42,7 @@ function verificationRequired() {
 export function Onboarding({
   renderDashboard,
 }: {
-  renderDashboard: (adapter: OwnerAdapter) => ReactNode;
+  renderDashboard: (adapter: OwnerAdapter, name?: string) => ReactNode;
 }) {
   const [config, setConfig] = useState<PublicConfig | null>(null),
     [who, setWho] = useState<IdentityView | null>(null);
@@ -288,6 +289,7 @@ export function Onboarding({
       <>
         <header className="identity-bar" aria-label="Verified wallet">
           <span>Signed in as {who.accountId} · NEAR testnet</span>
+          <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions">
           <button className="button secondary" onClick={() => lock()}>
             Switch wallet
           </button>
@@ -304,8 +306,9 @@ export function Onboarding({
               My organizations
             </button>
           )}
+          <details className="wallet-session-notice"><summary>About this wallet session</summary><p>This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p></details></div></details>
         </header>
-        <p className="wallet-session-notice">This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p>
+
         {walletNotice && <p role="status">{walletNotice}</p>}
         {verificationIssue ? (
             <main className="loading-screen">
@@ -316,8 +319,8 @@ export function Onboarding({
                 else lock((e as Error).message);
               })}>Retry verification</button>
             </main>
-          ) : active ? renderDashboard(active) : (
-          <main className="loading-screen" aria-label="Wallet onboarding">
+          ) : active ? renderDashboard(active, who.organizations.find(o=>o.id===active.config.organization)?.name) : (
+          <main className="loading-screen onboarding-surface" aria-label="Wallet onboarding">
             <h1>{selectedDraft ? selectedDraft.name : "Your workspace"}</h1>
             <p>Live testnet identity. No simulated records or balances.</p>
             <p>{who.notice}</p>
@@ -382,7 +385,7 @@ export function Onboarding({
               ))
             )}
             {selectedDraft && (
-              <><VaultOnboarding key={selectedDraft.id} organization={selectedDraft.id}/><PersistentContractorOwner key={`billing-${selectedDraft.id}`} organization={selectedDraft.id}/></>
+              <><VaultOnboarding key={selectedDraft.id} organization={selectedDraft.id}/><PersistentContractorOwner key={`billing-${selectedDraft.id}`} organization={selectedDraft.id} embedded/></>
             )}
             <form
               onSubmit={async (e) => {
@@ -422,25 +425,26 @@ export function Onboarding({
         )}
       </>
     );
-  if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p></main>;
+  if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><LoadingSkeleton/></main>;
   let accountValid = false;
   try {
     testnetWalletAccount(account.trim());
     accountValid = true;
   } catch {}
   return (
-    <main className="loading-screen">
+    <main className="loading-screen signin-surface">
+      <a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
       <h1>Nnetics · NEAR testnet</h1>
       <p>
         Verify any supported, activated testnet wallet. You do not need an
         organization or vault to sign in. Wallet verification grants no
         organization membership or vault ownership.
       </p>
-      <p>
+      <details><summary>Supported wallets and networks</summary>      <p>
         Meteor extension only. Select NEAR testnet and the activated named
         .testnet account or 64-character implicit account shown in your wallet.
         Other wallet connectors are not supported by this onboarding flow.
-      </p>
+      </p></details>
       {error && <p role="alert">{error}</p>}
       {restoreAvailable && <button className="button secondary" onClick={() => {
         setError("");

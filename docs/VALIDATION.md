@@ -2065,3 +2065,23 @@ Independent review remains necessary for the trusted bootstrap, consensus encodi
 Old attempts lacking an initiation marker or pre-payment checkpoint remain blocked; the owner cannot install a post-incident trust root or use a migration escape hatch. Resolving such legacy history requires a separately reviewed design. Public-network provisioning, transactions and deployment still require separate approval.
 
 Automated payment-core acceptance checks are now satisfied, including retained exact balances and real proof repair/rejection. Overall Milestone 1 acceptance remains incomplete while the stated consensus/resource review is outstanding. UI, worker, AI extraction and testnet demonstration remain outside this milestone.
+
+## 4 November 2026 — approved UI implementation
+
+- Implemented the shared owner navigation, compact account disclosure, contextual Vault/Access/Recovery/import tools, integrated contractor billing surface, empty states, actual-loading skeletons, reduced-motion-aware transitions and corrected zero-budget rendering. No server/worker/contract interfaces or payment payloads changed.
+- Local production build / TypeScript: passed. Existing backend tests: 96 passed, zero failed.
+- Browser execution: 71 passed + one intentional mobile duplicate skip in the intercepted session/role/layout suite; 22 passed in the owner/contractor demo workflow suite. Combined 93 passed, one skipped. These are fixtures and demo execution, not fresh Meteor acceptance. Initial stale selectors/copy and a paused-clock animation wait were fixed without relaxing financial/security assertions.
+- Thirty synthetic current-UI captures: no JavaScript errors or page overflow. Overview heading moved from y=1647 desktop / 2296 mobile to y=130 / 146. No covered identity. Native zoom, screen-reader and fresh real-wallet visual acceptance remain manual follow-ups.
+- Read-only chain check 2026-11-04T00:21:31.901Z, height 276121164: Grandtheft owner, vault paused, worker authorization null, existing INV-0002 Paid transaction unchanged; zero transactions sent. Existing amount 0.001 NEAR, order and Babygoat recipient preserved.
+- Local origin mismatch initially prevented the full demo workflow. Automatic approval review blocked a process-local origin override. At the user's explicit instruction, stopped the process occupying port 3100 and started the updated app at its existing configured origin http://127.0.0.1:3100. No private configuration change or origin-check bypass. The workflow suite then passed.
+- No Git push, deployment, live payment, worker activation, AI provider change or production record migration. Demo test records/logs remain in ignored artifacts. Independent security review status is unchanged.
+- Detailed implementation evidence and limits: [design-review/UI_IMPLEMENTATION.md](design-review/UI_IMPLEMENTATION.md).
+
+## 4 November 2026 — full-height shell and task-surface completion
+
+- Implemented the approved second design audit: full-height rail with wallet help in account menu, interruptible desktop width spring, accurate mobile ARIA, task-specific Vault/Access/Recovery, records-first vendor/order lists with contextual import, entry/provisioning polish, container-aware embedded contractor layout, truthful portal metadata, destructive/contrast fixes and preview-before-submit billing flow.
+- Backend/worker/contract interfaces and transaction payloads unchanged; financial requests now visibly respect the existing disabled configuration. Read-only refresh is explicitly separate from wallet-based reconciliation. Unknown outcomes remain blocked/reserved.
+- Actual local checks: production build/TypeScript passed; 96 backend tests passed; full browser suite 93 passed plus one intentional skip; final focused checks 8 passed after last copy/disabled-state adjustments. Fixture/demo results are not new real-wallet acceptance.
+- Captured 68 route/state cases across four widths: no page exceptions or document overflow. Normal-motion reversal and full-height/help invariance verified. Physical-device profiling, native zoom and screen-reader/real-Meteor visual acceptance remain manual.
+- Read-only chain preflight 2026-11-04T08:53:54.397Z, height 276172619: Grandtheft owner, vault paused, worker authorization null, existing 0.001-NEAR Babygoat Paid transaction unchanged; zero transactions sent. No worker start, payment/job creation, push, deployment or migration.
+- Detailed evidence: [design-review/completion/IMPLEMENTED.md](design-review/completion/IMPLEMENTED.md). Local app remains at http://127.0.0.1:3100.

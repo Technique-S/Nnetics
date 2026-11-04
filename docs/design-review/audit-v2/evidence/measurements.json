@@ -1,0 +1,1097 @@
+[
+  {
+    "name": "owner-overview-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "sidebar-wallet-note-expanded",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 148
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "sidebar-collapsed",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "account-menu",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vendors-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Vendors",
+        "y": 130
+      }
+    ],
+    "panel": 591.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "work-orders-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Work orders",
+        "y": 130
+      }
+    ],
+    "panel": 591.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vault-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Vault",
+        "y": 130
+      }
+    ],
+    "panel": 534.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "access-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Access",
+        "y": 130
+      }
+    ],
+    "panel": 481.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "recovery-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Recovery",
+        "y": 130
+      }
+    ],
+    "panel": 574.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "invoice-review-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Invoice review",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "payment-history-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Payment history",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "owner-contractor-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Contractors",
+        "y": 130
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 258
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "contractor-submit-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 205
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-my-payments-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 205
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-wallet-details-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 205
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "signin-desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "owner-overview-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "sidebar-mobile-open",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": true,
+    "errors": []
+  },
+  {
+    "name": "vendors-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Vendors",
+        "y": 146
+      }
+    ],
+    "panel": 838.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "work-orders-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Work orders",
+        "y": 146
+      }
+    ],
+    "panel": 838.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vault-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Vault",
+        "y": 146
+      }
+    ],
+    "panel": 718.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "access-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Access",
+        "y": 146
+      }
+    ],
+    "panel": 718.28125,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "recovery-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Recovery",
+        "y": 146
+      }
+    ],
+    "panel": 778.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "invoice-review-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Invoice review",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "payment-history-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Payment history",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "owner-contractor-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Contractors",
+        "y": 146
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 304
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "contractor-submit-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 236
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-my-payments-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 236
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-wallet-details-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 236
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "signin-mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "owner-overview-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 166
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vendors-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Vendors",
+        "y": 166
+      }
+    ],
+    "panel": 931.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "work-orders-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Work orders",
+        "y": 166
+      }
+    ],
+    "panel": 931.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vault-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Vault",
+        "y": 166
+      }
+    ],
+    "panel": 783.28125,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "access-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Access",
+        "y": 166
+      }
+    ],
+    "panel": 760.28125,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "recovery-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Recovery",
+        "y": 166
+      }
+    ],
+    "panel": 840.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "invoice-review-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Invoice review",
+        "y": 166
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "payment-history-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Payment history",
+        "y": 166
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "owner-contractor-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Contractors",
+        "y": 166
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 324
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "contractor-submit-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 255
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-my-payments-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 255
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-wallet-details-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 255
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "signin-narrow",
+    "width": 320,
+    "scrollWidth": 320,
+    "height": 844,
+    "heading": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "owner-overview-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vendors-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Vendors",
+        "y": 130
+      }
+    ],
+    "panel": 736.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "work-orders-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Work orders",
+        "y": 130
+      }
+    ],
+    "panel": 736.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "vault-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Vault",
+        "y": 130
+      }
+    ],
+    "panel": 637.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "access-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Access",
+        "y": 130
+      }
+    ],
+    "panel": 584.890625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "recovery-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Recovery",
+        "y": 130
+      }
+    ],
+    "panel": 678.390625,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "invoice-review-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Invoice review",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "payment-history-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Payment history",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "owner-contractor-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Contractors",
+        "y": 130
+      },
+      {
+        "text": "Contractors and bills",
+        "y": 258
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "contractor-submit-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 224
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-my-payments-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 224
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-wallet-details-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 224
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "signin-tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "height": 1024,
+    "heading": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "state-viewer",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "state-zero-pending",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "state-zero-budget",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 130
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "state-empty",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your workspace",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "state-draft",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your workspace",
+        "y": 146
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": false,
+    "errors": []
+  },
+  {
+    "name": "state-rpc-error",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "state-restoring",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Restoring your saved session",
+        "y": 48
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-revoked",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Private access unavailable",
+        "y": 200
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "contractor-wallet-pending",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "y": 205
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "demo-route",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Your payment desk",
+        "y": 74
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "demo-owner-route",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "height": 900,
+    "heading": [
+      {
+        "text": "Contractors and bills",
+        "y": 205
+      }
+    ],
+    "panel": null,
+    "stylesheets": 2,
+    "identityOccluded": null,
+    "errors": []
+  },
+  {
+    "name": "actual-public-signin",
+    "evidence": "Actual running server; isolated browser; no wallet or cookie imported",
+    "network": "testnet",
+    "transactionsEnabled": false,
+    "configured": true
+  }
+]

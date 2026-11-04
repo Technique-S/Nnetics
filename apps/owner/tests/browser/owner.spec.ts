@@ -1,3 +1,4 @@
+import {navigateOwner} from "./navigation-helpers";
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
@@ -15,7 +16,7 @@ test("labels simulations, disables deployment, navigates and fits the viewport",
 }, info) => {
   const external: string[] = [];
   page.on("request", (request) => {
-    if (!request.url().startsWith("http://127.0.0.1:3100/"))
+    if (new URL(request.url()).origin !== new URL(page.url()).origin)
       external.push(request.url());
   });
   await expect(
@@ -23,7 +24,7 @@ test("labels simulations, disables deployment, navigates and fits the viewport",
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Deployment disabled", exact: true }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("switch", { name: "Allow new simulated payments" }),
   ).toBeChecked();
@@ -40,10 +41,7 @@ test("labels simulations, disables deployment, navigates and fits the viewport",
     "Invoice review",
     "Payment history",
   ]) {
-    await page
-      .getByRole("navigation", { name: "Owner dashboard" })
-      .getByRole("button", { name: new RegExp("^" + view) })
-      .click();
+    await navigateOwner(page,view);
     await expect(
       page.getByRole("heading", { name: view, exact: true }),
     ).toBeVisible();
@@ -59,7 +57,7 @@ test("manages vendors, immutable work orders and pause/revocation controls", asy
   page,
 }) => {
   const nav = page.getByRole("navigation", { name: "Owner dashboard" });
-  await nav.getByRole("button", { name: "Vendors", exact: true }).click();
+  await navigateOwner(page, "Vendors");
   await page.getByRole("button", { name: "Manage vendor" }).click();
   const modal = page.getByRole("dialog");
   await modal.getByLabel("Recipient account").fill("writer-new.testnet");
@@ -68,7 +66,7 @@ test("manages vendors, immutable work orders and pause/revocation controls", asy
   await expect(
     page.getByText("writer-new.testnet", { exact: true }),
   ).toBeVisible();
-  await nav.getByRole("button", { name: "Work orders", exact: true }).click();
+  await navigateOwner(page, "Work orders");
   await expect(
     page.getByRole("cell", { name: "writer-demo.testnet", exact: true }),
   ).toBeVisible();
@@ -83,7 +81,7 @@ test("manages vendors, immutable work orders and pause/revocation controls", asy
   ).toBeVisible();
   await row.getByRole("button", { name: "Revoke order" }).click();
   await expect(row.getByText("Authority revoked")).toBeVisible();
-  await nav.getByRole("button", { name: "Overview", exact: true }).click();
+  await navigateOwner(page, "Overview");
   await page
     .getByRole("switch", { name: "Allow new simulated payments" })
     .click();
@@ -92,14 +90,14 @@ test("manages vendors, immutable work orders and pause/revocation controls", asy
   ).not.toBeChecked();
   await page.getByRole("button", { name: "Revoke worker authority" }).click();
   await expect(
-    page.getByText("Worker authority is revoked.", { exact: true }),
+    page.getByText("Worker access revoked.", { exact: false }),
   ).toBeVisible();
 });
 test("invoice review cannot override a conflict; unknown outcomes stay locked", async ({
   page,
 }, info) => {
   const nav = page.getByRole("navigation", { name: "Owner dashboard" });
-  await nav.getByRole("button", { name: /^Invoice review/ }).click();
+  await navigateOwner(page, "Invoice review");
   await page.getByRole("button", { name: /Miles Chen.*INV-1043/ }).click();
   await expect(
     page.getByRole("button", { name: "Simulate payment", exact: true }),
@@ -132,9 +130,7 @@ test("invoice review cannot override a conflict; unknown outcomes stay locked", 
     ),
     fullPage: true,
   });
-  await nav
-    .getByRole("button", { name: "Payment history", exact: true })
-    .click();
+  await navigateOwner(page, "Payment history");
   await page.getByLabel("Filter payment outcomes").selectOption("Pending");
   await expect(page.getByRole("row")).toHaveCount(3);
   await page.getByRole("button", { name: "Refresh mock state" }).click();
@@ -173,5 +169,5 @@ test("owner-entered invoices receive durable server references and reject source
  await expect(modal.getByRole("alert")).toContainText("Currency conflict");await expect(modal).toBeVisible();
  await modal.getByLabel("Original sample text").fill("Article delivered. Amount: 1 NEAR");await modal.getByRole("button",{name:"Save simulated change"}).click();await expect(modal).not.toBeVisible();
  const saved=await(await page.request.get("/api/demo/owner-invoices")).json();expect(saved).toHaveLength(1);expect(saved[0].id).toMatch(/^CTR-\d+-INV-0001$/);
- await expect(page.locator(".invoice-detail")).toContainText(saved[0].id);await page.reload();await page.getByRole("navigation",{name:"Owner dashboard"}).getByRole("button",{name:/^Invoice review/}).click();await expect(page.getByRole("button",{name:new RegExp(saved[0].id)})).toBeVisible();
+ await expect(page.locator(".invoice-detail")).toContainText(saved[0].id);await page.reload();await navigateOwner(page, "Invoice review");await expect(page.getByRole("button",{name:new RegExp(saved[0].id)})).toBeVisible();
 });

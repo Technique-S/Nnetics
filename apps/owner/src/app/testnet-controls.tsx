@@ -1,222 +1,42 @@
 "use client";
-import { useState } from "react";
-import { NearOwnerAdapter, api } from "../data/near-adapter";
-import { amountFromNear } from "../data/owner-adapter";
-import type { OwnerSnapshot } from "../data/owner-adapter";
-export function TestnetControls({
-  adapter,
-  snapshot,
-  run,
-}: {
-  adapter: NearOwnerAdapter;
-  snapshot: OwnerSnapshot;
-  run: (
-    key: string,
-    action: () => Promise<void>,
-    message?: string,
-  ) => Promise<void>;
-}) {
-  const [amount, setAmount] = useState("0.1"),
-    [target, setTarget] = useState<
-      "deposit" | "fund_storage" | "set_budget" | "set_payment_cap"
-    >("deposit");
-  const [attempt, setAttempt] = useState("");
-  const [importId, setImportId] = useState(""),
-    [kind, setKind] = useState<"vendor" | "order">("order");
-  const [viewer, setViewer] = useState("");
-  const readOnly = snapshot.access?.role !== "owner";
-  return (
-    <section
-      className="panel testnet-controls"
-      aria-label="Testnet owner controls"
-    >
-      <h3>Testnet wallet & funding</h3>
-      <p>
-        Organization {snapshot.access?.organization} · signed in as{" "}
-        {snapshot.access?.accountId} ·{" "}
-        {snapshot.access?.role === "owner"
-          ? "On-chain vault owner"
-          : "Read-only viewer"}
-      </p>
-      <button
-        className="text-button"
-        onClick={() => void run("disconnect", () => adapter.disconnect())}
-      >
-        Disconnect wallet
-      </button>
-      <fieldset
-        disabled={readOnly}
-        style={{ border: 0, padding: 0, minWidth: 0 }}
-      >
-        <p>
-          Owner {snapshot.vault.owner} · vault {adapter.config.contract}. Each
-          action opens your wallet. Funds for storage and payments have separate
-          ledgers.
-        </p>
-        <p className="mono">Finalized block: {snapshot.blockHash}</p>
-        <p>
-          Deployment requires separate authorization. Historical verifier
-          independent review, bootstrap trust, weak subjectivity and upgrade-key
-          custody remain unresolved. Unknown outcomes stay reserved.
-        </p>
-        <section aria-label="Funding and limits"><h3>Funding and limits</h3>
-        <label>
-          Action{" "}
-          <select
-            value={target}
-            onChange={(e) => setTarget(e.target.value as typeof target)}
-          >
-            <option value="deposit">Fund payment ledger</option>
-            <option value="fund_storage">Fund storage/operating reserve</option>
-            <option value="set_budget">Set total budget</option>
-            <option value="set_payment_cap">Set payment cap</option>
-          </select>
-        </label>
-        <label>
-          Amount (NEAR){" "}
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            inputMode="decimal"
-          />
-        </label>
-        <button
-          className="button secondary"
-          onClick={() =>
-            void run(
-              "fund",
-              () =>
-                target === "deposit" || target === "fund_storage"
-                  ? adapter.fund(target, amountFromNear(amount))
-                  : adapter.limits(target, amountFromNear(amount)),
-              "Wallet request submitted; refresh finalized state to confirm.",
-            )
-          }
-        >
-          Review owner transaction in wallet
-        </button>
-        </section><section aria-label="Payment reconciliation"><h3>Payment reconciliation</h3>
-        <label>
-          Recorded attempt ID{" "}
-          <input
-            value={attempt}
-            onChange={(e) => setAttempt(e.target.value)}
-            inputMode="numeric"
-          />
-        </label>
-        <button
-          className="button secondary"
-          onClick={() =>
-            void run("reconcile", () => adapter.reconcile(attempt))
-          }
-        >
-          Reconcile recorded outcome
-        </button>
-        </section><section aria-label="Viewer access"><h3>Viewer access</h3>
-        <label>
-          Viewer account
-          <input
-            value={viewer}
-            onChange={(e) => setViewer(e.target.value)}
-            maxLength={64}
-          />
-        </label>
-        <button
-          className="button secondary"
-          onClick={() =>
-            void run(
-              "viewer",
-              async () => {
-                await api("members", {
-                  accountId: viewer,
-                  role: "viewer",
-                  enabled: true,
-                });
-              },
-              "Read-only organization access granted.",
-            )
-          }
-        >
-          Grant viewer access
-        </button>
-        <button
-          className="button secondary"
-          onClick={() =>
-            void run(
-              "viewer",
-              async () => {
-                await api("members", {
-                  accountId: viewer,
-                  role: "viewer",
-                  enabled: false,
-                });
-              },
-              "Viewer access revoked.",
-            )
-          }
-        >
-          Revoke viewer access
-        </button>
-        </section><section aria-label="Existing references"><h3>Existing references</h3>
-        <p>
-          The frozen contract has no vendor/order enumeration. Import existing
-          references to discover them; all displayed authority is re-read from
-          the contract.
-        </p>
-        <label>
-          Reference type{" "}
-          <select
-            value={kind}
-            onChange={(e) => setKind(e.target.value as typeof kind)}
-          >
-            <option value="order">Work order</option>
-            <option value="vendor">Vendor</option>
-          </select>
-        </label>
-        <label>
-          Existing reference{" "}
-          <input
-            value={importId}
-            onChange={(e) => setImportId(e.target.value)}
-            maxLength={64}
-          />
-        </label>
-        <button
-          className="button secondary"
-          onClick={() =>
-            void run("import", async () => {
-              await api("registry", { kind, id: importId });
-            })
-          }
-        >
-          Import existing reference
-        </button>
-        </section>
-      </fieldset>
-      {snapshot.queue?.length ? (
-        <ul>
-          {snapshot.queue.map((j) => (
-            <li key={j.id}>
-              <strong>{j.id}</strong> — {j.state}: {j.reason}
-              {j.hash && (
-                <>
-                  {" "}
-                  ·{" "}
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`https://testnet.nearblocks.io/txns/${encodeURIComponent(j.hash)}`}
-                  >
-                    Transaction
-                  </a>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No durable invoices yet.</p>
-      )}
-    </section>
-  );
+import {useState} from "react";
+import {NearOwnerAdapter, api} from "../data/near-adapter";
+import {account, amountFromNear, formatNear} from "../data/owner-adapter";
+import type {OwnerSnapshot} from "../data/owner-adapter";
+
+type Action = "deposit" | "fund_storage" | "set_budget" | "set_payment_cap";
+export function TestnetControls({adapter,snapshot,run,section="vault",referenceKind="order"}:{
+ adapter:NearOwnerAdapter;snapshot:OwnerSnapshot;section?:"vault"|"access"|"recovery"|"references";referenceKind?:"vendor"|"order";
+ run:(key:string,action:()=>Promise<void>,message?:string)=>Promise<void>;
+}){
+ const [amount,setAmount]=useState("0.1"),[target,setTarget]=useState<Action>("deposit");
+ const [attempt,setAttempt]=useState(""),[viewer,setViewer]=useState(""),[importId,setImportId]=useState(""),[kind,setKind]=useState(referenceKind);
+ const [working,setWorking]=useState(false),[error,setError]=useState("");
+ const readOnly=snapshot.access?.role!=="owner",v=snapshot.vault;
+ const committed=BigInt(v.spent)+BigInt(v.reserved);
+ async function request(key:string,action:()=>Promise<void>,message?:string){if(working)return;setError("");setWorking(true);try{await run(key,action,message);}finally{setWorking(false);}}
+ let validAmount=false;try{validAmount=BigInt(amountFromNear(amount))>0n;}catch{}
+ let validViewer=false;try{account(viewer);validViewer=viewer.length>0;}catch{}
+ const current=target==="set_budget"?v.budget:target==="set_payment_cap"?v.payment_cap:undefined;
+ return <section className={`task-surface task-${section}`} aria-label="Testnet owner controls" aria-busy={working}>
+ {readOnly&&<p className="notice">Read-only viewer · owner actions are unavailable.</p>}
+ {(section==="vault"||section==="recovery")&&!adapter.config.transactionsEnabled&&<p className="notice">Testnet transactions are disabled. Review and explicit transaction authorization are required before wallet requests.</p>}
+ {section==="vault"&&<>
+  <dl className="vault-ledger">{[["Available payment funds",(BigInt(v.funded)-committed).toString()],["Reserved",v.reserved],["Uncommitted authority",(BigInt(v.budget)-committed).toString()],["Confirmed spend",v.spent]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{formatNear(value)} <small>NEAR</small></dd></div>)}</dl>
+  <div className="task-columns"><section className="task-form"><h2>Funding and limits</h2><p>Add funds or change a spending ceiling. Storage funding does not become payment funds.</p>
+  <fieldset disabled={readOnly||working||!adapter.config.transactionsEnabled}><label>Action<select value={target} onChange={e=>setTarget(e.target.value as Action)}><option value="deposit">Fund payment ledger</option><option value="fund_storage">Fund storage/operating reserve</option><option value="set_budget">Set total budget</option><option value="set_payment_cap">Set payment cap</option></select></label>
+  <label>Amount (NEAR)<input value={amount} onChange={e=>setAmount(e.target.value)} inputMode="decimal" aria-invalid={!validAmount}/></label>
+  {!validAmount&&<p className="field-error">Enter a valid NEAR amount. Use an exact positive amount.</p>}
+  <div className="transaction-review"><strong>{current===undefined?"Add funds":"Replace spending limit"}</strong>{current!==undefined&&<p>Current: {formatNear(current)} NEAR → Proposed: {amount || "—"} NEAR</p>}<p>Network: NEAR testnet · Receiver: <span className="mono">{adapter.config.contract}</span></p><p>{current===undefined?`Attached funding: ${amount || "—"} NEAR plus transaction fees.`:"This sets the total ceiling; it does not add funds. Wallet displays deposit and fees."}</p><p>No independent security review has occurred. Initial checkpoint trust and historical-verifier limitations remain disclosed. Unknown outcomes stay reserved.</p></div>
+  <button className="button primary" disabled={!validAmount} onClick={()=>void request("fund",()=>target==="deposit"||target==="fund_storage"?adapter.fund(target,amountFromNear(amount)):adapter.limits(target,amountFromNear(amount)),"Wallet request submitted; refresh finalized state to confirm.")}>{working?"Waiting for wallet…":"Review owner transaction in wallet"}</button></fieldset></section>
+  <aside className="task-context"><h2>Current authority</h2><dl><dt>Cumulative budget</dt><dd>{formatNear(v.budget)} NEAR</dd><dt>Per-payment cap</dt><dd>{formatNear(v.payment_cap)} NEAR</dd><dt>New payments</dt><dd>{v.paused?"Paused":"Not paused"}</dd><dt>Worker</dt><dd>{v.agent?"Authorized":"Revoked"}</dd></dl><p>Funds are money available for transfers. Authority is permission to spend within the approved work order and limits. Both must cover a payment.</p></aside></div>
+ </>}
+ {section==="access"&&<div className="task-columns"><section className="task-form"><h2>Viewer access</h2><p>Manage read-only access for a known account. This never grants vault ownership or payment authority.</p><fieldset disabled={readOnly||working}><label>Viewer account<input value={viewer} onChange={e=>setViewer(e.target.value)} maxLength={64} autoCapitalize="none" spellCheck={false}/></label>{viewer&&!validViewer&&<p className="field-error">Enter a valid NEAR account ID.</p>}<div className="actions"><button className="button primary" disabled={!validViewer} onClick={()=>void request("viewer",async()=>{await api("members",{accountId:viewer,role:"viewer",enabled:true});},`Read-only organization access granted to ${viewer}.`)}>Grant viewer access</button><button className="button danger" disabled={!validViewer} onClick={()=>void request("viewer",async()=>{await api("members",{accountId:viewer,role:"viewer",enabled:false});},`Viewer access revoked for ${viewer}.`)}>Revoke viewer access</button></div></fieldset></section><aside className="task-context"><h2>Access scope</h2><p>Verified vault owner</p><strong className="mono">{v.owner}</strong><p>This form changes organization records on the server; it does not request a wallet transaction. A current viewer roster is not exposed by this interface.</p><p>Signed in as {snapshot.access?.accountId} · {readOnly?"Read-only viewer":"On-chain vault owner"}</p></aside></div>}
+ {section==="recovery"&&<><section className="task-form"><h2>Recorded transfer attempts</h2><button className="text-button" disabled={working} onClick={()=>void request("refresh",async()=>{},"Recorded state refreshed.")}>Refresh recorded state · read-only</button><p>Chain outcomes and worker jobs are separate records. An empty worker queue does not resolve an unknown transfer.</p>{snapshot.payments.length===0?<p className="empty-state">No transfer attempts in the loaded vault history.</p>:<div className="attempt-list">{snapshot.payments.map(p=><article key={p.attempt_id}><div><strong>{p.attempt_id}</strong><span className="badge neutral">{p.status}</span></div><p>{formatNear(p.amount)} NEAR · {p.recipient}</p><p>Order: {p.order_id} · Invoice: {p.invoice_id}</p><button className="text-button" disabled={readOnly||working} onClick={()=>setAttempt(String(p.attempt_id))}>Use recorded attempt {p.attempt_id}</button></article>)}</div>}
+ <fieldset disabled={readOnly||working||!adapter.config.transactionsEnabled}><label>Recorded attempt ID<input value={attempt} onChange={e=>setAttempt(e.target.value)} inputMode="numeric"/></label><p className="field-help">Use the recorded attempt ID from payment details. Reconciliation requests a wallet transaction to update accounting from recorded evidence. It cannot authorize another vendor payment. Review the receiver, reconcile_payment call and fees in your wallet.</p><button className="button secondary" disabled={!/^\d+$/.test(attempt)} onClick={()=>void request("reconcile",()=>adapter.reconcile(attempt))}>Reconcile recorded outcome</button></fieldset></section>
+ <section className="task-form"><h2>Worker jobs</h2>{snapshot.queue?.length?<ul className="job-list">{snapshot.queue.map(j=><li key={j.id}><strong>{j.id}</strong><p>{j.state}: {j.reason}</p>{j.hash&&<a target="_blank" rel="noreferrer" href={`https://testnet.nearblocks.io/txns/${encodeURIComponent(j.hash)}`}>Transaction</a>}</li>)}</ul>:<p className="empty-state">No worker jobs in this organization queue. Check transfer attempts separately.</p>}</section></>}
+ {section==="references"&&<section className="task-form"><h2>Import existing references</h2><p>Load an existing on-chain reference. Importing discovers a record; it does not approve work or change its recipient.</p><fieldset disabled={readOnly||working}><label>Reference type<select value={kind} onChange={e=>setKind(e.target.value as typeof kind)}><option value="order">Work order</option><option value="vendor">Vendor</option></select></label><label>Existing reference<input value={importId} onChange={e=>setImportId(e.target.value)} maxLength={64}/></label><button className="button secondary" disabled={!importId.trim()} onClick={()=>void request("import",async()=>{await api("registry",{kind,id:importId});})}>Import existing reference</button></fieldset></section>}
+ {error&&<p role="alert">{error}</p>}{working&&<p role="status">Checking the requested action…</p>}
+ <details className="verification-details"><summary>Verification details</summary><dl><dt>Vault</dt><dd>{adapter.config.contract}</dd><dt>Owner</dt><dd>{v.owner}</dd><dt>Organization</dt><dd>{snapshot.access?.organization}</dd><dt>Finalized block</dt><dd>Finalized block: {snapshot.blockHash}</dd></dl><p>Unknown outcomes remain reserved. Deployment and historical-proof repair retain their existing review and authorization gates.</p><p>NEAR testnet · verified snapshot</p></details>
+ </section>;
 }

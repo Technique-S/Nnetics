@@ -1,0 +1,382 @@
+{
+  "date": "2026-11-04",
+  "scope": "Isolated design prototype only",
+  "results": [
+    {
+      "width": 1440,
+      "view": "signin",
+      "overflow": 0,
+      "heading": 207.5
+    },
+    {
+      "width": 1440,
+      "view": "onboarding",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "overview",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "vendors",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "orders",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "invoice",
+      "overflow": 0,
+      "heading": 159.5
+    },
+    {
+      "width": 1440,
+      "view": "history",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "vault",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "settings",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1440,
+      "view": "contractor",
+      "overflow": 0,
+      "heading": 141
+    },
+    {
+      "width": 1440,
+      "view": "components",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 390,
+      "view": "signin",
+      "overflow": 0,
+      "heading": 158
+    },
+    {
+      "width": 390,
+      "view": "onboarding",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "overview",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "vendors",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "orders",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "invoice",
+      "overflow": 0,
+      "heading": 163.5
+    },
+    {
+      "width": 390,
+      "view": "history",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "vault",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "settings",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 390,
+      "view": "contractor",
+      "overflow": 0,
+      "heading": 123.5
+    },
+    {
+      "width": 390,
+      "view": "components",
+      "overflow": 0,
+      "heading": 132
+    },
+    {
+      "width": 320,
+      "view": "signin",
+      "overflow": 0,
+      "heading": 158
+    },
+    {
+      "width": 320,
+      "view": "onboarding",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "overview",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "vendors",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "orders",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "invoice",
+      "overflow": 0,
+      "heading": 195.5
+    },
+    {
+      "width": 320,
+      "view": "history",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "vault",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "settings",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 320,
+      "view": "contractor",
+      "overflow": 0,
+      "heading": 125
+    },
+    {
+      "width": 320,
+      "view": "components",
+      "overflow": 0,
+      "heading": 164
+    },
+    {
+      "width": 768,
+      "view": "signin",
+      "overflow": 0,
+      "heading": 175.5
+    },
+    {
+      "width": 768,
+      "view": "onboarding",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "overview",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "vendors",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "orders",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "invoice",
+      "overflow": 0,
+      "heading": 151.5
+    },
+    {
+      "width": 768,
+      "view": "history",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "vault",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "settings",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 768,
+      "view": "contractor",
+      "overflow": 0,
+      "heading": 141
+    },
+    {
+      "width": 768,
+      "view": "components",
+      "overflow": 0,
+      "heading": 120
+    },
+    {
+      "width": 1280,
+      "view": "signin",
+      "overflow": 0,
+      "heading": 207.5
+    },
+    {
+      "width": 1280,
+      "view": "onboarding",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "overview",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "vendors",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "orders",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "invoice",
+      "overflow": 0,
+      "heading": 159.5
+    },
+    {
+      "width": 1280,
+      "view": "history",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "vault",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "settings",
+      "overflow": 0,
+      "heading": 128
+    },
+    {
+      "width": 1280,
+      "view": "contractor",
+      "overflow": 0,
+      "heading": 141
+    },
+    {
+      "width": 1280,
+      "view": "components",
+      "overflow": 0,
+      "heading": 128
+    }
+  ],
+  "contrasts": [
+    {
+      "label": "primary ink",
+      "ratio": 12.69
+    },
+    {
+      "label": "secondary",
+      "ratio": 6.38
+    },
+    {
+      "label": "muted",
+      "ratio": 5.01
+    },
+    {
+      "label": "button",
+      "ratio": 6.86
+    },
+    {
+      "label": "selection",
+      "ratio": 9.6
+    },
+    {
+      "label": "warning",
+      "ratio": 6.01
+    },
+    {
+      "label": "error",
+      "ratio": 5.92
+    },
+    {
+      "label": "info",
+      "ratio": 6.29
+    }
+  ],
+  "checks": [
+    "No API/wallet requests",
+    "Collapsed preference restored on reload",
+    "Back navigation",
+    "Mobile drawer focus wrap / Escape / focus restoration",
+    "Main inert while drawer open",
+    "Drawer closes on navigation",
+    "Bill preview dialog / Escape",
+    "Reduced motion",
+    "No horizontal overflow at 320, 390, 768, 1280, 1440 CSS px"
+  ],
+  "issues": []
+}

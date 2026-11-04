@@ -1,3 +1,4 @@
+import {navigateOwner, openAccountMenu} from "./navigation-helpers";
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -267,7 +268,7 @@ test("switching clears private records, revokes the old session, and failed/new 
   await expect(
     page.getByRole("heading", { name: "Your payment desk", exact: true }),
   ).toBeVisible();
-  await page
+  await openAccountMenu(page);await page
     .getByRole("button", { name: "Switch wallet", exact: true })
     .click();
   await expect(
@@ -363,7 +364,7 @@ test("a failed logout cannot restore private records on reload", async ({
   await expect(
     page.getByRole("heading", { name: "Your workspace" }),
   ).toBeVisible();
-  await page
+  await openAccountMenu(page);await page
     .getByRole("button", { name: "Switch wallet", exact: true })
     .click();
   await expect(
@@ -466,9 +467,9 @@ test('focused dashboard navigation, refresh and active renewal cross the former 
  await page.route('**/api/live/config',async route=>{return route.fulfill({json:{network:'testnet',organization:'studio',contract:'vault.owner.testnet',worker:'worker.owner.testnet',publicKey:'',configured:true,transactionsEnabled:false}})});
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode='testnet';snapshot.protocolVersion=88;snapshot.access={organization:'studio',accountId:'old-owner.testnet',role:'owner',vaultOwner:'old-owner.testnet'};
  await page.route('**/api/live/snapshot**',route=>route.fulfill({json:snapshot}));await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Your payment desk',exact:true})).toBeVisible();
- await page.getByRole('navigation',{name:'Owner dashboard'}).getByRole('button',{name:'Work orders',exact:true}).click();
- await page.clock.fastForward(16*60000);await page.getByRole('navigation',{name:'Owner dashboard'}).getByRole('button',{name:'Payment history',exact:true}).click();await expect.poll(()=>f.renewCalls()).toBeGreaterThan(0);
- await page.reload();await expect(page.getByRole('heading',{name:'Your payment desk',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
+ await navigateOwner(page, "Work orders");
+ await page.clock.fastForward(16*60000);await navigateOwner(page, "Payment history");await expect.poll(()=>f.renewCalls()).toBeGreaterThan(0);
+ await page.reload();await expect(page.getByRole('heading',{name:'Payment history',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
 });
 test('a foreground blur notification does not log out an app that still has document focus',async({page})=>{
  const f=await fixture(page,'new-user.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);
@@ -477,7 +478,7 @@ test('an unreported Meteor selection never transfers the authenticated account o
  const f=await fixture(page,'first.testnet');f.orgs.set('first.testnet',[{id:'private-first',name:'First private workspace',status:'unprovisioned',role:'creator'}]);await page.goto('/');await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();
  await page.evaluate(()=>{window.dispatchEvent(new Event('blur'));(window as any).meteorProbe.selected='second.testnet';window.dispatchEvent(new Event('focus'));});
  await expect(page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();expect(f.resumeCalls()).toBe(0);
- await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);expect(f.loginCalls()).toBe(0);
+ await openAccountMenu(page);await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);expect(f.loginCalls()).toBe(0);
  await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByText('Signed in as second.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();await expect(page.getByText('No organizations yet.')).toBeVisible();expect(f.loginCalls()).toBe(1);
 });
 
@@ -487,12 +488,12 @@ test('explicit logout and genuine expiry clear records and show why a fresh sign
 });
 test('a verified account change broadcasts revocation across tabs before separate authentication',async({page,context})=>{
  const f=await fixture(page,'first.testnet');f.orgs.set('first.testnet',[{id:'private-first',name:'First private workspace',status:'unprovisioned',role:'creator'}]);await page.goto('/');await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();
- const other=await context.newPage();const g=await fixture(other,'first.testnet');await other.goto('/');await expect(other.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await other.evaluate(()=>(window as any).meteorProbe.selected='second.testnet');await other.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();
+ const other=await context.newPage();const g=await fixture(other,'first.testnet');await other.goto('/');await expect(other.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await other.evaluate(()=>(window as any).meteorProbe.selected='second.testnet');await openAccountMenu(other);await other.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();
  await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);await expect(other.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();expect(g.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);await other.close();
 });
 
 test('sign out revokes the browser and refresh cannot restore private records',async({page})=>{
- const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics · NEAR testnet'})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBeGreaterThan(0);
+ const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await openAccountMenu(page);await page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics · NEAR testnet'})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBeGreaterThan(0);
 });
 test('ordinary navigation and refresh restore the same authenticated account without signatures',async({page})=>{
  const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.goto('/?returning=1');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);
@@ -542,13 +543,13 @@ test('persistent HttpOnly session survives a browser process restart and logout 
  let run=await launch();await run.page.goto(address);await run.page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(run.page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();
  const cookie=(await context!.cookies()).find(c=>c.name==='test_identity')!;expect(cookie.httpOnly).toBe(true);expect(cookie.expires).toBeGreaterThan(Date.now()/1000);await context!.close();context=undefined;
  run=await launch();await run.page.goto(address);await expect(run.page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();expect(await run.page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(0);
- await run.page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(run.page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect.poll(async()=>(await context!.cookies()).some(c=>c.name==='test_identity')).toBe(false);await context!.close();context=undefined;
+ await openAccountMenu(run.page);await run.page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(run.page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect.poll(async()=>(await context!.cookies()).some(c=>c.name==='test_identity')).toBe(false);await context!.close();context=undefined;
  run=await launch();await run.page.goto(address);await expect(run.page.getByRole('button',{name:'Connect to Meteor',exact:true})).toBeVisible();await expect(run.page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
  }finally{await context?.close();if(!profile.startsWith(join(tmpdir(),'nnetics-session-test-')))throw Error('Unexpected test profile path');await rm(profile,{recursive:true,force:true});}
 });
 
 test('a cancelled optional wallet check retains the authenticated account and its records',async({page})=>{
- const f=await fixture(page,'first.testnet',true);await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect.poll(()=>page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(1);await page.evaluate(()=>(window as any).meteorProbe.decline());await expect(page.getByRole('status').filter({hasText:'inconclusive'})).toBeVisible();await expect(page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);
+ const f=await fixture(page,'first.testnet',true);await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await openAccountMenu(page);await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect.poll(()=>page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(1);await page.evaluate(()=>(window as any).meteorProbe.decline());await expect(page.getByRole('status').filter({hasText:'inconclusive'})).toBeVisible();await expect(page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);
 });
 
 

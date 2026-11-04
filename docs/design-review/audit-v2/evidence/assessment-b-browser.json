@@ -1,0 +1,7290 @@
+[
+  {
+    "name": "owner-Overview-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 246.953125,
+        "h": 36
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 34,
+        "y": 1188.953125,
+        "w": 180.671875,
+        "h": 24
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 34,
+        "y": 1669.921875,
+        "w": 185.53125,
+        "h": 24
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 41,
+        "y": 2328.921875,
+        "w": 238,
+        "h": 97.40625
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 41,
+        "y": 2780.515625,
+        "w": 238,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 269.5,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 34,
+        "y": 1222.953125,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 34,
+        "y": 1703.921875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 245,
+        "y": 2681.015625,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 41,
+        "y": 2932.40625,
+        "w": 238,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Contractors-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 16,
+        "y": 323.5,
+        "w": 288,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 37,
+        "y": 518.6875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 37,
+        "y": 772.1875,
+        "w": 246,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 37,
+        "y": 1390.1875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 37,
+        "y": 1452.1875,
+        "w": 246,
+        "h": 51
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 37,
+        "y": 1665.1875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 1761.1875,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 2098.6875,
+        "w": 212,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vendors-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vendors",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 41,
+        "y": 358.890625,
+        "w": 238,
+        "h": 60
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 41,
+        "y": 878.390625,
+        "w": 238,
+        "h": 24
+      },
+      {
+        "text": "Ada Brooks",
+        "tag": "H2",
+        "x": 40,
+        "y": 1650.78125,
+        "w": 240,
+        "h": 33
+      },
+      {
+        "text": "Miles Chen",
+        "tag": "H2",
+        "x": 40,
+        "y": 2077.96875,
+        "w": 240,
+        "h": 33
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 40,
+        "y": 2505.15625,
+        "w": 240,
+        "h": 33
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Manage vendor",
+        "disabled": false,
+        "x": 16,
+        "y": 269.5,
+        "w": 123.296875,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 505.390625,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 41,
+        "y": 1060.390625,
+        "w": 238,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 1137.390625,
+        "w": 238,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 1865.78125,
+        "w": 240,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 2292.96875,
+        "w": 240,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 2720.15625,
+        "w": 240,
+        "h": 41.1875
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Work orders-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Work orders",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 41,
+        "y": 358.890625,
+        "w": 238,
+        "h": 60
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 41,
+        "y": 878.390625,
+        "w": 238,
+        "h": 24
+      },
+      {
+        "text": "Approved work 3",
+        "tag": "H2",
+        "x": 34,
+        "y": 1435.78125,
+        "w": 137.59375,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "New work order",
+        "disabled": false,
+        "x": 16,
+        "y": 269.5,
+        "w": 124.03125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 505.390625,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 41,
+        "y": 1060.390625,
+        "w": 238,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 1137.390625,
+        "w": 238,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Invoice review-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Invoice review",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Structured invoices",
+        "tag": "H2",
+        "x": 34,
+        "y": 479.890625,
+        "w": 141.78125,
+        "h": 24
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 34,
+        "y": 854.078125,
+        "w": 88.953125,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 269.5,
+        "w": 173.078125,
+        "h": 40.390625
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Payment history-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Payment history",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Every attempt stays visible",
+        "tag": "H2",
+        "x": 34,
+        "y": 479.890625,
+        "w": 194.640625,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 269.5,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "SELECT",
+        "name": "Filter payment outcomes",
+        "disabled": false,
+        "x": 86.6875,
+        "y": 513.890625,
+        "w": 105,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vault-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vault",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Funding and limits",
+        "tag": "H2",
+        "x": 41,
+        "y": 339.5,
+        "w": 238,
+        "h": 30
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 456,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Fund payment ledgerFund storage/operating reserveSet total budgetSet payment cap",
+        "disabled": false,
+        "x": 41,
+        "y": 870,
+        "w": 238,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 947,
+        "w": 238,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Access-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Access",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H2",
+        "x": 41,
+        "y": 339.5,
+        "w": 238,
+        "h": 30
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H3",
+        "x": 41,
+        "y": 829,
+        "w": 238,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 456,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 894,
+        "w": 238,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Recovery-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Recovery",
+        "tag": "H1",
+        "x": 16,
+        "y": 165.5,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H2",
+        "x": 41,
+        "y": 318.5,
+        "w": 238,
+        "h": 30
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H3",
+        "x": 41,
+        "y": 808,
+        "w": 238,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 134.03125,
+        "y": 59,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 167.5,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 208.6875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 151.03125,
+        "y": 329.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 115.5,
+        "w": 288,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 264,
+        "y": 145.5,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 435,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 873,
+        "w": 238,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-submit-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 255,
+        "w": 288,
+        "h": 69
+      },
+      {
+        "text": "Bill details",
+        "tag": "H2",
+        "x": 37,
+        "y": 521,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "Clarify the payment details",
+        "tag": "H3",
+        "x": 37,
+        "y": 1595.8125,
+        "w": 246,
+        "h": 25.5
+      },
+      {
+        "text": "Reference assigned on submission",
+        "tag": "H3",
+        "x": 37,
+        "y": 2215.8125,
+        "w": 246,
+        "h": 62
+      },
+      {
+        "text": "A few details are missing",
+        "tag": "H3",
+        "x": 37,
+        "y": 2680.3125,
+        "w": 246,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "INPUT",
+        "name": "invoice-upload",
+        "disabled": false,
+        "x": 54,
+        "y": 1132.8125,
+        "w": 212,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 37,
+        "y": 1399.8125,
+        "w": 246,
+        "h": 13
+      },
+      {
+        "tag": "SELECT",
+        "name": "Choose your approved work orderARTICLE-001 · One research article",
+        "disabled": false,
+        "x": 37,
+        "y": 1714.8125,
+        "w": 246,
+        "h": 43
+      }
+    ],
+    "checkboxes": [
+      {
+        "id": "",
+        "type": "checkbox",
+        "x": 37,
+        "y": 1399.8125,
+        "w": 246,
+        "h": 13
+      }
+    ]
+  },
+  {
+    "name": "contractor-payments-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 255,
+        "w": 288,
+        "h": 69
+      },
+      {
+        "text": "My payments",
+        "tag": "H2",
+        "x": 37,
+        "y": 521,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 813,
+        "w": 154.96875,
+        "h": 25.5
+      },
+      {
+        "text": "CTR-0042-INV-0002",
+        "tag": "H3",
+        "x": 54,
+        "y": 1316.5,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 1150.5,
+        "w": 212,
+        "h": 21
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 1542,
+        "w": 212,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-wallet-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 255,
+        "w": 288,
+        "h": 69
+      },
+      {
+        "text": "Wallet details",
+        "tag": "H2",
+        "x": 37,
+        "y": 521,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "Wallet approval",
+        "tag": "H2",
+        "x": 37,
+        "y": 1016,
+        "w": 246,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "demo-owner-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 288,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 37,
+        "y": 388.6875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 37,
+        "y": 642.1875,
+        "w": 246,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 37,
+        "y": 1260.1875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 37,
+        "y": 1322.1875,
+        "w": 246,
+        "h": 51
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 37,
+        "y": 1535.1875,
+        "w": 246,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 1631.1875,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "signin-320",
+    "width": 320,
+    "scrollWidth": 320,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "tag": "H1",
+        "x": 24,
+        "y": 48,
+        "w": 272,
+        "h": 74.375
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Use a specific testnet account (optional)",
+        "x": 24,
+        "y": 590.765625,
+        "w": 272,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Overview-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 246.953125,
+        "h": 36
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 34,
+        "y": 846.703125,
+        "w": 180.671875,
+        "h": 24
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 34,
+        "y": 1185.671875,
+        "w": 185.53125,
+        "h": 24
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 41,
+        "y": 1804.671875,
+        "w": 308,
+        "h": 64.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 41,
+        "y": 2223.796875,
+        "w": 308,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 262.625,
+        "y": 831.703125,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 263.515625,
+        "y": 1170.671875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 315,
+        "y": 2124.296875,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 41,
+        "y": 2375.6875,
+        "w": 308,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Contractors-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 16,
+        "y": 304,
+        "w": 358,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 37,
+        "y": 478.1875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 37,
+        "y": 731.6875,
+        "w": 316,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 37,
+        "y": 1274.1875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 37,
+        "y": 1336.1875,
+        "w": 316,
+        "h": 25.5
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 37,
+        "y": 1504.1875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 1600.1875,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 1918.1875,
+        "w": 282,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vendors-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vendors",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 41,
+        "y": 339.390625,
+        "w": 308,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 41,
+        "y": 786.890625,
+        "w": 308,
+        "h": 24
+      },
+      {
+        "text": "Ada Brooks",
+        "tag": "H2",
+        "x": 40,
+        "y": 1520.28125,
+        "w": 310,
+        "h": 33
+      },
+      {
+        "text": "Miles Chen",
+        "tag": "H2",
+        "x": 40,
+        "y": 1947.46875,
+        "w": 310,
+        "h": 33
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 40,
+        "y": 2374.65625,
+        "w": 310,
+        "h": 33
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Manage vendor",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 123.296875,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 455.890625,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 41,
+        "y": 947.890625,
+        "w": 308,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 1024.890625,
+        "w": 308,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 1735.28125,
+        "w": 310,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 2162.46875,
+        "w": 310,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 40,
+        "y": 2589.65625,
+        "w": 310,
+        "h": 41.1875
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Work orders-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Work orders",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 41,
+        "y": 339.390625,
+        "w": 308,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 41,
+        "y": 786.890625,
+        "w": 308,
+        "h": 24
+      },
+      {
+        "text": "Approved work 3",
+        "tag": "H2",
+        "x": 34,
+        "y": 1323.28125,
+        "w": 137.59375,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "New work order",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 124.03125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 455.890625,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 41,
+        "y": 947.890625,
+        "w": 308,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 1024.890625,
+        "w": 308,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Invoice review-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Invoice review",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Structured invoices",
+        "tag": "H2",
+        "x": 34,
+        "y": 460.390625,
+        "w": 141.78125,
+        "h": 24
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 34,
+        "y": 785.765625,
+        "w": 88.953125,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Payment history-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Payment history",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Every attempt stays visible",
+        "tag": "H2",
+        "x": 34,
+        "y": 460.390625,
+        "w": 194.640625,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "SELECT",
+        "name": "Filter payment outcomes",
+        "disabled": false,
+        "x": 86.6875,
+        "y": 494.390625,
+        "w": 105,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vault-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vault",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Funding and limits",
+        "tag": "H2",
+        "x": 41,
+        "y": 320,
+        "w": 308,
+        "h": 30
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 436.5,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Fund payment ledgerFund storage/operating reserveSet total budgetSet payment cap",
+        "disabled": false,
+        "x": 41,
+        "y": 808.5,
+        "w": 308,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 885.5,
+        "w": 308,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Access-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Access",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H2",
+        "x": 41,
+        "y": 320,
+        "w": 308,
+        "h": 30
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H3",
+        "x": 41,
+        "y": 767.5,
+        "w": 308,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 436.5,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 832.5,
+        "w": 308,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Recovery-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Recovery",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H2",
+        "x": 41,
+        "y": 299,
+        "w": 308,
+        "h": 30
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H3",
+        "x": 41,
+        "y": 746.5,
+        "w": 308,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 45,
+        "y": 415.5,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 41,
+        "y": 811.5,
+        "w": 308,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "mobile-drawer-keyboard",
+    "overflow": null,
+    "last": "Recovery",
+    "first": "Close navigation ×",
+    "focusAfter": "Toggle navigation",
+    "inertAfter": 0
+  },
+  {
+    "name": "contractor-submit-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 358,
+        "h": 69
+      },
+      {
+        "text": "Bill details",
+        "tag": "H2",
+        "x": 37,
+        "y": 483.5,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "Clarify the payment details",
+        "tag": "H3",
+        "x": 37,
+        "y": 1501.3125,
+        "w": 316,
+        "h": 25.5
+      },
+      {
+        "text": "Reference assigned on submission",
+        "tag": "H3",
+        "x": 37,
+        "y": 2121.3125,
+        "w": 316,
+        "h": 62
+      },
+      {
+        "text": "A few details are missing",
+        "tag": "H3",
+        "x": 37,
+        "y": 2585.8125,
+        "w": 316,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "INPUT",
+        "name": "invoice-upload",
+        "disabled": false,
+        "x": 54,
+        "y": 1074.3125,
+        "w": 282,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 37,
+        "y": 1305.3125,
+        "w": 316,
+        "h": 13
+      },
+      {
+        "tag": "SELECT",
+        "name": "Choose your approved work orderARTICLE-001 · One research article",
+        "disabled": false,
+        "x": 37,
+        "y": 1620.3125,
+        "w": 316,
+        "h": 43
+      }
+    ],
+    "checkboxes": [
+      {
+        "id": "",
+        "type": "checkbox",
+        "x": 37,
+        "y": 1305.3125,
+        "w": 316,
+        "h": 13
+      }
+    ]
+  },
+  {
+    "name": "contractor-payments-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 358,
+        "h": 69
+      },
+      {
+        "text": "My payments",
+        "tag": "H2",
+        "x": 37,
+        "y": 483.5,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 733.5,
+        "w": 154.96875,
+        "h": 25.5
+      },
+      {
+        "text": "CTR-0042-INV-0002",
+        "tag": "H3",
+        "x": 54,
+        "y": 1217.5,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 1051.5,
+        "w": 282,
+        "h": 21
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 54,
+        "y": 1423.5,
+        "w": 282,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-wallet-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 358,
+        "h": 69
+      },
+      {
+        "text": "Wallet details",
+        "tag": "H2",
+        "x": 37,
+        "y": 483.5,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "Wallet approval",
+        "tag": "H2",
+        "x": 37,
+        "y": 939.5,
+        "w": 316,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "demo-owner-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 358,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 37,
+        "y": 388.6875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 37,
+        "y": 642.1875,
+        "w": 316,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 37,
+        "y": 1184.6875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 37,
+        "y": 1246.6875,
+        "w": 316,
+        "h": 25.5
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 37,
+        "y": 1414.6875,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 54,
+        "y": 1510.6875,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "signin-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "tag": "H1",
+        "x": 24,
+        "y": 48,
+        "w": 342,
+        "h": 37.1875
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Use a specific testnet account (optional)",
+        "x": 24,
+        "y": 511.578125,
+        "w": 342,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Overview-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 237.921875,
+        "h": 86.375
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 293,
+        "y": 795.375,
+        "w": 201.578125,
+        "h": 27
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 293,
+        "y": 1125.15625,
+        "w": 209.859375,
+        "h": 27
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 297,
+        "y": 1676.15625,
+        "w": 192.171875,
+        "h": 125.25
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 559.171875,
+        "y": 1649.15625,
+        "w": 151.828125,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 621.625,
+        "y": 781.875,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 622.515625,
+        "y": 1111.65625,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 455.171875,
+        "y": 2103.6875,
+        "w": 34,
+        "h": 20
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Contractors-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 341.625,
+        "h": 43.1875
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 272,
+        "y": 258.1875,
+        "w": 464,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 297,
+        "y": 415.375,
+        "w": 170,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 297,
+        "y": 705.875,
+        "w": 170,
+        "h": 51
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 541,
+        "y": 415.375,
+        "w": 170,
+        "h": 52
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 541,
+        "y": 503.375,
+        "w": 170,
+        "h": 51
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 541,
+        "y": 724.375,
+        "w": 170,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 566,
+        "y": 864.375,
+        "w": 66.34375,
+        "h": 102
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 566,
+        "y": 1444.875,
+        "w": 120,
+        "h": 42
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vendors-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vendors",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 287.703125,
+        "h": 43.1875
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 297,
+        "y": 274.1875,
+        "w": 414,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 297,
+        "y": 640.6875,
+        "w": 414,
+        "h": 24
+      },
+      {
+        "text": "Ada Brooks",
+        "tag": "H2",
+        "x": 295,
+        "y": 1310.078125,
+        "w": 418,
+        "h": 33
+      },
+      {
+        "text": "Miles Chen",
+        "tag": "H2",
+        "x": 295,
+        "y": 1716.265625,
+        "w": 418,
+        "h": 33
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 295,
+        "y": 2122.453125,
+        "w": 418,
+        "h": 33
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 371.1875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 297,
+        "y": 780.6875,
+        "w": 414,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 857.6875,
+        "w": 414,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 295,
+        "y": 1512.078125,
+        "w": 418,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 295,
+        "y": 1918.265625,
+        "w": 418,
+        "h": 41.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disable future payments",
+        "disabled": false,
+        "x": 295,
+        "y": 2324.453125,
+        "w": 418,
+        "h": 41.1875
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Work orders-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Work orders",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 286.96875,
+        "h": 43.1875
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 297,
+        "y": 274.1875,
+        "w": 414,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 297,
+        "y": 640.6875,
+        "w": 414,
+        "h": 24
+      },
+      {
+        "text": "Approved work 3",
+        "tag": "H2",
+        "x": 293,
+        "y": 1139.078125,
+        "w": 152.71875,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 371.1875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 297,
+        "y": 780.6875,
+        "w": 414,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 857.6875,
+        "w": 414,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Invoice review-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Invoice review",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 237.921875,
+        "h": 43.1875
+      },
+      {
+        "text": "Structured invoices",
+        "tag": "H2",
+        "x": 293,
+        "y": 378.1875,
+        "w": 160.453125,
+        "h": 27
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 293,
+        "y": 717.96875,
+        "w": 100.625,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Payment history-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Payment history",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 237.921875,
+        "h": 86.375
+      },
+      {
+        "text": "Every attempt stays visible",
+        "tag": "H2",
+        "x": 293,
+        "y": 421.375,
+        "w": 220.328125,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SELECT",
+        "name": "Filter payment outcomes",
+        "disabled": false,
+        "x": 610,
+        "y": 406.875,
+        "w": 105,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vault-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vault",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 439,
+        "h": 43.1875
+      },
+      {
+        "text": "Funding and limits",
+        "tag": "H2",
+        "x": 297,
+        "y": 274.1875,
+        "w": 414,
+        "h": 30
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 371.1875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Fund payment ledgerFund storage/operating reserveSet total budgetSet payment cap",
+        "disabled": false,
+        "x": 297,
+        "y": 681.6875,
+        "w": 414,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 758.6875,
+        "w": 414,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Access-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Access",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 439,
+        "h": 43.1875
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H2",
+        "x": 297,
+        "y": 274.1875,
+        "w": 414,
+        "h": 30
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H3",
+        "x": 297,
+        "y": 640.6875,
+        "w": 414,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 371.1875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 705.6875,
+        "w": 414,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Recovery-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Recovery",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 414.796875,
+        "h": 43.1875
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 414,
+        "h": 30
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H3",
+        "x": 297,
+        "y": 619.6875,
+        "w": 414,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 574.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 591.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 720,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 712,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 350.1875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 684.6875,
+        "w": 414,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-submit-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 28,
+        "y": 224,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "Bill details",
+        "tag": "H2",
+        "x": 53,
+        "y": 432.390625,
+        "w": 294,
+        "h": 26
+      },
+      {
+        "text": "Clarify the payment details",
+        "tag": "H3",
+        "x": 53,
+        "y": 1420.46875,
+        "w": 294,
+        "h": 25.5
+      },
+      {
+        "text": "Reference assigned on submission",
+        "tag": "H3",
+        "x": 421,
+        "y": 462.390625,
+        "w": 294,
+        "h": 62
+      },
+      {
+        "text": "A few details are missing",
+        "tag": "H3",
+        "x": 421,
+        "y": 875.390625,
+        "w": 294,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 28,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "INPUT",
+        "name": "invoice-upload",
+        "disabled": false,
+        "x": 70,
+        "y": 996.46875,
+        "w": 260,
+        "h": 33
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 53,
+        "y": 1224.46875,
+        "w": 294,
+        "h": 13
+      },
+      {
+        "tag": "SELECT",
+        "name": "Choose your approved work orderARTICLE-001 · One research article",
+        "disabled": false,
+        "x": 53,
+        "y": 1539.46875,
+        "w": 294,
+        "h": 42
+      }
+    ],
+    "checkboxes": [
+      {
+        "id": "",
+        "type": "checkbox",
+        "x": 53,
+        "y": 1224.46875,
+        "w": 294,
+        "h": 13
+      }
+    ]
+  },
+  {
+    "name": "contractor-payments-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 28,
+        "y": 224,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "My payments",
+        "tag": "H2",
+        "x": 53,
+        "y": 432.390625,
+        "w": 564.65625,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 78,
+        "y": 613.390625,
+        "w": 154.96875,
+        "h": 25.5
+      },
+      {
+        "text": "CTR-0042-INV-0002",
+        "tag": "H3",
+        "x": 78,
+        "y": 1021.890625,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 28,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 78,
+        "y": 839.890625,
+        "w": 612,
+        "h": 21
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 78,
+        "y": 1157.390625,
+        "w": 612,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-wallet-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 28,
+        "y": 224,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "Wallet details",
+        "tag": "H2",
+        "x": 53,
+        "y": 432.390625,
+        "w": 294,
+        "h": 26
+      },
+      {
+        "text": "Wallet approval",
+        "tag": "H2",
+        "x": 421,
+        "y": 432.390625,
+        "w": 294,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 28,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "demo-owner-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 28,
+        "y": 204.5,
+        "w": 640,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 53,
+        "y": 340.6875,
+        "w": 294,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 53,
+        "y": 591.1875,
+        "w": 294,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 421,
+        "y": 340.6875,
+        "w": 294,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 421,
+        "y": 402.6875,
+        "w": 294,
+        "h": 25.5
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 421,
+        "y": 578.6875,
+        "w": 294,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 446,
+        "y": 682.6875,
+        "w": 148.609375,
+        "h": 51
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 28,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "signin-768",
+    "width": 768,
+    "scrollWidth": 768,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "tag": "H1",
+        "x": 24,
+        "y": 48,
+        "w": 720,
+        "h": 43.1875
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Use a specific testnet account (optional)",
+        "x": 24,
+        "y": 391.578125,
+        "w": 720,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Overview-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 311.03125,
+        "h": 43.1875
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 297,
+        "y": 547.6875,
+        "w": 201.578125,
+        "h": 27
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 297,
+        "y": 899.46875,
+        "w": 209.859375,
+        "h": 27
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 1139,
+        "y": 617.6875,
+        "w": 244,
+        "h": 93.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 1137,
+        "y": 1076.8125,
+        "w": 248,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 971.625,
+        "y": 534.1875,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 972.515625,
+        "y": 885.96875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 1349,
+        "y": 979.3125,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 1137,
+        "y": 1228.703125,
+        "w": 248,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Contractors-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 341.625,
+        "h": 43.1875
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 272,
+        "y": 258.1875,
+        "w": 640,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 297,
+        "y": 415.375,
+        "w": 506,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 297,
+        "y": 609.875,
+        "w": 506,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 877,
+        "y": 415.375,
+        "w": 506,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 877,
+        "y": 477.375,
+        "w": 506,
+        "h": 25.5
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 877,
+        "y": 653.375,
+        "w": 506,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 902,
+        "y": 757.375,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 902,
+        "y": 983.875,
+        "w": 456,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vendors-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vendors",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 364.21875,
+        "h": 43.1875
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 1086,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 297,
+        "y": 516.1875,
+        "w": 1086,
+        "h": 24
+      },
+      {
+        "text": "Ada Brooks",
+        "tag": "H2",
+        "x": 297,
+        "y": 1121.578125,
+        "w": 314,
+        "h": 34.5
+      },
+      {
+        "text": "Miles Chen",
+        "tag": "H2",
+        "x": 683,
+        "y": 1121.578125,
+        "w": 314,
+        "h": 34.5
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 1069,
+        "y": 1121.578125,
+        "w": 314,
+        "h": 34.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 330.6875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 297,
+        "y": 614.1875,
+        "w": 480,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 691.1875,
+        "w": 480,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Work orders-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Work orders",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 362.671875,
+        "h": 43.1875
+      },
+      {
+        "text": "Import existing references",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 1086,
+        "h": 30
+      },
+      {
+        "text": "Existing references",
+        "tag": "H3",
+        "x": 297,
+        "y": 516.1875,
+        "w": 1086,
+        "h": 24
+      },
+      {
+        "text": "Approved work 3",
+        "tag": "H2",
+        "x": 297,
+        "y": 960.578125,
+        "w": 152.71875,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 330.6875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Work orderVendor",
+        "disabled": false,
+        "x": 297,
+        "y": 614.1875,
+        "w": 480,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 691.1875,
+        "w": 480,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Revoke order",
+        "disabled": false,
+        "x": 1234.296875,
+        "y": 1160.078125,
+        "w": 76.703125,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Revoke order",
+        "disabled": false,
+        "x": 1234.296875,
+        "y": 1240.078125,
+        "w": 76.703125,
+        "h": 30
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Invoice review-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Invoice review",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 332.265625,
+        "h": 43.1875
+      },
+      {
+        "text": "Structured invoices",
+        "tag": "H2",
+        "x": 297,
+        "y": 345.1875,
+        "w": 160.453125,
+        "h": 27
+      },
+      {
+        "text": "Noor Okafor",
+        "tag": "H2",
+        "x": 797.5625,
+        "y": 345.1875,
+        "w": 100.625,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Payment history-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Payment history",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 406.984375,
+        "h": 43.1875
+      },
+      {
+        "text": "Every attempt stays visible",
+        "tag": "H2",
+        "x": 297,
+        "y": 345.1875,
+        "w": 220.328125,
+        "h": 27
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "SELECT",
+        "name": "Filter payment outcomes",
+        "disabled": false,
+        "x": 1278,
+        "y": 330.6875,
+        "w": 105,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Vault-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Vault",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 501.984375,
+        "h": 43.1875
+      },
+      {
+        "text": "Funding and limits",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 1086,
+        "h": 30
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 330.6875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "SELECT",
+        "name": "Fund payment ledgerFund storage/operating reserveSet total budgetSet payment cap",
+        "disabled": false,
+        "x": 297,
+        "y": 557.1875,
+        "w": 480,
+        "h": 36
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 634.1875,
+        "w": 480,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Access-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Access",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 448.25,
+        "h": 43.1875
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 1086,
+        "h": 30
+      },
+      {
+        "text": "Viewer access",
+        "tag": "H3",
+        "x": 297,
+        "y": 516.1875,
+        "w": 1086,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 330.6875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 581.1875,
+        "w": 480,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-Recovery-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Recovery",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 414.796875,
+        "h": 43.1875
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H2",
+        "x": 297,
+        "y": 253.1875,
+        "w": 1086,
+        "h": 30
+      },
+      {
+        "text": "Payment reconciliation",
+        "tag": "H3",
+        "x": 297,
+        "y": 516.1875,
+        "w": 1086,
+        "h": 24
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Disconnect wallet",
+        "disabled": false,
+        "x": 301,
+        "y": 330.6875,
+        "w": 101.375,
+        "h": 30
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 297,
+        "y": 581.1875,
+        "w": 480,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "owner-modal-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 272,
+        "y": 130,
+        "w": 311.03125,
+        "h": 43.1875
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 297,
+        "y": 547.6875,
+        "w": 201.578125,
+        "h": 27
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 297,
+        "y": 899.46875,
+        "w": 209.859375,
+        "h": 27
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 1139,
+        "y": 617.6875,
+        "w": 244,
+        "h": 93.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 1137,
+        "y": 1076.8125,
+        "w": 248,
+        "h": 19.5
+      },
+      {
+        "text": "Enter a structured invoice",
+        "tag": "H2",
+        "x": 475,
+        "y": 127.109375,
+        "w": 310.59375,
+        "h": 42
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 1246.03125,
+        "y": 13.75,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 122.25,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 163.4375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 1263.03125,
+        "y": 284.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 24,
+        "y": 72,
+        "w": 1392,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 20,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics.",
+        "x": 12,
+        "y": 122,
+        "w": 216,
+        "h": 39
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 1384,
+        "y": 102,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 971.625,
+        "y": 534.1875,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 972.515625,
+        "y": 885.96875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 1349,
+        "y": 979.3125,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 1137,
+        "y": 1228.703125,
+        "w": 248,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Close dialog",
+        "disabled": false,
+        "x": 931,
+        "y": 100.109375,
+        "w": 34,
+        "h": 34
+      },
+      {
+        "tag": "SELECT",
+        "name": "article-001 · Research articledesign-002 · Launch graphicvideo-003 · Campaign video edit",
+        "disabled": false,
+        "x": 475,
+        "y": 351.484375,
+        "w": 490,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 475,
+        "y": 432.484375,
+        "w": 490,
+        "h": 43
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 475,
+        "y": 516.484375,
+        "w": 490,
+        "h": 43
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "overlay-owner",
+    "overflow": null,
+    "preflight": true,
+    "error": "page.addScriptTag: Loading the script 'http://localhost:8400/detect.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+    "messages": []
+  },
+  {
+    "name": "contractor-submit-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 168,
+        "y": 204.5,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "Bill details",
+        "tag": "H2",
+        "x": 193,
+        "y": 412.890625,
+        "w": 490,
+        "h": 26
+      },
+      {
+        "text": "Clarify the payment details",
+        "tag": "H3",
+        "x": 193,
+        "y": 1271.46875,
+        "w": 490,
+        "h": 25.5
+      },
+      {
+        "text": "Reference assigned on submission",
+        "tag": "H3",
+        "x": 757,
+        "y": 442.890625,
+        "w": 490,
+        "h": 31
+      },
+      {
+        "text": "A few details are missing",
+        "tag": "H3",
+        "x": 757,
+        "y": 824.890625,
+        "w": 490,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 168,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "INPUT",
+        "name": "invoice-upload",
+        "disabled": false,
+        "x": 210,
+        "y": 976.96875,
+        "w": 456,
+        "h": 33
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 193,
+        "y": 1150.96875,
+        "w": 490,
+        "h": 13
+      },
+      {
+        "tag": "SELECT",
+        "name": "Choose your approved work orderARTICLE-001 · One research article",
+        "disabled": false,
+        "x": 193,
+        "y": 1369.46875,
+        "w": 490,
+        "h": 42
+      }
+    ],
+    "checkboxes": [
+      {
+        "id": "",
+        "type": "checkbox",
+        "x": 193,
+        "y": 1150.96875,
+        "w": 490,
+        "h": 13
+      }
+    ]
+  },
+  {
+    "name": "overlay-contractor",
+    "overflow": null,
+    "preflight": true,
+    "error": "page.addScriptTag: Loading the script 'http://localhost:8400/detect.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+    "messages": []
+  },
+  {
+    "name": "contractor-payments-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "[Human] Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 168,
+        "y": 204.5,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "My payments",
+        "tag": "H2",
+        "x": 193,
+        "y": 412.890625,
+        "w": 928.703125,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 218,
+        "y": 572.890625,
+        "w": 154.96875,
+        "h": 25.5
+      },
+      {
+        "text": "CTR-0042-INV-0002",
+        "tag": "H3",
+        "x": 218,
+        "y": 981.390625,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 168,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 218,
+        "y": 799.390625,
+        "w": 1004,
+        "h": 21
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 218,
+        "y": 1116.890625,
+        "w": 1004,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-wallet-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "[Human] Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 168,
+        "y": 204.5,
+        "w": 640,
+        "h": 41.390625
+      },
+      {
+        "text": "Wallet details",
+        "tag": "H2",
+        "x": 193,
+        "y": 412.890625,
+        "w": 490,
+        "h": 26
+      },
+      {
+        "text": "Wallet approval",
+        "tag": "H2",
+        "x": 757,
+        "y": 412.890625,
+        "w": 490,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 168,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "demo-owner-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 168,
+        "y": 204.5,
+        "w": 640,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 193,
+        "y": 340.6875,
+        "w": 490,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 193,
+        "y": 535.1875,
+        "w": 490,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 757,
+        "y": 340.6875,
+        "w": 490,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 757,
+        "y": 402.6875,
+        "w": 490,
+        "h": 25.5
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 757,
+        "y": 578.6875,
+        "w": 490,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 782,
+        "y": 682.6875,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 168,
+        "y": 32,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "overlay-demo-owner",
+    "overflow": null,
+    "preflight": true,
+    "error": "page.addScriptTag: Loading the script 'http://localhost:8400/detect.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+    "messages": []
+  },
+  {
+    "name": "signin-1440",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "tag": "H1",
+        "x": 264,
+        "y": 48,
+        "w": 912,
+        "h": 50.390625
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Use a specific testnet account (optional)",
+        "x": 264,
+        "y": 398.78125,
+        "w": 912,
+        "h": 21
+      },
+      {
+        "tag": "INPUT",
+        "name": "",
+        "disabled": false,
+        "x": 264,
+        "y": 462.78125,
+        "w": 420,
+        "h": 43
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "overlay-signin",
+    "overflow": null,
+    "preflight": true,
+    "error": "page.addScriptTag: Loading the script 'http://localhost:8400/detect.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+    "messages": []
+  },
+  {
+    "name": "viewer-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 246.953125,
+        "h": 36
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 34,
+        "y": 846.703125,
+        "w": 180.671875,
+        "h": 24
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 34,
+        "y": 1185.671875,
+        "w": 185.53125,
+        "h": 24
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 41,
+        "y": 1804.671875,
+        "w": 308,
+        "h": 64.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 41,
+        "y": 2223.796875,
+        "w": 308,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": true,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 262.625,
+        "y": 831.703125,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 263.515625,
+        "y": 1170.671875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": true,
+        "x": 315,
+        "y": 2124.296875,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": true,
+        "x": 41,
+        "y": 2375.6875,
+        "w": 308,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "zero-pending-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 246.953125,
+        "h": 36
+      },
+      {
+        "text": "Invoices at your desk 2",
+        "tag": "H2",
+        "x": 34,
+        "y": 828.703125,
+        "w": 180.671875,
+        "h": 24
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 34,
+        "y": 1167.671875,
+        "w": 185.53125,
+        "h": 24
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 41,
+        "y": 1624.671875,
+        "w": 308,
+        "h": 64.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 41,
+        "y": 2043.796875,
+        "w": 308,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 262.625,
+        "y": 813.703125,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 263.515625,
+        "y": 1152.671875,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 315,
+        "y": 1944.296875,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 41,
+        "y": 2195.6875,
+        "w": 308,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "zero-budget-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your payment desk",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 246.953125,
+        "h": 36
+      },
+      {
+        "text": "Invoices at your desk 0",
+        "tag": "H2",
+        "x": 34,
+        "y": 828.703125,
+        "w": 180.671875,
+        "h": 24
+      },
+      {
+        "text": "Recent payment attempts",
+        "tag": "H2",
+        "x": 34,
+        "y": 1072.890625,
+        "w": 185.53125,
+        "h": 24
+      },
+      {
+        "text": "Clear boundaries. Before every payment.",
+        "tag": "H2",
+        "x": 41,
+        "y": 1390.890625,
+        "w": 308,
+        "h": 64.9375
+      },
+      {
+        "text": "Worker permission",
+        "tag": "H3",
+        "x": 41,
+        "y": 1810.015625,
+        "w": 308,
+        "h": 19.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Enter structured invoice",
+        "disabled": false,
+        "x": 16,
+        "y": 250,
+        "w": 173.078125,
+        "h": 40.390625
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Open review",
+        "disabled": false,
+        "x": 262.625,
+        "y": 813.703125,
+        "w": 93.375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "View history",
+        "disabled": false,
+        "x": 263.515625,
+        "y": 1057.890625,
+        "w": 92.484375,
+        "h": 30
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Allow new testnet payments",
+        "disabled": false,
+        "x": 315,
+        "y": 1710.515625,
+        "w": 34,
+        "h": 20
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Authorize configured testnet worker",
+        "disabled": false,
+        "x": 41,
+        "y": 1961.90625,
+        "w": 308,
+        "h": 40
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "empty-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Your workspace",
+        "tag": "H1",
+        "x": 24,
+        "y": 170,
+        "w": 342,
+        "h": 37.1875
+      },
+      {
+        "text": "Your organizations",
+        "tag": "H2",
+        "x": 24,
+        "y": 481.1875,
+        "w": 342,
+        "h": 30
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Switch wallet",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 148,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "draft-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 2,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Content studio",
+        "tag": "H1",
+        "x": 24,
+        "y": 170,
+        "w": 342,
+        "h": 37.1875
+      },
+      {
+        "text": "Your organizations",
+        "tag": "H2",
+        "x": 24,
+        "y": 423.1875,
+        "w": 342,
+        "h": 30
+      },
+      {
+        "text": "Create vault",
+        "tag": "H2",
+        "x": 24,
+        "y": 537.578125,
+        "w": 342,
+        "h": 30
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 40,
+        "y": 1287.96875,
+        "w": 310,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractors 1/3",
+        "tag": "H2",
+        "x": 61,
+        "y": 1489.15625,
+        "w": 268,
+        "h": 26
+      },
+      {
+        "text": "Ada Brooks · audit fixture",
+        "tag": "H3",
+        "x": 61,
+        "y": 1740.65625,
+        "w": 268,
+        "h": 25.5
+      },
+      {
+        "text": "Approved work orders",
+        "tag": "H2",
+        "x": 61,
+        "y": 2371.15625,
+        "w": 268,
+        "h": 26
+      },
+      {
+        "text": "ARTICLE-001 · One research article",
+        "tag": "H3",
+        "x": 61,
+        "y": 2433.15625,
+        "w": 268,
+        "h": 51
+      },
+      {
+        "text": "Invoice review 1",
+        "tag": "H2",
+        "x": 61,
+        "y": 2680.15625,
+        "w": 268,
+        "h": 26
+      },
+      {
+        "text": "CTR-0042-INV-0001",
+        "tag": "H3",
+        "x": 78,
+        "y": 2776.15625,
+        "w": 154.96875,
+        "h": 25.5
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 40,
+        "y": 1056.96875,
+        "w": 86.921875,
+        "h": 39
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "Original billing text",
+        "x": 78,
+        "y": 3178.15625,
+        "w": 234,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "rpc-error-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Nnetics · NEAR testnet",
+        "tag": "H1",
+        "x": 24,
+        "y": 48,
+        "w": 342,
+        "h": 37.1875
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Use a specific testnet account (optional)",
+        "x": 24,
+        "y": 610.96875,
+        "w": 342,
+        "h": 21
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "restoring-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Restoring your saved session",
+        "tag": "H1",
+        "x": 24,
+        "y": 48,
+        "w": 342,
+        "h": 74.375
+      }
+    ],
+    "smallControls": [],
+    "checkboxes": []
+  },
+  {
+    "name": "portal-error-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Owner dashboard",
+    "headings": [
+      {
+        "text": "Contractors",
+        "tag": "H1",
+        "x": 16,
+        "y": 146,
+        "w": 240,
+        "h": 36
+      },
+      {
+        "text": "Contractors and bills",
+        "tag": "H1",
+        "x": 16,
+        "y": 304,
+        "w": 358,
+        "h": 32.1875
+      },
+      {
+        "text": "Contractor records unavailable",
+        "tag": "H2",
+        "x": 37,
+        "y": 541.1875,
+        "w": 316,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "SUMMARY",
+        "name": "Account & organizations",
+        "x": 204.03125,
+        "y": 39.5,
+        "w": 169.96875,
+        "h": 35.5
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Sign out",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 189.1875,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "BUTTON",
+        "name": "My organizations",
+        "disabled": false,
+        "x": 221.03125,
+        "y": 309.9375,
+        "w": 119.96875,
+        "h": 33.1875
+      },
+      {
+        "tag": "SUMMARY",
+        "name": "About this wallet session",
+        "x": 16,
+        "y": 96,
+        "w": 358,
+        "h": 18
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Toggle navigation",
+        "disabled": false,
+        "x": 12,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Refresh finalized state",
+        "disabled": false,
+        "x": 334,
+        "y": 126,
+        "w": 32,
+        "h": 32
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-revoked-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Private access unavailable",
+        "tag": "H1",
+        "x": 37,
+        "y": 226.5,
+        "w": 316,
+        "h": 69
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  },
+  {
+    "name": "contractor-wallet-pending-390",
+    "width": 390,
+    "scrollWidth": 390,
+    "overflow": 0,
+    "errors": [],
+    "mainCount": 1,
+    "title": "Nnetics · Contractor demo",
+    "headings": [
+      {
+        "text": "Ada Brooks · audit fixture · Billing",
+        "tag": "H1",
+        "x": 16,
+        "y": 235.5,
+        "w": 358,
+        "h": 69
+      },
+      {
+        "text": "Wallet details",
+        "tag": "H2",
+        "x": 37,
+        "y": 483.5,
+        "w": 316,
+        "h": 26
+      },
+      {
+        "text": "Wallet approval",
+        "tag": "H2",
+        "x": 37,
+        "y": 911.5,
+        "w": 316,
+        "h": 26
+      }
+    ],
+    "smallControls": [
+      {
+        "tag": "A",
+        "name": "Nnetics",
+        "x": 16,
+        "y": 24,
+        "w": 86.921875,
+        "h": 39
+      }
+    ],
+    "checkboxes": []
+  }
+]

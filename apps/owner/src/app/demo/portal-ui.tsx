@@ -4,12 +4,14 @@ import type { ContractorBill } from "../../data/contractor-adapter";
 import { safeTransactionLink } from "../../data/contractor-adapter";
 import s from "./portal.module.css";
 export { s };
-export function PortalShell({ children, owner = false, persistent = false }: {
+export function PortalShell({ children, owner = false, persistent = false, embedded = false }: {
     children: ReactNode;
     owner?: boolean;
     persistent?:boolean;
+    embedded?:boolean;
 }) {
-    return <main className={s.shell}><header className={s.top}><a className={s.brand} href={persistent ? "/" : "/?mode=demo"}>Nnetics</a><span className={s.tag}>{persistent ? (owner ? "OWNER RECORDS" : "PRIVATE CONTRACTOR") : owner ? "OWNER DEMO" : "CONTRACTOR DEMO"}</span></header><aside className={s.banner}>{persistent ? "Persistent private records · NEAR testnet. Wallet verification uses a signed message. Payment execution and deployment remain disabled." : "Simulated data · Private-link demo · Wallet proof is simulated. No live deployment, signing or payment execution."}</aside>{children}</main>;
+    const Surface = embedded ? "section" : "main";
+    return <Surface className={`${s.shell} ${owner ? `owner-billing-surface ${embedded ? "embedded-billing" : ""}` : "contractor-surface"}`}><header className={s.top}><a className={s.brand} href={persistent ? "/" : "/?mode=demo"}>Nnetics</a><span className={s.tag}>{persistent ? (owner ? "OWNER RECORDS" : "PRIVATE CONTRACTOR") : owner ? "OWNER DEMO" : "CONTRACTOR DEMO"}</span></header><aside className={s.banner}>{persistent ? "Persistent private records · NEAR testnet. Wallet verification uses a signed message. Payment execution and deployment remain disabled." : "Simulated data · Private-link demo · Wallet proof is simulated. No live deployment, signing or payment execution."}</aside>{children}</Surface>;
 }
 export function BillCard({ bill, children, persistent=false, organization }: {
     bill: ContractorBill;

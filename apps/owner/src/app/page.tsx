@@ -6,13 +6,14 @@ import { DEMO_AGENT } from "../data/mock-adapter";
 import { NearOwnerAdapter, api } from "../data/near-adapter";
 import {LiveContextChanged} from "../data/config-context";
 import {PersistentContractorOwner} from "./contractor-owner";
+import { DashboardNavigation } from "./dashboard-navigation";
+import { LoadingSkeleton } from "./loading-skeleton";
 import { Onboarding } from "./onboarding";
 import { TestnetControls } from "./testnet-controls";
 
 import {
   account,
   amountFromNear,
-  DEPLOYMENT_ENABLED,
   formatNear,
   reasonText,
   review,
@@ -31,14 +32,15 @@ type View =
   | "Vendors"
   | "Work orders"
   | "Invoice review"
-  | "Payment history";
+  | "Payment history"
+  | "Contractors" | "Vault" | "Access" | "Recovery";
 type DialogName = "vendor" | "order" | "invoice" | null;
 const views: View[] = [
   "Overview",
   "Vendors",
   "Work orders",
   "Invoice review",
-  "Payment history",
+  "Payment history", "Contractors", "Vault", "Access", "Recovery",
 ];
 const iconPaths: Record<string, string> = {
   Overview: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
@@ -182,14 +184,14 @@ function Modal({
 export default function OwnerDashboard() {
   return (
     <Onboarding
-      renderDashboard={(adapter) => <Dashboard adapter={adapter} />}
+      renderDashboard={(adapter, name) => <Dashboard adapter={adapter} organizationName={name} />}
     />
   );
 }
 
-function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
+function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organizationName?: string }) {
   const live = adapter instanceof NearOwnerAdapter ? adapter : null;
-  const [showContractors,setShowContractors]=useState(false);
+
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
   const [view, setView] = useState<View>("Overview");
   const [selected, setSelected] = useState(
@@ -251,19 +253,27 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
     setDialog(name);
   }
   function go(next: View) {
+    window.location.hash = encodeURIComponent(next);
     setView(next);
     setError(null);
   }
+  useEffect(() => {
+    const restore = () => { try {const name = decodeURIComponent(location.hash.slice(1)); if (views.includes(name as View)) setView(name as View);} catch {/* Invalid route hints never affect account authority. */} };
+    restore(); window.addEventListener("hashchange", restore);
+    return () => window.removeEventListener("hashchange", restore);
+  }, []);
+  const MainSurface = "main";
   if (!snapshot)
     return (
       <main className="loading-page">
-        <div className="brand-mark">P</div>
-        <h1>Opening your local payment desk</h1>
+        <div className="brand-mark">N</div>
+        <h1>Opening your payment desk</h1>
         <p>
           {adapter.mode === "simulation"
             ? "Loading clearly labeled synthetic data…"
             : "Loading verified NEAR testnet records…"}
         </p>
+        {!error && <LoadingSkeleton />}
         {error && (
           <>
             <p role="alert">{error}</p>
@@ -274,7 +284,6 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
         )}
       </main>
     );
-  if(showContractors && live && snapshot) return <><button className="button secondary" onClick={()=>setShowContractors(false)}>Back to vault dashboard</button><PersistentContractorOwner organization={snapshot.access?.organization || live.config.organization}/></>;
   const s = snapshot,
     v = s.vault;
   const readOnly = !!live && s.access?.role !== "owner";
@@ -286,6 +295,10 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
   const defaultOrder =
     s.orders.find((o) => o.status === "Approved" && o.enabled) ?? s.orders[0];
   const subtitle: Record<View, string> = {
+    Contractors: "Private invitations, wallet approvals and submitted bills.",
+    Vault: "Payment funds and spending authority are separate. Review both before signing.",
+    Access: "Manage who can view this organization. Owner authority stays on chain.",
+    Recovery: "Inspect unresolved attempts without retrying an unknown outcome.",
     Overview: "Approved work. Bounded authority. A clear record.",
     Vendors: "Keep recipient details explicit and approvals in your hands.",
     "Work orders": "Each order authorizes one exact payment to one recipient.",
@@ -468,65 +481,10 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
     </div></>
   );
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            go("Overview");
-          }}
-        >
-          <span className="brand-mark">
-            N<span />
-          </span>
-          Nnetics<span className="brand-period">.</span>
-        </a>
-        <div className="workspace">
-          <span className="workspace-icon">{live ? "N" : "CS"}</span>
-          <div>
-            <strong>
-              {live
-                ? s.access?.organization || "Verified workspace"
-                : "Content studio"}
-            </strong>
-            <small>Owner workspace</small>
-          </div>
-          <span className="workspace-dot" />
-        </div>
-        <span className="nav-caption">Payment desk</span>
-        <nav aria-label="Owner dashboard">{live && <button onClick={()=>setShowContractors(true)}>Contractor billing</button>}
-          {views.map((name) => (
-            <button
-              key={name}
-              aria-current={view === name ? "page" : undefined}
-              onClick={() => go(name)}
-            >
-              <Icon name={name} />
-              <span>{name}</span>
-              {name === "Invoice review" && (
-                <span className="nav-count">{s.invoices.length}</span>
-              )}
-            </button>
-          ))}
-          {!live && <a className="button secondary" href="/demo/contractors">Contractor portal demo</a>}
-        </nav><p className="nav-hint">Scroll the sections to see more</p>
-        <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <Icon name="shield" />
-            <strong>Authority stays with you</strong>
-            <p>Invoices can request payment. They cannot create approval.</p>
-          </div>
-          <div className="local-indicator">
-            <span />
-            {live ? "NEAR testnet" : "Local simulation"}
-            <span className="version">M3 integration</span>
-          </div>
-        </div>
-      </aside>
+    <div className="app-shell"><a className="skip-link" href="#workspace-content">Skip to content</a>
+      <DashboardNavigation view={view} onNavigate={name => go(name as View)} live={!!live} organization={organizationName || s.access?.organization || "Content studio"} invoiceCount={s.invoices.length} />
       <div className="workspace-main">
-        <div className="simulation-banner">
+        {!live && <div className="simulation-banner">
           <span className="simulation-tag">
             {live ? "TESTNET" : "SIMULATION"}
           </span>
@@ -535,7 +493,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               ? "Live testnet data. Owner actions require wallet signatures; queued invoices may be paid by the authorized worker."
               : "Synthetic data. No wallet connected. No tokens moved. Saved invoices persist; other demo changes reset on reload."}
           </span>
-        </div>
+        </div>}
         <header className="topbar">
           <div>
             <span className="breadcrumb">Workspace</span>
@@ -565,8 +523,8 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
             <span className="avatar owner">OW</span>
           </div>
         </header>
-        <main className="main-content">
-          {live && <TestnetControls adapter={live} snapshot={s} run={run} />}
+        <MainSurface aria-busy={busy.length > 0} className="main-content" id="workspace-content" tabIndex={-1}>
+
           <div className="page-heading">
             <div>
               <div className="eyebrow">Owner workspace</div>
@@ -574,13 +532,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               <p>{subtitle[view]}</p>
             </div>
             <div className="heading-actions">
-              <button
-                className="button deploy-button"
-                disabled={!DEPLOYMENT_ENABLED}
-                title="Disabled pending Milestone 1 review"
-              >
-                Deployment disabled
-              </button>
+
               {view === "Vendors" ? (
                 <button
                   className="button primary"
@@ -599,7 +551,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                   <Icon name="plus" size={16} />
                   New work order
                 </button>
-              ) : (
+              ) : ["Overview", "Invoice review", "Payment history"].includes(view) ? (
                 <button
                   className="button primary"
                   onClick={() => open("invoice")}
@@ -608,9 +560,13 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                   <Icon name="plus" size={16} />
                   {live ? "Enter structured invoice" : "Add sample invoice"}
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
+          {view === "Contractors" && (live ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization}/> : <p className="notice">Explore the <a href="/demo/contractors">explicitly simulated contractor workspace</a>.</p>)}
+          {live && ["Vault", "Access", "Recovery"].includes(view) && <TestnetControls adapter={live} snapshot={s} run={run} section={view === "Access" ? "access" : view === "Recovery" ? "recovery" : "vault"}/>}
+          {!live && ["Vault", "Access", "Recovery"].includes(view) && <p className="notice">These controls require a verified testnet organization. No live account is attached to this simulation.</p>}
+          {busy.length > 0 && <p className="action-progress" role="status">Updating verified records…</p>}
           {error && !dialog && (
             <div
               className="error-banner"
@@ -640,25 +596,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               </button>
             </div>
           )}
-          {v.paused && (
-            <div className="pause-banner">
-              <Icon name="pause" />
-              <div>
-                <strong>New payments are paused.</strong> Existing attempts
-                still need conclusive outcomes; their reservations remain
-                protected.
-              </div>
-            </div>
-          )}
-          {!v.agent && (
-            <div className="pause-banner">
-              <Icon name="shield" />
-              <div>
-                <strong>Worker authority is revoked.</strong> Existing payments
-                are still tracked. New requests are blocked.
-              </div>
-            </div>
-          )}
+          {(v.paused || !v.agent) && <div className="pause-banner"><Icon name="shield"/><div><strong>{v.paused ? "Payments paused." : "Worker authority revoked."}</strong> {!v.agent && "Worker access revoked. "}{pending.length ? `${pending.length} transfer(s) awaiting confirmation; funds remain reserved.` : "No unresolved transfers."}</div></div>}
           {view === "Overview" && (
             <>
               <section
@@ -671,7 +609,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               >
                 {[
                   [
-                    "Uncommitted budget",
+                    "Uncommitted authority",
                     (BigInt(v.budget) - committed).toString(),
                     "Within your cumulative authority",
                   ],
@@ -686,10 +624,10 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     "Only conclusively successful transfers",
                   ],
                   [
-                    "Funded payment ledger",
-                    v.funded,
+                    "Available payment funds",
+                    (BigInt(v.funded) - committed).toString(),
                     live
-                      ? "Finalized payment ledger · storage excluded"
+                      ? "Funded less spent and reserved · storage excluded"
                       : "Synthetic deposits · storage excluded",
                   ],
                 ].map(([label, value, hint], i) => (
@@ -764,12 +702,12 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     <div className="budget-track">
                       <span
                         style={{
-                          width: `${Number((BigInt(v.spent) * 100n) / BigInt(v.budget))}%`,
+                          width: `${Number((BigInt(v.spent) * 100n) / (BigInt(v.budget) || 1n))}%`,
                         }}
                       />
                       <span
                         style={{
-                          width: `${Number((BigInt(v.reserved) * 100n) / BigInt(v.budget))}%`,
+                          width: `${Number((BigInt(v.reserved) * 100n) / (BigInt(v.budget) || 1n))}%`,
                         }}
                       />
                     </div>
@@ -886,6 +824,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                   are available.
                 </span>
               </div>
+              {s.vendors.length === 0 && <div className="empty-state"><h2>No vendor references loaded</h2><p>Add a vendor or import an existing reference below. Existing approved orders retain their original recipient.</p></div>}
               <section className="vendor-grid">
                 {s.vendors.map((vendor, i) => (
                   <article className="panel vendor-card" key={vendor.id}>
@@ -972,6 +911,7 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
                     </tr>
                   </thead>
                   <tbody>
+                    {s.orders.length === 0 && <tr><td colSpan={6}><div className="empty-state">No work orders loaded. Import an existing reference below, or add a vendor and approve one exact amount and recipient.</div></td></tr>}
                     {s.orders.map((o) => (
                       <tr key={o.id}>
                         <td>
@@ -1260,14 +1200,15 @@ function Dashboard({ adapter }: { adapter: OwnerAdapter }) {
               </button>
             </section>
           )}
+          {live && ["Vendors", "Work orders"].includes(view) && <details className="reference-disclosure"><summary>Import existing {view === "Vendors" ? "vendor" : "work order"}</summary><TestnetControls key={view} adapter={live} snapshot={s} run={run} section="references" referenceKind={view === "Vendors" ? "vendor" : "order"}/></details>}
           <footer>
-            <span>Nnetics · Owner preview</span>
+            <span>Nnetics · Payment desk</span>
             <span>
               <Icon name="shield" size={13} />
-              Deployment disabled pending Milestone 1 review
+              Testnet deployment requires explicit authorization
             </span>
           </footer>
-        </main>
+        </MainSurface>
       </div>
       {dialog && (
         <Modal

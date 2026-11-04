@@ -1,3 +1,4 @@
+import {navigateOwner, openAccountMenu} from "./navigation-helpers";
 import { test, expect } from "@playwright/test";
 import { MockOwnerAdapter } from "../../src/data/mock-adapter";
 
@@ -48,32 +49,32 @@ test("organization viewers can navigate but cannot invoke owner or invoice mutat
     route.fulfill({ json: snapshot }),
   );
   await page.goto("/");
+  await navigateOwner(page, "Vault");
   await expect(
     page.getByText("Read-only viewer", { exact: false }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Review owner transaction in wallet" }),
   ).toBeDisabled();
+  await navigateOwner(page, "Access");
   await expect(
     page.getByRole("button", { name: "Grant viewer access" }),
   ).toBeDisabled();
+  await navigateOwner(page, "Overview");
   await expect(
     page.getByRole("button", { name: "Enter structured invoice" }),
   ).toBeDisabled();
   await expect(
     page.getByRole("switch", { name: "Allow new testnet payments" }),
   ).toBeDisabled();
-  await page.getByRole("button", { name: "Vendors", exact: true }).click();
+  await navigateOwner(page, "Vendors");
   await expect(
     page.getByRole("button", { name: "Manage vendor" }),
   ).toBeDisabled();
   await expect(
     page.getByRole("button", { name: "Disable future payments" }).first(),
   ).toBeDisabled();
-  await page
-    .getByRole("button", { name: "Invoice review", exact: false })
-    .first()
-    .click();
+  await navigateOwner(page, "Invoice review");
   await expect(
     page.getByRole("button", { name: "Mark reviewed" }),
   ).toBeDisabled();
@@ -133,9 +134,11 @@ test("controlled live adapter reads show finality and block unverified protocol-
     page.getByRole("heading", { name: "Your payment desk", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Live testnet data.", { exact: false }),
+    page.getByLabel("Verified wallet"),
   ).toBeVisible();
   await expect(page.getByLabel("Local simulation controls")).toHaveCount(0);
+  await navigateOwner(page, "Vault");
+  await page.getByText("Verification details",{exact:true}).click();
   await expect(
     page.getByText("Finalized block: controlled-final-block"),
   ).toBeVisible();

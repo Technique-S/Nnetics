@@ -1,3 +1,4 @@
+import {navigateOwner, openAccountMenu} from "./navigation-helpers";
 import {test, expect} from '@playwright/test';
 
 const empty = {mode:'simulation',profiles:[],orders:[],invoices:[]};
@@ -60,7 +61,7 @@ test('vendor cards retain their content inside the tablet breakpoint',async({pag
   await page.setViewportSize({width:768,height:900});
   await page.route('**/api/demo/owner-invoices',route=>route.fulfill({json:[]}));
   await page.goto('/?mode=demo');
-  await page.getByRole('navigation',{name:'Owner dashboard'}).getByRole('button',{name:'Vendors',exact:true}).click();
+  await navigateOwner(page, "Vendors");
   await expect(page.locator('.vendor-card')).toHaveCount(3);
   expect(await page.locator('.vendor-card').evaluateAll(cards=>cards.every(card=>card.scrollWidth<=card.clientWidth))).toBeTruthy();
 });
