@@ -162,11 +162,11 @@ function Modal({
           <ActionButton type="button" className="button secondary" onClick={onClose}>
             Cancel
           </ActionButton>
-          <ActionButton className="button primary" pending={busy} pendingLabel="Saving…" state={error?"error":"idle"}>
+          <ActionButton className="button primary" pending={busy} pendingLabel="Saving…" retryLabel={live?"Review wallet request":"Save simulated change"} state={error?"error":"idle"}>
             {busy
               ? "Saving…"
               : live
-                ? "Review / submit"
+                ? "Review wallet request"
                 : "Save simulated change"}
           </ActionButton>
         </div>

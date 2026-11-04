@@ -580,3 +580,9 @@ The user's later corrections supersede the initial brief and the Phase 1 choices
 ### Corrective commit checks
 
 Under the superseding instructions, no lint invocation is required and the custom lint command was removed without adding dependencies. Type-check, 111 current owner tests (including the new presentation-safety cases and concurrent recovery tests), 42 root tests and production build passed. The new formatter tests cover a one-yocto value and an exact amount beyond floating-point precision. No request/RPC files or changes were staged with this correction.
+
+### Phase 1 completion under the corrections
+
+The shared action error state now retains specific financial wording rather than defaulting to “Try again.” Configuration reload, read-only saved-session continuation and Meteor message login have separate handlers. A saved provisioning transaction exposes only the existing status-check control; dispatch is hidden while its transaction ID is present. Native submit/cancel behavior is retained. Synchronous invoice selection cannot inherit another action's loading state. No stored IDs, APIs, contract methods, authority handlers or idempotency identities changed.
+
+Actual test runs, the stale login-fixture correction, the isolated verification snapshot, and the outstanding broader shared-tree request/RPC failures are recorded separately in `POLISH_REPORT.md`. These UI checks are fixture-based, not a new real-wallet acceptance or independent security review. The original Paid payment, paused vault and revoked automatic-payment authorization were verified read-only. Later copy, metadata and route-check phases remain open. No push occurred.

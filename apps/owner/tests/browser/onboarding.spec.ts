@@ -151,7 +151,7 @@ async function signIn(page:Page,id:string){
  const advanced=page.locator('details').filter({has:page.getByText('Use a specific testnet account (optional)',{exact:true})});
  if(!(await advanced.evaluate(el=>(el as HTMLDetailsElement).open)))await page.getByText('Use a specific testnet account (optional)',{exact:true}).click();
  await page.getByLabel('Testnet wallet account ID').fill(id);
- await page.getByRole('button',{name:'Sign message to sign in',exact:true}).click();
+ await page.getByRole('region',{name:'Meteor connection'}).getByRole('button',{name:/^(Connect to Meteor|Try again)$/}).click();
 }
 test("unconfigured vault does not block a new wallet; identity starts empty and organization creation grants no vault", async ({
   page,
@@ -311,7 +311,7 @@ test("message login waits for approval, and editing the pending account cancels 
   await page.goto("/");
   await signIn(page, "first.testnet");
   await expect(
-    page.getByRole("button", { name: "Awaiting wallet approval / verifying…" }),
+    page.getByRole("region", {name:"Meteor connection"}).locator("button[aria-busy=true]"),
   ).toBeDisabled();
   // Busy starts before the HTTP challenge finishes. Establish that the first
   // Meteor request really exists before testing cancellation of a pending proof.
@@ -319,13 +319,13 @@ test("message login waits for approval, and editing the pending account cancels 
   expect(f.loginCalls()).toBe(0);
   await page.getByLabel("Testnet wallet account ID").fill("second.testnet");
   await expect(
-    page.getByRole("button", { name: "Sign message to sign in" }),
+    page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }),
   ).toBeEnabled();
   await expect(
     page.getByRole("alert").filter({ hasText: "Wallet switched" }),
   ).toBeVisible();
   expect(f.loginCalls()).toBe(0);
-  await page.getByRole("button", { name: "Sign message to sign in" }).click();
+  await page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }).click();
   // The challenge request is asynchronous. Reject the second wallet request,
   // rather than racing its registration and rejecting the cancelled first one.
   await expect
@@ -435,7 +435,7 @@ test("missing extension and mainnet account errors explain recovery; demo stays 
   await page.getByText("Use a specific testnet account (optional)",{exact:true}).click();
   await page.getByLabel("Testnet wallet account ID").fill("wallet.near");
   await expect(
-    page.getByRole("button", { name: "Sign message to sign in" }),
+    page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }),
   ).toBeDisabled();
   await page
     .getByRole("link", { name: "Open explicitly simulated demo" })
@@ -458,8 +458,8 @@ test("explicit pre-session RPC failure retries the same proof once without a sec
 
 test("saved session can recover a reload-time RPC outage without requesting a new signature",async({page})=>{
  const f=await fixture(page,'new-user.testnet');let down=true;await page.route('**/api/live/identity',route=>route.fulfill(down?{status:503,json:{error:'RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
- await page.goto('/');await expect(page.getByRole('button',{name:'Retry saved session',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
- down=false;await page.getByRole('button',{name:'Retry saved session',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
+ await page.goto('/');await expect(page.getByRole('button',{name:'Continue to workspace',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
+ down=false;await page.getByRole('button',{name:'Continue to workspace',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
 });
 
 test('focused dashboard navigation, refresh and active renewal cross the former 15-minute failure interval without signatures',async({page})=>{
@@ -516,7 +516,7 @@ test('server remaining lifetime avoids immediate logout when the browser wall cl
 });
 
 test('an accepted wallet message followed by workspace RPC failure offers saved-session recovery without another signature',async({page})=>{
- const f=await fixture(page);let failed=true;await page.route('**/api/live/identity',route=>route.fulfill(failed?{status:503,json:{error:'Workspace RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
+ const f=await fixture(page);let failed=true;await page.route('**/api/live/identity',route=>route.fulfill(f.loginCalls()===0?{status:401,json:{error:'Verify wallet'}}:failed?{status:503,json:{error:'Workspace RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
  await page.goto('/');await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Your message was accepted'})).toBeVisible();await expect(page.getByRole('button',{name:'Retry verification',exact:true})).toBeEnabled();expect(f.loginCalls()).toBe(1);
  failed=false;await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(1);expect(await page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);
 });

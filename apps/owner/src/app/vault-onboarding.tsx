@@ -168,7 +168,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
           Create vault
         </ActionButton>
       )}
-      {progress?.state &&
+      {progress?.state && !progress.hash &&
         progress.state !== "verified" &&
         progress.state !== "failed" && (
           <>
@@ -186,9 +186,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
               disabled={busy || !reviewed || !progress.enabled}
               onClick={() => void run("dispatch")}
             >
-              {progress.hash
-                ? "Reconcile and retry identical transaction"
-                : "Request Meteor approval"}
+              Request Meteor approval
             </ActionButton>
             {!progress.enabled && (
               <p>
@@ -206,7 +204,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
           disabled={busy}
           onClick={() => void run("reconcile")}
         >
-          Resume / reconcile provisioning
+          Check setup status
         </ActionButton>
         </div>
       )}

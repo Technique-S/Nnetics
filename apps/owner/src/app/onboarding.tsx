@@ -1,4 +1,5 @@
 "use client";
+import {getProgressMessage} from "../data/user-message";
 import {ActionButton} from "./action-button";
 import {LoadingSkeleton} from "./loading-skeleton";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -61,6 +62,7 @@ export function Onboarding({
   const [walletNotice,setWalletNotice]=useState("");
   const [loginStage,setLoginStage]=useState("");
   const [loginAttempted,setLoginAttempted]=useState(false);
+  const [checkingSaved,setCheckingSaved]=useState(false);
   const lastRenewal=useRef(0),renewing=useRef(false);
   const identityRef=useRef<IdentityView|null>(null);identityRef.current=who;
   const epoch = useRef(0),
@@ -437,12 +439,15 @@ export function Onboarding({
     <details><summary>Supported wallets and networks</summary><p>Meteor extension only. Select NEAR testnet and an activated account. Other connectors are not supported by this sign-in flow.</p></details>
     {error&&<p role="alert">{error}</p>}
     <section aria-label="Meteor connection">
-      <ActionButton className="button primary" pending={busy} pendingLabel={loginStage||"Connecting…"} state={error&&(loginAttempted||restoreAvailable)?"error":"idle"} onClick={()=>{
-        setLoginAttempted(true);
-        if(!config){location.reload();return;}
-        if(restoreAvailable){setError("");void restoreSession().catch(e=>{setError((e as Error).message);if(!(e instanceof LiveApiError&&e.retryable))setRestoreAvailable(false);});return;}
-        void signIn(!account.trim());
-      }}>{restoreAvailable?"Continue to workspace":"Connect to Meteor"}</ActionButton>
+      {!config ? <ActionButton className="button primary" onClick={()=>location.reload()}>Reload connection</ActionButton> : restoreAvailable ? (
+        <ActionButton className="button primary" pending={busy||checkingSaved} pendingLabel="Checking your saved session…" state={error?"error":"idle"} retryLabel="Continue to workspace" onClick={()=>{
+          setError("");setCheckingSaved(true);void restoreSession().catch(e=>{setError((e as Error).message);if(!(e instanceof LiveApiError&&e.retryable))setRestoreAvailable(false);}).finally(()=>setCheckingSaved(false));
+        }}>Continue to workspace</ActionButton>
+      ) : (
+        <ActionButton className="button primary" pending={busy} pendingLabel={getProgressMessage(loginStage)} disabled={!!account.trim()&&!accountValid} state={error&&loginAttempted?"error":"idle"} retryLabel="Try again" onClick={()=>{
+          setLoginAttempted(true);void signIn(!account.trim());
+        }}>Connect to Meteor</ActionButton>
+      )}
       {busy&&<ActionButton className="button secondary" onClick={()=>lock("Sign-in cancelled. You can connect again when ready.")}>Cancel sign-in</ActionButton>}
       <p role="status">{busy?loginStage:"Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested."}</p>
       <details><summary>Use a specific testnet account (optional)</summary><label>Testnet wallet account ID<input value={account} maxLength={64} autoCapitalize="none" spellCheck={false} onChange={e=>{if(who||busy)lock();setAccount(e.target.value);}}/></label>{!accountValid&&<p>Enter the activated account ID shown in Meteor.</p>}
