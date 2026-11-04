@@ -1,4 +1,5 @@
 "use client";
+import {ActionButton} from "./action-button";
 import { useEffect, useState } from "react";
 import { verifyVaultTransaction } from "../data/vault-transaction";
 import { api } from "../data/near-adapter";
@@ -159,13 +160,13 @@ export function VaultOnboarding({ organization }: { organization: string }) {
         </>
       )}
       {!progress?.state && (
-        <button
+        <ActionButton busy={busy}
           className="button primary"
           disabled={busy}
           onClick={() => void run("prepare")}
         >
           Create vault
-        </button>
+        </ActionButton>
       )}
       {progress?.state &&
         progress.state !== "verified" &&
@@ -180,7 +181,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
               I reviewed the network, owner, funding, immutable code and
               transaction details.
             </label>
-            <button
+            <ActionButton busy={busy}
               className="button primary"
               disabled={busy || !reviewed || !progress.enabled}
               onClick={() => void run("dispatch")}
@@ -188,7 +189,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
               {progress.hash
                 ? "Reconcile and retry identical transaction"
                 : "Request Meteor approval"}
-            </button>
+            </ActionButton>
             {!progress.enabled && (
               <p>
                 Deployment signing is disabled pending review and specific
@@ -200,23 +201,23 @@ export function VaultOnboarding({ organization }: { organization: string }) {
       {progress?.hash && (
         <div>
         {progress.state==="awaiting_chain"&&<label>Wallet transaction hash (only if different)<input value={walletHash} onChange={e=>setWalletHash(e.target.value)} /><span>Read-only verification of the same approved signer, key, nonce and call. Does not send or retry a transaction.</span></label>}
-        <button
+        <ActionButton busy={busy}
           className="button secondary"
           disabled={busy}
           onClick={() => void run("reconcile")}
         >
           Resume / reconcile provisioning
-        </button>
+        </ActionButton>
         </div>
       )}
       {progress?.state === "failed" && (
-        <button
+        <ActionButton busy={busy}
           className="button secondary"
           disabled={busy}
           onClick={() => void run("retry")}
         >
           Review retry of same vault
-        </button>
+        </ActionButton>
       )}
       <p>
         Payment controls remain unavailable. Wallet cancellation or interruption

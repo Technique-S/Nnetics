@@ -18,7 +18,8 @@
     "factory:plan": "node --env-file-if-exists=.env.local scripts/factory-plan.ts",
     "testnet:execute": "node --env-file-if-exists=.env.local scripts/testnet-execute.ts",
     "test:browser": "playwright test",
-    "test:contractor-acceptance": "node scripts/contractor-acceptance.mjs"
+    "test:contractor-acceptance": "node scripts/contractor-acceptance.mjs",
+    "lint": "node scripts/check-ui-source.mjs"
   },
   "dependencies": {
     "@near-wallet-selector/core": "10.1.4",

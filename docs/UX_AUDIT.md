@@ -568,3 +568,7 @@ Owner type-check passed; owner backend suite 96/96 passed; root reference suite 
 ### Concurrent work preserved
 
 The working tree was clean at Phase 0 start. Request/RPC changes appeared during the audit in live API, adapter, chain/config/identity/provisioning and new request-policy/request helpers, plus `.env.example`. They belong to separate ongoing work: they were not edited, staged, reset or included in this phase commit. Re-read their final error/status interfaces before Phase 1–2 presentation changes. The reported executions are actual runs, not a guarantee about later concurrent edits.
+
+## Phase 1 — action presentation
+
+Added the shared ActionButton (idle/loading/success/error), reused it across async surfaces, consolidated sign-in/restoration/configuration retry into one primary action and removed the duplicate modal close button. Existing callbacks, cancellation, idempotency identifiers and transaction recovery remain authoritative. Added a dependency-free UI source lint command (TypeScript syntax, console.log and unfinished JSX text checks); it is not an ESLint substitute or an accessibility certification. Working-tree lint, type-check, 107 current owner tests and build passed. The increased count includes concurrent request-recovery tests, which are not part of this phase's commit. Shared files are staged from a presentation-only projection of the baseline so unrelated request/RPC edits remain unstaged.

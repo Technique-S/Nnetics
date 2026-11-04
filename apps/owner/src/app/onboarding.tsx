@@ -1,4 +1,5 @@
 "use client";
+import {ActionButton} from "./action-button";
 import {LoadingSkeleton} from "./loading-skeleton";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NearOwnerAdapter, LiveApiError, checkMeteorIdentity, api, type PublicConfig } from "../data/near-adapter";
@@ -59,6 +60,7 @@ export function Onboarding({
   const [restoring, setRestoring] = useState(true);
   const [walletNotice,setWalletNotice]=useState("");
   const [loginStage,setLoginStage]=useState("");
+  const [loginAttempted,setLoginAttempted]=useState(false);
   const lastRenewal=useRef(0),renewing=useRef(false);
   const identityRef=useRef<IdentityView|null>(null);identityRef.current=who;
   const epoch = useRef(0),
@@ -290,13 +292,13 @@ export function Onboarding({
         <header className="identity-bar" aria-label="Verified wallet">
           <span>Signed in as {who.accountId} · NEAR testnet</span>
           <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions">
-          <button className="button secondary" onClick={() => lock()}>
+          <ActionButton className="button secondary" onClick={() => lock()}>
             Switch wallet
-          </button>
-          <button className="button secondary" onClick={()=>lock("You signed out. Verify a wallet to sign in again.")}>Sign out</button>
-          <button className="button secondary" disabled={busy} onClick={()=>void checkSelectedWallet()}>Check selected Meteor account (optional)</button>
+          </ActionButton>
+          <ActionButton className="button secondary" onClick={()=>lock("You signed out. Verify a wallet to sign in again.")}>Sign out</ActionButton>
+          <ActionButton className="button secondary" disabled={busy} onClick={()=>void checkSelectedWallet()}>Check selected Meteor account (optional)</ActionButton>
           {active && (
-            <button
+            <ActionButton
               className="button secondary"
               onClick={() => {
                 setActive(null);
@@ -304,7 +306,7 @@ export function Onboarding({
               }}
             >
               My organizations
-            </button>
+            </ActionButton>
           )}
           <details className="wallet-session-notice"><summary>About this wallet session</summary><p>This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p></details></div></details>
         </header>
@@ -314,10 +316,10 @@ export function Onboarding({
             <main className="loading-screen">
               <h1>{busy?'Loading your workspace':'Verification temporarily unavailable'}</h1>
               <p role="alert">{verificationIssue}</p>
-              <button className="button" disabled={busy} onClick={() => void overview(who.accountId).catch(e => {
+              <ActionButton className="button" disabled={busy} onClick={() => void overview(who.accountId).catch(e => {
                 if(e instanceof LiveApiError && e.retryable) setVerificationIssue(e.message);
                 else lock((e as Error).message);
-              })}>Retry verification</button>
+              })}>Retry verification</ActionButton>
             </main>
           ) : active ? renderDashboard(active, who.organizations.find(o=>o.id===active.config.organization)?.name) : (
           <main className="loading-screen onboarding-surface" aria-label="Wallet onboarding">
@@ -346,7 +348,7 @@ export function Onboarding({
               <p>No organizations yet.</p>
             ) : (
               who.organizations.map((org) => (
-                <button
+                <ActionButton
                   key={org.id}
                   className="button secondary"
                   onClick={async () => {
@@ -381,7 +383,7 @@ export function Onboarding({
                     : org.status === "vault_verified"
                       ? "Vault linked; verify current state"
                       : "Vault not provisioned"}
-                </button>
+                </ActionButton>
               ))
             )}
             {selectedDraft && (
@@ -417,9 +419,9 @@ export function Onboarding({
                   required
                 />
               </label>
-              <button className="button primary" disabled={busy}>
+              <ActionButton className="button primary" disabled={busy}>
                 Create organization
-              </button>
+              </ActionButton>
             </form>
           </main>
         )}
@@ -427,96 +429,25 @@ export function Onboarding({
     );
   if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><LoadingSkeleton/></main>;
   let accountValid = false;
-  try {
-    testnetWalletAccount(account.trim());
-    accountValid = true;
-  } catch {}
-  return (
-    <main className="loading-screen signin-surface">
-      <a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
-      <h1>Nnetics · NEAR testnet</h1>
-      <p>
-        Verify any supported, activated testnet wallet. You do not need an
-        organization or vault to sign in. Wallet verification grants no
-        organization membership or vault ownership.
-      </p>
-      <details><summary>Supported wallets and networks</summary>      <p>
-        Meteor extension only. Select NEAR testnet and the activated named
-        .testnet account or 64-character implicit account shown in your wallet.
-        Other wallet connectors are not supported by this onboarding flow.
-      </p></details>
-      {error && <p role="alert">{error}</p>}
-      {restoreAvailable && <button className="button secondary" onClick={() => {
-        setError("");
-        void restoreSession().catch(e => {
-          setError((e as Error).message);
-          if (!(e instanceof LiveApiError && e.retryable)) setRestoreAvailable(false);
-        });
-      }}>Retry saved session</button>}
-      <section aria-label="Meteor connection">
-        <button
-          className="button primary"
-          disabled={!config || busy}
-          onClick={() => void signIn(true)}
-        >
-          {busy ? loginStage||"Connecting…" : "Connect to Meteor"}
-        </button>
-        <p role="status">
-          {busy ? loginStage : ready
-            ? "Meteor is available. Connect opens an off-chain identity message for the account selected in your wallet. No transaction, funds or keys."
-            : "Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested."}
-        </p>
-        <details>
-          <summary>Use a specific testnet account (optional)</summary>
-        <label>
-          Testnet wallet account ID
-          <input
-            value={account}
-            maxLength={64}
-            autoCapitalize="none"
-            spellCheck={false}
-            onChange={(e) => {
-              const next = e.target.value;
-              if (who || busy) lock();
-              setAccount(next);
-            }}
-          />
-        </label>
-        {!accountValid && (
-          <p>Enter the activated testnet account ID shown in Meteor.</p>
-        )}
-        <button
-          className="button primary"
-          disabled={!config || !accountValid || busy}
-          onClick={() => void signIn()}
-        >
-          {busy
-            ? "Awaiting wallet approval / verifying…"
-            : "Sign message to sign in"}
-        </button>
-        <button
-          className="button secondary"
-          onClick={() =>
-            lock(
-              "Previous verification cleared. Select your wallet and verify again.",
-            )
-          }
-        >
-          Switch wallet / retry verification
-        </button>
-        </details>
-        {!config && (
-          <button
-            className="button secondary"
-            onClick={() => location.reload()}
-          >
-            Reload login configuration
-          </button>
-        )}
-      </section>
-      <a className="button secondary" href="/?mode=demo">
-        Open explicitly simulated demo
-      </a>
-    </main>
-  );
+  try {testnetWalletAccount(account.trim());accountValid=true;}catch{}
+  return <main className="loading-screen signin-surface">
+    <a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
+    <h1>Nnetics · NEAR testnet</h1>
+    <p>Verify any supported, activated testnet wallet. You do not need an organization or vault to sign in. Wallet verification grants no organization membership or vault ownership.</p>
+    <details><summary>Supported wallets and networks</summary><p>Meteor extension only. Select NEAR testnet and an activated account. Other connectors are not supported by this sign-in flow.</p></details>
+    {error&&<p role="alert">{error}</p>}
+    <section aria-label="Meteor connection">
+      <ActionButton className="button primary" pending={busy} pendingLabel={loginStage||"Connecting…"} state={error&&(loginAttempted||restoreAvailable)?"error":"idle"} onClick={()=>{
+        setLoginAttempted(true);
+        if(!config){location.reload();return;}
+        if(restoreAvailable){setError("");void restoreSession().catch(e=>{setError((e as Error).message);if(!(e instanceof LiveApiError&&e.retryable))setRestoreAvailable(false);});return;}
+        void signIn(!account.trim());
+      }}>{restoreAvailable?"Continue to workspace":"Connect to Meteor"}</ActionButton>
+      {busy&&<ActionButton className="button secondary" onClick={()=>lock("Sign-in cancelled. You can connect again when ready.")}>Cancel sign-in</ActionButton>}
+      <p role="status">{busy?loginStage:"Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested."}</p>
+      <details><summary>Use a specific testnet account (optional)</summary><label>Testnet wallet account ID<input value={account} maxLength={64} autoCapitalize="none" spellCheck={false} onChange={e=>{if(who||busy)lock();setAccount(e.target.value);}}/></label>{!accountValid&&<p>Enter the activated account ID shown in Meteor.</p>}
+      <ActionButton className="button secondary" onClick={()=>{setAccount("");lock("Choose a different wallet in Meteor, then connect again.");}}>Use a different wallet</ActionButton></details>
+    </section>
+    <a className="button secondary" href="/?mode=demo">Open explicitly simulated demo</a>
+  </main>;
 }

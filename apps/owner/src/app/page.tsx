@@ -1,4 +1,5 @@
 "use client";
+import {ActionButton} from "./action-button";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { requireNear } from "../data/invoice-currency";
@@ -144,13 +145,6 @@ function Modal({
           </span>
           <h2 id="modal-title">{title}</h2>
         </div>
-        <button
-          className="icon-button"
-          aria-label="Close dialog"
-          onClick={onClose}
-        >
-          <Icon name="close" />
-        </button>
       </div>
       <form
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -165,16 +159,16 @@ function Modal({
           </p>
         )}
         <div className="modal-actions">
-          <button type="button" className="button secondary" onClick={onClose}>
+          <ActionButton type="button" className="button secondary" onClick={onClose}>
             Cancel
-          </button>
-          <button className="button primary" disabled={busy}>
+          </ActionButton>
+          <ActionButton className="button primary" pending={busy} pendingLabel="Saving…" state={error?"error":"idle"}>
             {busy
               ? "Saving…"
               : live
                 ? "Review / submit"
                 : "Save simulated change"}
-          </button>
+          </ActionButton>
         </div>
       </form>
     </dialog>
@@ -277,9 +271,9 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
         {error && (
           <>
             <p role="alert">{error}</p>
-            <button className="button primary" onClick={() => void refresh()}>
+            <ActionButton busy={busy.length>0} className="button primary" onClick={() => void refresh()}>
               Retry loading
-            </button>
+            </ActionButton>
           </>
         )}
       </main>
@@ -370,7 +364,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
         s.invoices.slice(0, compact ? 3 : undefined).map((i) => {
           const codes = review(s, i);
           return (
-            <button
+            <ActionButton busy={busy.length>0}
               key={i.id}
               className={
                 "queue-row " +
@@ -409,7 +403,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                 />
               </span>
               <Icon name="arrow" size={17} />
-            </button>
+            </ActionButton>
           );
         })
       )}
@@ -501,7 +495,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
             {view}
           </div>
           <div className="topbar-actions">
-            <button
+            <ActionButton busy={busy.length>0}
               className="icon-button"
               aria-label={
                 live ? "Refresh finalized state" : "Refresh mock state"
@@ -516,7 +510,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
               disabled={busy.includes("refresh")}
             >
               <Icon name="refresh" size={18} />
-            </button>
+            </ActionButton>
             <span className="owner-label">
               {live ? s.access?.accountId : v.owner}
             </span>
@@ -534,32 +528,32 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
             <div className="heading-actions">
 
               {view === "Vendors" ? (
-                <button
+                <ActionButton busy={busy.length>0}
                   className="button primary"
                   onClick={() => open("vendor")}
                   disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   Manage vendor
-                </button>
+                </ActionButton>
               ) : view === "Work orders" ? (
-                <button
+                <ActionButton busy={busy.length>0}
                   className="button primary"
                   onClick={() => open("order")}
                   disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   New work order
-                </button>
+                </ActionButton>
               ) : ["Overview", "Invoice review", "Payment history"].includes(view) ? (
-                <button
+                <ActionButton busy={busy.length>0}
                   className="button primary"
                   onClick={() => open("invoice")}
                   disabled={readOnly}
                 >
                   <Icon name="plus" size={16} />
                   {live ? "Enter structured invoice" : "Add sample invoice"}
-                </button>
+                </ActionButton>
               ) : null}
             </div>
           </div>
@@ -574,26 +568,26 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
               aria-label={live ? "Testnet error" : "Simulation error"}
             >
               {error}
-              <button
+              <ActionButton busy={busy.length>0}
                 onClick={() => {
                   setError(null);
                   void refresh();
                 }}
               >
                 Retry refresh
-              </button>
+              </ActionButton>
             </div>
           )}
           {notice && (
             <div className="notice" role="status">
               <Icon name="check" size={16} />
               {notice}
-              <button
+              <ActionButton busy={busy.length>0}
                 aria-label="Dismiss notification"
                 onClick={() => setNotice("")}
               >
                 ×
-              </button>
+              </ActionButton>
             </div>
           )}
           {(v.paused || !v.agent) && <div className="pause-banner"><Icon name="shield"/><div><strong>{v.paused ? "Payments paused." : "Worker authority revoked."}</strong> {!v.agent && "Worker access revoked. "}{pending.length ? `${pending.length} transfer(s) awaiting confirmation; funds remain reserved.` : "No unresolved transfers."}</div></div>}
@@ -654,12 +648,12 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                           <span className="count">{s.invoices.length}</span>
                         </h2>
                       </div>
-                      <button
+                      <ActionButton busy={busy.length>0}
                         className="text-button"
                         onClick={() => go("Invoice review")}
                       >
                         Open review <Icon name="arrow" size={15} />
-                      </button>
+                      </ActionButton>
                     </div>
                     {queue(true)}
                     <div className="panel-foot">
@@ -675,12 +669,12 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         <span className="eyebrow">Payment records</span>
                         <h2>Recent payment attempts</h2>
                       </div>
-                      <button
+                      <ActionButton busy={busy.length>0}
                         className="text-button"
                         onClick={() => go("Payment history")}
                       >
                         View history <Icon name="arrow" size={15} />
-                      </button>
+                      </ActionButton>
                     </div>
                     {history(true)}
                   </section>
@@ -749,7 +743,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                             : "Open within approved authority"}
                         </small>
                       </div>
-                      <button
+                      <ActionButton busy={busy.length>0}
                         role="switch"
                         aria-checked={!v.paused}
                         aria-label={
@@ -769,7 +763,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         }
                       >
                         <span />
-                      </button>
+                      </ActionButton>
                     </div>
                   </section>
                   <section className="panel worker-panel">
@@ -785,7 +779,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                       Revocation stops future initiation. It cannot cancel a
                       transfer already sent.
                     </p>
-                    <button
+                    <ActionButton busy={busy.length>0}
                       className="button secondary full"
                       disabled={readOnly || busy.includes("agent")}
                       onClick={() =>
@@ -808,7 +802,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         : live
                           ? "Authorize configured testnet worker"
                           : "Authorize synthetic worker"}
-                    </button>
+                    </ActionButton>
                   </section>
                 </aside>
               </div>
@@ -856,7 +850,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         }
                       </strong>
                     </div>
-                    <button
+                    <ActionButton busy={busy.length>0}
                       className="button secondary full"
                       disabled={readOnly || busy.includes(vendor.id)}
                       onClick={() =>
@@ -881,7 +875,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                       {vendor.active
                         ? "Disable future payments"
                         : "Enable vendor"}
-                    </button>
+                    </ActionButton>
                   </article>
                 ))}
               </section>
@@ -931,7 +925,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         </td>
                         <td>
                           {o.enabled && o.status !== "Paid" ? (
-                            <button
+                            <ActionButton busy={busy.length>0}
                               className="text-button danger"
                               disabled={readOnly || busy.includes(o.id)}
                               onClick={() =>
@@ -944,7 +938,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                               }
                             >
                               Revoke order
-                            </button>
+                            </ActionButton>
                           ) : (
                             <span className="subtle">
                               {o.status === "Paid" ? "Closed" : "Revoked"}
@@ -1053,7 +1047,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                       {invoice.text || "No source text supplied."}
                     </pre>
                     <div className="invoice-actions">
-                      <button
+                      <ActionButton busy={busy.length>0}
                         className="button secondary"
                         disabled={
                           readOnly ||
@@ -1071,8 +1065,8 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                         {invoice.reviewed
                           ? "Review acknowledged"
                           : "Mark reviewed"}
-                      </button>
-                      <button
+                      </ActionButton>
+                      <ActionButton busy={busy.length>0}
                         className="button primary"
                         disabled={
                           readOnly ||
@@ -1100,7 +1094,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                             ? "Queue reviewed invoice"
                             : "Simulate payment"}
                         <Icon name="arrow" size={15} />
-                      </button>
+                      </ActionButton>
                     </div>
                     <p className="footnote">
                       {live
@@ -1179,7 +1173,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                   </option>
                 </select>
               </label>
-              <button
+              <ActionButton busy={busy.length>0}
                 className="text-button"
                 onClick={() => {
                   adapter.failNextRequest();
@@ -1187,8 +1181,8 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                 }}
               >
                 Simulate load error
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton busy={busy.length>0}
                 className="text-button"
                 onClick={() => {
                   adapter.reset();
@@ -1197,7 +1191,7 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
                 }}
               >
                 Reset demo
-              </button>
+              </ActionButton>
             </section>
           )}
           {live && ["Vendors", "Work orders"].includes(view) && <details className="reference-disclosure"><summary>Import existing {view === "Vendors" ? "vendor" : "work order"}</summary><TestnetControls key={view} adapter={live} snapshot={s} run={run} section="references" referenceKind={view === "Vendors" ? "vendor" : "order"}/></details>}

@@ -493,3 +493,4 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
   color:#52635a}
 
 .navigation-toggle{width:44px;height:44px;left:calc(var(--shell-nav) - 56px);top:20px}@media(min-width:761px){html[data-nav-collapsed=true] .navigation-toggle{left:14px;top:68px}}@media(max-width:760px){.navigation-toggle{left:12px;top:12px}}
+.action-spinner{display:inline-block;width:1em;height:1em;flex:none;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:.5em;animation:action-spin .7s linear infinite}@keyframes action-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.action-spinner{animation:none;border-style:dotted}}
