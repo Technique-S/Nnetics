@@ -30,6 +30,14 @@
   --success:#286346;--success-bg:#E5F1E8;--warning:#785820;--warning-bg:#FCF5E3;--warning-border:#967537;
   --danger:var(--color-danger);--danger-bg:var(--color-danger-bg);--danger-hover:#F9E2DC;--danger-border:#AD6B60;
   --shadow-dialog:rgb(16 47 51 / 18%);--shadow-soft:rgb(16 47 51 / 8%);--backdrop:var(--color-overlay);
+  --signin-cta:#0D63E6; --signin-cta-hover:#0A55C0; --signin-cta-pressed:#084A9F; --signin-cta-text:#FFFFFF;
+  --signin-link:#0D63E6;
+  --shadow-card:0 10px 40px -10px rgb(16 47 51 / 8%), 0 2px 10px -2px rgb(16 47 51 / 8%);
+  --signin-cta-shadow:0 4px 16px rgb(13 99 230 / 25%);
+  --art-soft:#EDF2F9; --art-soft-2:#E9ECF3; --art-highlight:#F3F5F9;
+  --art-line:#3B82F6; --art-accent:#75D625; --art-rose:#FF6B8B;
+  --art-pencil-shade:#D9DFEA; --art-pencil-dark:#334155;
+  --brand-dot:#E58A72;
 }
 /* Only essential-boundary lightness differs from the supplied dark table; measured below. */
 html[data-theme=dark] {
@@ -59,6 +67,14 @@ html[data-theme=dark] {
   --info:var(--color-primary-soft);--info-bg:var(--color-tint);--success:var(--color-primary);--success-bg:var(--color-tint);
   --warning:var(--color-accent);--warning-bg:var(--color-accent-bg);--warning-border:var(--color-accent);
   --danger-hover:var(--color-danger-bg);--danger-border:var(--color-danger);--shadow-dialog:transparent;--shadow-soft:transparent;
+  --signin-cta:#2E6BE6; --signin-cta-hover:#4A83F0; --signin-cta-pressed:#2458C4; --signin-cta-text:#FFFFFF;
+  --signin-link:#8FBAFF;
+  --shadow-card:none;
+  --signin-cta-shadow:0 4px 16px rgb(0 0 0 / 35%);
+  --art-soft:#162A26; --art-soft-2:#182B28; --art-highlight:#1E322E;
+  --art-line:#6EA0F8; --art-accent:#75D625; --art-rose:#FF7FA0;
+  --art-pencil-shade:#1E322E; --art-pencil-dark:#7E93A6;
+  --brand-dot:#E58A72;
 }
 /* Existing names are aliases, not a second palette. */
 :root { --canvas:var(--background);--ink:var(--text);--muted:var(--text-muted);--line:var(--border);--green:var(--action);--mint:var(--selection);--ink-muted:var(--text-muted);--danger-ink:var(--danger) }
