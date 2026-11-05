@@ -1,0 +1,19 @@
+// Seal the already captured bundle. Does not recollect/regenerate any input.
+import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+const here=path.dirname(fileURLToPath(import.meta.url)),root=path.resolve(here,'../..'),base=path.join(root,'artifacts/v4-checkpoint-verification'),out=fs.readFileSync(path.join(base,'latest-bundle.txt'),'utf8').trim();assert(out.startsWith(base+path.sep));
+const sha=b=>createHash('sha256').update(b).digest('hex'),manifest=JSON.parse(fs.readFileSync(path.join(out,'manifest.json'))),capture=JSON.parse(fs.readFileSync(path.join(out,'capture.json')));
+for(const [name,value]of Object.entries(manifest.files))assert.equal(sha(fs.readFileSync(path.join(out,name))),value);
+const rootArgsSha=sha(JSON.stringify({checkpoint:capture.checkpoint}));assert.equal(rootArgsSha,'e38bed03aadd216a2472fb92064cf77ee54aecc86f405f22259c6f6607731027');
+const approvedBytes=fs.readFileSync(path.join(root,'docs/PAYMENT_ACCEPTANCE_RESUMPTION_V3.json')),approved=JSON.parse(approvedBytes);assert.equal(sha(JSON.stringify(approved.plan)),approved.digest);assert.equal(approved.digest,'9ea7cb9e479d5df6c6cd79793aeb1ea53fb34e6b76a8fc139895afa4b06a27d8');assert.equal(approved.plan.checkpoint.args_sha256,rootArgsSha);
+for(const [from,to]of [['vm_test.rs','vm_test.rs'],['audit.mjs','audit.mjs'],['run-linux.sh','run-linux.sh'],['BUNDLE_README.md','README.md']])fs.copyFileSync(path.join(here,from),path.join(out,to));
+const crate=fs.readFileSync(path.join(base,'near-vm-runner-0.37.4.crate'));assert.equal(sha(crate),manifest.vmCrateSha256);fs.writeFileSync(path.join(out,'near-vm-runner-0.37.4.crate'),crate);
+fs.writeFileSync(path.join(out,'state-hex.json'),JSON.stringify(capture.state.values.map(v=>({key:Buffer.from(v.key,'base64').toString('hex'),value:Buffer.from(v.value,'base64').toString('hex')})),null,2)+'\n');
+fs.mkdirSync(path.join(out,'provenance'),{recursive:true});
+fs.writeFileSync(path.join(out,'provenance/trusted-root.json'),JSON.stringify({source:'Previously explicitly approved PAYMENT_ACCEPTANCE_RESUMPTION_V3.json',approvalDigest:approved.digest,sourceFileSha256:sha(approvedBytes),rootArgsSha256:rootArgsSha,initialTrust:'Owner-trusted initial current validator set; this check is not independent security review.'},null,2)+'\n');
+for(const [from,to]of [['rust-toolchain.toml','rust-toolchain.toml'],['contracts/vault/Cargo.toml','vault-Cargo.toml'],['contracts/vault/Cargo.lock','vault-Cargo.lock'],['contracts/vault/src/repair.rs','deployed-verifier-source.rs'],['contracts/vault/src/lib.rs','deployed-vault-source.rs'],['scripts/checkpoint-verification/prepare.mjs','prepare.mjs']])fs.copyFileSync(path.join(root,from),path.join(out,'provenance',to));
+function files(dir,prefix=''){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(d=>d.isDirectory()?files(path.join(dir,d.name),prefix+d.name+'/'):[prefix+d.name]);}
+manifest.initialRootArgsSha256=rootArgsSha;manifest.result.vmExecution='NOT EXECUTED: Linux/Cargo unavailable; runner prepared, not compiled';manifest.result.planReady=false;manifest.files={};
+for(const name of files(out).filter(n=>!['manifest.json','SHA256SUMS'].includes(n)&&!n.startsWith('results/')).sort())manifest.files[name]=sha(fs.readFileSync(path.join(out,name)));
+fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+const sums=files(out).filter(n=>n!=='SHA256SUMS'&&!n.startsWith('results/')).sort().map(name=>`${sha(fs.readFileSync(path.join(out,name)))}  ${name}`).join('\n')+'\n';fs.writeFileSync(path.join(out,'SHA256SUMS'),sums);
+console.log(JSON.stringify({bundle:out,files:Object.keys(manifest.files).length,manifestSha256:sha(fs.readFileSync(path.join(out,'manifest.json'))),rootArgsSha256:rootArgsSha,inputsUnchanged:true,vm:'NOT EXECUTED'}));
