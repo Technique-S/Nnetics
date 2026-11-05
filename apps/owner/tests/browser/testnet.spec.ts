@@ -148,7 +148,7 @@ test("controlled live adapter reads show finality and block unverified protocol-
   await expect(
     page.getByRole("alert", { name: "Testnet error" }),
   ).toContainText(
-    "Protocol 89 requires compatibility verification before signing.",
+    "This network version isn't approved for payments yet. Ask the owner to complete the review.",
   );
   expect(
     await page.evaluate(

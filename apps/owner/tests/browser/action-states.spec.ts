@@ -75,6 +75,7 @@ test("a dialog has one cancel control and keeps its recipient and exact amount f
   await page.getByRole("button", {name: "Add sample invoice", exact: true}).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("button", {name: "Cancel", exact: true})).toHaveCount(1);
+  await expect(dialog.getByRole("alert")).toHaveCount(0);
   await expect(dialog.getByRole("button", {name: "Close dialog", exact: true})).toHaveCount(0);
   await expect(dialog.getByLabel("Requested amount in NEAR")).toHaveValue("3");
   await expect(dialog.getByLabel("Invoice recipient")).toHaveValue("editor-demo.testnet");

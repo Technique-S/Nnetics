@@ -1,3 +1,4 @@
+import { api } from "./live-request.ts";
 // Shared billing DTOs. Payment execution remains server-side and separately gated.
 export interface WalletRequest {
     id: string;
@@ -129,7 +130,7 @@ export function safeTransactionLink(url: string | null): string | null {
 }
 export interface ContractorPortalAdapter {
     readonly mode: "simulation" | "persistent";
-    snapshot(): Promise<ContractorSnapshot>;
+    snapshot(signal?:AbortSignal): Promise<ContractorSnapshot>;
     command(input: ContractorCommand): Promise<{
         challenge?: string;
         invoice?:ContractorBill;
@@ -139,19 +140,18 @@ export interface ContractorPortalAdapter {
 
 export interface ContractorOwnerAdapter {
  readonly mode:"simulation"|"persistent";
- snapshot():Promise<PortalSnapshot>;
+ snapshot(signal?:AbortSignal):Promise<PortalSnapshot>;
  command(input:OwnerPortalCommand):Promise<{token?:string}>;
  start?():Promise<void>;
 }
 export interface WalletChallenge {nonce:string;message:string;recipient:string;accountId:string;}
-async function persistentRequest<T>(path:string,body?:unknown):Promise<T>{
- const r=await fetch(`/api/live/contractors/${path}`,{method:body===undefined?"GET":"POST",credentials:"same-origin",cache:"no-store",...(body===undefined?{}:{headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),signal:AbortSignal.timeout(90000)});
- const data=await r.json();if(!r.ok)throw Error(data.error||"Private contractor access unavailable.");return data as T;
+async function persistentRequest<T>(path:string,body?:unknown,signal?:AbortSignal):Promise<T>{
+ return api<T>('contractors/'+path,body,signal);
 }
 export class PersistentContractorAdapter implements ContractorPortalAdapter {
  readonly mode="persistent" as const;
  async enter(token:string){await persistentRequest("enter",{token});}
- snapshot(){return persistentRequest<ContractorSnapshot>("contractor");}
+ snapshot(signal?:AbortSignal){return persistentRequest<ContractorSnapshot>("contractor",undefined,signal);}
  command(input:ContractorCommand){return persistentRequest<{challenge?:string;invoice?:ContractorBill}>("contractor",input);}
  challenge(account:string){return persistentRequest<WalletChallenge>("wallet/challenge",{account});}
  proof(input:WalletChallenge&{accountId:string;publicKey:string;signature:string}){return persistentRequest("wallet/proof",input);}
@@ -162,7 +162,7 @@ export class PersistentContractorOwnerAdapter implements ContractorOwnerAdapter 
  readonly mode="persistent" as const;
  readonly organization:string;
  constructor(organization:string){this.organization=organization;}
- snapshot(){return persistentRequest<PortalSnapshot>(`owner?organization=${encodeURIComponent(this.organization)}`);}
+ snapshot(signal?:AbortSignal){return persistentRequest<PortalSnapshot>(`owner?organization=${encodeURIComponent(this.organization)}`,undefined,signal);}
  command(input:OwnerPortalCommand){return persistentRequest<{token?:string}>("owner",{...input,organization:this.organization});}
 }
 async function request<T>(path: string, body?: unknown): Promise<T> {

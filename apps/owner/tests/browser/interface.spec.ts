@@ -17,7 +17,7 @@ test('owner load failure offers retry, and failed creation retains the name', as
   await page.getByRole('button',{name:'Retry owner access'}).click();
   await page.getByLabel('Contractor name',{exact:true}).fill('Keep this name');
   await page.getByRole('button',{name:'Create contractor profile'}).click();
-  await expect(page.getByRole('main').getByRole('alert')).toHaveText('Save unavailable');
+  await expect(page.getByRole('main').getByRole('alert')).toHaveText("We couldn't check your account right now. Please try again shortly.");
   await expect(page.getByLabel('Contractor name',{exact:true})).toHaveValue('Keep this name');
 });
 
@@ -30,7 +30,7 @@ test('first demo session reports start failures and can retry', async ({page}) =
   });
   await page.goto('/demo/contractors');
   await page.getByRole('button',{name:'Start contractor demo'}).click();
-  await expect(page.getByRole('main').getByRole('alert')).toHaveText('Try starting again');
+  await expect(page.getByRole('main').getByRole('alert')).toHaveText('Something went wrong on our side. Please try again in a moment.');
   failStart=false;
   await page.getByRole('button',{name:'Start contractor demo'}).click();
   await expect(page.getByLabel('Contractor name',{exact:true})).toBeVisible();

@@ -67,8 +67,8 @@ test("signer accepts only tested runtime versions and refuses protocol 89 despit
   assert.doesNotThrow(() => assertTestedProtocol(86));
   assert.doesNotThrow(() => assertTestedProtocol(88));
   assert.throws(() => assertTestedProtocol(undefined));
-  const previous = process.env.NNETICS_TRANSACTIONS_AUTHORIZED;
-  process.env.NNETICS_TRANSACTIONS_AUTHORIZED = "testnet-reviewed";
+  const previous = process.env.NNETICS_PAYMENT_EXECUTION_AUTHORIZED;
+  process.env.NNETICS_PAYMENT_EXECUTION_AUTHORIZED = "testnet-reviewed";
   try {
     const transport = new WorkerNearTransport(liveConfig());
     transport.rpc.finalized = async () => ({
@@ -92,8 +92,8 @@ test("signer accepts only tested runtime versions and refuses protocol 89 despit
     );
   } finally {
     if (previous === undefined)
-      delete process.env.NNETICS_TRANSACTIONS_AUTHORIZED;
-    else process.env.NNETICS_TRANSACTIONS_AUTHORIZED = previous;
+      delete process.env.NNETICS_PAYMENT_EXECUTION_AUTHORIZED;
+    else process.env.NNETICS_PAYMENT_EXECUTION_AUTHORIZED = previous;
   }
 });
 test("database rejects scope reuse without leaking an open connection", () => {

@@ -1,3 +1,5 @@
+import { rpcRequest } from "./rpc-request.ts";
+import { RequestError } from "../data/request-policy.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -8,6 +10,9 @@ import { nep413Digest, walletAccount } from "./auth.ts";
 // A transport outage is not evidence that the wallet's key was removed.
 export class IdentityVerificationUnavailable extends Error {
   readonly retryable = true;
+  readonly automaticRetry:boolean;
+  readonly retryAfterMs:number;
+  constructor(message:string,automaticRetry=true,retryAfterMs=0) {super(message);this.automaticRetry=automaticRetry;this.retryAfterMs=retryAfterMs;}
 }
 export const IDENTITY_SESSION_MS = 5 * 60 * 60 * 1000; // no earlier idle logout than the five-hour cap
 export const IDENTITY_ABSOLUTE_MS = 5 * 60 * 60 * 1000;
@@ -23,7 +28,7 @@ export function identityConfig() {
     throw new Error(
       "Configure the exact application origin, then restart the server.",
     );
-  const rpc = process.env.NNETICS_RPC_URL || "https://test.rpc.fastnear.com";
+  const rpc = process.env.NNETICS_RPC_URL || "https://rpc.testnet.fastnear.com";
   if (new URL(rpc).protocol !== "https:")
     throw new Error("Wallet verification needs an HTTPS testnet RPC.");
   return {
@@ -150,38 +155,16 @@ export class IdentityAuth {
     return {nonce,message,recipient:this.config.origin};
   }
   async rpc<T>(method: string, params: unknown): Promise<T> {
-    const r = await fetch(this.config.rpc, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-      signal: AbortSignal.timeout(20000),
-      cache: "no-store",
-    }).catch(() => {
-      throw new IdentityVerificationUnavailable(
-        "Cannot reach NEAR testnet verification. Check your connection and retry verification; an existing session has not been revoked.",
-      );
-    });
-    if (!r.ok)
-      throw new IdentityVerificationUnavailable(
-        "Testnet verification RPC is temporarily unavailable. Retry verification; no new access was granted.",
-      );
-    const body = await r.json().catch(() => {
-      throw new IdentityVerificationUnavailable("Invalid verification RPC response. Retry verification.");
-    });
-    if (
-      body.error &&
-      ["UNKNOWN_ACCOUNT", "UNKNOWN_ACCESS_KEY"].includes(body.error.cause?.name)
-    )
-      throw new Error(
-        "Account or signing key was not found on testnet. Select the activated account ID shown in Meteor, enable testnet and retry. An implicit address is a different account from its named account.",
-      );
-    if (body.error)
-      throw new IdentityVerificationUnavailable(
-        "NEAR testnet RPC could not verify the account. Retry with a fresh message; no access was granted.",
-      );
-    if (!body.result)
-      throw new IdentityVerificationUnavailable("Incomplete testnet verification response. Retry verification.");
-    return body.result as T;
+    try { return await rpcRequest<T>(this.config.rpc, method, params); }
+    catch (error) {
+      if (error instanceof RequestError && ["UNKNOWN_ACCOUNT", "UNKNOWN_ACCESS_KEY"].includes(error.rpcCode || ""))
+        throw new Error("Account or signing key was not found on testnet. Select the activated account ID shown in Meteor, enable testnet and retry. An implicit address is a different account from its named account.");
+      if (error instanceof RequestError)
+        throw new IdentityVerificationUnavailable(error.message,error.retryable,error.retryAfterMs);
+      if (error instanceof Error && ['AbortError','TimeoutError'].includes(error.name))
+        throw new IdentityVerificationUnavailable('Verification was interrupted; your session is retained.');
+      throw error;
+    }
   }
   async keyBlock(identity: Identity) {
     const [status, block] = await Promise.all([

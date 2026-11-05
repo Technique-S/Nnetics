@@ -1,8 +1,10 @@
 "use client";
+import {getUserMessage} from "../data/user-message";
 import {ActionButton} from "./action-button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { OperationFeedback } from "./operation-feedback";
 import { verifyVaultTransaction } from "../data/vault-transaction";
-import { api } from "../data/near-adapter";
+import { api, LiveApiError } from "../data/near-adapter";
 import {
   meteorExtension,
   requestMeteorVaultCreation,
@@ -41,49 +43,73 @@ export function VaultOnboarding({ organization }: { organization: string }) {
     [busy, setBusy] = useState(false),
     [reviewed, setReviewed] = useState(false);
   const [walletHash,setWalletHash]=useState("");
+  const pending=useRef<AbortController|null>(null), epoch=useRef(0), locked=useRef(false);
+  const [stage,setStage]=useState("");
   useEffect(() => {
+    const controller=new AbortController(), mine=++epoch.current;
+    pending.current=controller;locked.current=true;setBusy(true);setStage("Checking vault setup…");
     let current = true;
     void api<Progress>(
-      "provisioning?organization=" + encodeURIComponent(organization),
+      "provisioning?organization=" + encodeURIComponent(organization), undefined, controller.signal,
     )
       .then((p) => {
         if (current) setProgress(p);
       })
       .catch((e) => {
         if (current) setError(e.message);
-      });
+      }).finally(()=>{if(mine===epoch.current){locked.current=false;setBusy(false);}});
     return () => {
       current = false;
+      epoch.current++;controller.abort();pending.current?.abort();locked.current=false;
     };
   }, [organization]);
   async function run(action: "prepare" | "reconcile" | "dispatch" | "retry") {
+    if(locked.current)return;
+    locked.current=true;
+    const mine=epoch.current, controller=new AbortController();pending.current=controller;
     setBusy(true);
+    setStage(action==="dispatch"||action==="prepare" ? "Preparing funding request…" : "Checking transaction status…");
     setError("");
     try {
+      // An existing hash only permits read-only reconciliation, never another prompt.
+      if(action==="dispatch" && progress?.hash)action="reconcile";
       const p = await api<Progress>("provisioning/" + action, {
         organization,
         digest: progress?.planDigest,
         ...(action==="reconcile"&&walletHash.trim()?{transactionHash:walletHash.trim()}:{}),
-      });
+      },controller.signal);
+      if(mine!==epoch.current)return;
       setProgress(p);
       if (action === "retry") setReviewed(false);
       if (action === "dispatch") {
         const unsigned = await verifyVaultTransaction(p);
+        controller.signal.throwIfAborted();
+        setStage("Waiting for wallet approval…");
         // Losing focus clears authenticated records. The durable outbox survives
         // that logout/unmount and a browser restart; wallet return data cannot link it.
-        await requestMeteorVaultCreation(meteorExtension(), unsigned);
+        await requestMeteorVaultCreation(meteorExtension(), unsigned,120000,controller.signal);
+        if(mine!==epoch.current)return;
+        setStage("Checking transaction status…");
         setProgress(
-          await api<Progress>("provisioning/reconcile", { organization }),
+          await api<Progress>("provisioning/reconcile", { organization },controller.signal),
         );
       }
     } catch (e) {
-      setError((e as Error).message);
+      if(mine!==epoch.current)return;
+      if(e instanceof LiveApiError && !e.retryable){setError(e.message);return;}
+      // Dispatch may have durably recorded a hash even if its response was lost.
+      if(action==="dispatch") {
+        try {setProgress(await api<Progress>("provisioning?organization="+encodeURIComponent(organization),undefined,controller.signal));}catch{}
+        if(mine!==epoch.current)return;
+        setError("We couldn’t confirm this transaction yet. Check its status before trying again.");
+      } else setError((e as Error).message);
     } finally {
-      setBusy(false);
+      if(mine===epoch.current){locked.current=false;setBusy(false);}
     }
   }
   return (
-    <section aria-label="Create vault" className="vault-onboarding">
+    <section aria-label="Create vault" className="vault-onboarding" aria-busy={busy}>
+      <OperationFeedback active={busy} message={stage} />
       <ol className="provisioning-steps" aria-label="Vault setup progress"><li aria-current={!progress?.state || progress.state === "prepared" ? "step" : undefined}>Review</li><li aria-current={progress?.state === "awaiting_chain" ? "step" : undefined}>Wallet approval</li><li aria-current={progress?.state === "verified" ? "step" : undefined}>Verify on chain</li></ol>
       <h2>
         {progress?.state === "verified" ? "Verified vault" : "Create vault"}
@@ -106,7 +132,7 @@ export function VaultOnboarding({ organization }: { organization: string }) {
           and approval before wallet requests can be enabled.
         </p>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{getUserMessage(error,"payment")}</p>}
       {progress?.vault && (
         <>
           <dl>

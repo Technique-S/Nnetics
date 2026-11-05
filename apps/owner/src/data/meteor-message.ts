@@ -203,13 +203,25 @@ export function initializeMeteorExtension(): MeteorExtension {
   return extension;
 }
 
-// The pinned SDK encodes one unsigned Borsh transaction as base64 for action `sign`.
-// Outcome payloads are hints only; the server reconciles its pre-recorded hash.
+// The pinned SDK uses base64 Borsh for action `sign`; this is sign-and-send,
+// not a guarantee of exact-byte signing. The observed extension refreshed blockHash.
+// V2 still requires the pinned hash: a different result stays in durable manual review.
 export function requestMeteorVaultCreation(
   extension: MeteorExtension,
   unsigned: string,
   timeoutMs = 120000,
+  signal?: AbortSignal,
 ): Promise<void> {
+  return requestMeteorOwnerTransaction(extension,unsigned,timeoutMs,signal).then(()=>undefined);
+}
+
+// Same pinned sign-and-send protocol as provisioning. No login or access keys.
+// Wallet outcomes are hints. Never substitute a returned hash for the prepared hash,
+// even if its visible action matches and RPC reports success.
+export function requestMeteorOwnerTransaction(
+  extension:MeteorExtension,unsigned:string,timeoutMs=120000,signal?:AbortSignal,
+):Promise<string|undefined> {
+  if(signal?.aborted)return Promise.reject(Error("Wallet request interrupted. Check the recorded transaction status before trying again."));
   if (
     !unsigned ||
     unsigned.length > 20000 ||
@@ -233,11 +245,12 @@ export function requestMeteorVaultCreation(
           ? { inputs: { transactions: unsigned } }
           : {}),
       });
-    const finish = (error?: string) => {
+    const finish = (error?: string,hash?:string) => {
       if (done) return;
       done = true;
       clearInterval(interval);
       clearTimeout(timeout);
+      signal?.removeEventListener('abort',abort);
       pending.delete(uid);
       status = error ? "disconnected" : "closed_success";
       try {
@@ -246,7 +259,7 @@ export function requestMeteorVaultCreation(
         /* The durable server hash remains authoritative. */
       }
       if (error) reject(Error(error));
-      else resolve();
+      else resolve(hash);
     };
     pending.set(uid, (data) => {
       if (
@@ -258,7 +271,12 @@ export function requestMeteorVaultCreation(
         );
       if (data.status === "connected") status = "connected";
       else if (data.status === "attempting_reconnect") status = "initializing";
-      else if (data.status === "closed_success") finish();
+      else if (data.status === "closed_success") {
+        const payload=data.payload as {executionOutcomes?:{transaction?:{hash?:string}}[]}|undefined;
+        const outcomes=payload?.executionOutcomes;
+        if(outcomes && outcomes.length!==1)return finish('Unexpected wallet outcomes. Reconcile the recorded transaction.');
+        finish(undefined,outcomes?.[0]?.transaction?.hash);
+      }
       else if (
         ["closed_fail", "closed_window", "disconnected"].includes(
           String(data.status),
@@ -282,6 +300,8 @@ export function requestMeteorVaultCreation(
         ),
       timeoutMs,
     );
+    const abort=()=>finish("Wallet request interrupted. Check the recorded transaction status before trying again.");
+    signal?.addEventListener('abort',abort,{once:true});
     try {
       send();
     } catch {

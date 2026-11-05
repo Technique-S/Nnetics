@@ -18,6 +18,14 @@ const id = (value: string) => {
 };
 const now = () =>
   uint((BigInt(Date.now()) * 1_000_000n).toString(), (1n << 64n) - 1n);
+export interface ContractorPaymentDraft {
+  id: string;
+  contractorId: string;
+  name: string;
+  recipient: string;
+  amount: string;
+  description: string;
+}
 export const DEMO_AGENT = {
   account_id: account("worker-demo.testnet"),
   public_key: "ed25519:11111111111111111111111111111111",
@@ -143,6 +151,7 @@ export class MockOwnerAdapter implements OwnerAdapter {
   readonly mode = "simulation" as const;
   readonly deploymentEnabled = false as const;
   private state = fixtures();
+  private contractorNames = new Map<string,string>();
   private listeners = new Set<() => void>();
   private fail = false;
   private epoch = 0;
@@ -191,6 +200,7 @@ export class MockOwnerAdapter implements OwnerAdapter {
     this.epoch++;
     const revision = this.state.revision;
     this.state = fixtures();
+    this.contractorNames.clear();
     this.state.revision = revision;
     this.emit("Local simulation reset.");
   }
@@ -308,6 +318,35 @@ export class MockOwnerAdapter implements OwnerAdapter {
     if (!invoice) throw new Error("Invoice not found.");
     invoice.reviewed = true;
     this.emit("Invoice review acknowledged. Payment rules still apply.");
+  }
+  contractorName(invoiceId:string) {
+    return this.contractorNames.get(invoiceId);
+  }
+  async payContractor(draft: ContractorPaymentDraft, scenario: TransferScenario) {
+    this.check();
+    id(draft.id);
+    id(draft.contractorId);
+    const s = this.state;
+    const recipient = account(draft.recipient);
+    const amount = uint(draft.amount);
+    if (!draft.description.trim() || draft.description.length > 240) throw Error("Enter a short payment description.");
+    if (s.invoices.some(invoice => invoice.id === draft.id)) throw Error("This request already exists. Check History before taking any action.");
+    if (s.payments.some(payment => payment.recipient === recipient && payment.status === "Pending")) throw Error("A payment to this wallet is unresolved. Check History before preparing another.");
+    const known = s.vendors.find(vendor => vendor.recipient === recipient && vendor.active);
+    const vendor = known ?? {id:draft.contractorId,name:draft.name,role:"Contractor",recipient,active:true};
+    if (!known && (s.vendors.length >= 3 || s.vendors.some(v => v.id === vendor.id)))
+      throw Error("The simulated vault has no available recipient slots. Use a contractor with an existing payout wallet in this fixture.");
+    const order:WorkOrder = {id:draft.id,title:draft.description,vendor_id:vendor.id,recipient,amount,
+      expires_at_ns:uint((BigInt(now())+86_400_000_000_000n).toString()),enabled:true,status:"Approved",current_attempt:uint("0"),attempts:0};
+    const invoice:Invoice = {id:draft.id,order_id:order.id,vendor_id:vendor.id,recipient,amount,asset:"NEAR",text:draft.description,reviewed:true};
+    const candidate = {...s,vendors:known?s.vendors:[...s.vendors,vendor],orders:[...s.orders,order]};
+    const reasons = review(candidate,invoice);
+    if (reasons.length) throw Error("Payment blocked: "+reasons.join(", "));
+    if (!known) s.vendors.push(vendor);
+    s.orders.push(order);
+    s.invoices.unshift(invoice);
+    this.contractorNames.set(invoice.id,draft.name);
+    await this.simulatePayment(invoice.id,scenario);
   }
   async simulatePayment(id: string, scenario: TransferScenario) {
     this.check();

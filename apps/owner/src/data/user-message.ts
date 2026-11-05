@@ -4,6 +4,37 @@ export const GENERIC_MESSAGE = "Something went wrong on our side. Please try aga
 export function getUserMessage(error:unknown,context:MessageContext="general"):string{
  const text=error instanceof Error?error.message:typeof error==="string"?error:"";
  const matches=(pattern:RegExp)=>pattern.test(text);
+ if(matches(/acceptance.*already submitted/i))return "This one-use acceptance was already submitted. Check its recorded owner transaction; another signature is not allowed.";
+ if(matches(/outside the reviewed acceptance scope/i))return "This action is outside the approved storage funding acceptance. No other owner transaction is allowed.";
+ if(matches(/Owner transactions require a valid hash-verified/i))return "Owner signing needs a valid reviewed acceptance plan. Check owner transaction configuration; payment execution remains separate.";
+ if(matches(/Meteor rejected or closed/))return "Meteor rejected or closed the request. Submission is not confirmed; check the recorded owner transaction before signing again.";
+ if(matches(/Meteor transaction approval timed out/))return "Meteor approval timed out. Submission is not confirmed; check the recorded owner transaction before signing again.";
+ if(matches(/Conflicting wallet transaction evidence|(?:Owner transaction|Transaction differs from).*manual review required/i))return "This owner transaction needs manual review. Keep all recorded transaction IDs; do not sign a replacement.";
+ if(matches(/Wallet returned a different transaction/))return "Meteor reported a different transaction. Both transaction IDs need manual review; do not sign a replacement.";
+ if(matches(/Owner transaction outcome is unknown|recorded owner request|prepared owner request/))return "This owner transaction is not confirmed. Check its recorded transaction status before requesting another signature.";
+ if(matches(/unsubmitted review|owner transaction review expired|prepared transaction expired/))return "This review was not submitted. Cancel the unsubmitted review, then check the account and transaction details again.";
+ if(matches(/review cancelled/))return "Review cancelled. No wallet transaction was requested.";
+ if(matches(/fee allowance|balance does not cover/))return "The account must cover the exact deposit and displayed fee allowance. Check its balance and current fees before proceeding.";
+ if(matches(/Conflicting amount/i))return "Your bill contains more than one amount. Confirm one amount before submitting.";
+ if(matches(/configuration changed|workspace configuration changed/i))return "The workspace configuration changed. Previous records were cleared; reopen your authorized workspace.";
+ if(matches(/Wallet switched/i))return "Choose your wallet account in Meteor, then connect again.";
+
+ if(matches(/unknown[ _-]outcome|ambiguous outcome|unresolved.*(?:payment|transfer)|awaiting.chain|transaction.*timed out|outcome.*unknown|(?:payment|transfer|transaction).*(?:not|couldn't).*confirm|(?:not|couldn't).*confirm.*(?:payment|transfer|transaction)/i))return "The payment result isn't confirmed. Check payment history before trying again.";
+ if(matches(/Your message was accepted/i))return "Your wallet is verified. We couldn't load your workspace. Retry verification without signing again.";
+ if(matches(/contract.*(?:reject|panic)|CONTRACT_EXECUTION_ERROR/i))return "The contract rejected this operation. Review the recorded details before requesting another transaction.";
+
+ if(matches(/owner transactions are disabled|signing is disabled|transactions?.*(?:disabled|not authorized)/i))return "Owner transactions are disabled. No wallet request was made.";
+ if(matches(/checkpoint.*(?:expired|future|ahead|valid|reviewed)|recovery.*checkpoint/i))return "Payments are blocked until the owner refreshes and reviews the recovery security check. No payment was sent.";
+ if(matches(/rate.limit|HTTP 429/i))return "The network provider is limiting requests. Wait before retrying verification; your session is retained.";
+ if(matches(/network request timed out|verification timed out/i))return "The network request timed out. Retry verification; your session is retained.";
+ if(matches(/five.hour.*expir/i))return "Your five-hour session has expired. Sign in again to continue.";
+
+ if(text==='We couldn’t confirm this transaction yet. Check its status before trying again.')return "This owner transaction is not confirmed. Check its recorded transaction status before requesting another signature.";
+ if(matches(/verification could not finish within the waiting limit/i))return "Verification could not finish within the waiting limit. Retry verification.";
+ if(matches(/provider.*denied access|providers denied access/i))return "The network provider denied access. Check provider configuration before retrying.";
+ if(matches(/provider TLS/i))return "The provider connection could not be verified. Check provider configuration.";
+ if(matches(/contract rejected the recorded transaction/i))return "The contract rejected this transaction. Review its details before trying again.";
+ if(matches(/Meteor supports message login only/i))return "Meteor transaction signing is not supported by this connector. No transaction was requested.";
  if(matches(/unknown[ _-]outcome|ambiguous outcome|unresolved.*(?:payment|transfer)|awaiting.chain|transaction.*timed out|outcome.*unknown|(?:payment|transfer|transaction).*(?:not|couldn't).*confirm|(?:not|couldn't).*confirm.*(?:payment|transfer|transaction)/i))return "The payment result isn't confirmed. Check payment history before trying again.";
  if(matches(/transfer[ _-]failed|transfer.*failed|payment.*failed/i))return "The transfer failed. Check the payment record before requesting another payment.";
  if(matches(/already paid|already.*confirmed payment/i))return "This work has already been paid. Open payment history to view the payment.";
@@ -18,7 +49,7 @@ export function getUserMessage(error:unknown,context:MessageContext="general"):s
  if(matches(/paused|revoked.*agent|agent.*revoked|worker.*revoked/i))return "Payments are paused. The owner can review payment access in Balance.";
  if(matches(/permission|only.*owner|owner.*only|not authoriz|access denied|read.only|viewer/i))return "You don't have permission to make this change. Use an approved account or contact the owner.";
  if(matches(/invalid.*account|valid NEAR account|invalid.*address|account.*format/i))return "Enter a valid NEAR account ID and check it before continuing.";
- if(matches(/mainnet|wrong network|testnet account/i))return "Switch your wallet to the network shown on this page, then connect again.";
+ if(matches(/mainnet|wrong network|different network|testnet account/i))return "Switch your wallet to the network shown on this page, then connect again.";
  if(matches(/extension|Meteor.*available|Meteor.*install|wallet.*missing/i))return "Open this page in the browser with Meteor installed. Unlock the wallet and allow access to this site.";
  if(matches(/signature|wallet.*different|account.*changed|key.*removed|key.*revoked|wallet.*control/i))return "Your wallet access couldn't be verified. Check the selected account and sign in again.";
  if(matches(/1 MB|file.*large|upload.*size/i))return "Choose a file no larger than 1 MB.";
@@ -30,6 +61,7 @@ export function getUserMessage(error:unknown,context:MessageContext="general"):s
 
 /** Public action progress: provider messages and transaction internals never become UI text. */
 export function getProgressMessage(value:string):string{
+ if(/^(Checking vault balance|Preparing funding request|Checking transaction status|Preparing wallet transaction|Checking the approved transaction on the network|Loading contractor records|Loading your billing records|Loading verified workspace records|Checking your saved session)…$/.test(value))return value;
  if(/wallet|approval|sign/i.test(value))return "Waiting for your wallet approval…";
  if(/confirm|receipt|chain|final/i.test(value))return "Checking the result…";
  if(/workspace|organization|record|snapshot/i.test(value))return "Loading your workspace…";

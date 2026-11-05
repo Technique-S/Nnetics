@@ -6,7 +6,7 @@ async function start(page: Page, name = "Writer") {
     await page.goto("/demo/contractors");
     await page.getByRole("button", { name: "Start contractor demo" }).click();
     await page.getByLabel("Contractor name", { exact: true }).fill(name);
-    await page.getByRole("button", { name: "Create contractor profile" }).click();
+    await page.getByRole("button", { name: "Add contractor" }).click();
     await page.getByRole("button", { name: `Create private link · ${name}`, exact: true }).click();
     return await page.getByLabel("Private invitation link · shown once").inputValue();
 }
@@ -22,19 +22,22 @@ test("owner invite → contractor upload and clarification → owner review, wal
     const link = await start(page), ctx = await browser.newContext({ baseURL: origin, viewport: page.viewportSize()! }), contractor = await ctx.newPage();
     await contractor.goto(link);
     await expect(contractor.getByRole("heading", { name: "Writer · Billing" })).toBeVisible();
-    await expect(contractor.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
+    await expect(contractor.getByRole("button",{name:"Wallet details",exact:true})).toHaveAttribute("aria-current","page");
     await expect(contractor.getByLabel("Invoice reference",{exact:true})).toHaveCount(0);
     await expect(contractor.getByText("Simulated data", { exact: false })).toBeVisible();
     await requestWallet(contractor, "writer-demo.testnet");
     await page.getByRole("button", { name: "Refresh owner records" }).click();
     await page.getByRole("button", { name: "Approve wallet · Writer", exact: true }).click();
+    await page.getByText("Billing agreement for optional bills",{exact:true}).click();
     await page.getByLabel("Work order reference · Writer").fill("WO-ARTICLE");
     await page.getByLabel("Work description · Writer").fill("One article");
     await page.getByLabel("Amount · Writer").fill("1");
     await page.getByRole("button", { name: "Approve work order · Writer", exact: true }).click();
+    await page.getByText("Saved billing agreements",{exact:true}).click();
     await expect(page.getByText("WO-ARTICLE · One article")).toBeVisible();
     await contractor.bringToFront();
-    await contractor.getByRole("button", { name: "Submit a bill", exact: true }).click();
+    await contractor.getByRole("button", { name: "Send a bill", exact: true }).click();
+    await expect(contractor.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
     await contractor.getByText("Attachments and extraction (optional)",{exact:true}).click();
     await contractor.getByLabel("Attach an invoice", { exact: true }).setInputFiles({ name: "article.txt", mimeType: "text/plain", buffer: Buffer.from("Invoice: INV-ARTICLE\nWork order: WO-ARTICLE\nAmount: 2 NEAR\nArticle delivered.") });
     await expect(contractor.getByText("article.txt ·", { exact: false })).toBeVisible();
@@ -70,7 +73,7 @@ test("owner invite → contractor upload and clarification → owner review, wal
     await expect(page.getByText("Immutable recipient: replacement-demo.testnet", { exact: true })).toBeVisible();
     // A second private capability has neither the first contractor's invoice nor orders.
     await page.getByLabel("Contractor name", { exact: true }).fill("Designer");
-    await page.getByRole("button", { name: "Create contractor profile" }).click();
+    await page.getByRole("button", { name: "Add contractor" }).click();
     await page.getByRole("button", { name: "Create private link · Designer", exact: true }).click();
     await expect(page.getByLabel("Private invitation link · shown once")).not.toHaveValue(link);
     const secondLink = await page.getByLabel("Private invitation link · shown once").inputValue();
@@ -133,7 +136,7 @@ test("conflicting invoice labels require clarification; uploaded markup cannot b
     await contractor.goto(link);
     await contractor.getByLabel("Bill text", { exact: true }).fill("Invoice: INV-1\nAmount: 1 NEAR\nAmount: 99 NEAR\n<script>window.stolen=true</script>");
     await contractor.getByRole("button", { name: "Format labeled details" }).click();
-    await expect(contractor.getByRole("alert").filter({ hasText: "Conflicting amount" })).toBeVisible();
+    await expect(contractor.getByRole("alert").filter({ hasText: "more than one amount" })).toBeVisible();
     await expect(contractor.getByRole("button", { name: "Submit bill for review" })).toBeDisabled();
     const bad = await contractor.request.post("/api/demo/contractors/upload", { headers: { Origin: origin }, multipart: { file: { name: "invoice.html", mimeType: "text/html", buffer: Buffer.from("<script>alert(1)</script>") } } });
     expect(bad.status()).toBe(400);
@@ -169,8 +172,9 @@ test("pasted currency conflicts block NEAR submission until the source is clarif
  const link=await start(page),ctx=await browser.newContext({baseURL:origin}),contractor=await ctx.newPage();
  await contractor.goto(link);await requestWallet(contractor,"writer-demo.testnet");
  await page.getByRole("button",{name:"Refresh owner records"}).click();await page.getByRole("button",{name:"Approve wallet · Writer",exact:true}).click();
+ await page.getByText("Billing agreement for optional bills",{exact:true}).click();
  await page.getByLabel("Work order reference · Writer").fill("CURRENCY-WO");await page.getByLabel("Work description · Writer").fill("Article");await page.getByLabel("Amount · Writer").fill("1");await page.getByRole("button",{name:"Approve work order · Writer",exact:true}).click();
- await contractor.bringToFront(); await contractor.getByRole("button",{name:"Submit a bill",exact:true}).click();
+ await contractor.bringToFront(); await contractor.getByRole("button",{name:"Send a bill",exact:true}).click();
  await expect(contractor.getByLabel("Approved work order",{exact:true})).toContainText("CURRENCY-WO");
  await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 USD\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByLabel("Work description",{exact:true}).fill("Article");
  await expect(contractor.locator("#submission-guidance")).toContainText("Currency conflict: clarify");await expect(contractor.getByRole("button",{name:"Submit bill for review"})).toBeDisabled();

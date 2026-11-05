@@ -1,4 +1,8 @@
 "use client";
+import {ViewMetadata} from "../view-metadata";
+import {getUserMessage} from "../../data/user-message";
+import {LiveApiError} from "../../data/live-request";
+import {OperationFeedback} from "../operation-feedback";
 import {ActionButton} from "../action-button";
 import {LoadingSkeleton} from "../loading-skeleton";
 import { useEffect, useRef, useState } from "react";
@@ -15,25 +19,31 @@ function ContractorPortal({adapter}:{adapter:MockContractorAdapter|PersistentCon
  const persistent=adapter.mode==="persistent",walletAbort=useRef<AbortController|null>(null);
  const [extraction,setExtraction]=useState<BillingPreview|null>(null),[confirmed,setConfirmed]=useState(false),[publicText,setPublicText]=useState(false);
     const [snapshot, setSnapshot] = useState<ContractorSnapshot | null>(null), [loading, setLoading] = useState(true), [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
-    const [tab, setTab] = useState("Submit a bill"), [body, setBody] = useState(""), [fields, setFields] = useState<BillFields>(empty), [description, setDescription] = useState(""), [attachment, setAttachment] = useState<BillAttachment | null>(null), [edit, setEdit] = useState<ContractorBill | null>(null);
+    const [tab, setTab] = useState("Wallet details"), [body, setBody] = useState(""), [fields, setFields] = useState<BillFields>(empty), [description, setDescription] = useState(""), [attachment, setAttachment] = useState<BillAttachment | null>(null), [edit, setEdit] = useState<ContractorBill | null>(null);
     const [wallet, setWallet] = useState(""), [challenge, setChallenge] = useState("");
     useEffect(()=>{setConfirmed(false);},[body,fields.amount,fields.orderId,fields.recipient,description]);
     const submission = useRef("");
     const current = useRef(""), accessGeneration = useRef(0), sessionReady = useRef(false);
-    function clearDraft() { walletAbort.current?.abort(); submission.current = ""; setExtraction(null);setConfirmed(false);setPublicText(false);setBody(""); setFields(empty); setDescription(""); setAttachment(null); setEdit(null); setWallet(""); setChallenge(""); }
-    async function refresh() { if (!sessionReady.current)
-        return; const generation = accessGeneration.current; try {
-        const next = await adapter.snapshot();
+    function clearDraft() { readAbort.current?.abort();walletAbort.current?.abort(); submission.current = ""; setExtraction(null);setConfirmed(false);setPublicText(false);setBody(""); setFields(empty); setDescription(""); setAttachment(null); setEdit(null); setWallet(""); setChallenge(""); }
+    const readAbort=useRef<AbortController|null>(null),readRunning=useRef(false),pollPaused=useRef(false);
+    const [reading,setReading]=useState(false);
+    async function refresh(manual=true) { if(readRunning.current||(!manual&&pollPaused.current))return;
+ if (!sessionReady.current)
+        return; const controller=new AbortController();readAbort.current=controller;readRunning.current=true;setReading(true);const generation = accessGeneration.current; try {
+        const next = await adapter.snapshot(controller.signal);
         if (generation !== accessGeneration.current)
             return;
         if (current.current && current.current !== next.profile.id)
             clearDraft();
+        if (!current.current || current.current !== next.profile.id) setTab(next.profile.wallet && !next.profile.pendingWallet ? "My payments" : "Wallet details");
         current.current = next.profile.id;
-        setSnapshot(next);
+        pollPaused.current=false;setSnapshot(next);
     }
     catch (e) {
         if (generation !== accessGeneration.current)
             return;
+        pollPaused.current=true;
+        if(e instanceof LiveApiError&&e.retryable){setLoading(false);setError(e.message);return;}
         accessGeneration.current++;
         sessionReady.current = false;
         setLoading(false);
@@ -42,7 +52,7 @@ function ContractorPortal({adapter}:{adapter:MockContractorAdapter|PersistentCon
         clearDraft();
         setNotice("");
         setError(e instanceof Error ? e.message : "Private access unavailable.");
-    } }
+    } finally {readRunning.current=false;if(generation===accessGeneration.current)setReading(false);} }
     useEffect(() => { let active = true; async function load() { const generation = ++accessGeneration.current; sessionReady.current = false; setLoading(true); setSnapshot(null); setNotice(""); setError(""); setBusy(false); clearDraft(); try {
         const token = location.hash.slice(1);
         if (token) {
@@ -66,8 +76,8 @@ function ContractorPortal({adapter}:{adapter:MockContractorAdapter|PersistentCon
         if (active && generation === accessGeneration.current)
             setLoading(false);
     } } void load(); const accessEvents=new BroadcastChannel("nnetics-contractor-access");accessEvents.onmessage=event=>{if(event.data?.profileId===current.current&&event.data?.mode===adapter.mode){accessGeneration.current++;sessionReady.current=false;setSnapshot(null);setLoading(false);setBusy(false);clearDraft();setNotice("");setError("Private link revoked or replaced. Ask the owner for a new link.");}}; const timer = setInterval(() => { if (active && sessionReady.current && !document.hidden)
-        void refresh(); }, 2000); const focus = () => { if (active && sessionReady.current)
-        void refresh(); }; const changed = () => { void load(); }; window.addEventListener("focus", focus); window.addEventListener("hashchange", changed); return () => { active = false; accessGeneration.current++; sessionReady.current = false; clearInterval(timer); accessEvents.close(); window.removeEventListener("focus", focus); window.removeEventListener("hashchange", changed); }; }, []);
+        void refresh(false); }, 2000); const focus = () => { if (active && sessionReady.current)
+        void refresh(false); }; const changed = () => { void load(); }; window.addEventListener("focus", focus); window.addEventListener("hashchange", changed); return () => { active = false;readAbort.current?.abort(); accessGeneration.current++; sessionReady.current = false; clearInterval(timer); accessEvents.close(); window.removeEventListener("focus", focus); window.removeEventListener("hashchange", changed); }; }, []);
     async function perform<T>(action: () => Promise<T>, message: string|((result:T)=>string), onSuccess?: (result: T) => void) { const generation = accessGeneration.current; setBusy(true); setError(""); setNotice(""); try {
         const result = await action();
         if (generation !== accessGeneration.current)
@@ -137,10 +147,10 @@ function ContractorPortal({adapter}:{adapter:MockContractorAdapter|PersistentCon
         clearDraft(); setTab("My payments");
       });
     }
-    return <PortalShell persistent={persistent}>{loading ? <section aria-busy="true"><p>Opening your private workspace…</p><LoadingSkeleton/></section> : !snapshot ? <section className={s.card}><h1 className={s.heading}>Private access unavailable</h1><p role="alert">{error || "Open the private invitation link the owner created for you."}</p><p className={s.muted}>Ask the owner for a new link if this one was revoked or expired. Private records are not available.</p></section> : <>
- <div className={s.intro}><span className={s.tag}>Contractor workspace</span><h1 className={s.heading}>{snapshot.profile.name} · Billing</h1><p className={s.muted}>Send a clear bill. Follow its review. Keep your wallet details up to date.</p></div>
- <nav className={s.tabs} aria-label="Contractor sections">{["Submit a bill", "My payments", "Wallet details"].map(t => <ActionButton busy={busy} key={t} className={`${s.tab} ${tab === t ? s.active : ""}`} aria-current={tab === t ? "page" : undefined} onClick={() => { setTab(t); setError(""); setNotice(""); }}>{t}</ActionButton>)}</nav>
- {error && <p role="alert" className={`${s.notice} ${s.error}`}>{error}</p>}{notice && <p role="status" className={s.notice}>{notice}</p>}
+    return <PortalShell persistent={persistent}><OperationFeedback active={reading||loading} message="Loading your billing records…"/>{error&&sessionReady.current&&<ActionButton disabled={reading} onClick={()=>void refresh()}>Retry verification</ActionButton>}{loading ? <section aria-busy="true"><h1>Opening your private workspace</h1><p>Checking your private access…</p><LoadingSkeleton/></section> : !snapshot ? <section className={s.card}><h1 className={s.heading}>Private access unavailable</h1><p role="alert">{error?getUserMessage(error):"Open the private invitation link the owner created for you."}</p><p className={s.muted}>Ask the owner for a new link if this one was revoked or expired. Private records are not available.</p></section> : <>
+ <ViewMetadata name={tab}/><div className={s.intro}><span className={s.tag}>Contractor workspace</span><h1 className={s.heading}>{snapshot.profile.name} · Billing</h1><p className={s.muted}>Send a clear bill. Follow its review. Keep your wallet details up to date.</p></div>
+ <nav className={s.tabs} aria-label="Contractor sections">{(snapshot.profile.wallet && !snapshot.profile.pendingWallet ? ["My payments", "Wallet details", "Submit a bill"] : ["Wallet details", "My payments", "Submit a bill"]).map(t => <ActionButton busy={busy} key={t} className={`${s.tab} ${tab === t ? s.active : ""}`} aria-current={tab === t ? "page" : undefined} onClick={() => { setTab(t); setError(""); setNotice(""); }}>{t === "Submit a bill" ? "Send a bill" : t}</ActionButton>)}</nav>
+ {error && <p role="alert" className={`${s.notice} ${s.error}`}>{getUserMessage(error)}</p>}{notice && <p role="status" className={s.notice}>{notice}</p>}
  {tab === "Submit a bill" && <div className={s.grid}><section className={s.card}><h2>{edit ? "Answer the owner’s clarification" : "Bill details"}</h2><p className={s.muted}>Paste your bill in your own words. Use the fields below to confirm the payment details.</p>
  <label htmlFor="bill-text">{persistent ? "What did you do?" : "Bill text"}</label><textarea id="bill-text" aria-describedby="submission-guidance" rows={7} maxLength={24000} value={body} onChange={e => {setBody(e.target.value);setExtraction(null);setConfirmed(false);}} placeholder={'Work order: WO-001\nAmount: 1 NEAR\nOne article delivered for the approved brief.'}/><div className={s.actions}><ActionButton busy={busy} type="button" className={`${s.button} ${s.secondary}`} onClick={parse}>Format labeled details</ActionButton></div>
  {persistent && <><label htmlFor="primary-amount">How much are you requesting?</label><input id="primary-amount" aria-describedby="submission-guidance" inputMode="decimal" value={fields.amount} onChange={e=>setFields({...fields,amount:e.target.value})}/><p>Currency: NEAR · Testnet</p></>} <label htmlFor="work-order">Approved work order</label><select id="work-order" aria-describedby="submission-guidance" disabled={!!edit} value={fields.orderId} onChange={e => setFields({ ...fields, orderId: e.target.value })}><option value="">Choose your approved work order</option>{snapshot.orders.map(o => <option key={o.id} value={o.id}>{o.reference} · {o.title}</option>)}</select>{snapshot.orders.length === 0 && <p className={s.small}>The owner must approve your wallet and work order first.</p>}

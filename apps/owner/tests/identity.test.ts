@@ -9,6 +9,7 @@ import { OrganizationIdentityAuth } from "../src/server/service.ts";
 import { Queue } from "../src/server/queue.ts";
 import { NearRpc } from "../src/server/chain.ts";
 import { liveConfig } from "../src/server/config.ts";
+import { withRpcScope } from "../src/server/rpc-request.ts";
 
 function fixture() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "nnetics-identity-"));
@@ -83,6 +84,22 @@ function fixture() {
     directory,
   };
 }
+test('real transport classification preserves a valid session on provider denial and cancellation',async()=>{
+  const f=fixture(),original=globalThis.fetch;
+  try {
+    const session=await f.login('transport.testnet');
+    f.auth.rpc=IdentityAuth.prototype.rpc;
+    globalThis.fetch=async()=>new Response('',{status:403});
+    await assert.rejects(withRpcScope(new AbortController().signal,15000,()=>f.auth.authenticate(session.token)),IdentityVerificationUnavailable);
+    assert.equal(f.auth.verify(session.token).account_id,'transport.testnet');
+    const cancelled=new AbortController();cancelled.abort();
+    await assert.rejects(withRpcScope(cancelled.signal,15000,()=>f.auth.authenticate(session.token)),IdentityVerificationUnavailable);
+    assert.equal(f.auth.verify(session.token).account_id,'transport.testnet');
+    const disconnected=new AbortController();disconnected.abort(new Error('The client disconnected'));
+    await assert.rejects(withRpcScope(disconnected.signal,15000,()=>f.auth.authenticate(session.token)),IdentityVerificationUnavailable);
+    assert.equal(f.auth.verify(session.token).account_id,'transport.testnet');
+  }finally{globalThis.fetch=original;f.close();}
+});
 test("unseen wallets authenticate without any org or vault and create only their own empty organization", async () => {
   const f = fixture();
   try {

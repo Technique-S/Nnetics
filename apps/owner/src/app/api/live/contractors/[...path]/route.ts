@@ -1,3 +1,6 @@
+import {withRpcScope} from "../../../../../server/rpc-request";
+import {RequestError,READ_TIMEOUTS} from "../../../../../data/request-policy";
+import {IdentityVerificationUnavailable} from "../../../../../server/identity";
 import {NextRequest,NextResponse} from "next/server";
 import {contractorService} from "../../../../../server/contractor-service";
 import {identityConfig} from "../../../../../server/identity";
@@ -8,7 +11,7 @@ const sessionCookie="nnetics_contractor";
 const json=(data:unknown,status=200)=>NextResponse.json(data,{status,headers:{"Cache-Control":"no-store","Referrer-Policy":"no-referrer"}});
 function cookie(response:NextResponse,value:string){response.cookies.set(sessionCookie,value,{httpOnly:true,sameSite:"strict",path:"/api/live/contractors",secure:identityConfig().origin.startsWith("https:"),maxAge:value?3600:0});return response;}
 async function bytes(req:NextRequest,max:number){const reader=req.body?.getReader();if(!reader)throw Error("Missing request body.");const chunks:Uint8Array[]=[];let size=0;for(;;){const p=await reader.read();if(p.done)break;size+=p.value.length;if(size>max){await reader.cancel();throw Error("Request too large.");}chunks.push(p.value);}return Buffer.concat(chunks,size);}
-export async function GET(req:NextRequest,context:Context){
+async function get(req:NextRequest,context:Context){
  try{
   const path=(await context.params).path,backend=contractorService(),session=req.cookies.get(sessionCookie)?.value||"";
   if(path.join("/")==="owner") return json(await backend.ownerRead(req.cookies.get("nnetics_identity")?.value||"",req.nextUrl.searchParams.get("organization")||""));
@@ -21,9 +24,9 @@ export async function GET(req:NextRequest,context:Context){
    return new NextResponse(new Uint8Array(file.bytes),{headers:{"Content-Type":file.mime,"Content-Disposition":`attachment; filename*=UTF-8''${encodeURIComponent(file.name)}`,"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","Content-Security-Policy":"sandbox","Referrer-Policy":"no-referrer"}});
   }
   return json({error:"Unknown contractor endpoint."},404);
- }catch(e){return json({error:e instanceof Error?e.message:"Private access denied."},403);}
+ }catch(e){return failure(e,403);}
 }
-export async function POST(req:NextRequest,context:Context){
+async function post(req:NextRequest,context:Context){
  let entering=false;
  try{
   if(req.headers.get("origin")!==identityConfig().origin) throw Error("Use the configured Nnetics origin for private requests.");
@@ -48,5 +51,16 @@ export async function POST(req:NextRequest,context:Context){
   if(path==="wallet/proof")return json(await backend.walletProof(session,input));
   if(path==="logout"){backend.logoutContractor(session);return cookie(json({ok:true}),"");}
   return json({error:"Unknown contractor endpoint."},404);
- }catch(e){const r=json({error:e instanceof Error?e.message:"Private request failed."},400);return entering?cookie(r,""):r;}
+ }catch(e){const r=failure(e,400);return entering?cookie(r,""):r;}
 }
+
+function failure(error:unknown,status:number){
+ const unavailable=error instanceof IdentityVerificationUnavailable||error instanceof RequestError;
+ const retryable=unavailable&&error.retryable;
+ return NextResponse.json({error:error instanceof Error?error.message:'Private request failed.',retryable,automaticRetry:error instanceof IdentityVerificationUnavailable?error.automaticRetry:retryable,verificationUnavailable:unavailable},{status:retryable?503:status,headers:{'Cache-Control':'no-store',...(unavailable&&error.retryAfterMs>0?{'Retry-After':String(Math.ceil(error.retryAfterMs/1000))}:{})}});
+}
+export function GET(req:NextRequest,context:Context){
+ const timeout=Number(req.headers.get('x-nnetics-read-timeout'));
+ return withRpcScope(req.signal,READ_TIMEOUTS.includes(timeout)?timeout:undefined,()=>get(req,context),Math.floor(Math.max(0,Math.min(3,Number(req.headers.get('x-nnetics-read-attempt'))||0))),Number(req.headers.get('x-nnetics-budget'))||180000);
+}
+export function POST(req:NextRequest,context:Context){return withRpcScope(req.signal,undefined,()=>post(req,context),0,Number(req.headers.get('x-nnetics-budget'))||180000);}

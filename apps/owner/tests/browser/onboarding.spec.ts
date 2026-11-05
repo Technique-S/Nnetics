@@ -147,6 +147,13 @@ async function fixture(page: Page, initial = "", pending = false) {
     },
   };
 }
+// Advance only after the browser has classified each response and scheduled backoff.
+// Waiting for route callbacks alone races response parsing and timer registration.
+function exhaustReads(page:Page,operation:string,delays=[500,1000,2000]){
+ const failures:number[]=[];
+ page.on('console',message=>{try{const e=JSON.parse(message.text());if(e.operation===operation&&(e.status>=500||e.status===429))failures.push(e.attempt);}catch{}});
+ return async()=>{for(let i=0;i<4;i++){await expect.poll(()=>failures.length).toBe(i+1);if(i<3)await page.clock.runFor(delays[i]);}};
+}
 async function signIn(page:Page,id:string){
  const advanced=page.locator('details').filter({has:page.getByText('Use a specific testnet account (optional)',{exact:true})});
  if(!(await advanced.evaluate(el=>(el as HTMLDetailsElement).open)))await page.getByText('Use a specific testnet account (optional)',{exact:true}).click();
@@ -266,7 +273,7 @@ test("switching clears private records, revokes the old session, and failed/new 
   );
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Your payment desk", exact: true }),
+    page.getByRole("heading", { name: "Vault", exact: true }),
   ).toBeVisible();
   await openAccountMenu(page);await page
     .getByRole("button", { name: "Switch wallet", exact: true })
@@ -275,12 +282,12 @@ test("switching clears private records, revokes the old session, and failed/new 
     page.getByRole("heading", { name: "Nnetics · NEAR testnet" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Your payment desk", exact: true }),
+    page.getByRole("heading", { name: "Vault", exact: true }),
   ).toHaveCount(0);
   f.deny(true);
   await signIn(page, "new-user.testnet");
   await expect(
-    page.getByRole("alert").filter({ hasText: "Invalid wallet signature" }),
+    page.getByRole("alert").filter({ hasText: "wallet access couldn't be verified" }),
   ).toBeVisible();
   await expect(page.getByText("Private studio")).toHaveCount(0);
   f.deny(false);
@@ -297,11 +304,11 @@ test("configuration drift clears the old workspace before showing a fresh server
  await page.route("**/api/live/config",route=>route.fulfill({json:{network:"testnet",organization:"studio",contract,worker:"worker.owner.testnet",publicKey:"",configured:true,transactionsEnabled:false}}));
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode="testnet";snapshot.protocolVersion=88;snapshot.access={organization:"studio",accountId:"old-owner.testnet",role:"owner",vaultOwner:"old-owner.testnet"};
  await page.route("**/api/live/snapshot**",route=>route.fulfill({json:snapshot}));
- await page.goto("/");await expect(page.getByRole("heading",{name:"Your payment desk",exact:true})).toBeVisible();
+ await page.goto("/");await expect(page.getByRole("heading",{name:"Vault",exact:true})).toBeVisible();
  contract="changed.testnet";
  await page.getByRole("button",{name:"Refresh finalized state",exact:true}).click();
- await expect(page.getByText(/Testnet configuration changed/)).toBeVisible();
- await expect(page.getByRole("heading",{name:"Your payment desk",exact:true})).toHaveCount(0);
+ await expect(page.getByText(/workspace configuration changed/)).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Vault",exact:true})).toHaveCount(0);
  await expect(page.getByRole("button",{name:"Review owner transaction in wallet",exact:true})).toHaveCount(0);
 });
 test("message login waits for approval, and editing the pending account cancels its proof and requires a fresh challenge", async ({
@@ -322,7 +329,7 @@ test("message login waits for approval, and editing the pending account cancels 
     page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }),
   ).toBeEnabled();
   await expect(
-    page.getByRole("alert").filter({ hasText: "Wallet switched" }),
+    page.getByRole("alert").filter({ hasText: "Choose your wallet account in Meteor" }),
   ).toBeVisible();
   expect(f.loginCalls()).toBe(0);
   await page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }).click();
@@ -343,7 +350,7 @@ test("message login waits for approval, and editing the pending account cancels 
     ).meteorProbe.decline(),
   );
   await expect(
-    page.getByRole("alert").filter({ hasText: "declined" }),
+    page.getByRole("alert").filter({ hasText: "cancelled the wallet request" }),
   ).toBeVisible();
   expect(f.loginCalls()).toBe(0);
 });
@@ -379,39 +386,17 @@ test("a failed logout cannot restore private records on reload", async ({
   ).toBeVisible();
 });
 
-test("slow verification never overlaps heartbeats and reports the actual failure", async ({
-  page,
-}) => {
-  await page.clock.install();
-  await fixture(page, "new-user.testnet");
-  await page.goto('/');
-  await expect(
-    page.getByRole("heading", { name: "Your workspace" }),
-  ).toBeVisible();
-  let requests = 0;
-  let release!: () => void;
-  const held = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  await page.route("**/api/live/session", async (route) => {
-    requests++;
-    await held;
-    await route.fulfill({
-      status: 503,
-      json: { error: "NEAR RPC HTTP 429; retry verification" },
-    });
-  });
-  await page.clock.fastForward(30000);
-  await expect.poll(() => requests).toBe(1);
-  await page.clock.fastForward(30000);
-  expect(requests).toBe(1);
-  release();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "NEAR RPC HTTP 429" }),
-  ).toContainText("NEAR RPC HTTP 429");
-  await expect(
-    page.getByRole("heading", { name: "Your workspace" }),
-  ).toHaveCount(0);
+test("slow verification never overlaps heartbeats and reports rate limiting without discarding the session", async ({page}) => {
+ const f=await fixture(page,"new-user.testnet");await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
+ const exhausted=exhaustReads(page,'session',[2000,2000,2000]);let requests=0,release!:()=>void;const held=new Promise<void>(r=>{release=r;});
+ await page.route('**/api/live/session',async route=>{requests++;if(requests===1)await held;await route.fulfill({status:429,headers:{'Retry-After':'2'},json:{error:'Provider rate limited verification'}}).catch(()=>{});});
+ await page.clock.fastForward(30000);await expect.poll(()=>requests).toBe(1);
+ await page.clock.runFor(10000);expect(requests).toBe(1);
+ const response=page.waitForResponse(r=>r.url().endsWith('/api/live/session'));release();await response;await exhausted();
+ await expect(page.getByRole('alert').filter({hasText:'limiting requests'})).toBeVisible();expect(requests).toBe(4);
+ await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);expect(f.loginCalls()).toBe(0);
+ expect(await page.getByRole('main',{name:'Wallet onboarding'}).evaluate(e=>(e as HTMLElement).inert)).toBe(true);
 });
 
 test("missing extension and mainnet account errors explain recovery; demo stays explicit", async ({
@@ -430,7 +415,7 @@ test("missing extension and mainnet account errors explain recovery; demo stays 
   await expect(
     page
       .getByRole("alert")
-      .filter({ hasText: "browser profile containing Meteor" }),
+      .filter({ hasText: "browser with Meteor installed" }),
   ).toBeVisible();
   await page.getByText("Use a specific testnet account (optional)",{exact:true}).click();
   await page.getByLabel("Testnet wallet account ID").fill("wallet.near");
@@ -445,20 +430,24 @@ test("missing extension and mainnet account errors explain recovery; demo stays 
   ).toBeVisible();
 });
 
-test("temporary RPC failure hides records and recovers the same session without another wallet signature",async({page})=>{
- const f=await fixture(page,'new-user.testnet');await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
- let down=true;await page.route('**/api/live/session',route=>route.fulfill(down?{status:503,json:{error:'RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
- await page.clock.fastForward(30000);await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBe(0);
- down=false;await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
+test("temporary RPC failure retains records and recovers the same session without another wallet signature",async({page})=>{
+ const f=await fixture(page,'new-user.testnet');await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
+ const exhausted=exhaustReads(page,'session');let down=true,calls=0;await page.route('**/api/live/session',route=>{calls++;return route.fulfill(down?{status:503,json:{error:'RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet'}});});
+ await page.clock.fastForward(30000);await expect.poll(()=>calls).toBe(1);await exhausted();
+ await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toBeVisible();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(calls).toBe(4);expect(f.logoutCalls()).toBe(0);
+ down=false;await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toHaveCount(0);expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
 });
-test("explicit pre-session RPC failure retries the same proof once without a second wallet message",async({page})=>{
- await fixture(page);let calls=0;let first:unknown;await page.route('**/api/live/login',route=>{calls++;const input=route.request().postDataJSON();if(calls===1){first=input;return route.fulfill({status:503,json:{error:'RPC temporarily unavailable',retryable:true}});}expect(input).toEqual(first);return route.fulfill({json:{ok:true}});});
- await page.goto('/');await signIn(page,'new-user.testnet');await expect.poll(()=>calls).toBe(2);expect(await page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);
+
+test("pre-session login failure never automatically replays its proof or asks for another signature",async({page})=>{
+ await fixture(page);let calls=0;await page.route('**/api/live/login',route=>{calls++;expect(route.request().postDataJSON().accountId).toBe('new-user.testnet');return route.fulfill({status:503,json:{error:'RPC temporarily unavailable',retryable:true}});});
+ await page.goto('/');await signIn(page,'new-user.testnet');await expect(page.getByRole('alert').filter({hasText:"couldn't check your account"})).toBeVisible();
+ await page.evaluate(()=>{window.dispatchEvent(new Event('blur'));window.dispatchEvent(new Event('focus'));});expect(calls).toBe(1);expect(await page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(1);
 });
 
 test("saved session can recover a reload-time RPC outage without requesting a new signature",async({page})=>{
- const f=await fixture(page,'new-user.testnet');let down=true;await page.route('**/api/live/identity',route=>route.fulfill(down?{status:503,json:{error:'RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
- await page.goto('/');await expect(page.getByRole('button',{name:'Continue to workspace',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
+ const f=await fixture(page,'new-user.testnet');await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});let down=true,calls=0;const exhausted=exhaustReads(page,'identity');
+ await page.route('**/api/live/identity',route=>{calls++;return route.fulfill(down?{status:503,json:{error:'RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}});});
+ await page.goto('/');await expect.poll(()=>calls).toBe(1);await exhausted();expect(calls).toBe(4);await expect(page.getByRole('button',{name:'Continue to workspace',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
  down=false;await page.getByRole('button',{name:'Continue to workspace',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
 });
 
@@ -466,7 +455,7 @@ test('focused dashboard navigation, refresh and active renewal cross the former 
  const f=await fixture(page,'old-owner.testnet');f.orgs.set('old-owner.testnet',[{id:'studio',name:'Private studio',status:'ready',role:'owner'}]);
  await page.route('**/api/live/config',async route=>{return route.fulfill({json:{network:'testnet',organization:'studio',contract:'vault.owner.testnet',worker:'worker.owner.testnet',publicKey:'',configured:true,transactionsEnabled:false}})});
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode='testnet';snapshot.protocolVersion=88;snapshot.access={organization:'studio',accountId:'old-owner.testnet',role:'owner',vaultOwner:'old-owner.testnet'};
- await page.route('**/api/live/snapshot**',route=>route.fulfill({json:snapshot}));await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Your payment desk',exact:true})).toBeVisible();
+ await page.route('**/api/live/snapshot**',route=>route.fulfill({json:snapshot}));await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Vault',exact:true})).toBeVisible();
  await navigateOwner(page, "Work orders");
  await page.clock.fastForward(16*60000);await navigateOwner(page, "Payment history");await expect.poll(()=>f.renewCalls()).toBeGreaterThan(0);
  await page.reload();await expect(page.getByRole('heading',{name:'Payment history',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
@@ -516,25 +505,30 @@ test('server remaining lifetime avoids immediate logout when the browser wall cl
 });
 
 test('an accepted wallet message followed by workspace RPC failure offers saved-session recovery without another signature',async({page})=>{
- const f=await fixture(page);let failed=true;await page.route('**/api/live/identity',route=>route.fulfill(f.loginCalls()===0?{status:401,json:{error:'Verify wallet'}}:failed?{status:503,json:{error:'Workspace RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}}));
- await page.goto('/');await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Your message was accepted'})).toBeVisible();await expect(page.getByRole('button',{name:'Retry verification',exact:true})).toBeEnabled();expect(f.loginCalls()).toBe(1);
- failed=false;await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(1);expect(await page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);
+ const f=await fixture(page);await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});let failed=true,calls=0;const exhausted=exhaustReads(page,'identity');
+ await page.route('**/api/live/identity',route=>{if(f.loginCalls()===0)return route.fulfill({status:401,json:{error:'Verify wallet'}});calls++;return route.fulfill(failed?{status:503,json:{error:'Workspace RPC temporarily unavailable',retryable:true}}:{json:{accountId:'new-user.testnet',network:'testnet',organizations:[],notice:''}});});
+ await page.goto('/');await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect.poll(()=>calls).toBe(1);await exhausted();expect(calls).toBe(4);
+ await expect(page.getByRole('alert').filter({hasText:'Your wallet is verified'})).toBeVisible();await expect(page.getByRole('button',{name:'Retry verification',exact:true})).toBeEnabled();expect(f.loginCalls()).toBe(1);
+ failed=false;await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toHaveCount(0);expect(f.loginCalls()).toBe(1);expect(await page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(1);
 });
+
 test('focus loss does not cancel an in-flight organization action or require wallet proof',async({page})=>{
  const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>release=r);await page.route('**/api/live/organizations',async route=>{await hold;await route.fulfill({json:{id:'new-org',name:'New workspace',status:'unprovisioned',role:'creator'}})});
  await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.getByLabel('Organization name').fill('New workspace');await page.getByRole('button',{name:'Create organization',exact:true}).click();await page.evaluate(()=>window.dispatchEvent(new Event('blur')));release();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toBeEnabled();expect(f.logoutCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);
 });
 
-test('an unreadable RPC-service HTTP response hides records without revoking the valid identity session',async({page})=>{
- const f=await fixture(page,'first.testnet');await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.route('**/api/live/session',route=>route.fulfill({status:503,contentType:'text/html',body:'<h1>Temporarily unavailable</h1>'}));await page.clock.fastForward(30000);await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toBeVisible();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBe(0);await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);
+test('an unreadable RPC-service response retains records and can recover without revoking the valid identity session',async({page})=>{
+ const f=await fixture(page,'first.testnet');await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();let calls=0;const exhausted=exhaustReads(page,'session');
+ await page.route('**/api/live/session',route=>{calls++;return route.fulfill({status:503,contentType:'text/html',body:'<h1>Temporarily unavailable</h1>'});});await page.clock.fastForward(30000);await expect.poll(()=>calls).toBe(1);await exhausted();expect(calls).toBe(4);
+ await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toBeVisible();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);
+ await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect(page.getByRole('heading',{name:'Verification temporarily unavailable'})).toHaveCount(0);expect(f.loginCalls()).toBe(0);
 });
 
-
 test('persistent HttpOnly session survives a browser process restart and logout survives the next restart',async({},testInfo)=>{
- test.skip(testInfo.project.name!=='desktop','Browser-process persistence uses one desktop test profile.');
+ // Both desktop and emulated mobile persistent contexts are supported here.
  const address=String(testInfo.project.use.baseURL);
  const profile=await mkdtemp(join(tmpdir(),'nnetics-session-test-'));let context:Awaited<ReturnType<typeof chromium.launchPersistentContext>>|undefined;
- const launch=async()=>{context=await chromium.launchPersistentContext(profile,{headless:true,channel:process.platform==='win32'?'msedge':undefined});const page=await context.newPage();const f=await fixture(page,'first.testnet');
+ const launch=async()=>{context=await chromium.launchPersistentContext(profile,{headless:true,channel:process.platform==='win32'?'msedge':undefined,viewport:testInfo.project.use.viewport,isMobile:testInfo.project.use.isMobile,hasTouch:testInfo.project.use.hasTouch});const page=await context.newPage();const f=await fixture(page,'first.testnet');
  const hasSession=(cookie:string|undefined)=>cookie?.includes('test_identity=opaque-test-token');
  await page.route('**/api/live/identity',route=>route.fulfill(hasSession(route.request().headers().cookie)?{json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:''}}:{status:401,json:{error:'Sign in required'}}));
  await page.route('**/api/live/login',route=>route.fulfill({headers:{'Set-Cookie':'test_identity=opaque-test-token; HttpOnly; SameSite=Strict; Path=/api/live; Max-Age=18000'},json:{ok:true}}));
@@ -556,4 +550,42 @@ test('a cancelled optional wallet check retains the authenticated account and it
 test('refresh waits for saved-session restoration instead of falsely showing a disconnected wallet',async({page})=>{
  const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>release=r);await page.route('**/api/live/identity',async route=>{await hold;await route.fulfill({json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:''}})});
  await page.goto('/');await expect(page.getByRole('heading',{name:'Restoring your saved session'})).toBeVisible();await expect(page.getByRole('button',{name:'Connect to Meteor',exact:true})).toHaveCount(0);release();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
+});
+
+
+test('switching organizations cancels the previous selection before its late response can restore records',async({page})=>{
+ const f=await fixture(page,'first.testnet');
+ f.orgs.set('first.testnet',[{id:'org-a',name:'First organization',status:'unprovisioned',role:'creator'},{id:'org-b',name:'Second organization',status:'unprovisioned',role:'creator'}]);
+ let release!:()=>void,captured=false,cancelled=false;const held=new Promise<void>(r=>{release=r;});
+ page.on('requestfailed',r=>{if(r.url().includes('organization=org-a'))cancelled=true;});
+ await page.route('**/api/live/organization?*',async route=>{if(new URL(route.request().url()).searchParams.get('organization')==='org-a'){captured=true;await held;}await route.fulfill({json:{}}).catch(()=>{});});
+ await page.route('**/api/live/contractors/owner?*',route=>route.fulfill({json:{mode:'persistent',profiles:[],orders:[],invoices:[]}}));
+ await page.goto('/');await page.getByRole('button',{name:/First organization/}).click();await expect.poll(()=>captured).toBe(true);
+ try {await page.getByRole('button',{name:/Second organization/}).click();await expect.poll(()=>cancelled).toBe(true);await expect(page.getByRole('heading',{name:'Second organization',exact:true})).toBeVisible();}
+ finally {release();}
+ await expect(page.getByRole('heading',{name:'First organization',exact:true})).toHaveCount(0);expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
+});
+
+test('wallet switching cancels workspace retry and the next identity cannot inherit its pending state',async({page})=>{
+ const f=await fixture(page,'first.testnet');await page.clock.install();await page.addInitScript(()=>{Math.random=()=>0;});
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
+ const exhausted=exhaustReads(page,'session');
+ await page.route('**/api/live/session',route=>route.fulfill({status:503,json:{error:'Temporary network failure',retryable:true}}));
+ await page.clock.fastForward(30000);await exhausted();
+ let release!:()=>void,captured=false;const held=new Promise<void>(r=>{release=r;});
+ await page.route('**/api/live/identity',async route=>{
+   if(f.loginCalls()===0){captured=true;await held;await route.fulfill({json:{accountId:'first.testnet',organizations:[],network:'testnet',notice:''}}).catch(()=>{});}
+   else await route.fulfill({json:{accountId:'second.testnet',organizations:[],network:'testnet',notice:''}});
+ });
+ await page.getByRole('button',{name:'Retry verification',exact:true}).click();await expect.poll(()=>captured).toBe(true);
+ try {
+   await openAccountMenu(page);await page.getByRole('button',{name:'Switch wallet',exact:true}).click();
+   await page.evaluate(()=>(window as any).meteorProbe.selected='second.testnet');
+   await page.getByRole('button',{name:/^(Connect to Meteor|Try again)$/}).click();
+   await expect(page.getByText('Signed in as second.testnet · NEAR testnet',{exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
+   await expect(page.getByText('Checking your saved session…',{exact:true})).toHaveCount(0);
+   expect(f.loginCalls()).toBe(1);
+ } finally {release();}
+ await expect(page.getByText('Signed in as first.testnet · NEAR testnet',{exact:true})).toHaveCount(0);
 });

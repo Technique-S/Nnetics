@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
+import {isDeepStrictEqual} from 'node:util';
 import { nextReference, previousSubmission, referenceTables } from "./invoice-references.ts";
 import { requireNear } from "../data/invoice-currency.ts";
 import { account, uint } from "../data/owner-adapter.ts";
@@ -83,6 +84,15 @@ export class Queue {
       CREATE TABLE IF NOT EXISTS invoices (id TEXT PRIMARY KEY, order_id TEXT NOT NULL, payload TEXT NOT NULL, state TEXT NOT NULL, reason TEXT NOT NULL DEFAULT '', signed TEXT, hash TEXT, attempt TEXT);
       CREATE UNIQUE INDEX IF NOT EXISTS claimed_order ON invoices(order_id) WHERE state IN ('queued','preparing','submitted','pending','paid','blocked','failed');
       CREATE TABLE IF NOT EXISTS registry (kind TEXT NOT NULL, id TEXT NOT NULL, PRIMARY KEY(kind,id));
+      CREATE TABLE IF NOT EXISTS staged_payment_jobs (bill TEXT PRIMARY KEY, job TEXT NOT NULL UNIQUE, organization TEXT NOT NULL, payload TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS staged_payment_releases (job TEXT PRIMARY KEY, plan TEXT NOT NULL);
+      CREATE TRIGGER IF NOT EXISTS staged_payment_no_dispatch BEFORE UPDATE OF state ON invoices
+        WHEN NEW.state <> 'review' AND EXISTS (SELECT 1 FROM staged_payment_jobs WHERE job=OLD.id)
+          AND NOT EXISTS (SELECT 1 FROM staged_payment_releases WHERE job=OLD.id)
+        BEGIN SELECT RAISE(ABORT, 'Staged payment requires separate release authorization'); END;
+      CREATE TRIGGER IF NOT EXISTS staged_payment_no_duplicate BEFORE INSERT ON invoices
+        WHEN EXISTS (SELECT 1 FROM staged_payment_jobs s JOIN invoices i ON i.id=s.job WHERE i.order_id=NEW.order_id)
+        BEGIN SELECT RAISE(ABORT, 'Agreement already has a staged payment'); END;
       CREATE TABLE IF NOT EXISTS challenges (nonce TEXT PRIMARY KEY, message TEXT NOT NULL, expires INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, expires INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY, description TEXT NOT NULL, time TEXT NOT NULL);`);
@@ -177,6 +187,64 @@ export class Queue {
       this.db.exec("COMMIT");return this.get(input.id)!;
     }catch(e){this.db.exec("ROLLBACK");throw e;}
   }
+  stagePayment(organization: string, bill: string, agreement: string, invoice: Omit<Invoice,"reviewed">) {
+    const input = structuredInvoice(invoice);
+    requireNear(input.asset, input.text);
+    const args = {order_id:input.order_id, invoice_id:input.id, recipient:input.recipient, amount:input.amount};
+    const binding = {organization, bill, agreement, job:input.id, args, argsBase64:Buffer.from(JSON.stringify(args)).toString('base64')};
+    const payload = JSON.stringify(binding);
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      this.bindOrganization(organization);
+      const prior = this.db.prepare("SELECT payload FROM staged_payment_jobs WHERE bill=?").get(bill) as {payload:string}|undefined;
+      if (prior) {
+        const job = this.get(input.id);
+        if (prior.payload !== payload || job?.state !== 'review' || JSON.stringify(job.invoice) !== JSON.stringify({...input,reviewed:false}))
+          throw Error("Existing staged payment differs. Manual review required.");
+      } else {
+        if (this.db.prepare("SELECT 1 FROM invoices WHERE order_id=?").get(input.order_id))
+          throw Error("Agreement already has a durable payment job.");
+        this.add(input, ["Acceptance job staged. Dispatch is unavailable."]);
+        this.db.prepare("INSERT INTO staged_payment_jobs VALUES (?,?,?,?)").run(bill,input.id,organization,payload);
+      }
+      this.db.exec("COMMIT");
+      return binding;
+    } catch (error) {
+      this.db.exec("ROLLBACK");
+      throw error;
+    }
+  }
+  stagedPayment(bill: string, organization: string) {
+    const row=this.db.prepare('SELECT payload FROM staged_payment_jobs WHERE bill=? AND organization=?').get(bill,organization) as {payload:string}|undefined;
+    return row?JSON.parse(row.payload) as {organization:string;bill:string;agreement:string;job:string;argsBase64:string}:undefined;
+  }
+  stagedReleasePlan(job: string) {
+    return (this.db.prepare('SELECT plan FROM staged_payment_releases WHERE job=?').get(job) as {plan:string}|undefined)?.plan;
+  }
+  releaseStagedPayment(invoice: Omit<Invoice,'reviewed'>, planHash: string) {
+    const input=structuredInvoice(invoice);
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      this.assertPaymentWindow(planHash);
+      const job=this.get(input.id);
+      const previous=this.stagedReleasePlan(input.id);
+      if(!job||JSON.stringify({...job.invoice,reviewed:false})!==JSON.stringify({...input,reviewed:false})||
+        (previous?previous!==planHash:job.state!=='review')||
+        !this.db.prepare('SELECT 1 FROM staged_payment_jobs WHERE job=?').get(input.id))throw Error('Staged payment differs from the reviewed release.');
+      if(!previous){
+        this.db.prepare('INSERT INTO staged_payment_releases VALUES (?,?)').run(input.id,planHash);
+        this.db.prepare("UPDATE invoices SET state='queued',reason='',payload=? WHERE id=?").run(JSON.stringify({...input,reviewed:true}),input.id);
+        this.register('order',input.order_id);
+      }
+      this.db.exec('COMMIT');
+      return this.get(input.id)!;
+    }catch(error){this.db.exec('ROLLBACK');throw error;}
+  }
+  assertStagedRelease(job: string, binding: unknown, planHash: string) {
+    const row=this.db.prepare('SELECT s.payload, r.plan FROM staged_payment_jobs s JOIN staged_payment_releases r ON r.job=s.job WHERE s.job=?').get(job) as {payload:string;plan:string}|undefined;
+    if(!row||row.plan!==planHash||!isDeepStrictEqual(JSON.parse(row.payload),binding))
+      throw Error('The exact staged payment was not released under this plan.');
+  }
   get(id: string): Job | undefined {
     const r = this.db.prepare("SELECT * FROM invoices WHERE id=?").get(id) as
       | Row
@@ -210,6 +278,10 @@ export class Queue {
         )
         .run(id).changes === 1
     );
+  }
+  assertPaymentWindow(planHash:string) {
+    if(this.db.prepare('SELECT 1 FROM metadata WHERE id=?').get('cleanup:'+planHash))
+      throw Error('Cleanup has begun. Payment dispatch is permanently closed for this plan.');
   }
   register(kind: "vendor" | "order", id: string) {
     this.db

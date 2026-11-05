@@ -1,9 +1,18 @@
 "use client";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
-const destinations = ["Overview", "Contractors", "Vendors", "Work orders", "Invoice review", "Payment history", "Vault", "Access", "Recovery"];
-const paths = ["M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z", "M4 21v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8", "M3 7h18v14H3z M7 7V3h10v4 M8 12h8", "M5 4h14v17H5z M8 9h8 M8 13h8 M8 17h5", "M5 3h14v18l-4-2-3 2-3-2-4 2z M8 8h8 M8 12h6", "M3 12a9 9 0 1 0 3-6 M3 3v6h6 M12 7v5l3 2", "M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z", "M8 10V7a4 4 0 0 1 8 0v3 M5 10h14v11H5z", "M20 7a9 9 0 1 0 1 8 M20 2v6h-6"];
+const destinations = ["Contractors", "Receipts", "History", "Vault", "Settings"] as const;
+export type View = typeof destinations[number];
+const legacy = new Map<string,View>([["Overview","Vault"],["Vendors","Contractors"],["Work orders","Contractors"],["Invoice review","Contractors"],["Payment history","History"],["Recovery","History"],["Access","Settings"]]);
+export function workspaceView(hash:string):{view:View;receipt:string} {
+ try {
+  const [name,receipt=""] = decodeURIComponent(hash.replace(/^#/,"")).split("/");
+  const view = destinations.find(tab=>tab===name) ?? legacy.get(name) ?? "Vault";
+  return {view,receipt:view==="Receipts"&&/^\d+$/.test(receipt)?receipt:""};
+ } catch {return {view:"Vault",receipt:""};}
+}
+const paths = ["M4 21v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8", "M5 3h14v18l-4-2-3 2-3-2-4 2z M8 8h8 M8 12h6", "M3 12a9 9 0 1 0 3-6 M3 3v6h6 M12 7v5l3 2", "M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z", "M4 6h16 M4 12h16 M4 18h16 M8 4v4 M16 10v4 M10 16v4"];
 
-export function DashboardNavigation({view,onNavigate,live,organization,invoiceCount}:{view:string;onNavigate:(name:string)=>void;live:boolean;organization:string;invoiceCount:number}) {
+export function DashboardNavigation({view,onNavigate,live,organization}:{view:View;onNavigate:(name:View)=>void;live:boolean;organization:string}) {
  const [collapsed,setCollapsed]=useState(false),[open,setOpen]=useState(false),[mobile,setMobile]=useState(false);
  const velocity=useRef(0);
  const trigger=useRef<HTMLButtonElement>(null),side=useRef<HTMLElement>(null);
@@ -29,9 +38,9 @@ export function DashboardNavigation({view,onNavigate,live,organization,invoiceCo
  return <><button ref={trigger} className="navigation-toggle" aria-label="Toggle navigation" aria-expanded={mobile?open:!collapsed} aria-controls="owner-navigation" onClick={toggle}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></button>{open&&<div className="navigation-backdrop" onClick={()=>setOpen(false)}/>}
  <aside id="owner-navigation" ref={side} className={`sidebar redesigned-sidebar ${open?"drawer-open":""}`} role={open?"dialog":undefined} aria-modal={open?true:undefined} aria-label="Workspace navigation">
  <button className="drawer-close" onClick={()=>setOpen(false)}>Close navigation</button>
- <a className="brand" href="#Overview" onClick={()=>{onNavigate("Overview");setOpen(false);}}>Nnetics<span className="brand-period">.</span></a>
+ <a className="brand" href="#Vault" onClick={()=>{onNavigate("Vault");setOpen(false);}}>Nnetics<span className="brand-period">.</span></a>
  <div className="workspace"><strong title={organization}>{organization.length>40?`Workspace · ${organization.slice(0,8)}`:organization}</strong></div>
- <nav aria-label="Owner dashboard"><span className="nav-active-indicator" aria-hidden="true"/>{destinations.map((name,i)=><a data-first-control={i===6?"true":undefined} data-group={i>=6?"controls":"work"} key={name} href={`#${encodeURIComponent(name)}`} aria-label={name} title={name} aria-current={view===name?"page":undefined} onClick={e=>{e.preventDefault();onNavigate(name);setOpen(false);}}><span aria-hidden="true" className="navigation-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={paths[i]}/></svg></span><span className="nav-label">{name === "Vendors" ? "On-chain vendors" : name}</span>{name==="Invoice review"&&<span className="nav-count">{invoiceCount}</span>}</a>)}</nav>
+ <nav aria-label="Owner dashboard"><span className="nav-active-indicator" aria-hidden="true"/>{destinations.map((name,i)=><a key={name} href={`#${encodeURIComponent(name)}`} aria-label={name} title={name} aria-current={view===name?"page":undefined} onClick={e=>{e.preventDefault();onNavigate(name);setOpen(false);}}><span aria-hidden="true" className="navigation-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={paths[i]}/></svg></span><span className="nav-label">{name}</span></a>)}</nav>
  <div className="sidebar-bottom"><span className="nav-label">{live?"NEAR testnet":"Simulated demo"}</span><p className="nav-label">Approval and payment are separate.</p></div>
  </aside></>;
 }

@@ -34,7 +34,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     ".next-hosting/types/**/*.ts",
-    ".next-hosting/dev/types/**/*.ts"
+    ".next-hosting/dev/types/**/*.ts",
+    ".next-rpc/types/**/*.ts",
+    ".next-rpc/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

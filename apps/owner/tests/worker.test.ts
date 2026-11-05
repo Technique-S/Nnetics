@@ -28,6 +28,8 @@ async function setup() {
   return { directory, file, q, snapshot, invoice };
 }
 class Chain implements WorkerTransport {
+  ready=true;
+  async assertReady(){if(!this.ready)throw Error('Checkpoint expired; refresh authenticated evidence');}
   linked = true;
   prepared = 0;
   transfers = 0;
@@ -80,6 +82,13 @@ class Chain implements WorkerTransport {
     return this.linked;
   }
 }
+
+test('expired checkpoint before claim preserves queued job across restart, then executes once after authenticated refresh',async()=>{
+ const x=await setup(),chain=new Chain(x.snapshot);chain.ready=false;x.q.add(x.invoice,[]);
+ await assert.rejects(new PaymentWorker(x.q,chain).tick(),/Checkpoint expired/);assert.equal(x.q.get(x.invoice.id)?.state,'queued');assert.equal(chain.prepared,0);x.q.close();
+ const reopened=new Queue(x.file,'testnet:fixture-vault:fixture-code');try{await assert.rejects(new PaymentWorker(reopened,chain).tick(),/Checkpoint expired/);assert.equal(chain.prepared,0);chain.ready=true;await new PaymentWorker(reopened,chain).tick();await new PaymentWorker(reopened,chain).tick();assert.equal(reopened.get(x.invoice.id)?.state,'paid');assert.equal(chain.transfers,1);assert.equal(chain.prepared,1);}finally{reopened.close();fs.rmSync(x.directory,{recursive:true});}
+});
+test('bounded worker processes only the selected existing job and leaves other queued work untouched',async()=>{const x=await setup(),chain=new Chain(x.snapshot);try{x.q.add(x.invoice,[]);x.q.add({...x.invoice,id:'another-job',order_id:'another-order'},[]);await new PaymentWorker(x.q,chain,x.invoice.id).tick();await new PaymentWorker(x.q,chain,x.invoice.id).tick();assert.equal(x.q.get(x.invoice.id)?.state,'paid');assert.equal(x.q.get('another-job')?.state,'queued');assert.equal(chain.prepared,1);assert.equal(chain.transfers,1);}finally{x.q.close();fs.rmSync(x.directory,{recursive:true});}});
 test("durable success and crash-after-broadcast: restart cannot pay twice", async () => {
   const x = await setup(),
     chain = new Chain(x.snapshot);

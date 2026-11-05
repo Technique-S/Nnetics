@@ -4,6 +4,8 @@ import { boundedId, structuredInvoice, type Queue } from "./queue.ts";
 import { review } from "../data/owner-adapter.ts";
 
 export interface OrganizationService {
+  /** Trusted server dependency only; never populated from request bodies. */
+  referenceEvidenceReader?: import('./reference-block-policy.ts').ReferenceEvidenceReader;
   auth: WalletAuth;
   chain: NearRpc;
   queue: Queue;

@@ -20,7 +20,7 @@ export function liveConfig() {
       throw new Error("Only named testnet accounts are supported.");
   if (contract === worker)
     throw new Error("Separate vault and worker required.");
-  const rpc = process.env.NNETICS_RPC_URL || "https://test.rpc.fastnear.com";
+  const rpc = process.env.NNETICS_RPC_URL || "https://rpc.testnet.fastnear.com";
   if (new URL(rpc).protocol !== "https:")
     throw new Error("Use an HTTPS testnet RPC.");
   const origin = process.env.NNETICS_APP_ORIGIN || "http://127.0.0.1:3100";

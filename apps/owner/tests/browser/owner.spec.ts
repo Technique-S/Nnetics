@@ -5,7 +5,7 @@ import path from "node:path";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/?mode=demo");
-  await expect(page).toHaveTitle("Nnetics · Owner dashboard");
+  await expect(page).toHaveTitle("Payment overview workspace | Nnetics");
   await expect(page.locator("body")).toContainText("Nnetics");
   await expect(
     page.getByRole("heading", { name: "Your payment desk", exact: true }),
@@ -141,7 +141,7 @@ test("load failures recover and untrusted invoice text stays literal", async ({
 }) => {
   await page.getByRole("button", { name: "Simulate load error" }).click();
   await expect(page.getByRole("alert", { name: "Simulation error" })).toContainText(
-    "Simulated adapter request failed",
+    "Something went wrong on our side. Please try again in a moment.",
   );
   await page.getByRole("button", { name: "Retry refresh" }).click();
   await expect(page.getByRole("alert", { name: "Simulation error" })).not.toBeVisible();
@@ -166,7 +166,7 @@ test("owner-entered invoices receive durable server references and reject source
  await page.getByRole("button",{name:"Add sample invoice",exact:true}).click();const modal=page.getByRole("dialog");
  await expect(modal.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
  await modal.getByLabel("Original sample text").fill("Amount: 1 USDC");await modal.getByRole("button",{name:"Save simulated change"}).click();
- await expect(modal.getByRole("alert")).toContainText("Currency conflict");await expect(modal).toBeVisible();
+ await expect(modal.getByRole("alert")).toContainText("mentions another currency");await expect(modal).toBeVisible();
  await modal.getByLabel("Original sample text").fill("Article delivered. Amount: 1 NEAR");await modal.getByRole("button",{name:"Save simulated change"}).click();await expect(modal).not.toBeVisible();
  const saved=await(await page.request.get("/api/demo/owner-invoices")).json();expect(saved).toHaveLength(1);expect(saved[0].id).toMatch(/^CTR-\d+-INV-0001$/);
  await expect(page.locator(".invoice-detail")).toContainText(saved[0].id);await page.reload();await navigateOwner(page, "Invoice review");await expect(page.getByRole("button",{name:new RegExp(saved[0].id)})).toBeVisible();

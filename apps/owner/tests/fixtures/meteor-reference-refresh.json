@@ -1,0 +1,68 @@
+{
+  "provenance": "Public NEAR testnet transaction; offline historical regression, not a new wallet test. Reference bytes reconstructed from canonical header and authenticated by the public Ed25519 transaction signature.",
+  "prepared": {
+    "id": "52f66a25-439a-4742-8d34-06dd092ba8f8",
+    "method": "fund_storage",
+    "args": {},
+    "publicKey": "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+    "nonceFloor": "275527848000003",
+    "deposit": "1000000000000000000",
+    "created": 1793842342424,
+    "state": "prepared",
+    "hash": "9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo",
+    "transport": "meteor",
+    "network": "testnet",
+    "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+    "owner": "grandtheft.testnet",
+    "contract": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+    "gas": "100000000000000",
+    "maxFee": "20400000000000000000000",
+    "expires": 1793842522828,
+    "unsigned": "EgAAAGdyYW5kdGhlZnQudGVzdG5ldAA7Syks1268UWNMl4GNUeES1BlRgq+sVsFKrC1SXVeDxgR6gVOX+gAAPwAAAHYtODQ4ZThhZDY4MjMyYWQzNDgzNGQxNDVmODFjMTY0MWU4OTk5MjZhYS52LmdyYW5kdGhlZnQudGVzdG5ldKhdLX4mKmhiVygbTOtQj4TQxSldQ6o1ndginzPd6fWDAQAAAAIMAAAAZnVuZF9zdG9yYWdlAgAAAHt9AEB6EPNaAAAAAGSns7bgDQAAAAAAAAAA",
+    "nonce": "275527848000004",
+    "referenceBlock": "CLDuCoRFoN6mMb5nGhofazpQvzcgXkAK1eekMAnVdy9L",
+    "scopeId": "16ec4c1bb178a02e96c2ed083f8a29b7a936d3e0c24297f70e7753321174d983",
+    "planHash": "d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a"
+  },
+  "executedUnsigned": "EgAAAGdyYW5kdGhlZnQudGVzdG5ldAA7Syks1268UWNMl4GNUeES1BlRgq+sVsFKrC1SXVeDxgR6gVOX+gAAPwAAAHYtODQ4ZThhZDY4MjMyYWQzNDgzNGQxNDVmODFjMTY0MWU4OTk5MjZhYS52LmdyYW5kdGhlZnQudGVzdG5ldLqeVoWTFDK5UU2zO5eo61qg22voXy+7Tbhpas4xRuLxAQAAAAIMAAAAZnVuZF9zdG9yYWdlAgAAAHt9AEB6EPNaAAAAAGSns7bgDQAAAAAAAAAA",
+  "executedReference": {
+    "height": 276275621,
+    "hash": "DZUsGZ19DMNUW4kz6ySPEQCkfKG12vXmio9tNa31T3aY"
+  },
+  "outcome": {
+    "final_execution_status": "FINAL",
+    "transaction": {
+      "actions": [
+        {
+          "FunctionCall": {
+            "args": "e30=",
+            "deposit": "1000000000000000000",
+            "gas": 100000000000000,
+            "method_name": "fund_storage"
+          }
+        }
+      ],
+      "hash": "CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG",
+      "nonce": 275527848000004,
+      "priority_fee": 0,
+      "public_key": "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+      "receiver_id": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+      "signature": "ed25519:2C7xxNWTi2zLuPWhhjDuuXe3Ep7b725aCRQGHnUT7Y5KPHgVZmK8ciVejonDFB4XwbjBFU9sYhsoonMn4PLqEdca",
+      "signer_id": "grandtheft.testnet"
+    },
+    "status": {
+      "SuccessValue": ""
+    },
+    "transaction_outcome": {
+      "id": "CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG"
+    },
+    "receipts_outcome": [
+      {
+        "id": "2CCxF5tQA8Ayo5A9YRvdaKvN1ZPdPCBu7sc2taB4a1Wk"
+      },
+      {
+        "id": "B4ntAsmwjbGbMoBvPRoJs7jzNEUedcWyTwRwzyDw5Ajz"
+      }
+    ]
+  }
+}

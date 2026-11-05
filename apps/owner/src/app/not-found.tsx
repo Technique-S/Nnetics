@@ -1,1 +1,3 @@
+import {privateMetadata} from "../data/page-metadata";
+export const metadata=privateMetadata("This page could not be found | Nnetics", "This address is unavailable. Return to your workspace or ask the organization owner for a new private invitation to access your records.");
 export default function NotFound(){return <main className="loading-screen signin-surface"><a className="entry-brand" href="/">Nnetics<span>.</span></a><h1>Page not found</h1><p>This address is unavailable. Return to your workspace, or use the private invitation link provided by the owner.</p><a className="button primary" href="/">Return to workspace</a></main>;}

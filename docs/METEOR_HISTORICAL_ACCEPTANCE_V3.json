@@ -1,0 +1,56 @@
+{
+  "recordVersion": 1,
+  "type": "limited-historical-acceptance",
+  "recordedAt": "2026-11-05T10:33:59.353Z",
+  "authorization": "Explicit user approval in this chat, limited to the existing transaction and reviewed V3 assessment.",
+  "policyFile": "docs/METEOR_REFERENCE_POLICY_V3.json",
+  "policyFileSha256": "1ff5abb96c4633d8d6f510ec4a2ab44c1fbf0bfe45d959edc05dc7bbd6543709",
+  "transaction": "CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG",
+  "preparedTransaction": "9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo",
+  "attempt": "52f66a25-439a-4742-8d34-06dd092ba8f8",
+  "scope": {
+    "network": "testnet",
+    "signer": "grandtheft.testnet",
+    "publicKey": "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+    "nonce": "275527848000004",
+    "contract": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+    "action": {
+      "type": "FunctionCall",
+      "method": "fund_storage",
+      "argsBase64": "e30=",
+      "depositYoctoNEAR": "1000000000000000000",
+      "gas": "100000000000000"
+    },
+    "feeAllowanceCeilingYoctoNEAR": "22000000000000000000000",
+    "totalAllowanceCeilingYoctoNEAR": "22001000000000000000000"
+  },
+  "result": "Historical storage-funding transaction: accepted under reviewed V3.",
+  "evidence": {
+    "assessmentAt": "2026-11-05T10:05:20.298Z",
+    "verifierSourceSha256": "45a4c1881633d055a64a0002872a3aa3ad8918be3336558522e9385d10db739c",
+    "evidenceDigest": "e7bab0219b605c1a899bb25c2ce567bbfb462cc0437247ad03e24f29f66731a6",
+    "durableSnapshotDigest": "2e0df4a7e5682e01567e964526242fc01e23d213eb5694b3ed1623070b543f07",
+    "signatureRecheckedOffline": true,
+    "retainedEvidenceDigestRechecked": true,
+    "feeYoctoNEAR": "187847047379000000000",
+    "storageReserveIncreaseYoctoNEAR": "1000000000000000000"
+  },
+  "limitations": [
+    "Trusted corroboration by two configured HTTPS RPC endpoints, not an independently verified consensus proof.",
+    "Endpoint operator independence is not established. No independent security review occurred.",
+    "Historical raw wallet frame/full extension response was not retained; signed final transaction and stored intent were verified.",
+    "Retained evidence reused; no new live wallet test or transaction.",
+    "Future automatic Meteor reference-block reconciliation: not enabled or live-verified.",
+    "Ongoing payment activation: still disabled."
+  ],
+  "preservation": {
+    "v2FileSha256": "d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a",
+    "v2Outcome": "manual_review",
+    "activeAttemptState": "manual_review",
+    "consumedAuthorization": true,
+    "originalIdsAndHistoryUnchanged": true,
+    "runtimeV3Adoption": false,
+    "newSubmissionAuthorized": false,
+    "holdCleared": false
+  }
+}

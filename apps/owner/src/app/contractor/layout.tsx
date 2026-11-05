@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = { title: "Nnetics · Contractor portal", referrer: "no-referrer", robots: { index: false, follow: false } };
-export default function ContractorLayout({ children }: {
-    children: React.ReactNode;
-}) { return children; }
+import {privateMetadata} from "../../data/page-metadata";
+export const metadata={...privateMetadata("Your private contractor portal | Nnetics", "Use your private contractor link to submit a bill, answer clarification questions, follow payment status and request wallet approval."),referrer:"no-referrer" as const};
+export default function ContractorLayout({children}:{children:React.ReactNode}){return children;}

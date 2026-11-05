@@ -1,3 +1,5 @@
+import { RequestError } from "../data/request-policy.ts";
+import { rpcRequest } from "./rpc-request.ts";
 import crypto from "node:crypto";
 import {
   actions,
@@ -89,26 +91,11 @@ export class Provisioning {
       .run(JSON.stringify(intent), intent.organization);
   }
   async rpc<T = any>(method: string, params: unknown): Promise<T> {
-    // Read-only RPC exclusively. This service never signs or broadcasts.
-    const response = await fetch(this.identities.config.rpc, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-      signal: AbortSignal.timeout(20000),
-      cache: "no-store",
-    });
-    if (!response.ok)
-      throw Error(
-        `Provisioning RPC HTTP ${response.status}; reconcile before retrying.`,
-      );
-    const body = await response.json();
-    if (body.error?.cause?.name === "UNKNOWN_ACCOUNT") return undefined as T;
-    if (body.error)
-      throw Object.assign(Error(
-        "Provisioning outcome is unknown. Retry reconciliation; no new vault or authority was granted.",
-      ), { rpcCode: body.error.cause?.name });
-    if (!body.result) throw Error("Incomplete provisioning evidence.");
-    return body.result;
+    try { return await rpcRequest<T>(this.identities.config.rpc, method, params); }
+    catch (error) {
+      if ((error as {rpcCode?:string}).rpcCode === "UNKNOWN_ACCOUNT") return undefined as T;
+      throw error;
+    }
   }
   async block() {
     const [status, block] = await Promise.all([
@@ -456,7 +443,8 @@ export class Provisioning {
         sender_account_id: intent.owner,
         wait_until: "FINAL",
       });
-    } catch {
+    } catch (error) {
+      if ((error as {rpcCode?:string}).rpcCode !== "UNKNOWN_TRANSACTION" && !(error instanceof RequestError && error.retryable)) throw error;
       return {
         ...this.public(intent),
         state:
@@ -464,7 +452,7 @@ export class Provisioning {
             ? "verification_unavailable"
             : intent.state,
         message:
-          "Transaction outcome remains unknown. The recorded intent stays blocked; retry reconciliation or the exact same transaction only.",
+          "We couldn’t confirm this transaction yet. Check its status before trying again.",
       };
     }
     if (tx.final_execution_status !== "FINAL") {

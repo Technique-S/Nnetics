@@ -1,48 +1,22 @@
 "use client";
+import {ViewMetadata} from "./view-metadata";
+import {getUserMessage} from "../data/user-message";
 import {ActionButton} from "./action-button";
-import { useEffect, useRef, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
-import { requireNear } from "../data/invoice-currency";
-import { DEMO_AGENT } from "../data/mock-adapter";
-import { NearOwnerAdapter, api } from "../data/near-adapter";
-import {LiveContextChanged} from "../data/config-context";
-import {PersistentContractorOwner} from "./contractor-owner";
-import { DashboardNavigation } from "./dashboard-navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { MockOwnerAdapter } from "../data/mock-adapter";
+import { NearOwnerAdapter, LiveApiError } from "../data/near-adapter";
+import { LiveContextChanged } from "../data/config-context";
+import { DemoContractorWorkspace, PersistentContractorOwner } from "./contractor-owner";
+import { DashboardNavigation, workspaceView, type View } from "./dashboard-navigation";
+import { AppearanceControl } from "./appearance-control";
+import { OperationFeedback } from "./operation-feedback";
 import { LoadingSkeleton } from "./loading-skeleton";
 import { Onboarding } from "./onboarding";
 import { TestnetControls } from "./testnet-controls";
+import { OwnerTransactionReview } from "./owner-transaction-review";
+import { paymentDisplayStatus } from "../data/payment-status";
+import { formatNear, type OwnerAdapter, type OwnerSnapshot, type TransferScenario } from "../data/owner-adapter";
 
-import {
-  account,
-  amountFromNear,
-  formatNear,
-  reasonText,
-  review,
-  uint,
-} from "../data/owner-adapter";
-import type {
-  Invoice,
-  OwnerAdapter,
-  OwnerSnapshot,
-  PaymentStatus,
-  TransferScenario,
-} from "../data/owner-adapter";
-
-type View =
-  | "Overview"
-  | "Vendors"
-  | "Work orders"
-  | "Invoice review"
-  | "Payment history"
-  | "Contractors" | "Vault" | "Access" | "Recovery";
-type DialogName = "vendor" | "order" | "invoice" | null;
-const views: View[] = [
-  "Overview",
-  "Vendors",
-  "Work orders",
-  "Invoice review",
-  "Payment history", "Contractors", "Vault", "Access", "Recovery",
-];
 const iconPaths: Record<string, string> = {
   Overview: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   Vendors:
@@ -86,14 +60,12 @@ function Badge({ status }: { status: string }) {
         ? "red"
         : "neutral";
   return (
-    <span className={"badge " + tone}>
-      <span className="status-dot" />
+    <span className={"badge " + tone} data-status={status}>
+      {status === "Paid" ? <Icon name="check" size={14}/> : <span className="status-dot" aria-hidden="true" />}
       {status}
     </span>
   );
 }
-const vendorName = (s: OwnerSnapshot, id: string) =>
-  s.vendors.find((v) => v.id === id)?.name ?? id;
 const date = (ns: string) =>
   new Date(Number(BigInt(ns) / 1_000_000n)).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -107,155 +79,104 @@ function Amount({ value, large = false }: { value: string; large?: boolean }) {
     </span>
   );
 }
-function Modal({
-  live = false,
-  title,
-  error,
-  busy,
-  onClose,
-  onSubmit,
-  children,
-}: {
-  live?: boolean;
-  title: string;
-  error: string | null;
-  busy: boolean;
-  onClose: () => void;
-  onSubmit: (data: FormData) => void;
-  children: ReactNode;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    ref.current?.showModal();
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      className="modal"
-      aria-labelledby="modal-title"
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-    >
-      <div className="modal-head">
-        <div>
-          <span className="eyebrow">
-            {live ? "NEAR TESTNET" : "LOCAL SIMULATION"}
-          </span>
-          <h2 id="modal-title">{title}</h2>
-        </div>
-      </div>
-      <form
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          onSubmit(new FormData(e.currentTarget));
-        }}
-      >
-        <div className="form-fields">{children}</div>
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
-        <div className="modal-actions">
-          <ActionButton type="button" className="button secondary" onClick={onClose}>
-            Cancel
-          </ActionButton>
-          <ActionButton className="button primary" pending={busy} pendingLabel="Saving…" retryLabel={live?"Review wallet request":"Save simulated change"} state={error?"error":"idle"}>
-            {busy
-              ? "Saving…"
-              : live
-                ? "Review wallet request"
-                : "Save simulated change"}
-          </ActionButton>
-        </div>
-      </form>
-    </dialog>
-  );
-}
-
 export default function OwnerDashboard() {
   return (
     <Onboarding
-      renderDashboard={(adapter, name) => <Dashboard adapter={adapter} organizationName={name} />}
+      renderDashboard={(adapter, name, accountActions) => <Dashboard adapter={adapter} organizationName={name} accountActions={accountActions}/>}
     />
   );
 }
 
-function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organizationName?: string }) {
+function Dashboard({ adapter, organizationName, accountActions }: { adapter: OwnerAdapter; organizationName?: string; accountActions?:ReactNode }) {
   const live = adapter instanceof NearOwnerAdapter ? adapter : null;
 
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
-  const [view, setView] = useState<View>("Overview");
-  const [selected, setSelected] = useState(
-    adapter.mode === "simulation" ? "INV-1042" : "",
-  );
-  const [dialog, setDialog] = useState<DialogName>(null);
+  const [view, setView] = useState<View>("Vault");
+  const [receipt, setReceipt] = useState("");
   const [busy, setBusy] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [scenario, setScenario] = useState<TransferScenario>("success");
   const [historyFilter, setHistoryFilter] = useState("All outcomes");
   const contextInvalid=useRef(false);
+  const dashboardGeneration=useRef(0);
+  const refreshing=useRef(false), inFlight=useRef(new Set<string>());
+  const autoRefreshBlocked=useRef(false);
+  const [loading,setLoading]=useState(true);
   async function refresh() {
+    if(refreshing.current || contextInvalid.current)return;
+    const generation=dashboardGeneration.current;
+    refreshing.current=true;setLoading(true);setError(null);
     try {
       const next = await adapter.snapshot();
-      if(contextInvalid.current)return;
+      if(contextInvalid.current || generation!==dashboardGeneration.current)return;
+      autoRefreshBlocked.current=false;
       setSnapshot((old) =>
         !old || next.revision >= old.revision ? next : old,
       );
     } catch (e) {
-      if(live){setSnapshot(null);setDialog(null);setSelected("");}
+      if(contextInvalid.current || generation!==dashboardGeneration.current)return;
+      autoRefreshBlocked.current=true;
+      if(live && !(e instanceof LiveApiError && e.retryable)){setSnapshot(null);setReceipt("");}
       if(e instanceof LiveContextChanged)contextInvalid.current=true;
       setError(
         e instanceof Error ? e.message : "Unable to load the simulation.",
       );
-    }
+    } finally { if(generation===dashboardGeneration.current){refreshing.current=false;if(!contextInvalid.current)setLoading(false);} }
   }
   useEffect(() => {
-    contextInvalid.current=false;
+    dashboardGeneration.current++;refreshing.current=false;
+    contextInvalid.current=false;live?.activate();
     void refresh();
     const unsubscribe=adapter.subscribe(() => {
-      void refresh();
+      if(!autoRefreshBlocked.current)void refresh();
     });
-    return ()=>{contextInvalid.current=true;unsubscribe();};
+    return ()=>{dashboardGeneration.current++;contextInvalid.current=true;live?.cancel();unsubscribe();};
   }, [adapter]); // Adapter is fixed for this session.
   async function run(
     key: string,
     action: () => Promise<void>,
     message?: string,
   ) {
+    if(inFlight.current.size || contextInvalid.current)return;
+    inFlight.current.add(key);
     setError(null);
     setBusy((old) => [...old, key]);
     try {
       await action();
+      if(contextInvalid.current)return;
       await refresh();
+      if(contextInvalid.current)return;
       if (message) setNotice(message);
     } catch (e) {
+      if(contextInvalid.current)return;
       setError(
         e instanceof Error ? e.message : "The simulated request failed.",
       );
     } finally {
-      setBusy((old) => old.filter((x) => x !== key));
+      inFlight.current.delete(key);
+      if(!contextInvalid.current)setBusy((old) => old.filter((x) => x !== key));
     }
   }
-  const invoiceSubmission = useRef("");
-  function open(name: DialogName) {
-    invoiceSubmission.current = crypto.randomUUID();
-    setError(null);
-    setDialog(name);
-  }
-  function go(next: View) {
-    window.location.hash = encodeURIComponent(next);
+  function go(next: View, receiptId?: string) {
+    location.hash = receiptId ? `Receipts/${encodeURIComponent(receiptId)}` : next;
     setView(next);
+    setReceipt(receiptId ?? "");
     setError(null);
   }
   useEffect(() => {
-    const restore = () => { try {const name = decodeURIComponent(location.hash.slice(1)); if (views.includes(name as View)) setView(name as View);} catch {/* Invalid route hints never affect account authority. */} };
-    restore(); window.addEventListener("hashchange", restore);
+    function restore() {
+      const target = workspaceView(location.hash);
+      setView(target.view);
+      setReceipt(target.receipt);
+    }
+    restore();
+    window.addEventListener("hashchange", restore);
     return () => window.removeEventListener("hashchange", restore);
   }, []);
+  useEffect(() => {
+    if (view === "Receipts" && receipt) document.getElementById(`receipt-${receipt}`)?.focus();
+  }, [view, receipt, snapshot]);
   const MainSurface = "main";
   if (!snapshot)
     return (
@@ -267,1093 +188,125 @@ function Dashboard({ adapter, organizationName }: { adapter: OwnerAdapter; organ
             ? "Loading clearly labeled synthetic data…"
             : "Loading verified NEAR testnet records…"}
         </p>
+        <OperationFeedback active={loading} message="Loading verified workspace records…" />
         {!error && <LoadingSkeleton />}
         {error && (
           <>
-            <p role="alert">{error}</p>
-            <ActionButton busy={busy.length>0} className="button primary" onClick={() => void refresh()}>
+            <p role="alert">{getUserMessage(error)}</p>
+            <ActionButton busy={busy.length>0} className="button primary" disabled={loading} onClick={() => void refresh()}>
               Retry loading
             </ActionButton>
           </>
         )}
       </main>
     );
-  const s = snapshot,
-    v = s.vault;
+  const s = snapshot;
+  const vault = s.vault;
   const readOnly = !!live && s.access?.role !== "owner";
-  const invoice = s.invoices.find((i) => i.id === selected) ?? s.invoices[0];
-  const reasons = invoice ? review(s, invoice) : [];
-  const ready = s.invoices.filter((i) => review(s, i).length === 0);
-  const committed = BigInt(v.spent) + BigInt(v.reserved);
-  const pending = s.payments.filter((p) => p.status === "Pending");
-  const defaultOrder =
-    s.orders.find((o) => o.status === "Approved" && o.enabled) ?? s.orders[0];
-  const subtitle: Record<View, string> = {
-    Contractors: "Private invitations, wallet approvals and submitted bills.",
-    Vault: "Payment funds and spending authority are separate. Review both before signing.",
-    Access: "Manage who can view this organization. Owner authority stays on chain.",
-    Recovery: "Inspect unresolved attempts without retrying an unknown outcome.",
-    Overview: "Approved work. Bounded authority. A clear record.",
-    Vendors: "Keep recipient details explicit and approvals in your hands.",
-    "Work orders": "Each order authorizes one exact payment to one recipient.",
-    "Invoice review": "Compare invoice claims with existing owner approval.",
-    "Payment history":
-      "Follow every attempt, including outcomes that remain unresolved.",
+  const available = BigInt(vault.funded) - BigInt(vault.spent) - BigInt(vault.reserved);
+  const outstanding = s.payments.filter(p => paymentDisplayStatus(s,p) === "Pending");
+  const confirmed = s.payments.filter(p => paymentDisplayStatus(s,p) === "Paid");
+  const ordered = [...s.payments].sort((a,b) => BigInt(a.initiated_at_ns) < BigInt(b.initiated_at_ns) ? 1 : -1);
+  const subtitles: Record<View,string> = {
+    Vault: "Check your available funds, payment limits and anything that needs your attention.",
+    Contractors: "Invite people, verify their payout wallets and prepare payments.",
+    Receipts: "Find proof of completed transfers and copy a receipt when you need it.",
+    History: "Track outstanding, failed and confirmed payments in one place.",
+    Settings: "Manage workspace access and choose how Nnetics looks.",
   };
-  async function submit(data: FormData) {
-    const field = (name: string) => String(data.get(name) ?? "");
-    await run(
-      "form",
-      async () => {
-        if (dialog === "vendor")
-          await adapter.command({
-            method: "register_vendor",
-            args: {
-              vendor_id: field("vendor_id"),
-              recipient: account(field("recipient")),
-            },
-          });
-        if (dialog === "order")
-          await adapter.command({
-            method: "approve_work_order",
-            args: {
-              order_id: field("order_id"),
-              vendor_id: field("vendor_id"),
-              amount: amountFromNear(field("amount")),
-              expires_at_ns: uint(
-                (
-                  BigInt(new Date(field("expiry") + "T23:59:59").getTime()) *
-                  1_000_000n
-                ).toString(),
-                (1n << 64n) - 1n,
-              ),
-            },
-          });
-        if (dialog === "invoice") {
-          const order = s.orders.find((o) => o.id === field("order_id"))!;
-          const draft: Omit<Invoice, "reviewed"> = {
-            id: invoiceSubmission.current || (invoiceSubmission.current = crypto.randomUUID()),
-            order_id: order.id,
-            vendor_id: order.vendor_id,
-            recipient: account(field("recipient")),
-            amount: amountFromNear(field("amount")),
-            asset: "NEAR",
-            text: field("text"),
-          };
-          requireNear(draft.asset,draft.text);
-          if (!live) {
-            const response=await fetch("/api/demo/owner-invoices",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(draft)});
-            const saved=await response.json();
-            if(!response.ok) throw Error(saved.error || "Invoice submission failed.");
-            await adapter.addInvoice(saved);setSelected(saved.id);
-          } else {await adapter.addInvoice(draft);setSelected("");}
-          setView("Invoice review");
-        }
-        setDialog(null);
-      },
-      live
-        ? "Request submitted. Refresh finalized state to confirm owner actions; eligible invoices enter the durable worker queue."
-        : "Local simulation updated. No transaction was submitted.",
-    );
+  const demo = adapter instanceof MockOwnerAdapter ? adapter : null;
+  function details(p: OwnerSnapshot["payments"][number]) {
+    const order = s.orders.find(o => o.id === p.order_id);
+    const invoice = s.invoices.find(i => i.id === p.invoice_id);
+    const vendor = s.vendors.find(v => v.id === order?.vendor_id);
+    const description = invoice?.text || (order?.title !== p.order_id ? order?.title : "");
+    const url = live && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(p.reference)
+      ? `https://testnet.nearblocks.io/txns/${encodeURIComponent(p.reference)}` : null;
+    return {contractor: demo?.contractorName(p.invoice_id) ?? (vendor?.name && vendor.name !== vendor.id ? vendor.name : p.recipient), description, url};
   }
-  const queue = (compact = false) => (
-    <div className="queue-list">
-      {s.invoices.length === 0 ? (
-        <div className="empty">No invoices to review.</div>
-      ) : (
-        s.invoices.slice(0, compact ? 3 : undefined).map((i) => {
-          const codes = review(s, i);
-          return (
-            <ActionButton busy={busy.length>0}
-              key={i.id}
-              className={
-                "queue-row " +
-                (view === "Invoice review" && invoice?.id === i.id
-                  ? "selected"
-                  : "")
-              }
-              onClick={() => {
-                setSelected(i.id);
-                go("Invoice review");
-              }}
-            >
-              <span className="avatar small">
-                {vendorName(s, i.vendor_id)
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .slice(0, 2)}
-              </span>
-              <span className="queue-person">
-                <strong>{vendorName(s, i.vendor_id)}</strong>
-                <small>
-                  {i.id} · {i.order_id}
-                </small>
-              </span>
-              <span className="queue-summary">
-                <Amount value={i.amount} />
-                <Badge
-                  status={
-                    codes.length
-                      ? "Needs review"
-                      : live
-                        ? "Ready for worker"
-                        : "Ready to simulate"
-                  }
-                />
-              </span>
-              <Icon name="arrow" size={17} />
-            </ActionButton>
-          );
-        })
-      )}
-    </div>
-  );
-  const history = (compact = false) => (
-    <><p className="scroll-hint">Scroll horizontally for all columns</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable payment records">
-      <table>
-        <thead>
-          <tr>
-            <th>Work & recipient</th>
-            <th>Amount</th>
-            <th>Outcome</th>
-            <th>Reference</th>
-          </tr>
-        </thead>
-        <tbody>
-          {s.payments
-            .filter(
-              (p) =>
-                historyFilter === "All outcomes" || p.status === historyFilter,
-            )
-            .slice(0, compact ? 3 : undefined)
-            .map((p) => (
-              <tr key={p.attempt_id}>
-                <td>
-                  <strong>
-                    {s.orders.find((o) => o.id === p.order_id)?.title ??
-                      p.order_id}
-                  </strong>
-                  <small className="mono">{p.recipient}</small>
-                  <small>{p.invoice_id}</small>
-                </td>
-                <td>
-                  <Amount value={p.amount} />
-                </td>
-                <td>
-                  <Badge status={p.status} />
-                  {p.status === "Pending" && (
-                    <small>Unknown outcome · funds locked</small>
-                  )}
-                </td>
-                <td>
-                  {live && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(p.reference) ? (
-                    <a
-                      className="mono"
-                      href={`https://testnet.nearblocks.io/txns/${encodeURIComponent(p.reference)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View transaction
-                    </a>
-                  ) : (
-                    <span className="mono">{p.reference}</span>
-                  )}
-                  <small>
-                    {live ? "Testnet transaction" : "Simulated receipt"}
-                  </small>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      {s.payments.filter(
-        (p) => historyFilter === "All outcomes" || p.status === historyFilter,
-      ).length === 0 && (
-        <div className="empty">No attempts match this outcome.</div>
-      )}
-    </div></>
-  );
+  const recoveryNeeded = !readOnly && (s.payments.some(p => ["Pending","TransferSucceeded","TransferFailed"].includes(p.status)));
+  const ownerScope = live?.config.ownerTransactionRestriction;
+  const pauseReview = ownerScope?.method === "set_paused" && typeof ownerScope.args?.paused === "boolean" ? ownerScope.args.paused : null;
   return (
-    <div className="app-shell"><a className="skip-link" href="#workspace-content">Skip to content</a>
-      <DashboardNavigation view={view} onNavigate={name => go(name as View)} live={!!live} organization={organizationName || s.access?.organization || "Content studio"} invoiceCount={s.invoices.length} />
+    <div className="app-shell">
+      {live && <OwnerTransactionReview adapter={live}/>}
+      <ViewMetadata name={view}/>
+      <a className="skip-link" href="#workspace-content">Skip to content</a>
+      <DashboardNavigation view={view} onNavigate={go} live={!!live} organization={organizationName || s.access?.organization || "Demo workspace"}/>
       <div className="workspace-main">
-        {!live && <div className="simulation-banner">
-          <span className="simulation-tag">
-            {live ? "TESTNET" : "SIMULATION"}
-          </span>
-          <span>
-            {live
-              ? "Live testnet data. Owner actions require wallet signatures; queued invoices may be paid by the authorized worker."
-              : "Synthetic data. No wallet connected. No tokens moved. Saved invoices persist; other demo changes reset on reload."}
-          </span>
-        </div>}
-        <header className="topbar">
-          <div>
-            <span className="breadcrumb">Workspace</span>
-            <span className="slash">/</span>
-            {view}
-          </div>
+        <header className={live ? "topbar" : "topbar demo-workspace-toolbar"}>
+          {!live && <span>Simulation · No funds move</span>}
           <div className="topbar-actions">
-            <ActionButton busy={busy.length>0}
-              className="icon-button"
-              aria-label={
-                live ? "Refresh finalized state" : "Refresh mock state"
-              }
-              onClick={() =>
-                void run(
-                  "refresh",
-                  async () => {},
-                  live ? "Finalized state refreshed." : "Mock state refreshed.",
-                )
-              }
-              disabled={busy.includes("refresh")}
-            >
-              <Icon name="refresh" size={18} />
-            </ActionButton>
-            <span className="owner-label">
-              {live ? s.access?.accountId : v.owner}
-            </span>
-            <span className="avatar owner">OW</span>
+            {!live && <details className="account-menu"><summary>Demo account</summary><div className="account-menu-actions"><AppearanceControl inline/></div></details>}
+            <ActionButton className="icon-button" aria-label="Refresh workspace" busy={loading} onClick={() => void refresh()}><Icon name="refresh" size={18}/></ActionButton>
           </div>
         </header>
-        <MainSurface aria-busy={busy.length > 0} className="main-content" id="workspace-content" tabIndex={-1}>
-
+        <MainSurface className="main-content" id="workspace-content" tabIndex={-1}>
           <div className="page-heading">
-            <div>
-              <div className="eyebrow">Owner workspace</div>
-              <h1>{view === "Overview" ? "Your payment desk" : view}</h1>
-              <p>{subtitle[view]}</p>
-            </div>
-            <div className="heading-actions">
-
-              {view === "Vendors" ? (
-                <ActionButton busy={busy.length>0}
-                  className="button primary"
-                  onClick={() => open("vendor")}
-                  disabled={readOnly}
-                >
-                  <Icon name="plus" size={16} />
-                  Manage vendor
-                </ActionButton>
-              ) : view === "Work orders" ? (
-                <ActionButton busy={busy.length>0}
-                  className="button primary"
-                  onClick={() => open("order")}
-                  disabled={readOnly}
-                >
-                  <Icon name="plus" size={16} />
-                  New work order
-                </ActionButton>
-              ) : ["Overview", "Invoice review", "Payment history"].includes(view) ? (
-                <ActionButton busy={busy.length>0}
-                  className="button primary"
-                  onClick={() => open("invoice")}
-                  disabled={readOnly}
-                >
-                  <Icon name="plus" size={16} />
-                  {live ? "Enter structured invoice" : "Add sample invoice"}
-                </ActionButton>
-              ) : null}
-            </div>
+            <div><h1>{view}</h1><p>{subtitles[view]}</p></div>
+            {view === "Vault" && !readOnly && <button className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</button>}
           </div>
-          {view === "Contractors" && (live ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization}/> : <p className="notice">Explore the <a href="/demo/contractors">explicitly simulated contractor workspace</a>.</p>)}
-          {live && ["Vault", "Access", "Recovery"].includes(view) && <TestnetControls adapter={live} snapshot={s} run={run} section={view === "Access" ? "access" : view === "Recovery" ? "recovery" : "vault"}/>}
-          {!live && ["Vault", "Access", "Recovery"].includes(view) && <p className="notice">These controls require a verified testnet organization. No live account is attached to this simulation.</p>}
-          {busy.length > 0 && <p className="action-progress" role="status">Updating verified records…</p>}
-          {error && !dialog && (
-            <div
-              className="error-banner"
-              role="alert"
-              aria-label={live ? "Testnet error" : "Simulation error"}
-            >
-              {error}
-              <ActionButton busy={busy.length>0}
-                onClick={() => {
-                  setError(null);
-                  void refresh();
-                }}
-              >
-                Retry refresh
-              </ActionButton>
-            </div>
-          )}
-          {notice && (
-            <div className="notice" role="status">
-              <Icon name="check" size={16} />
-              {notice}
-              <ActionButton busy={busy.length>0}
-                aria-label="Dismiss notification"
-                onClick={() => setNotice("")}
-              >
-                ×
-              </ActionButton>
-            </div>
-          )}
-          {(v.paused || !v.agent) && <div className="pause-banner"><Icon name="shield"/><div><strong>{v.paused ? "Payments paused." : "Worker authority revoked."}</strong> {!v.agent && "Worker access revoked. "}{pending.length ? `${pending.length} transfer(s) awaiting confirmation; funds remain reserved.` : "No unresolved transfers."}</div></div>}
-          {view === "Overview" && (
-            <>
-              <section
-                className="stats"
-                aria-label={
-                  live
-                    ? "Finalized vault accounting"
-                    : "Simulated vault accounting"
-                }
-              >
-                {[
-                  [
-                    "Uncommitted authority",
-                    (BigInt(v.budget) - committed).toString(),
-                    "Within your cumulative authority",
-                  ],
-                  [
-                    "Reserved in flight",
-                    v.reserved,
-                    `${pending.length} unresolved attempt${pending.length === 1 ? "" : "s"}`,
-                  ],
-                  [
-                    "Confirmed spend",
-                    v.spent,
-                    "Only conclusively successful transfers",
-                  ],
-                  [
-                    "Available payment funds",
-                    (BigInt(v.funded) - committed).toString(),
-                    live
-                      ? "Funded less spent and reserved · storage excluded"
-                      : "Synthetic deposits · storage excluded",
-                  ],
-                ].map(([label, value, hint], i) => (
-                  <article key={label} className={"stat-card stat-" + i}>
-                    <div className="stat-label">
-                      {label}
-                      <span className="stat-corner">
-                        {i === 0 ? "↗" : i === 1 ? "◷" : i === 2 ? "✓" : "◇"}
-                      </span>
-                    </div>
-                    <Amount large value={value} />
-                    <small>{hint}</small>
-                  </article>
-                ))}
-              </section>
-              <div className="overview-grid">
-                <div className="overview-primary">
-                  <section className="panel">
-                    <div className="section-head">
-                      <div>
-                        <span className="eyebrow">Next up</span>
-                        <h2>
-                          Invoices at your desk{" "}
-                          <span className="count">{s.invoices.length}</span>
-                        </h2>
-                      </div>
-                      <ActionButton busy={busy.length>0}
-                        className="text-button"
-                        onClick={() => go("Invoice review")}
-                      >
-                        Open review <Icon name="arrow" size={15} />
-                      </ActionButton>
-                    </div>
-                    {queue(true)}
-                    <div className="panel-foot">
-                      <span className="status-dot" />
-                      {ready.length} ready for{" "}
-                      {live ? "the worker" : "a local simulation"}. Review
-                      cannot override a failed rule.
-                    </div>
-                  </section>
-                  <section className="panel">
-                    <div className="section-head">
-                      <div>
-                        <span className="eyebrow">Payment records</span>
-                        <h2>Recent payment attempts</h2>
-                      </div>
-                      <ActionButton busy={busy.length>0}
-                        className="text-button"
-                        onClick={() => go("Payment history")}
-                      >
-                        View history <Icon name="arrow" size={15} />
-                      </ActionButton>
-                    </div>
-                    {history(true)}
-                  </section>
-                </div>
-                <aside className="overview-secondary">
-                  <section className="guardrail-panel">
-                    <div className="guardrail-icon">
-                      <Icon name="shield" size={25} />
-                    </div>
-                    <span className="eyebrow">Payment limits</span>
-                    <h2>
-                      Clear boundaries. <br />
-                      Before every payment.
-                    </h2>
-                    <p>
-                      Every request stays tied to an immutable, owner-approved
-                      work order.
-                    </p>
-                    <div className="budget-track">
-                      <span
-                        style={{
-                          width: `${Number((BigInt(v.spent) * 100n) / (BigInt(v.budget) || 1n))}%`,
-                        }}
-                      />
-                      <span
-                        style={{
-                          width: `${Number((BigInt(v.reserved) * 100n) / (BigInt(v.budget) || 1n))}%`,
-                        }}
-                      />
-                    </div>
-                    <div className="budget-legend">
-                      <span>
-                        <i />
-                        Spent
-                      </span>
-                      <span>
-                        <i />
-                        Reserved
-                      </span>
-                      <span>Uncommitted</span>
-                    </div>
-                    <dl>
-                      <div>
-                        <dt>Cumulative budget</dt>
-                        <dd>
-                          <Amount value={v.budget} />
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Per-payment cap</dt>
-                        <dd>
-                          <Amount value={v.payment_cap} />
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Vendor slots</dt>
-                        <dd>{s.vendors.length} / 3</dd>
-                      </div>
-                    </dl>
-                    <div className="control-row">
-                      <div>
-                        <strong>New payment requests</strong>
-                        <small>
-                          {v.paused
-                            ? "Paused"
-                            : "Open within approved authority"}
-                        </small>
-                      </div>
-                      <ActionButton busy={busy.length>0}
-                        role="switch"
-                        aria-checked={!v.paused}
-                        aria-label={
-                          live
-                            ? "Allow new testnet payments"
-                            : "Allow new simulated payments"
-                        }
-                        className={"switch " + (!v.paused ? "on" : "")}
-                        disabled={readOnly || busy.includes("pause")}
-                        onClick={() =>
-                          void run("pause", () =>
-                            adapter.command({
-                              method: "set_paused",
-                              args: { paused: !v.paused },
-                            }),
-                          )
-                        }
-                      >
-                        <span />
-                      </ActionButton>
-                    </div>
-                  </section>
-                  <section className="panel worker-panel">
-                    <div className="worker-icon">
-                      <Icon name="shield" size={18} />
-                    </div>
-                    <h3>Worker permission</h3>
-                    <p className="mono">
-                      {v.agent?.account_id ?? "No authorized worker"}
-                    </p>
-                    <Badge status={v.agent ? "Active" : "Revoked"} />
-                    <p>
-                      Revocation stops future initiation. It cannot cancel a
-                      transfer already sent.
-                    </p>
-                    <ActionButton busy={busy.length>0}
-                      className="button secondary full"
-                      disabled={readOnly || busy.includes("agent")}
-                      onClick={() =>
-                        void run("agent", () =>
-                          adapter.command(
-                            v.agent
-                              ? { method: "revoke_agent", args: {} }
-                              : {
-                                  method: "authorize_agent",
-                                  args: live
-                                    ? live.workerIdentity()
-                                    : DEMO_AGENT,
-                                },
-                          ),
-                        )
-                      }
-                    >
-                      {v.agent
-                        ? "Revoke worker authority"
-                        : live
-                          ? "Authorize configured testnet worker"
-                          : "Authorize synthetic worker"}
-                    </ActionButton>
-                  </section>
-                </aside>
-              </div>
-            </>
-          )}
-          {view === "Vendors" && (
-            <>
-              <div className="context-note">
-                <Icon name="shield" size={18} />
-                <span>
-                  Recipient changes apply to future orders. Existing work orders
-                  retain their approved recipient. Three permanent vendor slots
-                  are available.
-                </span>
-              </div>
-              {s.vendors.length === 0 && <div className="empty-state"><h2>No vendor references loaded</h2><p>Add a vendor or import an existing reference below. Existing approved orders retain their original recipient.</p></div>}
-              <section className="vendor-grid">
-                {s.vendors.map((vendor, i) => (
-                  <article className="panel vendor-card" key={vendor.id}>
-                    <div className="vendor-card-top">
-                      <span className={"avatar vendor-avatar color-" + i}>
-                        {vendor.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .slice(0, 2)}
-                      </span>
-                      <Badge status={vendor.active ? "Active" : "Disabled"} />
-                    </div>
-                    <span className="eyebrow">{vendor.role}</span>
-                    <h2>{vendor.name}</h2>
-                    <p>
-                      Vendor ID: <strong>{vendor.id}</strong>
-                    </p>
-                    <div className="recipient-box">
-                      <small>Recipient for new orders</small>
-                      <span className="mono">{vendor.recipient}</span>
-                    </div>
-                    <div className="vendor-detail">
-                      <span>Work orders</span>
-                      <strong>
-                        {
-                          s.orders.filter((o) => o.vendor_id === vendor.id)
-                            .length
-                        }
-                      </strong>
-                    </div>
-                    <ActionButton busy={busy.length>0}
-                      className="button secondary full"
-                      disabled={readOnly || busy.includes(vendor.id)}
-                      onClick={() =>
-                        void run(vendor.id, () =>
-                          adapter.command(
-                            vendor.active
-                              ? {
-                                  method: "disable_vendor",
-                                  args: { vendor_id: vendor.id },
-                                }
-                              : {
-                                  method: "register_vendor",
-                                  args: {
-                                    vendor_id: vendor.id,
-                                    recipient: vendor.recipient,
-                                  },
-                                },
-                          ),
-                        )
-                      }
-                    >
-                      {vendor.active
-                        ? "Disable future payments"
-                        : "Enable vendor"}
-                    </ActionButton>
-                  </article>
-                ))}
-              </section>
-            </>
-          )}
-          {view === "Work orders" && (
-            <section className="panel">
-              <div className="section-head">
-                <div>
-                  <span className="eyebrow">One order, one payment</span>
-                  <h2>
-                    Approved work{" "}
-                    <span className="count">{s.orders.length}</span>
-                  </h2>
-                </div>
-                <span className="subtle">Order IDs are never reused</span>
-              </div>
-              <><p className="scroll-hint">Scroll horizontally for all columns</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable payment records">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Work order</th>
-                      <th>Approved recipient</th>
-                      <th>Amount & expiry</th>
-                      <th>Status</th>
-                      <th>Authority</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.orders.length === 0 && <tr><td colSpan={6}><div className="empty-state">No work orders loaded. Import an existing reference below, or add a vendor and approve one exact amount and recipient.</div></td></tr>}
-                    {s.orders.map((o) => (
-                      <tr key={o.id}>
-                        <td>
-                          <strong>{o.title}</strong>
-                          <small>
-                            {o.id} · {vendorName(s, o.vendor_id)}
-                          </small>
-                        </td>
-                        <td className="mono">{o.recipient}</td>
-                        <td>
-                          <Amount value={o.amount} />
-                          <small>{date(o.expires_at_ns)}</small>
-                        </td>
-                        <td>
-                          <Badge status={o.status} />
-                          {!o.enabled && <small>Authority revoked</small>}
-                        </td>
-                        <td>
-                          {o.enabled && o.status !== "Paid" ? (
-                            <ActionButton busy={busy.length>0}
-                              className="text-button danger"
-                              disabled={readOnly || busy.includes(o.id)}
-                              onClick={() =>
-                                void run(o.id, () =>
-                                  adapter.command({
-                                    method: "revoke_work_order",
-                                    args: { order_id: o.id },
-                                  }),
-                                )
-                              }
-                            >
-                              Revoke order
-                            </ActionButton>
-                          ) : (
-                            <span className="subtle">
-                              {o.status === "Paid" ? "Closed" : "Revoked"}
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div></>
+          <OperationFeedback active={loading || busy.length > 0} message="Checking workspace records…"/>
+          {error && <div className="error-banner" role="alert">{getUserMessage(error)} <button onClick={() => void refresh()}>Retry refresh</button></div>}
+          {notice && <div className="notice" role="status">{notice} <button className="text-button" onClick={() => setNotice("")}>Dismiss</button></div>}
+          {view === "Vault" && <>
+            <section className="panel payment-workspace-panel">
+              <h2>Available payout funds</h2>
+              <p className="payment-workspace-amount"><Amount value={available > 0n ? available.toString() : "0"} large/></p>
+              <p>{formatNear(vault.reserved)} NEAR set aside for pending payments.</p>
+              {vault.paused && <p><Badge status="Paused"/> New payments cannot be sent while the vault is paused.</p>}
+              {!vault.agent && <p>Automatic payments are off.</p>}
+              {outstanding.length > 0 && <button className="text-button" onClick={() => go("History")}>Check {outstanding.length} outstanding {outstanding.length === 1 ? "payment" : "payments"}</button>}
             </section>
-          )}
-          {view === "Invoice review" && (
-            <div className="review-grid">
-              <section className="panel review-queue">
-                <div className="section-head">
-                  <div>
-                    <span className="eyebrow">Review queue</span>
-                    <h2>{live ? "Structured invoices" : "Sample invoices"}</h2>
-                  </div>
+            {live ? <TestnetControls adapter={live} snapshot={s} run={run} section="vault"/> : <section className="panel payment-workspace-panel"><h2>Payment limits</h2><p>{formatNear(vault.payment_cap)} NEAR per payment · {formatNear(vault.budget)} NEAR total</p><p>Funding is unavailable in the simulation.</p></section>}
+            {live && !readOnly && live.config.ownerTransactionsEnabled && pauseReview !== null &&
+              <ActionButton className="button secondary" busy={busy.length>0} onClick={()=>void run("pause",()=>live.command({method:"set_paused",args:{paused:pauseReview}}))}>{pauseReview ? "Review pause in wallet" : "Review unpause in wallet"}</ActionButton>}
+            {live && !readOnly && live.config.ownerTransactionsEnabled && ownerScope?.method === "revoke_agent" &&
+              <ActionButton className="button secondary" busy={busy.length>0} onClick={()=>void run("revoke",()=>live.command({method:"revoke_agent",args:{}}))}>Review turning off automatic payments</ActionButton>}
+          </>}
+          {view === "Contractors" && (live
+            ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization} readOnly={readOnly} limit={vault.payment_cap}/>
+            : <DemoContractorWorkspace onPay={demo ? async (draft) => {await demo.payContractor(draft,scenario);await refresh();} : undefined}/>)}
+          {view === "Receipts" && <section className="panel payment-workspace-panel" aria-label="Confirmed receipts">
+            {confirmed.length === 0 && <p className="empty">Receipts appear here after payment is confirmed.</p>}
+            {ordered.filter(p => confirmed.includes(p)).map(p => {
+              const info = details(p);
+              const summary = [info.contractor, `${formatNear(p.amount)} NEAR`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
+              return <article className="payment-record" key={p.attempt_id} id={`receipt-${p.attempt_id}`} tabIndex={-1}>
+                <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {live ? "Payment initiated" : "Simulated receipt"} · {p.invoice_id}</p>{info.description && <p className="payment-record-description">{info.description}</p>}</div>
+                <div className="payment-record-actions"><Amount value={p.amount}/><Badge status="Paid"/>
+                  {info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}
+                  <button className="text-button" onClick={async () => {try{await navigator.clipboard.writeText(summary);setNotice("Receipt copied.");}catch{setNotice("Clipboard unavailable. Select the receipt details to copy them.");}}}>Copy receipt</button>
                 </div>
-                {queue()}
-                <div className="panel-foot">
-                  Invoice text is untrusted data. No AI extraction is running.
-                </div>
-              </section>
-              {invoice ? (
-                <section className="panel invoice-detail">
-                  <div className="section-head">
-                    <div>
-                      <span className="eyebrow">{invoice.id}</span>
-                      <h2>{vendorName(s, invoice.vendor_id)}</h2>
-                    </div>
-                    <Badge
-                      status={
-                        reasons.length
-                          ? "Needs review"
-                          : live
-                            ? "Ready for worker"
-                            : "Ready to simulate"
-                      }
-                    />
-                  </div>
-                  <div className="invoice-detail-body">
-                    <div className="invoice-amount">
-                      <Amount large value={invoice.amount} />
-                      <small>
-                        {live
-                          ? "Requested payment · structured invoice"
-                          : "Requested payment · synthetic invoice"}
-                      </small>
-                    </div>
-                    <dl className="invoice-facts">
-                      <div>
-                        <dt>Work order</dt>
-                        <dd>{invoice.order_id}</dd>
-                      </div>
-                      <div>
-                        <dt>Invoice recipient</dt>
-                        <dd className="mono">{invoice.recipient}</dd>
-                      </div>
-                      <div>
-                        <dt>Approved recipient</dt>
-                        <dd className="mono">
-                          {s.orders.find((o) => o.id === invoice.order_id)
-                            ?.recipient ?? "No order"}
-                        </dd>
-                      </div>
-                    </dl>
-                    <div
-                      className={
-                        "decision-box " +
-                        (reasons.length ? "blocked" : "eligible")
-                      }
-                    >
-                      <strong>
-                        <Icon name="shield" size={18} />
-                        {reasons.length
-                          ? `${reasons.length} rule${reasons.length > 1 ? "s" : ""} require review`
-                          : "Matches existing owner approval"}
-                      </strong>
-                      {reasons.length ? (
-                        <ul>
-                          {reasons.map((code) => (
-                            <li key={code}>{reasonText[code]}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>
-                          Exact recipient and amount match. Budget and order
-                          guards permit{" "}
-                          {live
-                            ? "worker eligibility review"
-                            : "this local simulation"}
-                          .
-                        </p>
-                      )}
-                    </div>
-                    <label className="source-label">
-                      {live
-                        ? "Original invoice text"
-                        : "Original sample invoice"}
-                    </label>
-                    <pre className="invoice-source">
-                      {invoice.text || "No source text supplied."}
-                    </pre>
-                    <div className="invoice-actions">
-                      <ActionButton busy={busy.length>0}
-                        className="button secondary"
-                        disabled={
-                          readOnly ||
-                          busy.includes("review") ||
-                          invoice.reviewed
-                        }
-                        onClick={() =>
-                          void run(
-                            "review",
-                            () => adapter.markReviewed(invoice.id),
-                            "Review acknowledged. Failed rules still block payment.",
-                          )
-                        }
-                      >
-                        {invoice.reviewed
-                          ? "Review acknowledged"
-                          : "Mark reviewed"}
-                      </ActionButton>
-                      <ActionButton busy={busy.length>0}
-                        className="button primary"
-                        disabled={
-                          readOnly ||
-                          reasons.length > 0 ||
-                          busy.includes("payment")
-                        }
-                        onClick={() =>
-                          void run(
-                            "payment",
-                            () =>
-                              live
-                                ? live.enqueueInvoice(invoice.id)
-                                : adapter.simulatePayment(invoice.id, scenario),
-                            live
-                              ? "Invoice queued. The worker reconciles finalized results before any new submission."
-                              : "Simulation finished. Inspect its outcome in payment history.",
-                          )
-                        }
-                      >
-                        {busy.includes("payment")
-                          ? live
-                            ? "Queueing…"
-                            : "Simulation in flight…"
-                          : live
-                            ? "Queue reviewed invoice"
-                            : "Simulate payment"}
-                        <Icon name="arrow" size={15} />
-                      </ActionButton>
-                    </div>
-                    <p className="footnote">
-                      {live
-                        ? "Review acknowledgement grants no payment authority. Only finalized contract approvals authorize worker payments."
-                        : "Review acknowledgement grants no payment authority. No real transaction or signature is created."}
-                    </p>
-                  </div>
-                </section>
-              ) : (
-                <section className="panel empty">
-                  {live
-                    ? "Enter a structured invoice to begin."
-                    : "Add a sample invoice to begin."}
-                </section>
-              )}
-            </div>
-          )}
-          {view === "Payment history" && (
-            <section className="panel">
-              <div className="section-head">
-                <div>
-                  <span className="eyebrow">
-                    {live
-                      ? "Finalized contract attempts"
-                      : "Simulated receipts"}
-                  </span>
-                  <h2>Every attempt stays visible</h2>
-                </div>
-                <label className="filter-label">
-                  Outcome
-                  <select
-                    aria-label="Filter payment outcomes"
-                    value={historyFilter}
-                    onChange={(e) => setHistoryFilter(e.target.value)}
-                  >
-                    {["All outcomes", "Pending", "Paid", "Failed"].map(
-                      (status) => (
-                        <option key={status}>{status}</option>
-                      ),
-                    )}
-                  </select>
-                </label>
-              </div>
-              {history()}
-              <div className="panel-foot">
-                An unknown outcome stays pending and reserved. A refresh or
-                timeout does not authorize a retry.
-              </div>
+              </article>;
+            })}
+          </section>}
+          {view === "History" && <>
+            <section className="panel payment-workspace-panel" aria-label="Payment attempts">
+              <label className="filter-label">Outcome<select aria-label="Filter payment outcomes" value={historyFilter} onChange={e => setHistoryFilter(e.target.value)}>
+                {["All outcomes","Pending","Paid","Failed"].map(status => <option key={status}>{status}</option>)}
+              </select></label>
+              {ordered.filter(p => historyFilter === "All outcomes" || (["TransferSucceeded","TransferFailed"].includes(p.status) ? "Pending" : paymentDisplayStatus(s,p)) === historyFilter).map(p => {
+                const info = details(p), status = paymentDisplayStatus(s,p);
+                return <article className="payment-record" key={p.attempt_id}>
+                  <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {p.invoice_id}</p>{status === "Pending" && <p>Awaiting confirmation. Do not send this payment again.</p>}{["TransferSucceeded","TransferFailed"].includes(status) && <p>The transfer result is recorded. Final accounting is pending.</p>}</div>
+                  <div className="payment-record-actions"><Amount value={p.amount}/><Badge status={["TransferSucceeded","TransferFailed"].includes(status)?"Pending":status}/>{status === "Paid" && <a href={`#Receipts/${encodeURIComponent(p.attempt_id)}`} onClick={e=>{e.preventDefault();go("Receipts",p.attempt_id);}}>View receipt</a>}{status !== "Paid" && info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}</div>
+                </article>;
+              })}
+              {s.queue?.filter(job => !s.payments.some(p => p.invoice_id === job.id) && (historyFilter === "All outcomes" || (job.state === "failed" ? "Failed" : "Pending") === historyFilter)).map(job => <article key={job.id} className="payment-record"><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding. Check the existing attempt before taking action."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}
+              {!s.payments.length && !s.queue?.length && <p className="empty">Payment attempts will appear here.</p>}
             </section>
-          )}
-          {!live && (
-            <section
-              className="demo-tools"
-              aria-label="Local simulation controls"
-            >
-              <div>
-                <strong>Local simulation controls</strong>
-                <small>
-                  Saved invoices persist; other demo changes reset on reload. Wallet connection, funding and
-                  deployment are unavailable.
-                </small>
-              </div>
-              <label>
-                Next transfer
-                <select
-                  aria-label="Next simulated transfer outcome"
-                  value={scenario}
-                  onChange={(e) =>
-                    setScenario(e.target.value as TransferScenario)
-                  }
-                >
-                  <option value="success">Confirmed success</option>
-                  <option value="failure">Confirmed failure</option>
-                  <option value="unknown">
-                    Unknown outcome · stays locked
-                  </option>
-                </select>
-              </label>
-              <ActionButton busy={busy.length>0}
-                className="text-button"
-                onClick={() => {
-                  adapter.failNextRequest();
-                  void run("refresh", async () => {});
-                }}
-              >
-                Simulate load error
-              </ActionButton>
-              <ActionButton busy={busy.length>0}
-                className="text-button"
-                onClick={() => {
-                  adapter.reset();
-                  setSelected("INV-1042");
-                  setNotice("Synthetic workspace reset.");
-                }}
-              >
-                Reset demo
-              </ActionButton>
-            </section>
-          )}
-          {live && ["Vendors", "Work orders"].includes(view) && <details className="reference-disclosure"><summary>Import existing {view === "Vendors" ? "vendor" : "work order"}</summary><TestnetControls key={view} adapter={live} snapshot={s} run={run} section="references" referenceKind={view === "Vendors" ? "vendor" : "order"}/></details>}
-          <footer>
-            <span>Nnetics · Payment desk</span>
-            <span>
-              <Icon name="shield" size={13} />
-              Testnet deployment requires explicit authorization
-            </span>
-          </footer>
+            {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
+          </>}
+          {view === "Settings" && <>
+            {live && <section className="panel payment-workspace-panel"><h2>Account and wallet</h2><p>Signed in as {s.access?.accountId}</p><div className="actions">{accountActions}</div></section>}
+            <section className="panel payment-workspace-panel"><h2>Appearance</h2><p>Use the same preference across the workspace and account menu.</p><AppearanceControl inline/></section>
+            {live && <TestnetControls adapter={live} snapshot={s} run={run} section="access"/>}
+            {live && <details className="reference-disclosure"><summary>Advanced settings</summary><TestnetControls adapter={live} snapshot={s} run={run} section="references"/>{ownerScope?.method==="advance_repair_head"&&<TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/>}</details>}
+            {demo && <section className="panel payment-workspace-panel"><h2>Simulation controls</h2><label>Next transfer outcome<select aria-label="Next simulated transfer outcome" value={scenario} onChange={e => setScenario(e.target.value as TransferScenario)}><option value="success">Confirmed success</option><option value="failure">Confirmed failure</option><option value="unknown">Unknown outcome</option></select></label></section>}
+          </>}
         </MainSurface>
       </div>
-      {dialog && (
-        <Modal
-          live={!!live}
-          title={
-            dialog === "vendor"
-              ? "Manage a vendor"
-              : dialog === "order"
-                ? "Approve a work order"
-                : live
-                  ? "Enter a structured invoice"
-                  : "Add a sample invoice"
-          }
-          error={error}
-          busy={busy.includes("form")}
-          onClose={() => open(null)}
-          onSubmit={(data) => void submit(data)}
-        >
-          {dialog === "vendor" && (
-            <>
-              <p>
-                All {s.vendors.length} of 3 slots are used. Enter an existing ID
-                to update its recipient and enable it. Approved orders keep
-                their original recipient.
-              </p>
-              <label>
-                Vendor ID
-                <input
-                  name="vendor_id"
-                  required
-                  maxLength={64}
-                  defaultValue="writer"
-                />
-              </label>
-              <label>
-                Recipient account
-                <input
-                  name="recipient"
-                  required
-                  maxLength={64}
-                  defaultValue="writer-demo.testnet"
-                />
-              </label>
-            </>
-          )}
-          {dialog === "order" && (
-            <>
-              <p>
-                This authorizes one exact payment. To change the approval later,
-                revoke it and use a new order ID.
-              </p>
-              <label>
-                New work order ID
-                <input
-                  name="order_id"
-                  required
-                  maxLength={64}
-                  placeholder="article-004"
-                />
-              </label>
-              <label>
-                Vendor
-                <select
-                  name="vendor_id"
-                  defaultValue={s.vendors.find((x) => x.active)?.id}
-                >
-                  {s.vendors
-                    .filter((x) => x.active)
-                    .map((x) => (
-                      <option key={x.id} value={x.id}>
-                        {x.name} · {x.id}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <label>
-                Exact amount in NEAR
-                <input
-                  name="amount"
-                  inputMode="decimal"
-                  required
-                  placeholder="2"
-                />
-              </label>
-              <label>
-                Expiry date
-                <input
-                  name="expiry"
-                  type="date"
-                  required
-                  defaultValue={new Date(Date.now() + 14 * 86400000)
-                    .toISOString()
-                    .slice(0, 10)}
-                />
-              </label>
-            </>
-          )}
-          {dialog === "invoice" && (
-            <>
-              <p>
-                Enter {live ? "invoice" : "sample"} fields manually. No
-                extractor is running. Conflicting fields will be flagged for
-                review.
-              </p>
-              <p>Invoice reference assigned automatically on successful submission.</p>
-              <p>Currency: NEAR · Testnet</p>
-              <label>
-                Claimed work order
-                <select name="order_id" defaultValue={defaultOrder.id}>
-                  {s.orders.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.id} · {o.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Requested amount in NEAR
-                <input
-                  name="amount"
-                  inputMode="decimal"
-                  required
-                  defaultValue={formatNear(defaultOrder.amount)}
-                />
-              </label>
-              <label>
-                Invoice recipient
-                <input
-                  name="recipient"
-                  required
-                  maxLength={64}
-                  defaultValue={defaultOrder.recipient}
-                />
-              </label>
-              <label>
-                {live ? "Original invoice text" : "Original sample text"}
-                <textarea
-                  name="text"
-                  maxLength={8000}
-                  rows={4}
-                  placeholder={
-                    live
-                      ? "Optional source text; it cannot change payment authority."
-                      : "Paste synthetic invoice text only."
-                  }
-                />
-              </label>
-            </>
-          )}
-        </Modal>
-      )}
     </div>
   );
 }

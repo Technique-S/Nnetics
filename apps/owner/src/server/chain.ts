@@ -1,3 +1,4 @@
+import { rpcRequest } from "./rpc-request.ts";
 import { account, uint } from "../data/owner-adapter.ts";
 import type {
   OwnerSnapshot,
@@ -10,29 +11,12 @@ import type { LiveConfig } from "./config.ts";
 import type { Queue } from "./queue.ts";
 
 export class NearRpc {
-  private counter = 0;
   readonly config: LiveConfig;
   constructor(config: LiveConfig) {
     this.config = config;
   }
   async rpc<T>(method: string, params: unknown): Promise<T> {
-    const response = await fetch(this.config.rpc, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: ++this.counter,
-        method,
-        params,
-      }),
-      signal: AbortSignal.timeout(20000),
-      cache: "no-store",
-    });
-    if (!response.ok) throw new Error(`NEAR RPC HTTP ${response.status}`);
-    const body = await response.json();
-    if (body.error) throw new Error(`NEAR RPC: ${JSON.stringify(body.error)}`);
-    if (!("result" in body)) throw new Error("Missing RPC result.");
-    return body.result as T;
+    return rpcRequest<T>(this.config.rpc, method, params);
   }
   async finalized() {
     const status = await this.rpc<{

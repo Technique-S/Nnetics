@@ -1,6 +1,8 @@
 "use client";
-import {getProgressMessage} from "../data/user-message";
+import {getProgressMessage,getUserMessage} from "../data/user-message";
+import {AppearanceControl} from "./appearance-control";
 import {ActionButton} from "./action-button";
+import {OperationFeedback} from "./operation-feedback";
 import {LoadingSkeleton} from "./loading-skeleton";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NearOwnerAdapter, LiveApiError, checkMeteorIdentity, api, type PublicConfig } from "../data/near-adapter";
@@ -10,7 +12,6 @@ import {
   initializeMeteorExtension,
   testnetWalletAccount,
 } from "../data/meteor-message";
-import {PersistentContractorOwner} from "./contractor-owner";
 import { VaultOnboarding } from "./vault-onboarding";
 
 interface Workspace {
@@ -44,7 +45,7 @@ function verificationRequired() {
 export function Onboarding({
   renderDashboard,
 }: {
-  renderDashboard: (adapter: OwnerAdapter, name?: string) => ReactNode;
+  renderDashboard: (adapter: OwnerAdapter, name?: string, accountActions?: ReactNode) => ReactNode;
 }) {
   const [config, setConfig] = useState<PublicConfig | null>(null),
     [who, setWho] = useState<IdentityView | null>(null);
@@ -63,9 +64,15 @@ export function Onboarding({
   const [loginStage,setLoginStage]=useState("");
   const [loginAttempted,setLoginAttempted]=useState(false);
   const [checkingSaved,setCheckingSaved]=useState(false);
+  const [sessionChecking,setSessionChecking]=useState(false);
+  const workspaceReady=useRef(false);
+  const selection=useRef(0),selectionAbort=useRef<AbortController|null>(null);
+  const activeRef=useRef(active);activeRef.current=active;
+  const draftRef=useRef(selectedDraft);draftRef.current=selectedDraft;
   const lastRenewal=useRef(0),renewing=useRef(false);
   const identityRef=useRef<IdentityView|null>(null);identityRef.current=who;
   const epoch = useRef(0),
+    overviewAbort=useRef<AbortController|null>(null),
     pending = useRef<AbortController | null>(null),
     broadcast = useRef<BroadcastChannel | null>(null);
   const revocation = useRef<Promise<unknown>>(Promise.resolve());
@@ -73,15 +80,18 @@ export function Onboarding({
     if(revokeBrowser)markUnverified(true);
     setWalletNotice("");
     epoch.current++;
+    overviewAbort.current?.abort();
     pending.current?.abort();
     pending.current = null;
+    selection.current++;selectionAbort.current?.abort();activeRef.current?.cancel();
+    workspaceReady.current=false;
     setWho(null);
     setVerificationIssue("");
     setRestoreAvailable(false);
     setActive(null);
     setSelectedDraft(null);
     setOrganizationName("");
-    setBusy(false);
+    setBusy(false);setCheckingSaved(false);setSessionChecking(false);renewing.current=false;
     setLoginStage("");
     sessionStorage.removeItem("nnetics-wallet");
     localStorage.removeItem("nnetics-wallet");
@@ -103,20 +113,29 @@ export function Onboarding({
     }
   }
   async function overview(expected?: string, autoOpen = false, signal?:AbortSignal) {
-    const mine = epoch.current;
-    const fresh=await api<PublicConfig>("config",undefined,signal);
-    const identity = await api<IdentityView>("identity",undefined,signal);
+    overviewAbort.current?.abort();
+    const controller=new AbortController();overviewAbort.current=controller;
+    signal=signal?AbortSignal.any([signal,controller.signal]):controller.signal;
+    try {
+    const mine = epoch.current, deadline=Date.now()+180000;
+    const fresh=await api<PublicConfig>("config",undefined,signal,deadline);
+    const identity = await api<IdentityView>("identity",undefined,signal,deadline);
     if (mine !== epoch.current) return;
     if (expected && identity.accountId !== expected)
       throw new Error(
         "The wallet identity changed. Switch wallet and verify again.",
       );
+    const previous=activeRef.current;
+    if(previous&&(!fresh.configured||previous.config.contract!==fresh.contract||previous.config.organization!==fresh.organization||!identity.organizations.some(o=>o.id===previous.config.organization&&o.status==='ready'))){previous.cancel();setActive(null);setSelectedDraft(null);}
+    if(draftRef.current&&!identity.organizations.some(o=>o.id===draftRef.current!.id))setSelectedDraft(null);
     markUnverified(false);lastRenewal.current=Date.now();
     setVerificationIssue("");
     setRestoreAvailable(false);
+    workspaceReady.current=true;
     setWho(identity);
     if(autoOpen && fresh.configured && identity.organizations.some(o=>o.id===fresh.organization && o.status==='ready'))
       setActive(new NearOwnerAdapter(fresh,identity.accountId));
+    } catch(error) {if(signal.aborted)return;throw error;}
   }
   useEffect(() => {
     if (new URLSearchParams(location.search).get("mode") === "demo") {
@@ -144,6 +163,8 @@ export function Onboarding({
       });
     };
     window.addEventListener('pagehide',pagehide);window.addEventListener('pageshow',pageshow);
+    const mismatchedWallet=()=>{markUnverified(true);broadcast.current?.postMessage('lock');lock('The selected signing account changed. Authenticate that wallet separately; no permissions were transferred.',false);};
+    window.addEventListener('nnetics-wallet-mismatch',mismatchedWallet);
     // Obsolete per-tab proof markers are not credentials or logout requests.
     sessionStorage.removeItem('nnetics-foreground-required');sessionStorage.removeItem('nnetics-verified-document');
     void api<PublicConfig>("config")
@@ -154,9 +175,12 @@ export function Onboarding({
         );
       });
     return () => {
+      selectionAbort.current?.abort();
+      overviewAbort.current?.abort();
       pending.current?.abort();
       broadcast.current?.close();
       window.removeEventListener('pagehide',pagehide);window.removeEventListener('pageshow',pageshow);
+      window.removeEventListener('nnetics-wallet-mismatch',mismatchedWallet);
     };
   }, []);
   useEffect(() => {
@@ -182,33 +206,34 @@ export function Onboarding({
   async function restoreSession() { await overview(undefined,true); }
   useEffect(() => {
     if(!who)return;
+    const controller=new AbortController();
     let stopped=false,running=false,lastCheck=0,timer:ReturnType<typeof setTimeout>;
     const failure=(e:unknown)=>{
       if(e instanceof LiveApiError && e.retryable)setVerificationIssue(e.message+' Private records and actions are blocked until silent verification succeeds; your session is retained.');
       else lock(e instanceof Error?e.message:'Session verification failed. Sign in again.');
     };
     const refresh=async()=>{
-      if(stopped||running)return;running=true;clearTimeout(timer);const mine=epoch.current;
-      try{const next=await api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session');if(mine!==epoch.current)return;
+      if(stopped||running)return;if(renewing.current){timer=setTimeout(refresh,30000);return;}running=true;setSessionChecking(true);clearTimeout(timer);const mine=epoch.current;
+      try{const next=await api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session',undefined,controller.signal,undefined,()=>{if(!stopped&&mine===epoch.current)setVerificationIssue('Temporary network problem. Checking your saved session; existing records are retained.');});if(mine!==epoch.current)return;
         if(next.accountId!==who.accountId)lock('The authenticated account changed in another tab. Sign in to continue.',false);
         else {setVerificationIssue('');setWho(previous=>previous?{...previous,session:next}:previous);}
-      }catch(e){if(mine===epoch.current)failure(e);}
-      finally{running=false;lastCheck=Date.now();if(!stopped&&mine===epoch.current)timer=setTimeout(refresh,30000);}
+      }catch(e){if(!stopped&&mine===epoch.current)failure(e);}
+      finally{running=false;if(!stopped&&mine===epoch.current)setSessionChecking(false);lastCheck=Date.now();if(!stopped&&mine===epoch.current)timer=setTimeout(refresh,30000);}
     };
     const returned=()=>{if(!document.hidden&&Date.now()-lastCheck>3000)void refresh();};
     timer=setTimeout(refresh,30000);
     window.addEventListener('focus',returned);document.addEventListener('visibilitychange',returned);
     const activity=(e:Event)=>{
-      if(!e.isTrusted||document.hidden||!document.hasFocus()||renewing.current||Date.now()-lastRenewal.current<60000)return;
-      renewing.current=true;const mine=epoch.current;
-      void api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session/renew',{active:true}).then(next=>{
+      if(!e.isTrusted||document.hidden||!document.hasFocus()||renewing.current||running||Date.now()-lastRenewal.current<60000)return;
+      renewing.current=true;lastRenewal.current=Date.now();const mine=epoch.current;
+      void api<{accountId:string;idleExpires:number;absoluteExpires:number;serverTime?:number}>('session/renew',{active:true},controller.signal).then(next=>{
         if(mine!==epoch.current)return;
         if(next.accountId!==who.accountId)lock('The authenticated account changed. Sign in again.',false);
         else {lastRenewal.current=Date.now();setVerificationIssue('');setWho(previous=>previous?{...previous,session:next}:previous);}
-      }).catch(e=>{if(mine===epoch.current)failure(e);}).finally(()=>{renewing.current=false;});
+      }).catch(e=>{if(!stopped&&mine===epoch.current)failure(e);}).finally(()=>{if(mine===epoch.current)renewing.current=false;});
     };
     window.addEventListener('pointerdown',activity);window.addEventListener('keydown',activity);
-    return()=>{stopped=true;clearTimeout(timer);window.removeEventListener('focus',returned);document.removeEventListener('visibilitychange',returned);window.removeEventListener('pointerdown',activity);window.removeEventListener('keydown',activity);};
+    return()=>{stopped=true;controller.abort();clearTimeout(timer);window.removeEventListener('focus',returned);document.removeEventListener('visibilitychange',returned);window.removeEventListener('pointerdown',activity);window.removeEventListener('keydown',activity);};
   },[who?.accountId]);
   useEffect(()=>{
     const limits=who?.session;if(!limits)return;
@@ -287,44 +312,41 @@ export function Onboarding({
       }
     }
   }
+  const accountActions = who && <>
+    <ActionButton className="button secondary" onClick={() => lock()}>Switch wallet</ActionButton>
+    <ActionButton className="button secondary" onClick={()=>lock("You signed out. Verify a wallet to sign in again.")}>Sign out</ActionButton>
+    <ActionButton className="button secondary" disabled={busy} onClick={()=>void checkSelectedWallet()}>Check selected Meteor account (optional)</ActionButton>
+    {active && <ActionButton className="button secondary" onClick={()=>{setActive(null);setSelectedDraft(null);}}>My organizations</ActionButton>}
+  </>;
   if (demo) return renderDashboard(demo);
   if (who)
     return (
       <>
         <header className="identity-bar" aria-label="Verified wallet">
           <span>Signed in as {who.accountId} · NEAR testnet</span>
-          <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions">
-          <ActionButton className="button secondary" onClick={() => lock()}>
-            Switch wallet
-          </ActionButton>
-          <ActionButton className="button secondary" onClick={()=>lock("You signed out. Verify a wallet to sign in again.")}>Sign out</ActionButton>
-          <ActionButton className="button secondary" disabled={busy} onClick={()=>void checkSelectedWallet()}>Check selected Meteor account (optional)</ActionButton>
-          {active && (
-            <ActionButton
-              className="button secondary"
-              onClick={() => {
-                setActive(null);
-                setSelectedDraft(null);
-              }}
-            >
-              My organizations
-            </ActionButton>
-          )}
+          <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions"><AppearanceControl inline/>
+          {accountActions}
           <details className="wallet-session-notice"><summary>About this wallet session</summary><p>This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p></details></div></details>
         </header>
 
+        <OperationFeedback active={busy||checkingSaved||(sessionChecking&&!!verificationIssue)} message={busy?loginStage:"Checking your saved session…"} />
         {walletNotice && <p role="status">{walletNotice}</p>}
-        {verificationIssue ? (
-            <main className="loading-screen">
-              <h1>{busy?'Loading your workspace':'Verification temporarily unavailable'}</h1>
-              <p role="alert">{verificationIssue}</p>
-              <ActionButton className="button" disabled={busy} onClick={() => void overview(who.accountId).catch(e => {
-                if(e instanceof LiveApiError && e.retryable) setVerificationIssue(e.message);
-                else lock((e as Error).message);
-              })}>Retry verification</ActionButton>
-            </main>
-          ) : active ? renderDashboard(active, who.organizations.find(o=>o.id===active.config.organization)?.name) : (
-          <main className="loading-screen onboarding-surface" aria-label="Wallet onboarding">
+        {verificationIssue && (
+            <section className="loading-screen" aria-label="Session verification">
+              <h2>{busy||checkingSaved||sessionChecking?'Loading your workspace':'Verification temporarily unavailable'}</h2>
+              <p role="alert">{busy?"Your wallet was verified. Loading your authorized workspace…":sessionChecking||checkingSaved?"Checking your saved session. Existing records are retained; changes are temporarily unavailable.":getUserMessage(verificationIssue)}</p>
+              <ActionButton className="button" disabled={busy||sessionChecking||checkingSaved} onClick={() => {
+                const mine=epoch.current;setCheckingSaved(true);
+                void overview(who.accountId).catch(e => {
+                  if(mine!==epoch.current)return;
+                  if(e instanceof LiveApiError && e.retryable) setVerificationIssue(e.message);
+                  else lock((e as Error).message);
+                }).finally(()=>{if(mine===epoch.current)setCheckingSaved(false);});
+              }}>Retry verification</ActionButton>
+            </section>
+          )}
+        {active ? <div hidden={!!verificationIssue&&!workspaceReady.current} inert={!!verificationIssue}>{renderDashboard(active, who.organizations.find(o=>o.id===active.config.organization)?.name,accountActions)}</div> : (
+          <main hidden={!!verificationIssue&&!workspaceReady.current} inert={!!verificationIssue} className="loading-screen onboarding-surface" aria-label="Wallet onboarding">
             <h1>{selectedDraft ? selectedDraft.name : "Your workspace"}</h1>
             <p>Live testnet identity. No simulated records or balances.</p>
             <p>{who.notice}</p>
@@ -344,7 +366,7 @@ export function Onboarding({
               No vault balance is shown until a vault is linked and verified
               on-chain.
             </p>
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{getUserMessage(error)}</p>}
             <h2>Your organizations</h2>
             {who.organizations.length === 0 ? (
               <p>No organizations yet.</p>
@@ -354,27 +376,30 @@ export function Onboarding({
                   key={org.id}
                   className="button secondary"
                   onClick={async () => {
-                    const mine = epoch.current;
+                    const mine = epoch.current, chosen=++selection.current;
+                    selectionAbort.current?.abort();activeRef.current?.cancel();
+                    const controller=new AbortController();selectionAbort.current=controller;
+                    setActive(null);setSelectedDraft(null);
                     setError("");
                     try {
                       if (org.status === "ready" && config) {
-                        const fresh=await api<PublicConfig>("config");
+                        const fresh=await api<PublicConfig>("config",undefined,controller.signal);
                         if(!fresh.configured||fresh.organization!==org.id)throw Error("Workspace configuration changed. Reload login configuration before opening this vault.");
                         const adapter = new NearOwnerAdapter(
                           fresh,
                           who.accountId,
                         );
-                        await adapter.snapshot();
-                        if (mine === epoch.current) setActive(adapter);
+                        await adapter.snapshot(controller.signal);
+                        if (mine === epoch.current && chosen===selection.current && !controller.signal.aborted) setActive(adapter);
                       } else {
                         await api(
                           "organization?organization=" +
-                            encodeURIComponent(org.id),
+                            encodeURIComponent(org.id), undefined, controller.signal,
                         );
-                        if (mine === epoch.current) setSelectedDraft(org);
+                        if (mine === epoch.current && chosen===selection.current && !controller.signal.aborted) setSelectedDraft(org);
                       }
                     } catch (e) {
-                      if (mine === epoch.current)
+                      if (mine === epoch.current && chosen===selection.current && !controller.signal.aborted)
                         setError((e as Error).message);
                     }
                   }}
@@ -389,7 +414,7 @@ export function Onboarding({
               ))
             )}
             {selectedDraft && (
-              <><VaultOnboarding key={selectedDraft.id} organization={selectedDraft.id}/><PersistentContractorOwner key={`billing-${selectedDraft.id}`} organization={selectedDraft.id} embedded/></>
+              <VaultOnboarding key={selectedDraft.id} organization={selectedDraft.id}/>
             )}
             <form
               onSubmit={async (e) => {
@@ -429,15 +454,15 @@ export function Onboarding({
         )}
       </>
     );
-  if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><LoadingSkeleton/></main>;
+  if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><OperationFeedback active message="Checking your saved session…"/><LoadingSkeleton/></main>;
   let accountValid = false;
   try {testnetWalletAccount(account.trim());accountValid=true;}catch{}
   return <main className="loading-screen signin-surface">
-    <a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
+    <div className="signin-appearance"><AppearanceControl inline/></div><a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
     <h1>Nnetics · NEAR testnet</h1>
     <p>Verify any supported, activated testnet wallet. You do not need an organization or vault to sign in. Wallet verification grants no organization membership or vault ownership.</p>
     <details><summary>Supported wallets and networks</summary><p>Meteor extension only. Select NEAR testnet and an activated account. Other connectors are not supported by this sign-in flow.</p></details>
-    {error&&<p role="alert">{error}</p>}
+    {error&&<p role="alert">{getUserMessage(error)}</p>}
     <section aria-label="Meteor connection">
       {!config ? <ActionButton className="button primary" onClick={()=>location.reload()}>Reload connection</ActionButton> : restoreAvailable ? (
         <ActionButton className="button primary" pending={busy||checkingSaved} pendingLabel="Checking your saved session…" state={error?"error":"idle"} retryLabel="Continue to workspace" onClick={()=>{
@@ -449,7 +474,8 @@ export function Onboarding({
         }}>Connect to Meteor</ActionButton>
       )}
       {busy&&<ActionButton className="button secondary" onClick={()=>lock("Sign-in cancelled. You can connect again when ready.")}>Cancel sign-in</ActionButton>}
-      <p role="status">{busy?loginStage:"Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested."}</p>
+      <OperationFeedback active={busy} message={loginStage}/>
+      {!busy&&<p>Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested.</p>}
       <details><summary>Use a specific testnet account (optional)</summary><label>Testnet wallet account ID<input value={account} maxLength={64} autoCapitalize="none" spellCheck={false} onChange={e=>{if(who||busy)lock();setAccount(e.target.value);}}/></label>{!accountValid&&<p>Enter the activated account ID shown in Meteor.</p>}
       <ActionButton className="button secondary" onClick={()=>{setAccount("");lock("Choose a different wallet in Meteor, then connect again.");}}>Use a different wallet</ActionButton></details>
     </section>

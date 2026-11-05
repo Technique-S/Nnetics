@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "policyId": "meteor-reference-block-v1",
+  "mode": "assessment-only",
+  "status": "proposal-awaiting-explicit-review",
+  "network": "testnet",
+  "genesisHash": "FWJ9kR6KFWoyMoNjpLXXGHeuiy7tEY6GmoFeCA5yuc6b",
+  "baseV2Sha256": "d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a",
+  "intentSha256": "dd4bd9a3f0af67fe6a4ad976cb96ca64a12b43f69536dd39d5a199f16b435262",
+  "attemptId": "52f66a25-439a-4742-8d34-06dd092ba8f8",
+  "candidateHash": "CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG",
+  "originalHash": "9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo",
+  "consumedScopeId": "16ec4c1bb178a02e96c2ed083f8a29b7a936d3e0c24297f70e7753321174d983",
+  "owner": "grandtheft.testnet",
+  "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+  "contract": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+  "expectedCodeHash": "Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ",
+  "publicKey": "ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX",
+  "nonce": "275527848000004",
+  "action": {
+    "type": "FunctionCall",
+    "method": "fund_storage",
+    "argsBase64": "e30=",
+    "depositYoctoNEAR": "1000000000000000000",
+    "gas": "100000000000000"
+  },
+  "feeAllowanceCeilingYoctoNEAR": "22000000000000000000000",
+  "totalAllowanceCeilingYoctoNEAR": "22001000000000000000000",
+  "collectionClock": "monotonic-performance",
+  "skippedHeightRule": "dual-UNKNOWN_BLOCK-only-with-direct-parent-link",
+  "bounds": {
+    "reviewMs": 180000,
+    "preparedBlockAgeMs": 30000,
+    "referenceAdvance": 256,
+    "inclusionBlocks": 16,
+    "inclusionMs": 30000,
+    "receiptBlocks": 16,
+    "receiptMs": 30000,
+    "maxHeaders": 35,
+    "maxHttpAttempts": 128,
+    "collectionMs": 180000,
+    "headSkewBlocks": 32,
+    "minRequestSpacingMs": 1000,
+    "headerBatch": 1
+  },
+  "sources": [
+    "https://test.rpc.fastnear.com",
+    "https://rpc.testnet.near.org"
+  ],
+  "newTransactionsAuthorized": false,
+  "historicalDispositionAuthorized": false,
+  "runtimeActivation": false,
+  "permittedDifference": "reference block hash only; V0 canonical bytes otherwise identical",
+  "requiredExecution": "FINAL success including linked action and system gas-refund receipts",
+  "evidenceTrust": "Two fixed HTTPS RPC sources, testnet genesis pin, common finalized canonical-height agreement and parent continuity; Ed25519 transaction authentication. Not a light-client consensus proof or independent security review.",
+  "disposition": "Assessment only. Preserve V2, all IDs, manual-review history and consumed authorization. Explicit separate review is required before any historical disposition. No rearm or new live test is authorized.",
+  "changesFromV2": [
+    "Allow a bounded canonical reference-block refresh only in a separate assessment policy; no change to signer/key/nonce/receiver/actions/args/deposit/gas",
+    "Require dual-source, genesis-pinned canonical evidence and full hash/signature reconstruction plus complete receipt linkage",
+    "Authorize zero new transactions; existing V2 remains unchanged and consumed",
+    "Never treat post-submission detection as prevention of wallet byte alteration"
+  ],
+  "limitations": [
+    "Historical extension frames were not recorded; no retrospective wire capture is claimed",
+    "Existing V2 exact-hash acceptance remains failed; a V3 historical acceptance would be a separately reviewed exception",
+    "Collector trusts both configured HTTPS RPC endpoints; this is not independent light-client verification",
+    "No automatic historical disposition, hold clear, submission or runtime adoption path is exposed"
+  ]
+}

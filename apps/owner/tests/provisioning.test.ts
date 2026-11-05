@@ -54,7 +54,7 @@ function fixture() {
     else if (method === "block")
       result = { header: { hash: block, height: 500 } };
     else if (method === "tx") {
-      if (outcome === "unknown") throw Error("RPC does not know this hash");
+      if (outcome === "unknown") throw Object.assign(Error("RPC does not know this hash"),{rpcCode:"UNKNOWN_TRANSACTION"});
       const i = p.read("organization-one")!;
       const success = (executor_id: string) => ({
         outcome: { executor_id, status: { SuccessValue: "" } },

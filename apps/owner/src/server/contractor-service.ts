@@ -10,6 +10,8 @@ import type {ContractorBill,ContractorCommand,OwnerPortalCommand,PortalSnapshot}
 import {extractBilling,sourceQuestions,mentionedOrders,sourceOrderQuestions} from "./billing-extraction.ts";
 import {reviewedPayment,importPaymentIntent} from "./contractor-payments.ts";
 import {WorkerNearTransport} from "./signer.ts";
+import {workerScope} from "./worker-scope.ts";
+import {paymentExecutionEnabled} from "./transaction-gates.ts";
 import {boundedId} from "./queue.ts";
 import type {Payment} from "../data/owner-adapter.ts";
 
@@ -128,6 +130,26 @@ export class ContractorBackend extends ContractorRecordStore {
   if(bill.status!=="Approved"||bill.reasons.length)throw Error("Resolve billing clarification and obtain owner review before linking or resuming a payment intent.");
   const prior=this.db.prepare("SELECT payload,chain_order FROM contractor_queue_intents WHERE bill=? AND org=?").get(bill.id,org) as {payload:string;chain_order:string}|undefined;
   if(prior&&prior.chain_order!==chainOrderId)throw Error("Invoice already linked to one immutable chain order.");
+  const staged=s.queue.stagedPayment(bill.id,org);
+  if(staged) {
+   if(!paymentExecutionEnabled())throw Error("Payment execution is disabled. The existing acceptance job remains staged.");
+   const scope=workerScope(config,{...process.env,NNETICS_PAYMENT_JOB_ID:staged.job});
+   if(!scope.binding||staged.agreement!==local.id||staged.argsBase64!==scope.binding.argsBase64||
+      scope.binding.bill!==bill.id||scope.binding.agreement!==local.id||scope.args.order_id!==chainOrderId)
+    throw Error("Staged invoice differs from the exact reviewed plan.");
+   const saved=s.queue.get(staged.job);
+   if(!saved||saved.invoice.text!==bill.text)throw Error("Staged invoice text or job is missing or changed.");
+   const {reviewed:_,...prepared}=saved.invoice;
+   const invoice=prior&&s.queue.stagedReleasePlan(staged.job)===scope.planHash
+    ?JSON.parse(prior.payload):{...reviewedPayment(bill,local,chain,chainOrderId),id:staged.job};
+   if(invoice.id!==staged.job||JSON.stringify(invoice)!==JSON.stringify(prepared))throw Error("Finalized agreement differs from the staged payment.");
+   this.db.prepare("INSERT OR IGNORE INTO contractor_queue_intents VALUES (?,?,?,?,?)").run(bill.id,org,chainOrderId,JSON.stringify(invoice),"prepared");
+   const link=this.db.prepare("SELECT payload FROM contractor_queue_intents WHERE bill=? AND org=?").get(bill.id,org) as {payload:string}|undefined;
+   if(link?.payload!==JSON.stringify(invoice))throw Error("A different durable linkage exists.");
+   const job=s.queue.releaseStagedPayment(invoice,scope.planHash);
+   this.db.prepare("UPDATE contractor_queue_intents SET state='linked' WHERE bill=? AND org=?").run(bill.id,org);
+   return {payment:{state:job.state,orderId:job.order_id},ok:true};
+  }
   // Existing durable intent is immutable, including after the chain order has
   // become Pending/Paid; retry imports the same bytes and never resets the job.
   const invoice=prior?JSON.parse(prior.payload):reviewedPayment(bill,local,chain,chainOrderId);
@@ -140,7 +162,7 @@ export class ContractorBackend extends ContractorRecordStore {
    bill.payment={state:"blocked",reason:"Payment adapter unavailable; no payment confirmation.",orderId:intent.chain_order,transactionUrl:null,confirmed:false};
    try{
     const config=liveConfig();if(!config.configured||config.organization!==org)continue;
-    const s=service();s.queue.bindOrganization(org);const job=s.queue.get(bill.reference);
+    const s=service();s.queue.bindOrganization(org);const job=s.queue.get(JSON.parse(intent.payload).id);
     if(!job) {bill.payment.reason="Durable linkage prepared; owner must resume the same queue request.";continue;}
     const {reviewed:_,...saved}=job.invoice;
     if(JSON.stringify(saved)!==intent.payload){bill.payment.reason="Queue reference conflict; investigate without retrying payment.";continue;}

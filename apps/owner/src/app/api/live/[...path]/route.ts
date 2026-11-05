@@ -1,3 +1,7 @@
+import { ownerAttempt } from "../../../../server/owner-attempt";
+import {transactionCapabilities} from '../../../../server/transaction-gates';
+import { withRpcScope } from "../../../../server/rpc-request";
+import { RequestError, READ_TIMEOUTS } from "../../../../data/request-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { liveConfig } from "../../../../server/config";
 import { Provisioning } from "../../../../server/provisioning";
@@ -17,9 +21,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Context = { params: Promise<{ path: string[] }> };
-const json = (body: unknown, status = 200) =>
-  NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
-export async function GET(req: NextRequest, context: Context) {
+const json = (body: unknown, status = 200, retryAfterMs=0) =>
+  NextResponse.json(body, { status, headers: { "Cache-Control": "no-store",...(retryAfterMs>0?{"Retry-After":String(Math.ceil(retryAfterMs/1000))}:{}) } });
+async function get(req: NextRequest, context: Context) {
   try {
     const path = (await context.params).path.join("/");
     const identity = identityService();
@@ -39,8 +43,7 @@ export async function GET(req: NextRequest, context: Context) {
         publicKey: c?.publicKey || "",
         configured: c?.configured || false,
         missingConfiguration: c?.missingConfiguration || [],
-        transactionsEnabled:
-          process.env.NNETICS_TRANSACTIONS_AUTHORIZED === "testnet-reviewed",
+        ...transactionCapabilities(),
       });
     }
     const token = req.cookies.get("nnetics_identity")?.value || "";
@@ -105,16 +108,18 @@ export async function GET(req: NextRequest, context: Context) {
       throw new Error("Organization access denied.");
     const s = service();
     await identity.authenticate(token);
+    if (path === "owner-attempt") return json(await ownerAttempt(s, token));
     if (path === "snapshot") return json(await organizationSnapshot(s, token));
     throw new Error("Unknown endpoint.");
   } catch (e) {
     return json(
-      { error: e instanceof Error ? e.message : "Request failed", retryable: e instanceof IdentityVerificationUnavailable },
-      e instanceof IdentityVerificationUnavailable ? 503 : 400,
+      { error: e instanceof Error ? e.message : "Request failed", verificationUnavailable:e instanceof IdentityVerificationUnavailable || e instanceof RequestError, automaticRetry: e instanceof IdentityVerificationUnavailable ? e.automaticRetry : e instanceof RequestError ? e.retryable : false, retryable: (e instanceof IdentityVerificationUnavailable || e instanceof RequestError && e.retryable) },
+      (e instanceof IdentityVerificationUnavailable || e instanceof RequestError && e.retryable) ? 503 : 400,
+      e instanceof IdentityVerificationUnavailable || e instanceof RequestError ? e.retryAfterMs : 0,
     );
   }
 }
-export async function POST(req: NextRequest, context: Context) {
+async function post(req: NextRequest, context: Context) {
   try {
     const c = identityConfig();
     if (
@@ -233,11 +238,28 @@ export async function POST(req: NextRequest, context: Context) {
       return json(await identities.createOrganization(token, body.name));
     await identities.authenticate(token);
     const s = service();
+    if (path === "owner-attempt") {
+      return json(await ownerAttempt(s, token, body));
+    }
     return json(await organizationMutation(s, token, path, body));
   } catch (e) {
     return json(
-      { error: e instanceof Error ? e.message : "Request failed", retryable: e instanceof IdentityVerificationUnavailable },
-      e instanceof IdentityVerificationUnavailable ? 503 : 400,
+      { error: e instanceof Error ? e.message : "Request failed", verificationUnavailable:e instanceof IdentityVerificationUnavailable || e instanceof RequestError, automaticRetry: e instanceof IdentityVerificationUnavailable ? e.automaticRetry : e instanceof RequestError ? e.retryable : false, retryable: (e instanceof IdentityVerificationUnavailable || e instanceof RequestError && e.retryable) },
+      (e instanceof IdentityVerificationUnavailable || e instanceof RequestError && e.retryable) ? 503 : 400,
+      e instanceof IdentityVerificationUnavailable || e instanceof RequestError ? e.retryAfterMs : 0,
     );
   }
+}
+
+// The browser owns GET retries; server RPC reads get one attempt per GET.
+// POSTs are never replayed by the browser: only their safe RPC reads retry here.
+export function GET(req: NextRequest, context: Context) {
+  const requested = Number(req.headers.get('x-nnetics-read-timeout'));
+  const timeout = READ_TIMEOUTS.includes(requested) ? requested : undefined;
+  const offset=Number(req.headers.get('x-nnetics-read-attempt'))||0;
+  const budget=Number(req.headers.get('x-nnetics-budget'))||180000;
+  return withRpcScope(req.signal, timeout, () => get(req, context),Math.floor(Math.max(0,Math.min(3,offset))),budget);
+}
+export function POST(req: NextRequest, context: Context) {
+  return withRpcScope(req.signal, undefined, () => post(req, context),0,Number(req.headers.get('x-nnetics-budget'))||180000);
 }

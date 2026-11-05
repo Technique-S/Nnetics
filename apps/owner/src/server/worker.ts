@@ -3,6 +3,7 @@ import type { OwnerSnapshot, Payment } from "../data/owner-adapter.ts";
 import type { Job, Queue } from "./queue.ts";
 
 export interface WorkerTransport {
+  assertReady?(snapshot: OwnerSnapshot): Promise<void>;
   snapshot(queue: Queue): Promise<OwnerSnapshot>;
   prepare(args: {
     order_id: string;
@@ -17,9 +18,11 @@ export interface WorkerTransport {
 export class PaymentWorker {
   readonly queue: Queue;
   readonly chain: WorkerTransport;
-  constructor(queue: Queue, chain: WorkerTransport) {
+  readonly onlyJob?: string;
+  constructor(queue: Queue, chain: WorkerTransport, onlyJob?:string) {
     this.queue = queue;
     this.chain = chain;
+    this.onlyJob = onlyJob;
   }
   async tick() {
     // Restarted jobs are reconciled first. Unknown outcomes never become queued.
@@ -33,13 +36,16 @@ export class PaymentWorker {
         .some((j) => ["preparing", "submitted", "pending"].includes(j.state))
     )
       return;
-    for (const job of this.queue.all().filter((j) => j.state === "queued")) {
+    for (const job of this.queue.all().filter((j) => j.state === "queued"&&(!this.onlyJob||j.id===this.onlyJob))) {
       const snapshot = await this.chain.snapshot(this.queue);
       const reasons = review(snapshot, job.invoice);
       if (reasons.length) {
         this.queue.update(job.id, "review", reasons.join(", "));
         continue;
       }
+      // Temporary readiness failures must not consume the permanent signing claim.
+      // Concrete transport checks the checkpoint at this same finalized snapshot.
+      await this.chain.assertReady?.(snapshot);
       if (!this.queue.claim(job.id)) continue;
       // preparing is committed before signing. A crash in this gap blocks instead
       // of guessing whether an external signer has submitted anything.
