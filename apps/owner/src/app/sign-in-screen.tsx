@@ -144,9 +144,9 @@ export function SignInScreen({
       <footer className="signin-footer">
         <span>@MDBcertified</span>
         <span aria-hidden="true"> · </span>
-        <a href="#" className="signin-footer-link" aria-disabled="true" onClick={e => e.preventDefault()}>Privacy Policy</a>
+        <span className="signin-footer-link" aria-disabled="true">Privacy Policy</span>
         <span aria-hidden="true"> · </span>
-        <a href="#" className="signin-footer-link" aria-disabled="true" onClick={e => e.preventDefault()}>Terms of Service</a>
+        <span className="signin-footer-link" aria-disabled="true">Terms of Service</span>
       </footer>
     </main>
   );

@@ -67,7 +67,7 @@ html[data-theme=dark] {
   --info:var(--color-primary-soft);--info-bg:var(--color-tint);--success:var(--color-primary);--success-bg:var(--color-tint);
   --warning:var(--color-accent);--warning-bg:var(--color-accent-bg);--warning-border:var(--color-accent);
   --danger-hover:var(--color-danger-bg);--danger-border:var(--color-danger);--shadow-dialog:transparent;--shadow-soft:transparent;
-  --signin-cta:#2E6BE6; --signin-cta-hover:#4A83F0; --signin-cta-pressed:#2458C4; --signin-cta-text:#FFFFFF;
+  --signin-cta:#2E6BE6; --signin-cta-hover:#335FCC; --signin-cta-pressed:#2458C4; --signin-cta-text:#FFFFFF;
   --signin-link:#8FBAFF;
   --shadow-card:none;
   --signin-cta-shadow:0 4px 16px rgb(0 0 0 / 35%);
