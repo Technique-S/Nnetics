@@ -279,7 +279,7 @@ test("switching clears private records, revokes the old session, and failed/new 
     .getByRole("button", { name: "Switch wallet", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Nnetics · NEAR testnet" }),
+    page.getByRole("heading", { name: "Sign in" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Vault", exact: true }),
@@ -375,14 +375,14 @@ test("a failed logout cannot restore private records on reload", async ({
     .getByRole("button", { name: "Switch wallet", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Nnetics · NEAR testnet" }),
+    page.getByRole("heading", { name: "Sign in" }),
   ).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Your workspace" }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Nnetics · NEAR testnet" }),
+    page.getByRole("heading", { name: "Sign in" }),
   ).toBeVisible();
 });
 
@@ -467,22 +467,22 @@ test('an unreported Meteor selection never transfers the authenticated account o
  const f=await fixture(page,'first.testnet');f.orgs.set('first.testnet',[{id:'private-first',name:'First private workspace',status:'unprovisioned',role:'creator'}]);await page.goto('/');await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();
  await page.evaluate(()=>{window.dispatchEvent(new Event('blur'));(window as any).meteorProbe.selected='second.testnet';window.dispatchEvent(new Event('focus'));});
  await expect(page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();expect(f.resumeCalls()).toBe(0);
- await openAccountMenu(page);await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);expect(f.loginCalls()).toBe(0);
+ await openAccountMenu(page);await page.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);expect(f.loginCalls()).toBe(0);
  await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByText('Signed in as second.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();await expect(page.getByText('No organizations yet.')).toBeVisible();expect(f.loginCalls()).toBe(1);
 });
 
 test('explicit logout and genuine expiry clear records and show why a fresh signature is required',async({page})=>{
  const f=await fixture(page,'first.testnet');await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();
- await page.route('**/api/live/session',route=>route.fulfill({status:401,json:{error:'Your five-hour session has expired. Sign a fresh message.'}}));await page.clock.fastForward(30000);await expect(page.getByRole('heading',{name:'Nnetics · NEAR testnet'})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'five-hour session'})).toBeVisible();expect(f.logoutCalls()).toBe(1);
+ await page.route('**/api/live/session',route=>route.fulfill({status:401,json:{error:'Your five-hour session has expired. Sign a fresh message.'}}));await page.clock.fastForward(30000);await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'five-hour session'})).toBeVisible();expect(f.logoutCalls()).toBe(1);
 });
 test('a verified account change broadcasts revocation across tabs before separate authentication',async({page,context})=>{
  const f=await fixture(page,'first.testnet');f.orgs.set('first.testnet',[{id:'private-first',name:'First private workspace',status:'unprovisioned',role:'creator'}]);await page.goto('/');await expect(page.getByRole('button',{name:/First private workspace/})).toBeVisible();
  const other=await context.newPage();const g=await fixture(other,'first.testnet');await other.goto('/');await expect(other.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await other.evaluate(()=>(window as any).meteorProbe.selected='second.testnet');await openAccountMenu(other);await other.getByRole('button',{name:'Check selected Meteor account (optional)',exact:true}).click();
- await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);await expect(other.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();expect(g.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);await other.close();
+ await expect(page.getByRole('button',{name:/First private workspace/})).toHaveCount(0);await expect(other.getByRole('heading',{name:'Sign in'})).toBeVisible();expect(g.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);await other.close();
 });
 
 test('sign out revokes the browser and refresh cannot restore private records',async({page})=>{
- const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await openAccountMenu(page);await page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(page.getByRole('heading',{name:'Nnetics · NEAR testnet'})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBeGreaterThan(0);
+ const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await openAccountMenu(page);await page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);expect(f.logoutCalls()).toBeGreaterThan(0);
 });
 test('ordinary navigation and refresh restore the same authenticated account without signatures',async({page})=>{
  const f=await fixture(page,'first.testnet');await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.goto('/?returning=1');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.logoutCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);
@@ -496,7 +496,7 @@ test('the five-hour client deadline logs out exactly at the boundary without bac
  await page.clock.install({time:new Date('2026-11-03T12:00:00Z')});const f=await fixture(page,'first.testnet');const base=Date.parse('2026-11-03T12:00:00Z'),deadline=base+5*3600000;
  await page.route('**/api/live/identity',async route=>route.fulfill({json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:'',session:{idleExpires:deadline,absoluteExpires:deadline,serverTime:await page.evaluate(()=>Date.now())}}}));
  await page.route('**/api/live/session',async route=>{const now=await page.evaluate(()=>Date.now());return route.fulfill(now>=deadline?{status:401,json:{error:'Your five-hour session has expired.'}}:{json:{accountId:'first.testnet',idleExpires:deadline,absoluteExpires:deadline,serverTime:now}})});
- await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.clock.pauseAt(new Date((await page.evaluate(()=>Date.now()))+1000));const remaining=deadline-(await page.evaluate(()=>Date.now()));const checked=page.waitForResponse(r=>r.url().endsWith('/api/live/session'));await page.clock.fastForward(remaining-1);await checked;await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.clock.fastForward(1);await expect(page.getByRole('heading',{name:'Nnetics · NEAR testnet'})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'five-hour session'})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBeGreaterThan(0);
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.clock.pauseAt(new Date((await page.evaluate(()=>Date.now()))+1000));const remaining=deadline-(await page.evaluate(()=>Date.now()));const checked=page.waitForResponse(r=>r.url().endsWith('/api/live/session'));await page.clock.fastForward(remaining-1);await checked;await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.clock.fastForward(1);await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'five-hour session'})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBeGreaterThan(0);
 });
 test('server remaining lifetime avoids immediate logout when the browser wall clock is ahead',async({page})=>{
  const base=Date.parse('2026-11-03T12:00:00Z');await page.clock.install({time:new Date(base+6*3600000)});const f=await fixture(page,'first.testnet');
@@ -537,7 +537,7 @@ test('persistent HttpOnly session survives a browser process restart and logout 
  let run=await launch();await run.page.goto(address);await run.page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(run.page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();
  const cookie=(await context!.cookies()).find(c=>c.name==='test_identity')!;expect(cookie.httpOnly).toBe(true);expect(cookie.expires).toBeGreaterThan(Date.now()/1000);await context!.close();context=undefined;
  run=await launch();await run.page.goto(address);await expect(run.page.getByText('Signed in as first.testnet \u00b7 NEAR testnet',{exact:true})).toBeVisible();expect(await run.page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(0);
- await openAccountMenu(run.page);await run.page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(run.page.getByRole('heading',{name:'Nnetics \u00b7 NEAR testnet'})).toBeVisible();await expect.poll(async()=>(await context!.cookies()).some(c=>c.name==='test_identity')).toBe(false);await context!.close();context=undefined;
+ await openAccountMenu(run.page);await run.page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(run.page.getByRole('heading',{name:'Sign in'})).toBeVisible();await expect.poll(async()=>(await context!.cookies()).some(c=>c.name==='test_identity')).toBe(false);await context!.close();context=undefined;
  run=await launch();await run.page.goto(address);await expect(run.page.getByRole('button',{name:'Connect to Meteor',exact:true})).toBeVisible();await expect(run.page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
  }finally{await context?.close();if(!profile.startsWith(join(tmpdir(),'nnetics-session-test-')))throw Error('Unexpected test profile path');await rm(profile,{recursive:true,force:true});}
 });
