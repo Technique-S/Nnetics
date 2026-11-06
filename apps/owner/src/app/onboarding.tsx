@@ -10,7 +10,6 @@ import { MockOwnerAdapter } from "../data/mock-adapter";
 import type { OwnerAdapter } from "../data/owner-adapter";
 import {
   initializeMeteorExtension,
-  testnetWalletAccount,
 } from "../data/meteor-message";
 import { VaultOnboarding } from "./vault-onboarding";
 import { SignInScreen } from "./sign-in-screen";
@@ -52,8 +51,7 @@ export function Onboarding({
     [who, setWho] = useState<IdentityView | null>(null);
   const [active, setActive] = useState<NearOwnerAdapter | null>(null),
     [demo, setDemo] = useState<MockOwnerAdapter | null>(null);
-  const [account, setAccount] = useState(""),
-    [ready, setReady] = useState(false),
+  const [ready, setReady] = useState(false),
     [busy, setBusy] = useState(false);
   const [error, setError] = useState(""),
     [organizationName, setOrganizationName] = useState("");
@@ -262,15 +260,8 @@ export function Onboarding({
     setWho({accountId,network:'testnet',organizations:[],notice:''});
     setVerificationIssue('Wallet verified. Loading your authorized workspace…');
   }
-  async function signIn(discover=false) {
+  async function signIn() {
     if (!config) return;
-    const chosen = discover ? undefined : account.trim();
-    try {
-      if(chosen!==undefined)testnetWalletAccount(chosen);
-    } catch (e) {
-      setError((e as Error).message);
-      return;
-    }
     clearLocal();
     broadcast.current?.postMessage("lock");
     const mine = epoch.current,
@@ -287,7 +278,7 @@ export function Onboarding({
       if (mine !== epoch.current) return;
       markUnverified(false);
       const verifiedAccount=await new NearOwnerAdapter(config).connectMeteor(
-        chosen,
+        undefined,
         controller.signal,
         message=>{if(mine===epoch.current)setLoginStage(message);},
       );
@@ -456,8 +447,6 @@ export function Onboarding({
       </>
     );
   if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><OperationFeedback active message="Checking your saved session…"/><LoadingSkeleton/></main>;
-  let accountValid = false;
-  try {testnetWalletAccount(account.trim());accountValid=true;}catch{}
   return <SignInScreen
     configReady={!!config}
     restoreAvailable={restoreAvailable}
@@ -466,8 +455,6 @@ export function Onboarding({
     loginStage={loginStage}
     loginAttempted={loginAttempted}
     error={error}
-    account={account}
-    accountValid={accountValid}
     onReloadConfiguration={() => location.reload()}
     onRestore={() => {
       setError("");setCheckingSaved(true);
@@ -476,9 +463,7 @@ export function Onboarding({
         if(!(e instanceof LiveApiError && e.retryable)) setRestoreAvailable(false);
       }).finally(() => setCheckingSaved(false));
     }}
-    onConnect={() => { setLoginAttempted(true); void signIn(!account.trim()); }}
+    onConnect={() => { setLoginAttempted(true); void signIn(); }}
     onCancel={() => lock("Sign-in cancelled. You can connect again when ready.")}
-    onAccountChange={(value) => { if(who||busy)lock(); setAccount(value); }}
-    onUseDifferentWallet={() => { setAccount(""); lock("Choose a different wallet in Meteor, then connect again."); }}
   />;
 }

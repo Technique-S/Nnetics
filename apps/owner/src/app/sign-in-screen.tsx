@@ -11,14 +11,10 @@ export interface SignInScreenProps {
   loginStage: string;
   loginAttempted: boolean;
   error: string;
-  account: string;
-  accountValid: boolean;
   onReloadConfiguration: () => void;
   onRestore: () => void;
   onConnect: () => void;
   onCancel: () => void;
-  onAccountChange: (value: string) => void;
-  onUseDifferentWallet: () => void;
 }
 
 export function SignInScreen({
@@ -29,17 +25,14 @@ export function SignInScreen({
   loginStage,
   loginAttempted,
   error,
-  account,
-  accountValid,
   onReloadConfiguration,
   onRestore,
   onConnect,
   onCancel,
-  onAccountChange,
-  onUseDifferentWallet,
 }: SignInScreenProps) {
   return (
     <main className="signin-screen">
+      <a className="button secondary signin-demo" href="/?mode=demo">Open explicitly simulated demo</a>
       <div className="signin-art" aria-hidden="true">
         <svg className="signin-art-item signin-art-tl" viewBox="0 0 200 200" fill="none">
           <path d="M100 0L115 65L171 29L143 88L200 100L143 112L171 171L115 135L100 200L85 135L29 171L57 112L0 100L57 88L29 29L85 65Z" />
@@ -105,8 +98,6 @@ export function SignInScreen({
         <section className="signin-card">
           <h1 className="signin-title">Sign in</h1>
           <p className="signin-subtitle">Connect your wallet</p>
-          <p>Verify any supported, activated testnet wallet. You do not need an organization or vault to sign in. Wallet verification grants no organization membership or vault ownership.</p>
-          <details className="signin-disclosure"><summary>Supported wallets and networks</summary><p>Meteor extension only. Select NEAR testnet and an activated account. Other connectors are not supported by this sign-in flow.</p></details>
           {error && <p role="alert">{getUserMessage(error)}</p>}
 
           <section className="signin-connection" aria-label="Meteor connection">
@@ -115,7 +106,7 @@ export function SignInScreen({
             ) : restoreAvailable ? (
               <ActionButton className="button primary" pending={busy || checkingSaved} pendingLabel="Checking your saved session…" state={error ? "error" : "idle"} retryLabel="Continue to workspace" onClick={onRestore}>Continue to workspace</ActionButton>
             ) : (
-              <ActionButton className="button primary" pending={busy} pendingLabel={getProgressMessage(loginStage)} disabled={!!account.trim() && !accountValid} state={error && loginAttempted ? "error" : "idle"} retryLabel="Try again" onClick={onConnect}>
+              <ActionButton className="button primary" pending={busy} pendingLabel={getProgressMessage(loginStage)} state={error && loginAttempted ? "error" : "idle"} retryLabel="Try again" onClick={onConnect}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
                   <path d="M16 3H4a2 2 0 0 0-2 2v2"></path>
@@ -126,19 +117,8 @@ export function SignInScreen({
             )}
             {busy && <ActionButton className="button secondary" onClick={onCancel}>Cancel sign-in</ActionButton>}
             <OperationFeedback active={busy} message={loginStage} />
-            {!busy && <p>Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested.</p>}
-
-            <details className="signin-disclosure"><summary>Use a specific testnet account (optional)</summary>
-              <label>Testnet wallet account ID
-                <input value={account} maxLength={64} autoCapitalize="none" spellCheck={false} onChange={e => onAccountChange(e.target.value)} />
-              </label>
-              {!accountValid && <p>Enter the activated account ID shown in Meteor.</p>}
-              <ActionButton className="button secondary" onClick={onUseDifferentWallet}>Use a different wallet</ActionButton>
-            </details>
           </section>
         </section>
-
-        <a className="button secondary signin-demo" href="/?mode=demo">Open explicitly simulated demo</a>
       </div>
 
       <footer className="signin-footer">

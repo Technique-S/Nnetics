@@ -588,17 +588,15 @@ html[data-theme=dark] .signin-card { box-shadow:none; }
 .signin-title { font-family:var(--font-jakarta), Arial, Helvetica, sans-serif; font-size:26px; font-weight:700; letter-spacing:-.01em; margin:0 0 6px; }
 .signin-subtitle { color:var(--text-muted); font-size:14.5px; margin:0 0 20px; }
 .signin-card :is(p, li) { color:var(--text-muted); }
-.signin-disclosure { text-align:left; margin:16px 0; padding-top:16px; border-top:1px solid var(--border); }
-.signin-disclosure summary { cursor:pointer; font-size:14px; color:var(--text); }
 .signin-connection { text-align:left; }
 .signin-connection .button.primary { width:100%; gap:10px; border-radius:14px; padding:15px 20px; background:var(--signin-cta); border-color:var(--signin-cta); color:var(--signin-cta-text); box-shadow:var(--signin-cta-shadow); }
 .signin-connection .button.primary:hover:not(:disabled) { background:var(--signin-cta-hover); border-color:var(--signin-cta-hover); }
 .signin-connection .button.primary:active:not(:disabled) { background:var(--signin-cta-pressed); border-color:var(--signin-cta-pressed); }
 .signin-connection .button.primary:disabled { background:var(--border); border-color:var(--border); color:var(--text-muted); box-shadow:none; }
 .signin-connection .button.secondary { margin-top:12px; }
-.signin-demo { margin-top:20px; }
+.signin-demo { position:absolute; top:20px; left:20px; z-index:2; margin-top:0; }
 .signin-footer { position:relative; z-index:1; display:block; justify-content:normal; border-top:none; margin-top:auto; padding-top:28px; font-size:12.5px; color:var(--text-muted); text-align:center; }
-.signin-footer-link { color:var(--signin-link); text-decoration:none; }
+.signin-footer .signin-footer-link { display:inline; color:var(--signin-link); text-decoration:none; }
 .signin-footer-link:hover { text-decoration:underline; }
 .signin-footer-link[aria-disabled="true"] { cursor:default; }
 @media (max-width:760px) {
@@ -606,6 +604,7 @@ html[data-theme=dark] .signin-card { box-shadow:none; }
   .signin-card { padding:32px 22px; border-radius:22px; }
   .signin-content { max-width:100%; }
   .signin-appearance { top:10px; right:10px; }
+  .signin-demo { top:12px; left:12px; font-size:11px; line-height:1.35; padding:6px 8px; max-width:116px; white-space:normal; text-align:left; }
 }
 @media (prefers-reduced-motion: reduce) { .signin-art-lime-star { animation:none; } }
 @media (forced-colors: active) {

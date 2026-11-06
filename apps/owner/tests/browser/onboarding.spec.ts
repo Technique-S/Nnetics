@@ -155,10 +155,9 @@ function exhaustReads(page:Page,operation:string,delays=[500,1000,2000]){
  return async()=>{for(let i=0;i<4;i++){await expect.poll(()=>failures.length).toBe(i+1);if(i<3)await page.clock.runFor(delays[i]);}};
 }
 async function signIn(page:Page,id:string){
- const advanced=page.locator('details').filter({has:page.getByText('Use a specific testnet account (optional)',{exact:true})});
- if(!(await advanced.evaluate(el=>(el as HTMLDetailsElement).open)))await page.getByText('Use a specific testnet account (optional)',{exact:true}).click();
- await page.getByLabel('Testnet wallet account ID').fill(id);
- await page.getByRole('region',{name:'Meteor connection'}).getByRole('button',{name:/^(Connect to Meteor|Try again)$/}).click();
+  // Sign-in always uses discovery: Meteor returns its selected account (the
+  // fixture sets it to 'id'). The typed-account UI was removed by request.
+  await page.getByRole('region',{name:'Meteor connection'}).getByRole('button',{name:/^(Connect to Meteor|Try again)$/}).click();
 }
 test("unconfigured vault does not block a new wallet; identity starts empty and organization creation grants no vault", async ({
   page,
@@ -285,6 +284,9 @@ test("switching clears private records, revokes the old session, and failed/new 
     page.getByRole("heading", { name: "Vault", exact: true }),
   ).toHaveCount(0);
   f.deny(true);
+  // Meteor must report the newly picked account; the pinned-account input is gone,
+  // so flip the fixture's selection directly (as the unreported-selection test does).
+  await page.evaluate(() => { (window as unknown as { meteorProbe: { selected: string } }).meteorProbe.selected = "new-user.testnet"; });
   await signIn(page, "new-user.testnet");
   await expect(
     page.getByRole("alert").filter({ hasText: "wallet access couldn't be verified" }),
@@ -311,47 +313,18 @@ test("configuration drift clears the old workspace before showing a fresh server
  await expect(page.getByRole("heading",{name:"Vault",exact:true})).toHaveCount(0);
  await expect(page.getByRole("button",{name:"Review owner transaction in wallet",exact:true})).toHaveCount(0);
 });
-test("message login waits for approval, and editing the pending account cancels its proof and requires a fresh challenge", async ({
+test('message login waits for approval', async ({
   page,
 }) => {
-  const f = await fixture(page, "", true);
-  await page.goto("/");
-  await signIn(page, "first.testnet");
+  const f = await fixture(page, '', true);
+  await page.goto('/');
+  await signIn(page, 'new-user.testnet');
+  // Pending Meteor approval: the button stays disabled and in busy state.
   await expect(
-    page.getByRole("region", {name:"Meteor connection"}).locator("button[aria-busy=true]"),
+    page.getByRole('region', {name:'Meteor connection'}).locator('button[aria-busy=true]'),
   ).toBeDisabled();
-  // Busy starts before the HTTP challenge finishes. Establish that the first
-  // Meteor request really exists before testing cancellation of a pending proof.
+  // Establish the first Meteor request really exists before any assertion on it.
   await expect.poll(()=>page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);
-  expect(f.loginCalls()).toBe(0);
-  await page.getByLabel("Testnet wallet account ID").fill("second.testnet");
-  await expect(
-    page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }),
-  ).toBeEnabled();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Choose your wallet account in Meteor" }),
-  ).toBeVisible();
-  expect(f.loginCalls()).toBe(0);
-  await page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }).click();
-  // The challenge request is asynchronous. Reject the second wallet request,
-  // rather than racing its registration and rejecting the cancelled first one.
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          (window as unknown as { meteorProbe: { requests: number } })
-            .meteorProbe.requests,
-      ),
-    )
-    .toBe(2);
-  await page.evaluate(() =>
-    (
-      window as unknown as { meteorProbe: { decline: () => void } }
-    ).meteorProbe.decline(),
-  );
-  await expect(
-    page.getByRole("alert").filter({ hasText: "cancelled the wallet request" }),
-  ).toBeVisible();
   expect(f.loginCalls()).toBe(0);
 });
 test('tab and focus transitions preserve private views without signatures',async({page})=>{
@@ -417,16 +390,11 @@ test("missing extension and mainnet account errors explain recovery; demo stays 
       .getByRole("alert")
       .filter({ hasText: "browser with Meteor installed" }),
   ).toBeVisible();
-  await page.getByText("Use a specific testnet account (optional)",{exact:true}).click();
-  await page.getByLabel("Testnet wallet account ID").fill("wallet.near");
-  await expect(
-    page.getByRole("button", { name: /^(Connect to Meteor|Try again)$/ }),
-  ).toBeDisabled();
   await page
     .getByRole("link", { name: "Open explicitly simulated demo" })
     .click();
   await expect(
-    page.getByText("Synthetic data. No wallet connected.", { exact: false }),
+    page.getByText(/No funds move/),
   ).toBeVisible();
 });
 
@@ -489,7 +457,7 @@ test('ordinary navigation and refresh restore the same authenticated account wit
 });
 
 test('Connect to Meteor requests one off-chain selected-wallet proof without typing an account ID',async({page})=>{
- const f=await fixture(page);await page.goto('/');await expect(page.getByLabel('Testnet wallet account ID')).not.toBeVisible();await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(1);expect(await page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);await expect(page.getByText('No organizations yet.')).toBeVisible();
+ const f=await fixture(page);await page.goto('/');await expect(page.getByLabel('Testnet wallet account ID')).toHaveCount(0);await page.getByRole('button',{name:'Connect to Meteor',exact:true}).click();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(1);expect(await page.evaluate(()=>(window as unknown as {meteorProbe:{requests:number}}).meteorProbe.requests)).toBe(1);await expect(page.getByText('No organizations yet.')).toBeVisible();
 });
 
 test('the five-hour client deadline logs out exactly at the boundary without background polling extending it',async({page})=>{
