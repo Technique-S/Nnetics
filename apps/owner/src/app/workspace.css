@@ -557,3 +557,67 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
   .payment-record { grid-template-columns: minmax(0, 1fr); }
   .payment-record-actions { justify-content: start; }
 }
+
+/* ===== Sign-in screen (redesigned) ===== */
+.signin-screen { position:relative; min-height:100dvh; overflow:hidden; display:flex; flex-direction:column; background:var(--background); color:var(--text); font-family:var(--font-jakarta), Arial, Helvetica, sans-serif; padding:40px 20px 24px; }
+.signin-art { position:absolute; inset:0; z-index:0; pointer-events:none; }
+.signin-art-item { position:absolute; }
+.signin-art-tl { top:-30px; left:-40px; width:260px; opacity:.85; }
+.signin-art-planet { left:3%; top:40%; width:170px; }
+.signin-art-bl { bottom:-60px; left:-40px; width:280px; opacity:.75; }
+.signin-art-tr { top:-30px; right:-60px; width:320px; opacity:.65; }
+.signin-art-lime-star { top:25%; right:17%; width:54px; height:54px; animation:signin-float 4s ease-in-out infinite alternate; }
+.signin-art-pencil { right:-10px; top:42%; width:220px; }
+.signin-art-br { bottom:-80px; right:-50px; width:300px; opacity:.8; }
+@keyframes signin-float { from { transform:translateY(0) rotate(0); } to { transform:translateY(-8px) rotate(6deg); } }
+.signin-art-tl path, .signin-art-bl path, .signin-art-br path { fill:var(--art-soft); }
+.signin-art-planet circle { fill:var(--art-soft-2); }
+.signin-art-planet path { fill:var(--art-highlight); }
+.signin-art-planet ellipse { stroke:var(--art-line); fill:none; }
+.signin-art-tr circle { fill:var(--art-soft-2); }
+.signin-art-tr line { stroke:var(--art-highlight); }
+.signin-art-lime-star path { fill:var(--art-accent); }
+.signin-art-pencil path:nth-of-type(1) { fill:var(--art-soft-2); }
+.signin-art-pencil circle { fill:var(--background); }
+.signin-art-pencil path:nth-of-type(2) { fill:var(--art-pencil-shade); }
+.signin-art-pencil path:nth-of-type(3) { fill:var(--art-rose); }
+.signin-art-pencil polygon:nth-of-type(1) { fill:var(--art-pencil-dark); }
+.signin-art-pencil polygon:nth-of-type(2) { fill:var(--art-highlight); }
+.signin-appearance { position:absolute; top:16px; right:16px; z-index:2; }
+.signin-content { position:relative; z-index:1; width:100%; max-width:460px; margin:auto; display:flex; flex-direction:column; align-items:center; }
+.signin-logo { display:flex; align-items:center; gap:12px; text-decoration:none; margin:8px 0 28px; }
+.signin-logo-badge { width:40px; height:40px; display:block; }
+.signin-logo-tile { fill:var(--color-header); }
+.signin-logo-letter { fill:var(--sidebar-text); }
+.signin-logo-dot { fill:var(--brand-dot); }
+.signin-wordmark { font-size:22px; font-weight:700; letter-spacing:-.02em; color:var(--text); }
+.signin-pill { font-size:12px; font-weight:600; color:var(--action); background:var(--selection); border-radius:999px; padding:4px 10px; }
+.signin-card { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:28px; box-shadow:var(--shadow-card); padding:40px 36px 36px; text-align:center; }
+html[data-theme=dark] .signin-card { box-shadow:none; }
+.signin-title { font-family:var(--font-jakarta), Arial, Helvetica, sans-serif; font-size:26px; font-weight:700; letter-spacing:-.01em; margin:0 0 6px; }
+.signin-subtitle { color:var(--text-muted); font-size:14.5px; margin:0 0 20px; }
+.signin-card :is(p, li) { color:var(--text-muted); }
+.signin-disclosure { text-align:left; margin:16px 0; padding-top:16px; border-top:1px solid var(--border); }
+.signin-disclosure summary { cursor:pointer; font-size:14px; color:var(--text); }
+.signin-connection { text-align:left; }
+.signin-connection .button.primary { width:100%; gap:10px; border-radius:14px; padding:15px 20px; background:var(--signin-cta); border-color:var(--signin-cta); color:var(--signin-cta-text); box-shadow:var(--signin-cta-shadow); }
+.signin-connection .button.primary:hover:not(:disabled) { background:var(--signin-cta-hover); border-color:var(--signin-cta-hover); }
+.signin-connection .button.primary:active:not(:disabled) { background:var(--signin-cta-pressed); border-color:var(--signin-cta-pressed); }
+.signin-connection .button.secondary { margin-top:12px; }
+.signin-demo { margin-top:20px; }
+.signin-footer { position:relative; z-index:1; display:block; justify-content:normal; border-top:none; margin-top:auto; padding-top:28px; font-size:12.5px; color:var(--text-muted); text-align:center; }
+.signin-footer-link { color:var(--signin-link); text-decoration:none; }
+.signin-footer-link:hover { text-decoration:underline; }
+.signin-footer-link[aria-disabled="true"] { cursor:default; }
+@media (max-width:760px) {
+  .signin-art-planet, .signin-art-pencil { opacity:.35; }
+  .signin-card { padding:32px 22px; border-radius:22px; }
+  .signin-content { max-width:100%; }
+  .signin-appearance { top:10px; right:10px; }
+}
+@media (prefers-reduced-motion: reduce) { .signin-art-lime-star { animation:none; } }
+@media (forced-colors: active) {
+  .signin-art { display:none; }
+  .signin-card { border:1px solid CanvasText; box-shadow:none; }
+  .signin-pill { border:1px solid ButtonText; }
+}

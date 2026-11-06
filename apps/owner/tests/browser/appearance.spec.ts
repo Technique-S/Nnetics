@@ -16,7 +16,7 @@ for(const theme of ['light','dark'] as const){
  });
  test(`${theme}: sign-in, loading, access error and not-found`,async({page},info)=>{
   await page.emulateMedia({colorScheme:theme});await page.route('**/api/live/config',route=>route.fulfill({json:{network:'testnet',wallet:'meteor',missing:[],configurationValid:true,transactionsEnabled:false,paymentExecutionEnabled:false}}));
-  await page.goto('/');await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,`${info.project.name}-${theme}-signin`);
+  await page.goto('/');await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-signin`);
   await page.goto('/contractor');await expect(page.getByRole('heading',{name:'Private access unavailable'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-contractor-invalid`);
   let release!:()=>void;const gate=new Promise<void>(r=>release=r);let requested=false;
   await page.route('**/api/demo/contractors/owner',async route=>{requested=true;await gate;await route.fulfill({status:503,json:{error:'Fixture unavailable'}});});
