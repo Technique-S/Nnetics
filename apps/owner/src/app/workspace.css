@@ -306,15 +306,6 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
   text-decoration:none;
   color:var(--text);
   margin-bottom:36px}
-.entry-brand span {
-  color:var(--action)}
-.entry-network {
-  float:right;
-  color:var(--action);
-  background:var(--selection);
-  padding:6px 10px;
-  border-radius:4px;
-  font-size:12px}
 .signin-surface h1 {
   font-size:32px;
   line-height:1.2;
