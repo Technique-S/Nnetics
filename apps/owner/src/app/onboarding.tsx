@@ -1,5 +1,5 @@
 "use client";
-import {getProgressMessage,getUserMessage} from "../data/user-message";
+import {getUserMessage} from "../data/user-message";
 import {AppearanceControl} from "./appearance-control";
 import {ActionButton} from "./action-button";
 import {OperationFeedback} from "./operation-feedback";
@@ -13,6 +13,7 @@ import {
   testnetWalletAccount,
 } from "../data/meteor-message";
 import { VaultOnboarding } from "./vault-onboarding";
+import { SignInScreen } from "./sign-in-screen";
 
 interface Workspace {
   id: string;
@@ -457,28 +458,27 @@ export function Onboarding({
   if(restoring)return <main className="loading-screen" aria-busy="true"><h1>Restoring your saved session</h1><p>Checking the saved session and authorized workspace. No wallet signature is needed for a valid session.</p><OperationFeedback active message="Checking your saved session…"/><LoadingSkeleton/></main>;
   let accountValid = false;
   try {testnetWalletAccount(account.trim());accountValid=true;}catch{}
-  return <main className="loading-screen signin-surface">
-    <div className="signin-appearance"><AppearanceControl inline/></div><a className="entry-brand" href="/">Nnetics<span>.</span></a><span className="entry-network">NEAR testnet</span>
-    <h1>Nnetics · NEAR testnet</h1>
-    <p>Verify any supported, activated testnet wallet. You do not need an organization or vault to sign in. Wallet verification grants no organization membership or vault ownership.</p>
-    <details><summary>Supported wallets and networks</summary><p>Meteor extension only. Select NEAR testnet and an activated account. Other connectors are not supported by this sign-in flow.</p></details>
-    {error&&<p role="alert">{getUserMessage(error)}</p>}
-    <section aria-label="Meteor connection">
-      {!config ? <ActionButton className="button primary" onClick={()=>location.reload()}>Reload connection</ActionButton> : restoreAvailable ? (
-        <ActionButton className="button primary" pending={busy||checkingSaved} pendingLabel="Checking your saved session…" state={error?"error":"idle"} retryLabel="Continue to workspace" onClick={()=>{
-          setError("");setCheckingSaved(true);void restoreSession().catch(e=>{setError((e as Error).message);if(!(e instanceof LiveApiError&&e.retryable))setRestoreAvailable(false);}).finally(()=>setCheckingSaved(false));
-        }}>Continue to workspace</ActionButton>
-      ) : (
-        <ActionButton className="button primary" pending={busy} pendingLabel={getProgressMessage(loginStage)} disabled={!!account.trim()&&!accountValid} state={error&&loginAttempted?"error":"idle"} retryLabel="Try again" onClick={()=>{
-          setLoginAttempted(true);void signIn(!account.trim());
-        }}>Connect to Meteor</ActionButton>
-      )}
-      {busy&&<ActionButton className="button secondary" onClick={()=>lock("Sign-in cancelled. You can connect again when ready.")}>Cancel sign-in</ActionButton>}
-      <OperationFeedback active={busy} message={loginStage}/>
-      {!busy&&<p>Connect opens an off-chain sign-in message in Meteor. No transaction, funds or access keys are requested.</p>}
-      <details><summary>Use a specific testnet account (optional)</summary><label>Testnet wallet account ID<input value={account} maxLength={64} autoCapitalize="none" spellCheck={false} onChange={e=>{if(who||busy)lock();setAccount(e.target.value);}}/></label>{!accountValid&&<p>Enter the activated account ID shown in Meteor.</p>}
-      <ActionButton className="button secondary" onClick={()=>{setAccount("");lock("Choose a different wallet in Meteor, then connect again.");}}>Use a different wallet</ActionButton></details>
-    </section>
-    <a className="button secondary" href="/?mode=demo">Open explicitly simulated demo</a>
-  </main>;
+  return <SignInScreen
+    configReady={!!config}
+    restoreAvailable={restoreAvailable}
+    busy={busy}
+    checkingSaved={checkingSaved}
+    loginStage={loginStage}
+    loginAttempted={loginAttempted}
+    error={error}
+    account={account}
+    accountValid={accountValid}
+    onReloadConfiguration={() => location.reload()}
+    onRestore={() => {
+      setError("");setCheckingSaved(true);
+      void restoreSession().catch(e => {
+        setError((e as Error).message);
+        if(!(e instanceof LiveApiError && e.retryable)) setRestoreAvailable(false);
+      }).finally(() => setCheckingSaved(false));
+    }}
+    onConnect={() => { setLoginAttempted(true); void signIn(!account.trim()); }}
+    onCancel={() => lock("Sign-in cancelled. You can connect again when ready.")}
+    onAccountChange={(value) => { if(who||busy)lock(); setAccount(value); }}
+    onUseDifferentWallet={() => { setAccount(""); lock("Choose a different wallet in Meteor, then connect again."); }}
+  />;
 }
