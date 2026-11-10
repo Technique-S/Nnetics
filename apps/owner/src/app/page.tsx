@@ -6,12 +6,12 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MockOwnerAdapter } from "../data/mock-adapter";
 import { NearOwnerAdapter, LiveApiError } from "../data/near-adapter";
 import { DemoWorkspaceAdapter } from "../data/demo-workspace-adapter";
-import { MockContractorOwnerAdapter } from "../data/contractor-adapter";
+import { MockContractorOwnerAdapter, PersistentContractorOwnerAdapter, type ContractorBill, type PortalSnapshot } from "../data/contractor-adapter";
 import { DEMO_FEE } from "../data/demo-constants";
 import { LiveContextChanged } from "../data/config-context";
 import { DemoContractorWorkspace, PersistentContractorOwner, type DemoAssistantIntent } from "./contractor-owner";
 import { AskNnetics, type AssistantAction } from "./ask-nnetics";
-import { DashboardNavigation, workspaceView, type View } from "./dashboard-navigation";
+import { DashboardNavigation, workspaceView, receiptView, type View } from "./dashboard-navigation";
 import { AppearanceControl } from "./appearance-control";
 import { OperationFeedback } from "./operation-feedback";
 import { LoadingSkeleton } from "./loading-skeleton";
@@ -122,7 +122,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const demoWs = adapter instanceof DemoWorkspaceAdapter ? adapter : null;
 
   const [snapshot, setSnapshot] = useState<OwnerSnapshot | null>(null);
-  const [view, setView] = useState<View>(() => (adapter instanceof DemoWorkspaceAdapter ? "Overview" : "Vault"));
+  const [view, setView] = useState<View>(() => (adapter instanceof DemoWorkspaceAdapter ? "Overview" : "Vault & Controls"));
   const [receipt, setReceipt] = useState("");
   const [busy, setBusy] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -133,6 +133,9 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const [assistantConfigured, setAssistantConfigured] = useState<boolean | null>(null);
   const [assistantModel, setAssistantModel] = useState<string | null>(null);
   const [historyFilter, setHistoryFilter] = useState("All outcomes");
+  const [activityFilter, setActivityFilter] = useState("All activity");
+  const [invoiceFilter, setInvoiceFilter] = useState("All invoices");
+  const [portal, setPortal] = useState<PortalSnapshot | null>(null);
   const contextInvalid=useRef(false);
   const dashboardGeneration=useRef(0);
   const refreshing=useRef(false), inFlight=useRef(new Set<string>());
@@ -188,6 +191,17 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     const timer = setTimeout(() => { void refresh(); }, 1600);
     return () => clearTimeout(timer);
   }, [demoWs, hasPendingPayments, snapshot?.revision]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The Invoices and Activity surfaces read the same portal records the
+  // contractor panel uses, so there is one source of truth for a bill.
+  useEffect(() => {
+    if (view !== "Invoices" && view !== "Activity" && view !== "Overview") return;
+    const source = live
+      ? new PersistentContractorOwnerAdapter(live.config.organization)
+      : new MockContractorOwnerAdapter();
+    let cancelled = false;
+    void source.snapshot().then(value => { if (!cancelled) setPortal(value); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [view, live]);
   // Ask Nnetics actions run through the same UI commands a manual visit would.
   function handleAssistantAction(action: AssistantAction) {
     if (action.kind === "create-contractor") {
@@ -223,8 +237,8 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       go("Contractors");
     } else if (action.kind === "find-receipt") {
       const found = action.reference ? snapshot?.payments.find(p => p.reference === action.reference) : undefined;
-      if (found?.status === "Paid") go("Receipts", found.attempt_id);
-      else go("History");
+      if (found?.status === "Paid") go("Activity", found.attempt_id);
+      else go("Activity");
     } else if (
       action.kind === "list-contractors" ||
       action.kind === "get-contractor" ||
@@ -244,7 +258,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       action.kind === "get-vault-available-balance" ||
       action.kind === "get-vault-transaction-history"
     ) {
-      go("Vault");
+      go("Vault & Controls");
     } else if (action.kind === "get-organization-overview" || action.kind === "get-organization-statistics") {
       go("Overview");
     } else {
@@ -278,7 +292,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     }
   }
   function go(next: View, receiptId?: string) {
-    location.hash = receiptId ? `Receipts/${encodeURIComponent(receiptId)}` : next;
+    location.hash = receiptId ? `Activity/${encodeURIComponent(receiptId)}` : next;
     setView(next);
     setReceipt(receiptId ?? "");
     setError(null);
@@ -289,14 +303,14 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       if (demoWs && !location.hash.replace(/^#/, "").trim())
         setView("Overview");
       else setView(target.view);
-      setReceipt(target.receipt);
+      setReceipt(receiptView(location.hash) || target.receipt);
     }
     restore();
     window.addEventListener("hashchange", restore);
     return () => window.removeEventListener("hashchange", restore);
   }, []);
   useEffect(() => {
-    if (view === "Receipts" && receipt) document.getElementById(`receipt-${receipt}`)?.focus();
+    if (view === "Activity" && receipt) document.getElementById(`receipt-${receipt}`)?.focus();
   }, [view, receipt, snapshot]);
   const MainSurface = "main";
   if (!snapshot)
@@ -327,7 +341,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   // profile and vault are created in one labelled walkthrough, then every tab
   // behaves like the standard dashboard on simulated funds.
   if (demoWs && !demoWs.demo()?.initialized)
-    return <div className="app-shell demo-shell demo-setup-shell"><ViewMetadata name="Vault"/><a className="skip-link" href="#workspace-content">Skip to content</a>
+    return <div className="app-shell demo-shell demo-setup-shell"><ViewMetadata name="Vault &amp; Controls"/><a className="skip-link" href="#workspace-content">Skip to content</a>
       <main className="main-content demo-setup" id="workspace-content" tabIndex={-1}>
         <div className="page-heading"><div><h1>Try the Nnetics demo</h1><p>No account, wallet, keys or tokens needed. Everything below is simulated.</p></div></div>
         <DemoWorkspaceSetup busy={busy.length > 0} flowError={error} onCreate={async (profileName, vaultName) => {
@@ -342,10 +356,11 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const ordered = [...s.payments].sort((a,b) => BigInt(a.initiated_at_ns) < BigInt(b.initiated_at_ns) ? 1 : -1);
   const subtitles: Record<View,string> = {
     Overview: "Your demo vault, payouts and next steps at a glance.",
-    Vault: "Check your available funds, payment limits and anything that needs your attention.",
-    Contractors: "Invite people, verify their payout wallets and prepare payments.",
-    Receipts: "Find proof of completed transfers and copy a receipt when you need it.",
-    History: "Track outstanding, failed and confirmed payments in one place.",
+    Contractors: "Invite people, verify their payout wallets and keep their records tidy.",
+    Invoices: "Submitted, approved and paid invoices, with the agreement behind each one.",
+    Payments: "Prepare, confirm and follow every simulated payment.",
+    Activity: "Every payment, invoice and audit event, with proof of completed transfers.",
+    "Vault & Controls": "Check your available funds, payment limits and anything that needs your attention.",
     Settings: "Manage workspace access and choose how Nnetics looks.",
   };
   const demo = adapter instanceof MockOwnerAdapter ? adapter : null;
@@ -366,12 +381,33 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   });
   const totalPaid = confirmed.reduce((sum, payment) => sum + BigInt(payment.amount), 0n);
   const nextAction = available <= 0n
-    ? { label: "Fund vault", view: "Vault" as View, detail: "Add simulated funds before paying a contractor." }
+    ? { label: "Fund vault", view: "Vault & Controls" as View, detail: "Add simulated funds before paying a contractor." }
     : s.payments.length === 0
       ? { label: "Add contractor", view: "Contractors" as View, detail: "Invite a contractor and prepare the first payment." }
       : needsAttentionItems.length > 0
-        ? { label: "Review outstanding", view: "History" as View, detail: "Check pending and failed payment records." }
+        ? { label: "Review outstanding", view: "Activity" as View, detail: "Check pending and failed payment records." }
         : { label: "Add contractor", view: "Contractors" as View, detail: "Keep your contractor list up to date." };
+  // The portal record may come from an organization that has no contractor
+  // workspace yet, so every collection is read defensively.
+  const portalProfiles = Array.isArray(portal?.profiles) ? portal.profiles : [];
+  const portalInvoices = Array.isArray(portal?.invoices) ? portal.invoices : [];
+  const portalEvents = Array.isArray(portal?.events) ? portal.events : [];
+  const portalContractorName = (id: string) => portalProfiles.find(p => p.id === id)?.name ?? "Contractor";
+  const invoiceBadge = (status: string) => status === "Paid" ? "Paid" : status === "Approved" ? "Approved" : status === "Rejected" ? "Failed" : "Pending";
+  const paymentBadge = (status: string) => status === "confirmed" ? "Paid" : status === "failed" || status === "cancelled" ? "Failed" : "Pending";
+  const auditEvents = [
+    ...(demoWs?.demo()?.history ?? []).filter(h => h.kind === "control").map(h => ({id: h.id, label: h.label, at: h.at})),
+    ...portalEvents.map(e => ({id: e.id, label: `${e.profileName} · ${e.action} · ${e.detail}`, at: e.at})),
+    ...(live ? s.audit.map(a => ({id: `live-${a.id}`, label: a.description, at: a.time})) : []),
+  ].sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const activeContractorCount = portalProfiles.length;
+  const pendingInvoiceCount = portalInvoices.filter(b => b.status !== "Paid" && b.status !== "Rejected").length;
+  const overviewWarnings: string[] = [];
+  if (vault.paused) overviewWarnings.push("The demo vault is paused. New simulated payments are refused until you resume it in Vault & Controls.");
+  if (available <= 0n) overviewWarnings.push("There are no available demo funds. Fund the demo vault before preparing a payment.");
+  const walletsMissing = portalProfiles.filter(p => !p.wallet).length;
+  if (walletsMissing > 0) overviewWarnings.push(`${walletsMissing} contractor${walletsMissing === 1 ? " has" : "s have"} no approved payout wallet yet.`);
+  if (failedPayments.length > 0) overviewWarnings.push(`${failedPayments.length} payment${failedPayments.length === 1 ? "" : "s"} failed. Review them in Activity.`);
   const ownerScope = live?.config.ownerTransactionRestriction;
   const pauseReview = ownerScope?.method === "set_paused" && typeof ownerScope.args?.paused === "boolean" ? ownerScope.args.paused : null;
   return (
@@ -384,14 +420,14 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
         <header className={live ? "topbar" : "topbar demo-workspace-toolbar"}>
           {!live && <span>{demoWs ? "Demo · simulated funds · no wallets, keys or tokens involved" : "Simulation · No funds move"}</span>}
           <div className="topbar-actions">
-            {!live && <details className="account-menu"><summary>Demo account</summary><div className="account-menu-actions"><AppearanceControl inline/></div></details>}
+            {!live && <details className="account-menu"><summary>Demo account</summary><div className="account-menu-actions"><a className="text-button" href="#Settings" onClick={e=>{e.preventDefault();go("Settings");}}>Settings</a><AppearanceControl inline/></div></details>}
             <ActionButton className="icon-button" aria-label="Refresh workspace" busy={loading} onClick={() => void refresh()}><Icon name="refresh" size={18}/></ActionButton>
           </div>
         </header>
         <MainSurface className="main-content" id="workspace-content" tabIndex={-1}>
           <div className="page-heading">
             <div><h1>{view}</h1><p>{subtitles[view]}</p></div>
-            {view === "Vault" && !readOnly && <button className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</button>}
+            {view === "Vault & Controls" && !readOnly && <button className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</button>}
           </div>
           <OperationFeedback active={loading || busy.length > 0} message="Checking workspace records…"/>
           {error && <div className="error-banner" role="alert">{getUserMessage(error)} <button onClick={() => void refresh()}>Retry refresh</button></div>}
@@ -402,6 +438,35 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 <h2>Available vault balance</h2>
                 <p className="payment-workspace-amount"><Amount value={available > 0n ? available.toString() : "0"} large/></p>
                 <p>{formatNear(vault.reserved)} NEAR set aside for pending payments.</p>
+              </section>
+              <section className="overview-card overview-balance">
+                <h2>Reserved funds</h2>
+                <p className="payment-workspace-amount"><Amount value={formatNear(vault.reserved)} large/></p>
+                <p>Held for payments that are prepared but not settled yet.</p>
+              </section>
+              <section className="overview-card overview-balance">
+                <h2>Pending invoices</h2>
+                <p className="payment-workspace-amount">{pendingInvoiceCount}</p>
+                <p>Invoices still waiting for review or payment.</p>
+                <button className="text-button" onClick={() => go("Invoices")}>Open invoices</button>
+              </section>
+              <section className="overview-card overview-balance">
+                <h2>Active contractors</h2>
+                <p className="payment-workspace-amount">{activeContractorCount}</p>
+                <p>Contractors you can pay and assign work to.</p>
+                <button className="text-button" onClick={() => go("Contractors")}>Open contractors</button>
+              </section>
+              {overviewWarnings.length > 0 && <section className="overview-card overview-attention">
+                <h2>Important warnings</h2>
+                <div className="overview-list">{overviewWarnings.map(warning => <span key={warning}>{warning}</span>)}</div>
+              </section>}
+              <section className="overview-card overview-next-action">
+                <h2>Quick actions</h2>
+                <div className="actions">
+                  <button className="button secondary" onClick={() => go("Contractors")}>Add contractor</button>
+                  <button className="button secondary" onClick={() => go("Payments")}>Prepare a payment</button>
+                  <button className="button secondary" onClick={() => go("Vault & Controls")}>Fund the vault</button>
+                </div>
               </section>
               <section className="overview-card overview-next-action">
                 <h2>Next action</h2>
@@ -416,7 +481,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                       {needsAttentionItems.slice(0, 6).map(p => {
                         const info = details(p);
                         const status = paymentDisplayStatus(s, p);
-                        return <button key={p.attempt_id} className="overview-list-item" type="button" onClick={() => go(status === "Paid" ? "Receipts" : "History", status === "Paid" ? p.attempt_id : undefined)}>
+                        return <button key={p.attempt_id} className="overview-list-item" type="button" onClick={() => go("Activity", status === "Paid" ? p.attempt_id : undefined)}>
                           <span>{info.contractor}</span>
                           <span>{formatNear(p.amount)} NEAR</span>
                           <Badge status={status === "Paid" ? "Paid" : (status === "Failed" ? "Failed" : "Pending")}/>
@@ -456,7 +521,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                       {ordered.slice(0, 8).map(p => {
                         const info = details(p);
                         const status = paymentDisplayStatus(s, p);
-                        return <button key={p.attempt_id} className="overview-list-item" type="button" onClick={() => go(status === "Paid" ? "Receipts" : "History", status === "Paid" ? p.attempt_id : undefined)}>
+                        return <button key={p.attempt_id} className="overview-list-item" type="button" onClick={() => go("Activity", status === "Paid" ? p.attempt_id : undefined)}>
                           <span>{info.contractor}</span>
                           <span>{formatNear(p.amount)} NEAR · {date(p.initiated_at_ns)}</span>
                           <Badge status={status === "Paid" ? "Paid" : (status === "Failed" ? "Failed" : "Pending")}/>
@@ -490,14 +555,14 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
             </div>
           </>}
 
-          {view === "Vault" && <>
+          {view === "Vault & Controls" && <>
             <section className="panel payment-workspace-panel">
               <h2>Available payout funds</h2>
               <p className="payment-workspace-amount"><Amount value={available > 0n ? available.toString() : "0"} large/></p>
               <p>{formatNear(vault.reserved)} NEAR set aside for pending payments.</p>
               {vault.paused && <p><Badge status="Paused"/> New payments cannot be sent while the vault is paused.</p>}
               {!vault.agent && <p>Automatic payments are off.</p>}
-              {outstanding.length > 0 && <button className="text-button" onClick={() => go("History")}>Check {outstanding.length} outstanding {outstanding.length === 1 ? "payment" : "payments"}</button>}
+              {outstanding.length > 0 && <button className="text-button" onClick={() => go("Activity")}>Check {outstanding.length} outstanding {outstanding.length === 1 ? "payment" : "payments"}</button>}
             </section>
             {live ? <TestnetControls adapter={live} snapshot={s} run={run} section="vault"/> : demoWs ? <DemoVaultCard demoWs={demoWs} run={run}/> : <section className="panel payment-workspace-panel"><h2>Payment limits</h2><p>{formatNear(vault.payment_cap)} NEAR per payment · {formatNear(vault.budget)} NEAR total</p><p>Funding is unavailable in the simulation.</p></section>}
             {live && !readOnly && live.config.ownerTransactionsEnabled && pauseReview !== null &&
@@ -544,42 +609,104 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 paymentFee={demoWs ? DEMO_FEE : undefined}
                 intent={intent ?? undefined}/>)}
           {demoWs && intent && <button className="text-button" onClick={() => setIntent(null)}>Clear the prepared assistant step</button>}
-          {view === "Receipts" && <section className="panel payment-workspace-panel" aria-label="Confirmed receipts">
-            {confirmed.length === 0 && <p className="empty">Receipts appear here after payment is confirmed.</p>}
-            {ordered.filter(p => confirmed.includes(p)).map(p => {
-              const info = details(p);
-              const summary = [info.contractor, `${formatNear(p.amount)} NEAR`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
-              return <article className="payment-record" key={p.attempt_id} id={`receipt-${p.attempt_id}`} tabIndex={-1}>
-                <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {live ? "Payment initiated" : "Simulated receipt"} · {p.invoice_id}</p>{info.description && <p className="payment-record-description">{info.description}</p>}</div>
-                <div className="payment-record-actions"><Amount value={p.amount}/><Badge status="Paid"/>
-                  {info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}
-                  <button className="text-button" onClick={async () => {try{await navigator.clipboard.writeText(summary);setNotice("Receipt copied.");}catch{setNotice("Clipboard unavailable. Select the receipt details to copy them.");}}}>Copy receipt</button>
-                </div>
-              </article>;
-            })}
-          </section>}
-          {view === "History" && <>
-            {demoWs && demoWs.demo() && demoWs.demo()!.history.some(h => h.kind === "funding") && <section className="panel payment-workspace-panel" aria-label="Demo Wallet funding">
-              <h2>Demo Wallet funding · simulated funds</h2>
-              {demoWs.demo()!.history.filter(h => h.kind === "funding").slice(0, 30).map(h => <article className="payment-record" key={h.id}><div><p>{h.label}</p><p className="payment-record-description">{new Date(h.at).toLocaleString("en-GB", {day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"})}</p></div><div className="payment-record-actions"><Badge status={h.status === "confirmed" ? "Active" : "Pending"}/><Amount value={amountFromNear(h.amount).toString()}/></div></article>)}
-            </section>}
-            <section className="panel payment-workspace-panel" aria-label="Payment attempts">
-              <label className="filter-label">Outcome<select aria-label="Filter payment outcomes" value={historyFilter} onChange={e => setHistoryFilter(e.target.value)}>
-                {["All outcomes","Pending","Paid","Failed"].map(status => <option key={status}>{status}</option>)}
+                              {view === "Activity" && (
+            <div className="activity-surface">
+              <section className="panel payment-workspace-panel" aria-label="Activity filters">
+                <label className="filter-label">Show<select aria-label="Filter activity" value={activityFilter} onChange={e => setActivityFilter(e.target.value)}>
+                  {["All activity","Payments","Invoices","Audit events"].map(option=><option key={option}>{option}</option>)}
+                </select></label>
+              </section>
+              {(activityFilter === "All activity" || activityFilter === "Payments") && (
+                <>
+                  <section className="panel payment-workspace-panel" aria-label="Payment attempts">
+                    <h2>Payments</h2>
+                    <label className="filter-label">Outcome<select aria-label="Filter payment outcomes" value={historyFilter} onChange={e => setHistoryFilter(e.target.value)}>
+                      {["All outcomes","Pending","Paid","Failed"].map(status => <option key={status}>{status}</option>)}
+                    </select></label>
+                    {ordered.filter(p => historyFilter === "All outcomes" || (["TransferSucceeded","TransferFailed"].includes(p.status) ? "Pending" : paymentDisplayStatus(s,p)) === historyFilter).map(p => {
+                      const info = details(p), status = paymentDisplayStatus(s,p);
+                      return <article className="payment-record" key={p.attempt_id}>
+                        <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {p.invoice_id}</p>{status === "Pending" && <p>Awaiting confirmation. Do not send this payment again.</p>}{["TransferSucceeded","TransferFailed"].includes(status) && <p>The transfer result is recorded. Final accounting is pending.</p>}</div>
+                        <div className="payment-record-actions"><Amount value={p.amount}/><Badge status={["TransferSucceeded","TransferFailed"].includes(status)?"Pending":status}/>{status === "Paid" && <a href={`#Activity/${encodeURIComponent(p.attempt_id)}`} onClick={e=>{e.preventDefault();go("Activity",p.attempt_id);}}>View receipt</a>}{status !== "Paid" && info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}</div>
+                      </article>;
+                    })}
+                    {s.queue?.filter(job => !s.payments.some(p => p.invoice_id === job.id) && (historyFilter === "All outcomes" || (job.state === "failed" ? "Failed" : "Pending") === historyFilter)).map(job => <article key={job.id} className="payment-record"><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding. Check the existing attempt before taking action."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}
+                    {!s.payments.length && !s.queue?.length && <p className="empty">Payment attempts will appear here.</p>}
+                  </section>
+                  <section className="panel payment-workspace-panel" aria-label="Confirmed receipts">
+                    <h2>Receipts</h2>
+                    {confirmed.length === 0 && <p className="empty">Receipts appear here after payment is confirmed.</p>}
+                    {ordered.filter(p => confirmed.includes(p)).map(p => {
+                      const info = details(p);
+                      const summary = [info.contractor, `${formatNear(p.amount)} NEAR`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
+                      return <article className="payment-record" key={p.attempt_id} id={`receipt-${p.attempt_id}`} tabIndex={-1}>
+                        <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {live ? "Payment initiated" : "Simulated receipt"} · {p.invoice_id}</p>{info.description && <p className="payment-record-description">{info.description}</p>}</div>
+                        <div className="payment-record-actions"><Amount value={p.amount}/><Badge status="Paid"/>
+                          {info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}
+                          <button className="text-button" onClick={async () => {try{await navigator.clipboard.writeText(summary);setNotice("Receipt copied.");}catch{setNotice("Clipboard unavailable. Select the receipt details to copy them.");}}}>Copy receipt</button>
+                        </div>
+                      </article>;
+                    })}
+                  </section>
+                </>
+              )}
+              {(activityFilter === "All activity" || activityFilter === "Invoices") && (
+                <section className="panel payment-workspace-panel" aria-label="Invoice activity">
+                  <h2>Invoices</h2>
+                  {portalInvoices.length === 0 && <p className="empty">Invoice activity appears here after a contractor submits a bill.</p>}
+                  {portalInvoices.map(b => <article className="payment-record" key={b.id}>
+                    <div><h2>{b.reference}</h2><p>{portalContractorName(b.contractorId)} · {b.amount} NEAR</p><p className="payment-record-description">{b.description}</p></div>
+                    <div className="payment-record-actions"><Badge status={invoiceBadge(b.status)}/></div>
+                  </article>)}
+                </section>
+              )}
+              {(activityFilter === "All activity" || activityFilter === "Audit events") && (
+                <section className="panel payment-workspace-panel" aria-label="Audit events">
+                  <h2>Audit events</h2>
+                  {auditEvents.length === 0 && <p className="empty">Vault controls and contractor changes appear here.</p>}
+                  {auditEvents.map(event => <article className="payment-record" key={event.id}><div><h2>{event.label}</h2><p>{new Date(event.at).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</p></div></article>)}
+                </section>
+              )}
+              {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
+            </div>
+          )}
+          {view === "Invoices" && (
+            <section className="panel payment-workspace-panel" aria-label="Invoices">
+              <label className="filter-label">Status<select aria-label="Filter invoices" value={invoiceFilter} onChange={e => setInvoiceFilter(e.target.value)}>
+                {["All invoices","Submitted","Under review","Needs clarification","Approved","Rejected","Paid"].map(option=><option key={option}>{option}</option>)}
               </select></label>
-              {ordered.filter(p => historyFilter === "All outcomes" || (["TransferSucceeded","TransferFailed"].includes(p.status) ? "Pending" : paymentDisplayStatus(s,p)) === historyFilter).map(p => {
-                const info = details(p), status = paymentDisplayStatus(s,p);
-                return <article className="payment-record" key={p.attempt_id}>
-                  <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {p.invoice_id}</p>{status === "Pending" && <p>Awaiting confirmation. Do not send this payment again.</p>}{["TransferSucceeded","TransferFailed"].includes(status) && <p>The transfer result is recorded. Final accounting is pending.</p>}</div>
-                  <div className="payment-record-actions"><Amount value={p.amount}/><Badge status={["TransferSucceeded","TransferFailed"].includes(status)?"Pending":status}/>{status === "Paid" && <a href={`#Receipts/${encodeURIComponent(p.attempt_id)}`} onClick={e=>{e.preventDefault();go("Receipts",p.attempt_id);}}>View receipt</a>}{status !== "Paid" && info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}</div>
-                </article>;
-              })}
-              {s.queue?.filter(job => !s.payments.some(p => p.invoice_id === job.id) && (historyFilter === "All outcomes" || (job.state === "failed" ? "Failed" : "Pending") === historyFilter)).map(job => <article key={job.id} className="payment-record"><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding. Check the existing attempt before taking action."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}
-              {!s.payments.length && !s.queue?.length && <p className="empty">Payment attempts will appear here.</p>}
+              {portalInvoices.length === 0 && <p className="empty">Invoices appear here after a contractor submits one in their portal.</p>}
+              {portalInvoices.filter(b => invoiceFilter === "All invoices" || b.status === invoiceFilter).map(b => <article className="payment-record" key={b.id}>
+                <div><h2>{b.reference}</h2><p>{portalContractorName(b.contractorId)} · {b.amount} NEAR</p><p className="payment-record-description">{b.description}</p>{b.orderReference && <p className="payment-record-description">Agreement: {b.orderReference}</p>}</div>
+                <div className="payment-record-actions"><Badge status={invoiceBadge(b.status)}/></div>
+              </article>)}
             </section>
-            {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
-          </>}
-          {view === "Settings" && <>
+          )}
+          {view === "Payments" && (
+            <div className="payment-surface">
+              <section className="panel payment-workspace-panel" aria-label="Payment queue">
+                <h2>Payment queue</h2>
+                {demoWs ? (demoWs.demo()?.payments ?? []).map(p => <article className="payment-record" key={p.id}>
+                  <div><h2>{p.contractor || p.recipient}</h2><p>{p.reference} · {p.description}</p><p className="payment-record-description">{new Date(p.createdAt).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}{p.awaitingConfirmation ? " · awaiting your confirmation" : ""}{p.reason ? ` · ${p.reason}` : ""}</p></div>
+                  <div className="payment-record-actions"><Amount value={p.amount}/><Badge status={paymentBadge(p.status)}/></div>
+                </article>) : s.queue?.map(job => <article className="payment-record" key={job.id}><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}
+                {demoWs && !(demoWs.demo()?.payments ?? []).length && <p className="empty">Prepared and completed payments appear here.</p>}
+                {!demoWs && !s.queue?.length && <p className="empty">The payment queue is empty.</p>}
+              </section>
+              {live ? <PersistentContractorOwner embedded focus="payments" organization={s.access?.organization || live.config.organization} readOnly={readOnly} limit={vault.payment_cap}/> : <DemoContractorWorkspace
+                key={contractorRevision}
+                focus="payments"
+                onPrepare={demoWs ? async draft => {
+                  const prepared = await demoWs.preparePayment(draft);
+                  return {id: prepared.payment.id, reference: prepared.payment.reference, contractor: prepared.payment.contractor, recipient: prepared.payment.recipient, amount: prepared.payment.amount, fee: prepared.payment.fee, total: prepared.payment.total, description: prepared.payment.description, confirmationSecret: prepared.confirmationSecret};
+                } : undefined}
+                onConfirm={demoWs ? async prepared => { await demoWs.confirmPayment(prepared.id, prepared.confirmationSecret); await refresh(); } : undefined}
+                onCancel={demoWs ? async prepared => { await demoWs.cancelPayment(prepared.id); await refresh(); } : undefined}
+                paymentFee={demoWs ? DEMO_FEE : undefined}
+                intent={intent ?? undefined}/>}
+            </div>
+          )}
+{view === "Settings" && <>
             {live && <section className="panel payment-workspace-panel"><h2>Account and wallet</h2><p>Signed in as {s.access?.accountId}</p><div className="actions">{accountActions}</div></section>}
             <section className="panel payment-workspace-panel"><h2>Appearance</h2><p>Use the same preference across the workspace and account menu.</p><AppearanceControl inline/></section>
             {live && <TestnetControls adapter={live} snapshot={s} run={run} section="access"/>}

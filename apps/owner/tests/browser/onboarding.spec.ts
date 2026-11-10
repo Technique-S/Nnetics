@@ -272,7 +272,7 @@ test("switching clears private records, revokes the old session, and failed/new 
   );
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Vault", exact: true }),
+    page.getByRole("heading", { name: "Overview", exact: true }),
   ).toBeVisible();
   await openAccountMenu(page);await page
     .getByRole("button", { name: "Switch wallet", exact: true })
@@ -281,7 +281,7 @@ test("switching clears private records, revokes the old session, and failed/new 
     page.getByRole("heading", { name: "Sign in" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Vault", exact: true }),
+    page.getByRole("heading", { name: "Overview", exact: true }),
   ).toHaveCount(0);
   f.deny(true);
   // Meteor must report the newly picked account; the pinned-account input is gone,
@@ -306,11 +306,11 @@ test("configuration drift clears the old workspace before showing a fresh server
  await page.route("**/api/live/config",route=>route.fulfill({json:{network:"testnet",organization:"studio",contract,worker:"worker.owner.testnet",publicKey:"",configured:true,transactionsEnabled:false}}));
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode="testnet";snapshot.protocolVersion=88;snapshot.access={organization:"studio",accountId:"old-owner.testnet",role:"owner",vaultOwner:"old-owner.testnet"};
  await page.route("**/api/live/snapshot**",route=>route.fulfill({json:snapshot}));
- await page.goto("/");await expect(page.getByRole("heading",{name:"Vault",exact:true})).toBeVisible();
+ await page.goto("/");await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
  contract="changed.testnet";
  await page.getByRole("button",{name:"Refresh finalized state",exact:true}).click();
  await expect(page.getByText(/workspace configuration changed/)).toBeVisible();
- await expect(page.getByRole("heading",{name:"Vault",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("heading",{name:"Overview",exact:true})).toHaveCount(0);
  await expect(page.getByRole("button",{name:"Review owner transaction in wallet",exact:true})).toHaveCount(0);
 });
 test('message login waits for approval', async ({
@@ -423,7 +423,7 @@ test('focused dashboard navigation, refresh and active renewal cross the former 
  const f=await fixture(page,'old-owner.testnet');f.orgs.set('old-owner.testnet',[{id:'studio',name:'Private studio',status:'ready',role:'owner'}]);
  await page.route('**/api/live/config',async route=>{return route.fulfill({json:{network:'testnet',organization:'studio',contract:'vault.owner.testnet',worker:'worker.owner.testnet',publicKey:'',configured:true,transactionsEnabled:false}})});
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode='testnet';snapshot.protocolVersion=88;snapshot.access={organization:'studio',accountId:'old-owner.testnet',role:'owner',vaultOwner:'old-owner.testnet'};
- await page.route('**/api/live/snapshot**',route=>route.fulfill({json:snapshot}));await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Vault',exact:true})).toBeVisible();
+ await page.route('**/api/live/snapshot**',route=>route.fulfill({json:snapshot}));await page.clock.install();await page.goto('/');await expect(page.getByRole('heading',{name:'Overview',exact:true})).toBeVisible();
  await navigateOwner(page, "Work orders");
  await page.clock.fastForward(16*60000);await navigateOwner(page, "Payment history");await expect.poll(()=>f.renewCalls()).toBeGreaterThan(0);
  await page.reload();await expect(page.getByRole('heading',{name:'Payment history',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);

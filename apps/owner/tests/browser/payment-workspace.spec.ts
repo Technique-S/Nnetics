@@ -18,16 +18,21 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
   await page.getByRole("button",{name:"Create demo workspace"}).click();
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
   const nav=page.locator('nav[aria-label="Owner dashboard"]');
-  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Receipts","History","Vault","Settings"]);
+  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Invoices","Payments","Activity","Vault & Controls"]);
   const shots=path.resolve("../../artifacts/payment-workspace-redesign");
   await page.screenshot({path:path.join(shots,`${info.project.name}-overview-light.png`)});
   // the vault is funded before the first payout so the ledger isn't degenerate
-  await tab(page,"Vault");
+  await tab(page,"Vault & Controls");
   await page.locator('input[name="amount"]').fill("2");
   await page.getByRole("button",{name:"Fund vault"}).click();
   await expect(page.getByText(/Funded the Demo Wallet with 2 NEAR/)).toBeVisible();
   await page.screenshot({path:path.join(shots,`${info.project.name}-vault-light.png`)});
-  await tab(page,"Settings");
+  // Settings lives in the utility navigation, not in the primary destinations.
+  await page.locator(".account-menu summary").click();
+  await page.getByRole("link",{name:"Settings",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Settings",exact:true})).toBeVisible();
+  // Close the utility menu again so the appearance checks start from a known state.
+  await page.locator(".account-menu summary").click();
   const appearance=page.getByRole("heading",{name:"Appearance",exact:true}).locator("..").getByRole("switch");
   await appearance.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
@@ -41,6 +46,8 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
   await expect(page.getByRole("heading",{name:"Settings",exact:true})).toBeVisible();
+  // Close the utility menu again so the appearance checks start from a known state.
+  await page.locator(".account-menu summary").click();
   await tab(page,"Contractors");
   // The demo owner session starts with the workspace, so the contractor panel
   // is already authorised and no separate "start" step is required.
@@ -59,6 +66,7 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
     await contractor.getByRole("button",{name:"Simulate proof and request approval"}).click();
     await page.getByRole("button",{name:"Refresh owner records"}).click();
     await page.getByRole("button",{name:"Approve wallet · Sample writer"}).click();
+    await tab(page,"Payments");
     await page.getByText("Prepare payment",{exact:true}).click();
     await page.getByLabel("Amount (NEAR)",{exact:true}).fill("0.1");
     await page.getByLabel("Payment description").fill("Sample article delivered");
@@ -80,23 +88,24 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
     await page.getByRole("button",{name:"Confirm and simulate payment"}).click();
     await expect(page.getByText("Simulated payment recorded.",{exact:false})).toBeVisible();
     await page.waitForTimeout(1200);
-    await tab(page, "History");
+    await tab(page, "Activity");
     await page.getByRole("button", { name: "Refresh workspace" }).click();
     await page.waitForTimeout(1500);
     await page.getByRole("button", { name: "Refresh workspace" }).click();
     await page.waitForTimeout(300);
-    await expect(page.getByRole("heading",{name:"History",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Activity",exact:true})).toBeVisible();
     // The settled payment must actually exist. A missing record is a failure,
     // not a silently passing assertion.
-    const record=page.locator(".payment-record").filter({hasText:"0.1 NEAR"});
+    const record=page.locator("[aria-label=\"Payment attempts\"] .payment-record").filter({hasText:"0.1 NEAR"});
     await expect(record).toHaveCount(1);
     await expect(record.first()).toContainText("Paid");
     await page.screenshot({path:path.join(shots,`${info.project.name}-receipts-dark.png`)});
-    // The receipt exists for the completed payment.
-    await tab(page,"Receipts");
-    await expect(page.locator(".payment-record").filter({hasText:"0.1 NEAR"})).toHaveCount(1);
+    // The receipt for the completed payment lives in the same Activity surface.
+    const receipt=page.locator("[aria-label=\"Confirmed receipts\"] .payment-record").filter({hasText:"0.1 NEAR"});
+    await expect(receipt).toHaveCount(1);
+    await expect(receipt.first()).toContainText("Simulated receipt");
     // The demo ledger really moved: available funds dropped by amount plus fee.
-    await tab(page,"Vault");
+    await tab(page,"Vault & Controls");
     const available=await page.getByRole("heading",{name:"Available payout funds"}).locator("..").innerText();
     expect(available).toContain("1.899");
     // the paid payment shows up in the Overview right rail
@@ -120,7 +129,7 @@ test("a paused demo vault refuses new payments and resumes cleanly",async({page}
   await page.getByLabel("Vault name").fill("Paused vault");
   await page.getByRole("button",{name:"Create demo workspace"}).click();
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
-  await tab(page,"Vault");
+  await tab(page,"Vault & Controls");
   await page.locator('input[name="amount"]').fill("2");
   await page.getByRole("button",{name:"Fund vault"}).click();
   await expect(page.getByText(/Funded the Demo Wallet with 2 NEAR/)).toBeVisible();
@@ -171,7 +180,7 @@ test("a demo payment never reaches the chain, a wallet or a signer",async({page}
   await page.getByLabel("Vault name").fill("No chain");
   await page.getByRole("button",{name:"Create demo workspace"}).click();
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
-  await tab(page,"Vault");
+  await tab(page,"Vault & Controls");
   await page.locator('input[name="amount"]').fill("1");
   await page.getByRole("button",{name:"Fund vault"}).click();
   await expect(page.getByText(/Funded the Demo Wallet with 1 NEAR/)).toBeVisible();

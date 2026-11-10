@@ -316,7 +316,7 @@ export function Onboarding({
       <>
         <header className="identity-bar" aria-label="Verified wallet">
           <span>Signed in as {who.accountId} · NEAR network</span>
-          <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions"><AppearanceControl inline/>
+          <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions"><a className="text-button" href="#Settings">Settings</a><AppearanceControl inline/>
           {accountActions}
           <details className="wallet-session-notice"><summary>About this wallet session</summary><p>This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p></details></div></details>
         </header>
