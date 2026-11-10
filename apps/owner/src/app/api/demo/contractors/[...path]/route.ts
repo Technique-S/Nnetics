@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { demoContractors } from "../../../../../server/demo-contractors";
 import type { ContractorCommand, OwnerPortalCommand } from "../../../../../data/contractor-adapter";
+import { isAllowedAppOrigin } from "../../../../../server/origin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const ownerCookie = "nnetics_demo_portal_owner", contractorCookie = "nnetics_demo_portal_contractor";
@@ -40,7 +41,10 @@ export async function GET(req: NextRequest, context: Context) {
         if (path[0] === "attachment" && path.length === 2) {
             let file;
             try {
-                file = store.attachment(path[1], store.owner(req.cookies.get(ownerCookie)?.value || ""));
+                const org = store.owner(req.cookies.get(ownerCookie)?.value || "");
+                if (!org)
+                    throw Error("Owner access denied.");
+                file = store.attachment(path[1], org);
             }
             catch {
                 const who = store.contractor(req.cookies.get(contractorCookie)?.value || "");
@@ -57,8 +61,7 @@ export async function GET(req: NextRequest, context: Context) {
 export async function POST(req: NextRequest, context: Context) {
     let entering = false;
     try {
-        const expected = process.env.NNETICS_APP_ORIGIN || "http://127.0.0.1:3100";
-        if (req.headers.get("origin") !== expected)
+        if (!isAllowedAppOrigin(req.headers.get("origin")))
             throw Error("Demo requests must come from this app.");
         const path = (await context.params).path.join("/"), store = demoContractors();
         const owner = req.cookies.get(ownerCookie)?.value || "", contractor = req.cookies.get(contractorCookie)?.value || "";

@@ -55,13 +55,11 @@ export class ContractorRecordStore {
         this.db.prepare("INSERT INTO demo_owners VALUES (?,?,?)").run(hash(token), id(), Date.now() + 30 * 86400000);
         return token;
     }
-    owner(token: string): string {
+    owner(token: string): string | undefined {
         const row = this.db.prepare("SELECT org FROM demo_owners WHERE token=? AND expires>?").get(hash(token), Date.now()) as {
             org: string;
         } | undefined;
-        if (!row)
-            throw Error("Open a demo owner workspace first. This is not live wallet login.");
-        return row.org;
+        return row?.org;
     }
     protected profile(profileId: string, org?: string): ContractorProfile {
         const row = this.db.prepare("SELECT org,payload FROM demo_profiles WHERE id=?").get(profileId) as {
@@ -120,6 +118,10 @@ export class ContractorRecordStore {
     }
     ownerSnapshot(token: string): PortalSnapshot {
         const org = this.owner(token);
+        if (!org) {
+            // Return a blank portal snapshot for demo purposes
+            return { mode: "simulation", profiles: [], orders: [], invoices: [] };
+        }
         return { mode: this.mode, profiles: (this.db.prepare("SELECT payload FROM demo_profiles WHERE org=? ORDER BY rowid").all(org) as {
                 payload: string;
             }[]).map(r => JSON.parse(r.payload)), orders: this.rows("demo_orders", org), invoices: this.rows("demo_bills", org) };
@@ -130,8 +132,11 @@ export class ContractorRecordStore {
     }
     ownerCommand(token: string, input: OwnerPortalCommand): {
         token?: string;
+        profileId?: string;
     } {
         const org = this.owner(token);
+        if (!org)
+            throw Error("Not an owner workspace.");
         this.db.exec("BEGIN IMMEDIATE");
         try {
             const result = this.ownerMutation(org, input);
@@ -145,6 +150,7 @@ export class ContractorRecordStore {
     }
     protected ownerMutation(org: string, input: OwnerPortalCommand): {
         token?: string;
+        profileId?: string;
     } {
         if (input.action === "create-profile") {
             const p: ContractorProfile = { id: id(), name: text(input.name, 80, "contractor name"), generation: 0, linkActive: false, wallet: null, walletVersion: 0, pendingWallet: null };
@@ -154,7 +160,7 @@ export class ContractorRecordStore {
             if (count.n >= 3)
                 throw Error("This MVP demo supports three contractors per workspace.");
             this.db.prepare("INSERT INTO demo_profiles VALUES (?,?,?)").run(p.id, org, JSON.stringify(p));
-            return {};
+            return { profileId: p.id };
         }
         if (input.action === "review-invoice") {
             const bill = this.rows<ContractorBill>("demo_bills", org).find(b => b.id === input.invoiceId);
@@ -260,10 +266,20 @@ export class ContractorRecordStore {
         const f = input.fields as BillFields;
         if (!f || typeof f !== "object")
             throw Error("Clarify the required invoice details.");
-        const orderId = text(f.orderId, 80, "approved work order"), asset = "NEAR";
-        const order = this.rows<ContractorOrder>("demo_orders", org, p.id).find(o => o.id === orderId);
-        if (!order)
-            throw Error("Select your own approved work order.");
+        // Demo visitors may bill without a prior approved work order; the owner
+        // then reviews the claimed amount and recipient inside the profile.
+        // Persistent organizations always keep an approved work order as the
+        // billing basis, so their submission path is unchanged here.
+        const direct = this.mode === "simulation" && !String(f.orderId ?? "").trim();
+        let order: ContractorOrder | undefined;
+        let orderId = "";
+        if (!direct) {
+            orderId = text(f.orderId, 80, "approved work order");
+            order = this.rows<ContractorOrder>("demo_orders", org, p.id).find(o => o.id === orderId);
+            if (!order)
+                throw Error("Select your own approved work order.");
+        }
+        const asset = "NEAR";
         const amount = formatNear(amountFromNear(f.amount)), description = text(input.description, 1000, "work description");
         text(input.text,24000,"bill text");
         const body=input.text;
@@ -276,7 +292,7 @@ export class ContractorRecordStore {
             const previous = previousSubmission(this.db, scope, submission, fingerprint);
             if (previous) return this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === previous)!;
         }
-        if (input.action === "submit-invoice") {
+        if (input.action === "submit-invoice" && !direct) {
             const existing = this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.orderId === orderId);
             if(existing && this.db.prepare("SELECT 1 FROM invoice_submissions WHERE scope=? AND invoice=? AND fingerprint=?").get(scope,existing.id,fingerprint)) return existing;
             if (existing)
@@ -284,22 +300,29 @@ export class ContractorRecordStore {
         }
         const old = input.action === "clarify-invoice" ? this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === input.invoiceId) : undefined;
         const reference = old?.reference || nextReference(this.db, scope);
-        const recipient = f.recipient?.trim() || order.recipient;
+        const recipient = f.recipient?.trim() || order?.recipient || p.wallet || "";
+        if (!recipient)
+            throw Error("Approve a demo wallet or set an explicit recipient in this bill.");
         const reasons: string[] = [];
         if(this.mode === "persistent" && currencyConflict(body)) reasons.push("Currency conflict in source text. Clarification is required; no amount was converted to NEAR.");
         if(this.mode === "persistent")reasons.push(...sourceQuestions(body,amount).filter(q=>!q.startsWith("Which currency")),...sourceOrderQuestions(body,orderId,this.rows<ContractorOrder>("demo_orders",org,p.id)));
-        if (amount !== order.amount)
-            reasons.push("Amount differs from approved work order.");
-        if (asset !== "NEAR")
-            reasons.push("Only native NEAR is supported.");
-        if (recipient !== order.recipient)
-            reasons.push("Wallet differs from the immutable work order recipient.");
+        if (direct) {
+            // No work order exists to compare against; owner review stands in for it.
+        }
+        else {
+            if (amount !== order!.amount)
+                reasons.push("Amount differs from approved work order.");
+            if (asset !== "NEAR")
+                reasons.push("Only native NEAR is supported.");
+            if (recipient !== order!.recipient)
+                reasons.push("Wallet differs from the immutable work order recipient.");
+        }
         let attachment: BillAttachment | null = null;
         if (input.attachmentId) {
             const a = this.attachment(input.attachmentId, org, p.id);
             attachment = { id: input.attachmentId, name: a.name, mime: a.mime, size: a.bytes.length };
         }
-        let bill: ContractorBill = { id: id(), contractorId: p.id, reference, orderId, orderReference:order.reference, amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
+        let bill: ContractorBill = { id: id(), contractorId: p.id, reference, orderId, orderReference: order ? order.reference : "No work order", amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: direct ? "Submitted" : this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
         if (input.action === "clarify-invoice") {
             if (!old || old.status !== "Needs clarification" || old.orderId !== orderId)
                 throw Error("Only a requested clarification of the same invoice and work order is allowed.");
@@ -310,7 +333,7 @@ export class ContractorRecordStore {
         }
         else {
             try {
-                this.db.prepare("INSERT INTO demo_bills VALUES (?,?,?,?,?,?)").run(bill.id, org, p.id, reference, orderId, JSON.stringify(bill));
+                this.db.prepare("INSERT INTO demo_bills VALUES (?,?,?,?,?,?)").run(bill.id, org, p.id, reference, direct ? `direct-${id()}` : orderId, JSON.stringify(bill));
             }
             catch (e) {
                 if (String(e).includes("UNIQUE"))
@@ -365,3 +388,5 @@ export class ContractorRecordStore {
         return row;
     }
 }
+
+

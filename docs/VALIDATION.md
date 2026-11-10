@@ -1,4 +1,532 @@
-# Validation record — through 3 November 2026
+# Validation record — through 5 November 2026
+
+## V4 checkpoint handoff and blocking plan review — 5 November 2026
+
+**Not live-ready.** Original V4 SHA-256 still **`d6ee7587ed059a22e76ce05cf254d4de33d3066730d5abda7672424add9599f5`**; all seven exact inputs are unchanged. [Detailed evidence, hashes, Linux commands and failure-cleanup table](V4_CHECKPOINT_VERIFICATION.md). This later review supersedes any earlier implication that only Linux execution/approval remains.
+
+Available execution checks found no usable WSL, Cargo, Docker or configured SSH host. No Linux execution was attempted through an alternate/unapproved service. No infrastructure purchase, upload, signatures, transactions, live deployment, commit or push occurred. Existing uncommitted work was preserved; application/contract code was not changed for this verification task.
+
+**Actually executed:** read-only dual-source testnet capture at finalized height **276384748**, expected deployed code/owner/paused/revoked/no-key checks, exact deployed WASM download/hash validation, seven real-input cryptographic/order/continuity checks through the existing local verifier, original trusted root/validator-set argument digest comparison, transaction byte-size/gas/deposit and allowance arithmetic checks, vendor recipient corroboration, Node bundle integrity audit and syntax checks. Windows Git Bash performed shell parsing only. No synthetic checkpoint input was substituted. No unchanged application/browser/root suite was rerun or represented as fresh evidence.
+
+The current complete root argument SHA-256 matches the previously approved bootstrap exactly: **`e38bed03aadd216a2472fb92064cf77ee54aecc86f405f22259c6f6607731027`**. Exact deployed WASM SHA-256: **`dc4cf64736110a33cce94531e2e00ba4510bcebbbb240bee6ecdacacf778560f`**, NEAR code hash **`Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ`**. Public captured state is supplied to the offline harness; no private database, wallet key, session or invitation is included.
+
+**Prepared, NOT executed:** Linux integration target for official near-vm-runner **0.37.4**, Rust **1.93.0**, Node **24.22.1**, captured protocol-88 **Wasmtime** configuration and all seven exact **250-Tgas / zero-deposit** calls. Source signatures/commitments/quorum/ancestry checks passed locally with Node **24.18.0** and installed SDK **7.4.0**; WASM resource/contract execution remains unverified. The new Rust harness itself has not compiled here. Its memory-trie adapter is not full nearcore receipt/trie simulation, and cannot establish live transaction overhead or independent security review.
+
+Bundle: ignored `artifacts/v4-checkpoint-verification/nnetics-v4-checkpoint-bundle.zip`, **1,706,342 bytes**, SHA-256 **`7c0031f84d4a7b0d6d4b68c64eb59aab9b3ada80b5dd5ab164ae40249389d813`**. Manifest SHA-256 **`594de08499fa8b219625aa9d8f908d2b61740f6656b9c513144ebd3445528829`**. It contains unchanged inputs/plan, real deployed WASM and public state, checksummed official VM crate/lockfile, sources/provenance and exact commands. Run `bash run-linux.sh` on an authorized Linux x86_64 host with the specified toolchain; return the fresh `work-*` results. Compilation/configuration/gas failures must be reported without changing gas, proofs, versions or lockfiles to force a pass.
+
+**Plan checks:** single 0.001-NEAR Babygoat payment, cumulative 0.002 vs additional 0.001 authority, unchanged per-payment cap, zero additional worker funding, and the combined **0.595000000000000000000006-NEAR** allowance all pass. The transfer uses the already-counted payout deposit, not another funding amount. The active vendor's recipient is exactly `babygoat.testnet` at the captured block.
+
+**Two additional blockers:** (1) read-only private-store checks found no actual INV-0003 bill or job, only the existing single Paid INV-0002 job. V4 predicts a label instead of binding an actual bill/agreement UUID and immutable durable import/job payload; normal authorized record creation/review and an enforced amended binding are required. No records were fabricated or created. (2) V3's success-only result collector (`reference-block-policy.ts:83,118`) retains a finalized failure as a held owner attempt (`owner-attempt.ts:184`), which blocks later owner steps. V4's generic cleanup text cannot safely resolve failed pause/revocation. Reviewed failure adjudication plus explicit partial-cleanup handling are required; no hold was cleared or consumed step rearmed to evade this blocker.
+
+The plan was unexpired and its final head fresh at **20:56:18 WAT**. Deadline remains **6 November, 05:14:10.901 WAT**, with checkpoint expiry **07:35:20.133 WAT**. No silent refresh/extension occurred. After expiry, the bundle permits only clearly labeled historical verification; an executable refreshed plan needs new version/hash review and any explicitly collected replacement evidence. Do not execute expired V4. Even a seven-input VM pass will not clear the two plan/runtime blockers or authorize a live run.
+
+Both runtime gates remain disabled. Final containment evidence is recorded separately under `artifacts/v4-checkpoint-verification/`; the vault stays paused, worker revoked/stopped, and the original Paid/V2 history is preserved. No independent security review has occurred. Exact remaining environment access: a runnable authorized Linux x86_64 host/SSH alias, or operator execution of the supplied public-data bundle; no wallet credentials are needed.
+
+## Operational integration — 5 November 2026, local only
+
+Submission preparation paused; the prior recording guide/publication proposal and all unrelated uncommitted work are preserved. Branch `codex/nnetics-live-integration`, HEAD `70e4f5b43db9d037e4b1fd70269dca92b3c3b86f` remains unchanged. No staging, commits, pushes, deployment, wallet prompts, real signatures or transactions occurred.
+
+### Implemented
+
+- Integrated the pinned V3 verifier into normal new owner-attempt reconciliation. V3 file SHA-256 remains `1ff5abb96c4633d8d6f510ec4a2ab44c1fbf0bfe45d959edc05dc7bbd6543709`; V2 remains `d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`. Exact intent, nonce/key, ordered actions/argument bytes, signature/hash, bounded canonical reference refresh, FINAL outcome, executed code and complete supported receipt graph are verified. Only the reference may differ. Missing evidence remains blocked/consumed and can recover by read-only reconciliation after restart. Definitive mismatches remain manual review.
+- Added bounded V4 owner scopes for existing actions, with a pinned owner key, exact per-step action/deposit/gas/fees, expiry, prerequisite confirmations and atomic one-use consumption. The accepted historical V2 hold stays in its original scope; known historical evidence is not reused as authorization. Cross-scope unresolved attempts block preparation/dispatch. Concurrent/late conflicting IDs remain durable, including a report arriving while the next operation is prepared.
+- Added authenticated checkpoint preparation/staging and exact-state installation reconciliation. Same/next epoch only; validator commitments, signatures, >2/3 stake, ancestry, time/height and input bounds mirror the pinned Rust verifier. No new root or transaction is installed by the collector. Recovery UI can review an exact scoped 250-Tgas/zero-deposit update. Funding/limit reviews show their actual limits, not a one-yocto deposit substituted as the amount.
+- Bound worker operation to one existing job, exact hash-pinned payment plan, order, generated invoice reference, recipient/amount, restricted key, fees and balances. `--once --job` is mandatory; other queued jobs do not run. Freshness is checked before claim, preparation and broadcast. Expiry before claim keeps the job queued/unsigned. Unknown signed jobs retain their claim/bytes. Permission changes during preflight stop key loading/signing/broadcast. Paid still requires authoritative contract and transaction linkage.
+
+### Actual execution and failures
+
+| Check | Actual result |
+| --- | --- |
+| Final owner/backend `npm test` | **241 passed, 0 failed/skipped** |
+| Root `npm test` | **42 passed, 0 failed/skipped** |
+| Complete browser-fixture replay, desktop/mobile | **166 passed, 0 failed/skipped** |
+| Typecheck and `.next-rpc` production build | **Passed**, build ID `TrVHhZCye9N0v8cRtqwgm` |
+| New real Meteor/financial acceptance | **Not performed** |
+| New Rust/sandbox execution | **Not performed**: no Cargo/usable WSL here |
+| Existing unchanged contract sandbox evidence | [Run 41809747952](https://github.com/Technique-S/Nnetics/actions/runs/41809747952): protocols 86/88 (`2.13.0`, `2.14.0-rc.5`) both passed; no diff in contracts/normalizer/core script against that tested revision |
+| Exact seven newly collected checkpoint inputs in VM | **Not executed; required before live execution** |
+
+The browser run replayed final prebuilt HTML/static assets on the existing permitted 3100 origin, preserving the source test assertions and API fixtures. It did not restart the server, repeat a policy-blocked fixture startup, access a real wallet or prove the final Next backend served a live transaction. Initial replay: **152 passed / 8 failed**, because extra tabs/persistent browser contexts and a 404 received old-server assets. The ignored replay harness was corrected at context/browser level and supplied final 404 assets; the final complete run passed 166 (including six new viewport cases for compatible reference results, scoped limits and checkpoint review). No assertions were removed, sleeps/timeouts added, or failures skipped. The old server remains running; a future live run must start the final build after approval/preflight.
+
+Focused diagnosis caught and fixed: (1) importing prior payload hash evidence before counting candidate hashes; (2) re-reading the correct operation scope for late reports; (3) checking unresolved operations again atomically at dispatch; and (4) preserving resumable evidence-unavailable state without losing consumed authorization. Deterministic barriers, isolated SQLite files and simulated provider responses cover both race orderings and restart recovery. Fixture signing uses ephemeral test keys only.
+
+Artifacts (ignored/private, not publication files): `artifacts/operational-owner-final.log`, `operational-reference-final.log`, `operational-browser.log` (initial), `operational-browser-final.log`, `operational-build-final.log`, `operational-checkpoint-collection.log`, `operational-checkpoint-final.log`, `operational-checkpoint-margin.log`, `operational-snapshot.json`, `operational-containment.json`, plus the ignored browser replay harness/results. No private invitation or credential was copied into the public plan.
+
+### Checkpoint collection and remaining trust
+
+Read-only collection first hit Fastnear `UNKNOWN_BLOCK` for the stored root. An archival next-head query succeeded; recent near.org/Intear/dRPC endpoints could not supply older canonical headers (422/UNKNOWN_BLOCK). The collector therefore uses archival signed updates/ancestry, corroborates the stored checkpoint/current pinned block separately, and cryptographically validates every advance from the existing on-chain validator sets. It does **not** label archival header availability as independent consensus verification.
+
+Seven dependent proposals are staged, not installed, from stored head `Gk91ppKatpsQhi62mK9CE1WKfFMFA7BH1EDt3vBSnnpD` to `JBDep4XZ79gwwbc7KhQUQ24TVsbHDPDfzUbPusfPTc6c`, height **276306052**. Exact normalized request sizes: **9,605; 9,634; 9,198; 9,133; 9,502; 9,383; 8,980 bytes**. Collection continued beyond the first almost-expired fresh head to obtain more than twelve hours of review margin. Final head's 24-hour deadline: **6 November 2026, 07:35:20.133 WAT**. Stale evidence still blocks signing/broadcast. No validator root reset, skipped-epoch shortcut, fabricated evidence or on-chain update occurred.
+
+Initial validator-set trust/weak subjectivity and lack of independent security review remain disclosed. Current official references checked: [NEAR light-client specification](https://nomicon.io/ChainSpec/LightClient.html), [NEAR SDK provider next-light-client interface](https://near.github.io/near-api-js/classes/providers_failover-rpc-provider.FailoverRpcProvider.html), [official Wallet Selector Meteor adapter](https://github.com/near/wallet-selector/blob/main/packages/meteor-wallet/src/lib/meteor-wallet.ts). Installed NEAR SDK remains 7.4.0; no dependency changes. Passing fixtures/author verification are not independent review.
+
+### Conditional live plan and containment
+
+Complete proposal: [OPERATIONAL_TESTNET_ACCEPTANCE_V4.md](OPERATIONAL_TESTNET_ACCEPTANCE_V4.md) and exact [JSON](OPERATIONAL_TESTNET_ACCEPTANCE_V4.json), SHA-256 **`d6ee7587ed059a22e76ce05cf254d4de33d3066730d5abda7672424add9599f5`**. It proposes 14 owner calls (seven checkpoint advances, payout funding, total limit, new agreement, authorization, unpause, pause, revoke) and one exact 0.001-NEAR worker payment to Babygoat. Owner maximum **0.540000000000000000000006 NEAR**, worker maximum **0.055 NEAR**, combined **0.595000000000000000000006 NEAR**. No top-up or new key is proposed. Approval/dispatch deadline: **6 November 2026, 05:14:10.901 WAT**. Current observed balances cover the proposed ceilings, subject to fresh storage-adjusted checks.
+
+INV-0003 is only the read-only observed next automatic reference, not a created/reserved record. Normal review must create exactly that reference for the fixed new agreement or the run stops for amendment. INV-0002 must never pay again. The exact seven update arguments must first pass the pinned Linux VM; a supported Linux environment is the outstanding environment requirement. This plan/hash has **not** been approved. Prior independent-review exceptions do not authorize this payment.
+
+Direct containment recheck at **17:45:41 WAT**, finalized height **276367555** / block `3REBLKNaCn8PoK2it3wtzz2u5NSvR6G91nMQq9ZHayUB`: owner Grandtheft, expected code, vault paused, agent null. Both runtime gates false/legacy empty; worker process count was **0** at the preceding process check and no live worker was started. Original INV-0002 remains the same single Paid job/attempt with transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`; original owner-attempt snapshot digest, both IDs, history count **1**, consumed-use count **1**, and manual-review hold are unchanged. Seven local checkpoint proposals do not add payment jobs. Structural validation of all 14 owner scopes and the exact worker arguments passed against the loaded private configuration without enabling either gate. An initial parser invocation omitted environment loading and correctly failed closed; configuration was loaded for the succeeding read-only check, with no code/plan changes to bypass it.
+
+**Disposition:** local operational wiring and automated verification complete; **live operational acceptance incomplete**, pending exact-input Linux VM verification, fresh preflight, explicit bounded-plan/risk approval and real Meteor/payment checks. There is no new chat assistant, recurring payment or cross-chain feature. Deterministic billing remains the acceptance path. No financial activation occurred.
+
+## Final local handoff — 5 November 2026
+
+**One publication proposal and recording guide prepared, no repository/financial action executed.** Current branch `codex/nnetics-live-integration`, HEAD `70e4f5b43db9d037e4b1fd70269dca92b3c3b86f`. [Proposal](PUBLICATION_PROPOSAL.md) lists all intended modified and new/untracked files, exclusions, full description/post copy, commit message, push destination and the recommendation to make this existing branch GitHub's default after its approved push. The generated local `.next-rpc` references in `next-env.d.ts` are excluded from the commit proposal but preserved in the working tree. No staging, commit, push, default-branch change, hosting purchase or deployment occurred.
+
+The owner explicitly supplied **MDBcertified** as the license holder. LICENSE and notices now use that exact text; no legal name was inferred and no third-party copyright was changed. This is not automatically used as the separate submission lead name.
+
+### Demo-specific verification
+
+Normal local startup on 3101 was attempted once using the existing npm start script and final `.next-rpc` build. Automatic approval review rejected it before execution: **blocked by policy**. The previous blocked fixture-server method was not retried, and no substitute server process was started. Exact human startup commands, with financial gates empty, are in [DEMO_GUIDE.md](DEMO_GUIDE.md). Existing 3100 remains an older permitted server, not the final build.
+
+Completed a targeted **browser-only fixture replay** of final frontend artifacts `w38xe4-dMFK3Cw1XhXWUm` on the existing 3100 origin. Static HTML/JS/CSS came from the final build; browser HTTP fixtures called the current source `DemoContractorStore` against a newly created isolated SQLite demo database. All live-write calls were rejected by the fixture harness. No production/private store, wallet proof, new real payment job or network transaction was used. Every capture carried a visible fixture/no-funds-move label. This is **not** a fresh normal Next-server or real-Meteor acceptance result.
+
+Observed entry/workspace render, contractor creation and invitation, simulated wallet request/owner approval, DEMO-001 for 0.001 NEAR, bill submission, same-invoice clarification, owner approval, record/reference retention after refresh, light/dark toggle and preference persistence. The synthetic invoice remained **Approved, not Paid**. Its temporary access link was revoked after rehearsal. A separate viewer fixture displayed public historical INV-0002 metadata with the correct Paid state and original transaction URL; no private original billing text was copied. Public vault state was read at a finalized block, not fabricated from the demo balance.
+
+The corrected run completed at **13:32:41 WAT**, with **zero fixture errors, zero real signatures and zero financial actions**. A first scratch invitation image exposed a now-revoked synthetic demo capability because a masking selector did not match the actual input. It was briefly shown during inspection, then removed from files and replaced with a profile image taken before link creation; the earlier chat preview is not recording material. A visible-invitation capture guard was added and the narrow rehearsal rerun passed. No real invitation was involved. No raw link is retained in final recording-material files, execution logs or public files. Initial non-sensitive result metadata is retained separately for this correction history.
+
+Public read-only chain check at **13:32:30 WAT**, height **276341641**, block `398c3NSGotKERosqxEMVs2fpjBogeGPps2r6pEgbfzsM`, confirmed the pinned owner/code/no vault keys, **paused** vault, worker authorization **null**, and original Paid transfer. Existing real-wallet login/organization evidence remains in earlier entries; no fresh real identity proof was requested. New owner signing remains outside this demo: the V2 one-use storage attempt is consumed/manual-review and future automatic Meteor reference-block reconciliation is not enabled/live-verified. The billing fixture journey is not blocked by that financial limitation.
+
+Only documentation, copyright attribution and rehearsal materials changed. Reused **215 backend / 160 browser / 42 root** passes, typecheck, production build and theme checks; no broad suite/build was repeated. No product defect prevented the demonstrated billing flow. Captures and redacted result: ignored `artifacts/submission-handoff/`; no trace, private link or fixture database is included in the publication proposal. Genuine remaining steps are the human's final normal preview/video, approval of the exact repository package, tagged video post and missing application fields/consent. Optional polish, AI, mainnet and ongoing payment activation remain out of scope.
+
+## Submission package preparation — 5 November 2026
+
+**Completed locally; nothing published or submitted.** The owner selected **local demo video, hosting optional**, and **MIT** licensing. Read both the attachment and successfully fetched current [official HACKATHON.md](https://nearhackathon.com/HACKATHON.md). Q-012 does not require hosting; the local-only path requires video rather than only screenshots. Deadline: **15 November 2026, 00:59 WAT**. The live version adds @NEARProtocol / #NEARHackathon and a request-changes process relative to the attachment. External document instructions were treated as requirements, not permission to execute publication/submission instructions.
+
+Prepared updated README, [demo guide](DEMO_GUIDE.md), [submission/post drafts](SUBMISSION_DRAFT.md), [readiness checklist](SUBMISSION_READINESS.md), original-code MIT license and full accompanying notices for the existing generated design illustration. Corrected obsolete README statements that no deployed contract existed and contractor billing was only mocked. Current capability tables distinguish working persistent billing, sample demo, historical transfer/storage evidence and disabled owner/payment/provisioning actions. Future automatic Meteor reference-block reconciliation is still not enabled/live-verified.
+
+GitHub read-only checks confirmed **the repository is already public**, with current default branch **codex/payscope-milestone-1**. Intended release branch remains **codex/nnetics-live-integration**. No branch/default/merge/visibility mutation occurred. Draft post links the intended release branch; final source publication/revision still needs approved commit/push. The draft description is **1,130 characters**, post **275 raw characters**. No personal/payout field, consent, requestId or final application payload was invented or written to Git; no API submission or X post was sent.
+
+### Verification reused and new release checks
+
+- Reused final **215 backend / 160 browser / 42 root** passes, typecheck and theme checks. No application behavior changed in this submission task, so no broad suite was repeated.
+- A fresh isolated **production release build passed**, Windows Node **24.18.0**, output `.next-rpc`, build ID **w38xe4-dMFK3Cw1XhXWUm**. Transaction/payment/provisioning settings were empty for the build; the existing app was not restarted. Current candidate has not run in remote Node 24.22.1 CI; the previously recorded Linux memory/restart evidence applies to its earlier revision only.
+- Build safety check: **52 public static/prerender files**, two configured sensitive values compared in memory, **zero matches**, **zero copied private environment files**. Values were never printed or saved in the report. This is an exact-value/filename check, not proof against unknown/encoded secrets.
+- Redacted read-only publication scan: **639 tracked working files**, non-ignored candidates and **810 reachable Git blobs**, no matching key/provider-token/private invitation URL/SQLite-header finding. Private `.env`, databases/WALs, dependencies/build/test output and artifacts remain ignored. Alternate SQLite extensions/journals were added to ignore rules. One intentionally tracked generated asset, `docs/design-review/scene.js`, was retained and its full attribution notices added. Unreachable Git objects and unknown secret formats were not audited; this is not certified secret detection.
+- Read-only HTTP check: existing port 3100 returns 200 but does **not** serve the final appearance bootstrap/control. No blocked fixture startup was repeated. Reused final-build captures and static error-component previews; exhaustive dark setup/recovery sub-state captures, runtime root-boundary fault injection, OS-wide high contrast and browser-toolbar zoom remain unverified. No additional screenshot is claimed as a pass.
+- Publication checks/report, build log/safety check, rules snapshot, source fingerprint/release manifest and preservation evidence are in ignored `artifacts/submission-release/`. Three fixture-only screenshots were copied unchanged into `docs/screenshots` as explicitly reviewed documentation assets, with provenance and simulation labels; no private capture directory or browser chrome is prepared for Git. No private database was exported or uploaded; the running writer was not falsely declared quiesced.
+
+The optional Render guide now identifies the definitive single 512 MB Node service + 1 GB persistent disk, about **$7.25/month** before tax/overages, maintenance initially on, no worker and separate gates empty. Official compute/disk/TLS documentation was refreshed. HTTPS origin/session cookies, private link generation, same-origin restart behavior, three-store cutover and rollback boundaries were checked against existing code and prior valid evidence; actual Render-domain acceptance has not occurred. No hosting credentials are needed for the selected local route.
+
+### Preservation and remaining requirements
+
+Final direct read-only check at **12:51:53 WAT**, finalized height **276337581**, block `GniqXb3wUQHjCHAWV1uv7zvV3F945QtGSKUjKuCpdzBK`: expected owner/code/no vault keys, vault **paused**, worker authorization **null**, original chain Paid record. Both runtime gates false, legacy flag absent/empty; durable active/history/consumed-use snapshot unchanged, original prepared/reported IDs retained. INV-0002 is still **one Paid job**, attempt **1**, original transaction/payload/signed bytes. The separate limited V3 historical acceptance record and original V2 outcome remain unchanged. No worker was started; no new signature/transaction/contract deployment occurred.
+
+Ranked requirements before actual submission: **(1)** review/publish the exact final code/license/docs on the correct branch with explicit commit/push authorization; **(2)** human records and publishes the tagged local-demo video; **(3)** human supplies submission fields, other-entry/prior-submission disclosures, consent and exact final payload approval. Optional hosting and new payment/AI features are not blockers for this chosen route. No commits or pushes occurred. A bulk documentation shell write was rejected by automatic approval review (`blocked by policy`) before changing files; scoped file patches completed the documents safely, without executing any startup/submission command.
+
+## Submission readiness — 5 November 2026: historical acceptance and dual themes
+
+### Precise milestone disposition
+
+- **Historical storage-funding transaction: accepted under reviewed V3.** The user's explicit approval covers existing `CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG` only. Separate [historical acceptance record](METEOR_HISTORICAL_ACCEPTANCE_V3.json), SHA-256 **`8e64a71240fc3292f01ae8ed3782e2c3343e34a21bd3c5e0e7b9c3cf355fcdfc`**, recorded at 11:33:59 WAT.
+- **Future automatic Meteor reference-block reconciliation: not enabled or live-verified.** No runtime gate consumes V3; no hold is cleared or submission reopened.
+- **Ongoing payment activation: still disabled.** Vault paused; worker revoked/stopped. No transfer repeated.
+
+V3 JSON was rechecked as **`1ff5abb96c4633d8d6f510ec4a2ab44c1fbf0bfe45d959edc05dc7bbd6543709`**; unchanged V2 remains **`d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`**. Retained evidence digest, producing verifier source hash, exact durable snapshot and reconstructed Ed25519 signature were rechecked offline. This reuses the prior valid bounded verifier assessment; serialized evidence is not promoted into a new trusted runtime proof. The record pins signer/key/nonce/receiver/ordered call, `{}` bytes, **0.000001 NEAR**, **100 Tgas**, unchanged fee/total ceilings and actual **0.000187847047379 NEAR** fee. Only the reference block changed. Limitations remain trusted dual HTTPS RPC corroboration rather than independent consensus proof, unestablished operator independence, absent historical raw extension wire response and no independent security review. V2's mismatch/manual review and both IDs remain in active/history/consumption rows. Acceptance is a separate documentary decision, not a rewrite.
+
+### Implementation and verification
+
+Completed Jade & Midnight light plus the supplied Jade Night dark specification. Semantic tokens/aliases: `apps/owner/src/app/tokens.css`. The visual-only controller implements system default, pre-paint theme selection, accessible toggle, safe storage fallback, cross-tab synchronization and matching color-scheme/theme-color. Account/provider lifetimes and authorization are separate. The compact shell and contextual administrative controls are preserved. Existing route families/shared states, contractor CSS modules and global error recovery use the tokens. Full coverage, exact final values, limitations and screenshots: [THEME_REPORT.md](THEME_REPORT.md).
+
+Only the supplied dark essential boundary needed a lightness adjustment: **#2E4A44 → #4B796F**, giving **3.060:1** against the raised surface. Minimum checked text pairs: **4.994:1 light / 5.035:1 dark**. A false generic error on healthy modal opening was traced to mapping a null error and fixed at that presentation boundary. Financial details/status sources and signing/reconciliation handlers are unchanged.
+
+| Executed check | Actual final result |
+| --- | --- |
+| Full browser regression suite, final dual-theme build | **160 passed, 0 failed/skipped** |
+| Focused dual-theme browser checks, subset | **20 passed, 0 failed/skipped** |
+| Owner/backend tests | **215 passed, 0 failed/skipped** |
+| Root tests | **42 passed, 0 failed/skipped**; reused valid same-session evidence for unchanged root source |
+| Typecheck / production build | **Passed / Passed**, isolated `.next-rpc` |
+| `check:theme` | **Passed**, contrast plus application-source literal checks |
+| New real-Meteor wallet/transaction run | **Not performed or authorized** |
+
+Windows/PowerShell, Node **24.18.0**, HEAD **70e4f5b**. Logs and captures: ignored `artifacts/submission-readiness/`. New browser evidence is fixture-based: theme defaults/overrides, refresh/tabs/isolated browser-process restart, unavailable storage, 320px layout, 200%-equivalent CSS reflow, keyboard trap/Escape, reduced motion and Windows forced-colors emulation. Eight actual error-component region previews were rendered without inducing a production crash. Exhaustive dark setup-state captures, OS-wide high contrast and browser-toolbar zoom were not claimed. Prior real-wallet evidence remains separate.
+
+The missing Jade Night prompt arrived and was implemented; it is **no longer a blocker**. Extra administrative capture hit incomplete organization/session screenshot fixtures; no application change was made to satisfy them. Automatic approval review rejected a separate port-3114 fixture-server startup (`blocked by policy`); it was not bypassed. Final test build/existing captures remain valid; the running 3100 service was not restarted. No `check:seo`/`check:links` scripts existed in the manifests; no unrelated infrastructure or dependencies were added.
+
+### Final direct preservation check
+
+At **12:06:30 WAT**, finalized height **276332972**, block `8HZH4ktwKma5eZCpqQqocUBBK3fMhZSLUcYnGiV5Mtjr`, read-only RPC confirmed expected owner/code/no vault keys, **paused=true**, worker authorization **null**, and the original Paid chain record. Worker process count **0**. Both runtime gates **false**, legacy flag absent/empty. Active/history/consumed-use snapshot is unchanged (one history row, one consumed-use row, both IDs/manual review retained). INV-0002 is exactly **one Paid job**, attempt **1**, **0.001 NEAR** to **babygoat.testnet**, original payload/signed bytes and `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`. Artifact: `artifacts/submission-readiness/containment-final.json`.
+
+No signatures, transactions, activation, deployment, commits or pushes occurred. Ranked readiness items in THEME_REPORT.md: hosted rollout/public-origin approval if a public submission URL is needed; separately reviewed future runtime reconciliation before broader financial use; allowed/manual preview startup and further optional visual captures. No final tests fail. Full financial activation and independent security acceptance are not claimed.
+
+## Meteor reference-block policy V3 — 5 November 2026: implemented for assessment only
+
+**Disposition:** local verifier and regression coverage are complete. The historical transaction is **compatible_under_proposal**, but its durable state is still **manual_review**, authorization remains consumed, and no runtime route adopts V3. Explicit policy review and a separately authorized historical disposition are still required. V2 has not passed or changed. No new signature, transaction, deployment, commit or push occurred.
+
+Proposal: [METEOR_REFERENCE_POLICY_V3.md](METEOR_REFERENCE_POLICY_V3.md), [machine-readable V3](METEOR_REFERENCE_POLICY_V3.json). Exact file SHA-256: **`1ff5abb96c4633d8d6f510ec4a2ab44c1fbf0bfe45d959edc05dc7bbd6543709`**. Original V2 remains **`d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`**. V3 changes only the proposed treatment of a bounded reference-block refresh and adds explicit evidence/resource/trust requirements; signer, key, nonce, ordered action bytes, recipient, deposit, gas, fees, one-use consumption and manual-review authority are unchanged. This is a proposal, not an executable replacement acceptance plan.
+
+### Implemented boundaries and evidence
+
+`src/server/reference-block-policy.ts` and `scripts/assess-owner-reference.mjs` provide read-only assessment. Only the original reference hash can change: canonical Borsh reconstruction, exact SHA-256 and Ed25519 signature must all match. Full FINAL action/refund receipt linkage, success, pinned executed code, owner and paused/revoked state are checked. Missing, changed or contradictory evidence fails closed. The durable active/history/consumption snapshot is rechecked in a consistent SQLite read transaction after asynchronous evidence collection; no history, consumption or active row is modified. Concurrent evidence invalidates the assessment; later reports cannot be erased by an assessment. Existing transaction-attempt finalization/concurrency protections remain unchanged.
+
+Inclusive application limits: prepared anchor age **30 seconds**; replacement strictly newer and at most **256 height units** ahead; inclusion before **min(original expiry, creation + 180 seconds)** and within **16 height units / 30 seconds** of replacement; receipts within **16 height units / 30 seconds** of inclusion. Both height and timestamp bounds apply. Maximum **35 canonical assessment headers** plus two provider-tip observations; common finalized-head disagreement at most **32 height units**. Collection is bounded to **180 seconds monotonic elapsed**, **128 HTTP attempts**, **2 MiB per response**, globally spaced at least **1 second** apart, using one existing bounded retry layer. These are conservative application choices, not NEAR/Meteor guarantees. Slow but valid cases remain held.
+
+Both fixed HTTPS sources (`test.rpc.fastnear.com`, `rpc.testnet.near.org`) must corroborate pinned testnet genesis/protocol 88, historical validity **86400 blocks**, canonical heights, finality, receipts and state. The original anchor and candidate-through-receipt segment are verified; the intervening unmodified gap is not walked. A skipped height requires both providers' specific UNKNOWN_BLOCK responses and direct parent linkage across the gap. Source agreement is trusted RPC corroboration, **not a light-client consensus proof**. Operator independence is not established, and no independent security review occurred. In-memory sealed evidence cannot be replaced by a wallet object or serialized `trusted:true` claim.
+
+Nnetics controls its approved intent, scoped application dispatch and request payload before signing. It cannot prevent Meteor from constructing/broadcasting changed bytes. This policy authenticates and compares the resulting transaction afterward, retains deviations and blocks further application submission; it does not prevent or reverse an already submitted transaction.
+
+### Existing transaction: separate historical assessment
+
+Direct read-only collection completed **5 November 2026, 11:05:20 WAT**. Artifacts: ignored `artifacts/meteor-reference-policy-v3/assessment-final.json` and `.evidence.json`; verifier source SHA-256 **`45a4c1881633d055a64a0002872a3aa3ad8918be3336558522e9385d10db739c`**. The offline evaluator then produced **compatible_under_proposal**, **manualReviewRequired=true**, **submissionAuthorized=false**, **requiresExplicitHistoricalDisposition=true**. It made **63 HTTP attempts**, collected **21 canonical assessment headers**, and completed in **139484 ms**.
+
+- Original ID: `9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo`.
+- Finalized candidate: [`CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG`](https://testnet.nearblocks.io/txns/CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG).
+- Original height **276275468**; replacement **276275621** (advance **153**); inclusion **276275624** (lag **3**, approximately **1.900 seconds**). Inclusion occurred approximately **92.720 seconds** after stored creation; prepared anchor age approximately **1.130 seconds**.
+- Only the 32 reference-block bytes differ. The original key's signature, exact approved call, complete successful FINAL action/refund receipts and pinned execution code qualify. Actual total token burn: **0.000187847047379 NEAR**, below the unchanged fee ceiling. Historical storage-reserve effect remains the previously verified **0.000001 NEAR**; no new funds moved.
+- Evidence digest: `e7bab0219b605c1a899bb25c2ce567bbfb462cc0437247ad03e24f29f66731a6`; durable snapshot digest: `2e0df4a7e5682e01567e964526242fc01e23d213eb5694b3ed1623070b543f07`.
+
+Initial collector iterations encountered a corroborated skipped height (HTTP 422 with UNKNOWN_BLOCK) and burst rate limits (429); each failed closed without changing the durable hold. Bounded linked-gap handling and global pacing were implemented and tested. The final collector intersects the 256-height and 16-height windows rather than unnecessarily fetching the entire original-to-inclusion range. No bounds were broadened to force this historical result.
+
+The evidence can support a **separate historical V3 acceptance decision after explicit review**, without another transfer. A future authorized disposition would append that decision while retaining V2's mismatch, both IDs and consumed scope; no disposition writer is exposed here. Future automatic/runtime adoption requires a separately reviewed implementation and approved end-to-end live plan/test. This historical assessment does not establish that future flow.
+
+### Actual checks executed in this task
+
+Windows/PowerShell, Node **24.18.0**, HEAD **70e4f5b**, all pre-existing uncommitted UI/RPC/checkpoint work preserved. Final logs in ignored `artifacts/meteor-reference-policy-v3/`.
+
+| Check | Actual result |
+| --- | --- |
+| Focused reference-policy tests | **59 passed, 0 failed/skipped** |
+| Owner/backend `npm test` | **209 passed, 0 failed/skipped** |
+| Root `npm test` | **42 passed, 0 failed/skipped** |
+| Relevant owner-transaction browser suite, desktop/mobile | **20 passed, 0 failed/skipped** |
+| Typecheck and production build, isolated `.next-rpc` | **Passed** |
+| Entire 140-case browser suite | **Not rerun in this task**; earlier full result remains historical |
+| New real-Meteor transaction acceptance | **Not performed or authorized** |
+
+Focused fixtures cover positive/boundary proofs; altered signer/key/nonce/receiver/actions/method/argument bytes/deposit/gas; invalid signatures/hash; wrong network/genesis/protocol/code/owner; missing/failed/unlinked receipts and fee excess; source disagreement/untrusted evidence; skipped blocks; expiry/height/time bounds; cancellation; serialized evidence rejection; and separate-connection SQLite report-before/report-after assessment with persisted reopening. Temporary keys/signatures and mocked provider responses are fixture evidence, not wallet acceptance. Tests also prove V3 cannot activate the existing owner gate and legacy configuration cannot enable payments.
+
+### Final preservation checks
+
+Direct read-only chain check at **11:10:59 WAT**, finalized height **276327371**, block `3DifQ4nki3yNBxFW7wJXragEpuG3eZDrCVvE7xsyVYQm`: expected owner/code, no vault keys, vault **paused**, automatic-payment authorization **null**, original Paid chain record intact. Both runtime gates **false**, legacy flag absent/empty, worker process count **0**. Active attempt, its one history row and one consumed-use row match the saved pre-task evidence in every field; both IDs/manual-review state remain. INV-0002 still has exactly **one Paid job**, attempt **1**, original transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`, amount **0.001 NEAR**, recipient **babygoat.testnet**, unchanged signed/payload evidence. Local containment artifact: `artifacts/meteor-reference-policy-v3/containment.json`.
+
+## Meteor hash diagnosis - 5 November 2026: reference-block change proved, hold preserved
+
+**Finding:** only the unsigned transaction's **32-byte reference block hash** changed. The mismatch is not caused by nonce, key, receiver, action, method, argument, deposit, gas, receipt-ID selection, transaction version or including the signature in the hash. The full comparison, source evidence, limitations and proposed acceptance-policy revision are in [METEOR_HASH_DIAGNOSIS.md](METEOR_HASH_DIAGNOSIS.md).
+
+### Cryptographic and source evidence
+
+The saved prepared unsigned transaction is 213 bytes and recomputes to `9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo`. Replacing only offsets **130-161** (zero-based) with canonical block `DZUsGZ19DMNUW4kz6ySPEQCkfKG12vXmio9tNa31T3aY` (height **276275621**, 02:33:53.244 WAT) recomputes **exactly** to `CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG`. Its published Ed25519 signature verifies over the reconstructed digest and fails over the prepared digest. Original reference: `CLDuCoRFoN6mMb5nGhofazpQvzcgXkAK1eekMAnVdy9L`, height **276275468**, 02:32:21.294 WAT. All other **181 bytes** are identical. Only eight bounded header lookups were needed. FastNEAR and the near.org testnet endpoint returned the same reference header; this is endpoint corroboration, not independent security review or a new light-client implementation.
+
+The re-fetched finalized transaction matches V2's signer `grandtheft.testnet`, public key `ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX`, nonce **275527848000004**, full approved vault, exactly one `fund_storage({})` FunctionCall, exact raw args `7b7d`, deposit **0.000001 NEAR**, and gas **100 Tgas**. `transaction.hash` and `transaction_outcome.id` both equal `CGm...`; neither is either receipt ID. The RPC view omits the reference hash; reconstruction plus signature verification closes that evidence gap. RPC `priority_fee:0` is a compatibility view field, not a V1 or fee mutation in these V0 bytes.
+
+The app runs near-api-js 7.4.0 and a custom legacy Meteor bridge, not an installed Meteor SDK/connector. The audited public cached SDK 1.0.24/connector 10.1.4 archives and current official [Meteor SDK](https://github.com/Meteor-Wallet/meteor_wallet_sdk/blob/main/packages/meteor-sdk-v1/src/MeteorWallet.ts), [Meteor README](https://github.com/Meteor-Wallet/meteor_wallet_sdk/blob/main/packages/meteor-sdk-v1/README.md), [NEAR RPC docs](https://docs.near.org/api/rpc/transactions), and [pinned NEAR hash implementation](https://github.com/near/nearcore/blob/2.14.0-rc.5/core/primitives/src/transaction.rs) were inspected. The published flow constructs transaction envelopes; current SDK comments explicitly assign key/nonce replacement to the wallet. Exact-byte sign-only calls are unsupported by the audited connector. No package was installed/upgraded.
+
+Source tracing shows Nnetics passes the preserved Base64 directly as `inputs.transactions`, and selects only `executionOutcomes[0].transaction.hash` from a response. A controlled transport capture verifies that behavior. **The historical live frame/full raw extension response were not retained**, so this is a code-path/fixture comparison rather than a retrospective wire capture. The effective wallet-flow reference refresh is proved; its exact extension-internal function is not observable. The interoperability defect is the unsupported exact-envelope-preservation assumption, not a bad SHA-256 algorithm or receipt parser.
+
+### Local disposition and proposed change (not activated)
+
+No transaction-verification behavior or authorization rule was relaxed. Only misleading transport comments were clarified and offline regression coverage/public historical fixture were added. Correct strict V2 behavior is still **manual_review**. Refreshing the prepared block immediately before opening Meteor cannot guarantee that the wallet will not refresh it again; it is not an exact-byte fix.
+
+The proposal in METEOR_HASH_DIAGNOSIS.md binds the immutable owner/network/organization/vault/code/key/nonce/action/args/deposit/gas/fees/expiry intent before dispatch, consumes one use atomically, and permits only an explicitly bounded canonical reference refresh in a **separately reviewed future policy**. A returned candidate would need full byte/hash/signature reconstruction and FINAL receipt validation against that intent, not just successful execution. Unknown, out-of-window, changed-field, unsupported-version or conflicting evidence remains blocked. The proposal preserves exact key/nonce for the initial profile; any wider wallet-selected envelope policy needs its own review. There is no change to this V2 hold, no rearm and no authority for another transaction.
+
+V2 SHA-256 remains **`d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`**. No revised executable plan was created or applied. A reviewed compatible policy would require a new explicit plan/approval and separately authorized live test; none was requested or performed in this task. The old transaction can be diagnosed without another live test.
+
+### Actual checks executed
+
+Windows/PowerShell, Node **24.18.0**, unchanged HEAD `70e4f5b`; all pre-existing uncommitted work retained. Logs and reconstruction artifacts: ignored `artifacts/meteor-hash-diagnosis-nov5/`.
+
+- Focused `node --test .../meteor-hash.test.ts .../meteor-owner.test.ts .../owner-attempt.test.ts`: **20 passed, 0 failed/skipped**. Four new offline cases prove exact block-only reconstruction/signature, reject authenticated equality after changes to any other critical field, capture unchanged Base64/transaction-vs-receipt result interpretation, and reopen an isolated durable copy of the real case to prove manual review and consumed authorization cannot be overwritten, cancelled or replaced.
+- Owner/backend `npm test`: **150 passed, 0 failed/skipped**.
+- Root `npm test`: **42 passed, 0 failed/skipped**.
+- `.next-rpc` typecheck and production build: **passed**, isolated from the running disabled app on port 3100.
+- Relevant owner-transaction browser suite, desktop/emulated mobile: **20 passed, 0 failed/skipped** in the final unchanged rerun. Initial run: **19 passed / 1 failed** at `page.goto` with Chromium **ERR_NETWORK_IO_SUSPENDED**, before application/owner rejection logic, spanning a **6.3-hour interruption**. The original trace/context were preserved. No assertion, timeout, sleep or product behavior was altered for that environmental failure.
+- The entire 140-case browser suite was **not rerun in this diagnosis task**. Its prior complete pass remains separate historical evidence. This task changes only comments, fixtures/tests and documentation, with the relevant 20 owner-flow browser cases executed against the new isolated build.
+
+### Preserved live state
+
+Read-only verification on **5 November 2026 at 09:26:56 WAT** (08:26:56 UTC), finalized height **276316888**, block `97DxSYeMk9GZ14yR8cfiprffX3WVNohb3b11qJxqck6D`, verified pinned vault code/owner, no vault keys, **paused=true**, **agent=null**, reserved zero and original Paid transfer. Runtime public config shows **owner=false, payments=false**; legacy flag absent/empty; payment-worker process count **zero**.
+
+The live active/history/consumption payloads were compared in read-only SQLite mode against the original saved post-wallet payload and are **unchanged in every field**, not merely their displayed IDs. Attempt `52f66a25-439a-4742-8d34-06dd092ba8f8` remains manual_review, with the prepared and reported hashes preserved, one history entry and one consumed authorization. No live attempt/history row was updated by this diagnosis. INV-0002 remains one Paid job/attempt 1, 0.001 NEAR to Babygoat, with original transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1` and unchanged pinned payload/signed-payment bytes.
+
+No wallet signature, live transaction, replacement, hold clear, gate enablement, payment activation, on-chain setting change, deployment, commit or push occurred. No independent security review is claimed. **Remaining blocker:** choosing/reviewing a supported wallet-built-envelope verification policy; exact prepared-hash V2 acceptance is still not passed and remains consumed.
+
+
+## Real Meteor V2 storage acceptance - 5 November 2026: STOPPED for hash mismatch
+
+**Disposition:** the single wallet-reported storage transaction is FINAL/successful and its visible action matches the approved scope. Exact prepared-hash acceptance **did not pass**: Meteor reported a different hash. Execution stopped, both IDs remain in durable manual review, the one-use authorization remains consumed, and both runtime signing/execution gates have been disabled. No replacement or second transaction was requested. The hash change must be investigated/reviewed separately; this record does not authorize a repair, new signature or another transaction.
+
+### Authorization and fresh checks (directly observed)
+
+The user explicitly authorized unchanged V2 for this run. SHA-256 remains `d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`; the JSON was not edited. HEAD remains `70e4f5b`; no application source, private .env, contract, checkpoint, spending limit or payment settings were changed. Existing uncommitted work was preserved. Only this validation record and ignored local acceptance artifacts were added/updated; no deployment, commit or push occurred.
+
+Fresh read-only preflight at **2026-11-05 01:30:12 UTC**, finalized height **276275240**, block `5VceHipcVk3PH6YPZdQrBLr2uVKN7BJSX1HemtjUJh5T`, verified NEAR testnet/protocol 88, organization `e3600323-ad40-43c4-a31d-7d53abc4833e`, owner `grandtheft.testnet`, vault `v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet`, pinned code `Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ`, no vault keys, paused state, revoked worker, original Paid evidence and one durable payment job. The V2 stable scope `16ec4c1bb178a02e96c2ed083f8a29b7a936d3e0c24297f70e7753321174d983` was unused and had no unresolved owner attempt.
+
+Owner balance was **5.329457227044466499999986 NEAR**, storage usage 264 bytes. Finalized gas price was 100000000 yoctoNEAR/gas. The existing conservative formula quoted **0.0204 NEAR** fees and **0.020401 NEAR** deposit plus allowance, below the authorized **0.022 / 0.022001 NEAR** ceilings. Balance covered the full approved allowance plus storage collateral. The ceiling is a preflight stop condition, not a protocol-enforced token cap.
+
+The latest completed `.next-hosting` build ran on `http://127.0.0.1:3100` in a temporary child process with only the hash-verified V2 owner scope enabled. Public config directly reported owner=true, payments=false, the exact `fund_storage({})`/deposit/gas/owner/target restriction. The legacy shared flag was empty. No worker was started and provisioning permission was not exercised.
+
+### Application review and wallet evidence
+
+- Directly observed: normal Meteor login restored **grandtheft.testnet**, the correct organization, original Paid invoice and paused/revoked workspace. The native application review displayed testnet, full contract, `fund_storage({})`, **0.000001 NEAR**, **100 Tgas**, **0.0204 NEAR** fee allowance, effect and expiry. Prepared bytes were independently decoded/checked against the unchanged server scope before continuing.
+- Prepared attempt: `52f66a25-439a-4742-8d34-06dd092ba8f8`; expected transaction **`9q3wKFxTSUa3LJ3o4SsuqMaMUY67Jobsa1BVCp9ELLAo`**, nonce **275527848000004**, key `ed25519:4zTXZ9GfZztRiT3QazNKF9aoKYnxfpxwTKbh6A2L8qZX`, review expiry **2026-11-05 01:35:22.828 UTC**. Dispatch used the existing durable one-use mechanism before opening the wallet transaction flow.
+- User-confirmed: the user replied done to the initial off-chain login and then to the selected-account proof/transaction approval instructions. **Meteor's extension confirmation page was not directly observable:** browser security denied `chrome-extension:` inspection. No alternate surface, CLI, key or protection bypass was used. The wallet-screen contents/approval are user confirmation, not an independently captured wallet screenshot.
+- Directly observed afterward: the application entered **Manual review required; do not sign a replacement** and durably saved reported ID **`CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG`** alongside the unchanged expected ID. This triggered V2's stop condition. The scoped process was stopped and replaced with the same local build with owner/payment/legacy gates empty. No second wallet request was made.
+
+### Finalized result and actual cost (direct read-only RPC evidence)
+
+[Reported transaction: FINAL success](https://testnet.nearblocks.io/txns/CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG). All visible transaction fields matched: signer Grandtheft; expected public key and nonce; exact approved vault; one FunctionCall only; method `fund_storage`; arguments `{}` (`e30=`); deposit `1000000000000000000` yoctoNEAR; gas `100000000000000`. Final execution and the action/refund outcomes were successful. Current finalized access-key evidence showed the same FullAccess key with nonce 275527848000004. The prepared hash still returned `UNKNOWN_TRANSACTION`; it was not replaced or marked confirmed.
+
+| Measured item | Before | After / actual |
+| --- | --- | --- |
+| Owner account balance (NEAR) | 5.329457227044466499999986 | 5.329268379997087499999986 |
+| Vault account balance (NEAR) | 5.000000000000000000000013 | 5.000001000000000000000013 |
+| Vault increase | - | **0.000001 NEAR**, exactly the approved deposit |
+| Actual fee, sum of transaction/receipt `tokens_burnt` | - | **0.000187847047379 NEAR** (187847047379000000000 yoctoNEAR) |
+| Owner balance decrease | - | **0.000188847047379 NEAR**, exactly deposit plus actual fee |
+
+`fund_storage` retains its deposit in the contract account; it does not increment a separate storage-funding counter. The complete `get_vault` view stayed identical: storage stake and fixed operating-reserve requirement unchanged, payout funded/spent/budget/cap still 0.001 NEAR, reserved/uncommitted funds zero, last payment attempt 1, owner Grandtheft, paused true, agent null. Thus this added storage/operating balance, not payout funds. No account balance difference was mislabeled as a contractor payment.
+
+The matching visible fields do **not** explain the different transaction hash or establish exact signed-byte preservation. The differing signed serialization/reference data was not available through the permitted wallet observation. At the end of that acceptance run, the cause of Meteor's hash change was unresolved. The subsequent diagnosis above proves the reference-block-only change; no automatic substitution or manual override was implemented.
+
+### Refresh, restart and final containment (directly observed)
+
+After the scoped server was stopped, the disabled server reopened the same durable database. Refresh restored Grandtheft's session without another signature. The normal **Check transaction status** read-only action restored the same manual-review hold and both IDs; it did not submit, replace or clear the attempt. The signing control was disabled. Final read-only database verification at **01:38:58 UTC** found one active manual-review record, one history entry for that same attempt and one consumed V2 use in manual_review. No replacement-signing test was attempted live; its exclusion is evidenced by these records, disabled controls/gates and the prior automated tests.
+
+Final chain verification at **2026-11-05 01:38:07 UTC**, height **276276059**, block `GkjrAGFANSBjV1au2ceDKFHGSyjFsYM89AFnSdkpJASk`, verified the pinned owner/code, no vault keys, **paused=true, agent=null**, reserved zero and original Paid payment. Payment-worker process count was **zero**. Public runtime config confirmed **ownerTransactionsEnabled=false** and **paymentExecutionEnabled=false**. Temporary permission was process-only; `.env.local` was never edited. The scoped process is stopped; the ordinary disabled app remains available on port 3100.
+
+INV-0002 remains **0.001 NEAR to babygoat.testnet**, order ACCEPTANCE-001, exactly one Paid durable job/attempt 1, original transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`, and unchanged pinned invoice/signed-payment bytes. There was no payment activation, payout funding, worker authorization, unpause, deployment, additional transaction, commit or push.
+
+Local ignored evidence is under `artifacts/meteor-acceptance-v2-nov5/`: preflight, prepared/public attempt, both RPC transaction lookups, postflight assertions, final chain/DB invariants, process logs and application review/manual-hold screenshots. These real observations are separate from the earlier 146/140/42 automated fixture results; no fixture pass is counted as real wallet evidence. A read-only helper initially compared SQLite null-prototype rows against ordinary objects; the assertion was corrected to check row count/state explicitly, and all intended persisted-state checks then passed. No application or database repair resulted from that helper correction.
+
+**Remaining blocker:** exact-byte Meteor transaction compatibility/hash mismatch, with V2 consumed and requiring manual review. No independent security review is claimed. Stop here; this run supplies no authority to clear the hold, rearm V2, sign again or activate payments.
+
+
+## Owner reconciliation race repair - 5 November 2026
+
+### Cause and fix
+
+The preceding read-only review reproduced a product defect: reconciliation captured an attempt before awaiting RPC, then finalized/deleted that stale snapshot after another request persisted a different wallet-reported hash. The expected transaction appeared Confirmed while conflicting evidence disappeared. One-use authorization stayed consumed, but V2's manual-review/evidence-retention requirement failed.
+
+Finalization now uses SQLite `BEGIN IMMEDIATE` after the network wait, re-reads the current durable record under that transaction, merges an append-only unique `(attempt, hash)` evidence table, validates the current expected request, and atomically updates history/consumption and deletes only the exact conflict-free active payload. No await or in-process lock supplies this guarantee. Concurrent finalizers return current history instead of stale snapshots. Hash/rejection mutations also re-read atomically.
+
+Conflicts persist the expected hash, every `reportedHashes` entry, `manualReviewRequired` and `manual_review`. They never release exclusion or rearm consumed authorization. Late reports after terminal finalization are checked against the authenticated owner/organization/contract history; a conflict restores a held manual-review record while retaining the prior expected-transaction result. Repeated reports are idempotent. The UI shows the hold and all IDs; it does not substitute a hash or request a replacement signature. Normal exact FINAL success/failure and historical non-Meteor reconciliation remain supported with signing gates disabled.
+
+### Actual execution
+
+Windows 11 PowerShell, Node **24.18.0**, unchanged HEAD **70e4f5b**, preserved uncommitted UI/RPC/session/checkpoint changes. No applicable repo/ancestor AGENTS.md exists. Pre-edit diff/status/source backups and logs are ignored under `artifacts/reconciliation-race-nov5/`. Automated signing/RPC evidence below is controlled fixture evidence, not real-wallet acceptance.
+
+- `node --test tests/meteor-owner.test.ts tests/owner-attempt.test.ts` from `apps/owner`: **16 passed, 0 failed, 0 skipped**. Explicit barriers hold two concurrent reconciliations, another SQLite connection saves two conflicting IDs and an idempotent repeat, then successful FINAL responses are released. Expected/reported IDs, active/manual history, consumed authorization, blocked cancellation/replacement and database reopen all pass. Reverse finalization-then-report, cross-organization history denial and normal concurrent finalization also pass. A SQLite trigger injects a finalization write failure: history insertion, consumption update and deletion roll back together; the original unknown attempt remains, then reconciles normally after the fixture fault is removed. No timing sleeps decide these orderings.
+- `npm test` from `apps/owner`, final rerun: **146 passed, 0 failed, 0 skipped**.
+- Root `npm test`: **42 passed, 0 failed, 0 skipped**.
+- `NNETICS_BUILD_DIRECTORY=.next-rpc npm run typecheck` and production `npm run build`: **passed**. Final typecheck/build also **passed** using `.next-hosting` after narrowing the new error mapping to owner-transaction conflicts only; both outputs are isolated from the normal app.
+- Focused Playwright using `artifacts/reliability-nov4/browser.ps1 -TestArguments @('meteor-owner.spec.ts')`: **20 passed** on desktop/emulated mobile. Initial new-test run: 18 passed/2 failed because its replacement-click expectation demanded manual-review wording instead of the correct server one-use denial. The corrected fixture asserts manual review before/after refresh, all displayed IDs, denied replacement, zero dispatches and zero wallet transaction requests. No coverage was deleted/skipped and no sleeps/timeouts were broadened.
+- Initial complete browser run (`.next-rpc`): **139 passed, 1 failed, 0 skipped**; `tests/browser/onboarding.spec.ts:527` (mobile persistent-browser restart) exceeded its existing 45-second whole-test deadline. No assertion-specific failure was logged. A separate production build overlapped that run; resource contention is a possibility, not a proven root cause. No session code, assertions, sleeps or timeouts were changed. Final complete rerun against the completed `.next-hosting` build with no competing build: **140 passed, 0 failed, 0 skipped (6.6 minutes)**. The same mobile browser-restart case passed in **14.1 seconds** under the unchanged 45-second limit; its intermittent earlier timeout was not reproduced and its precise cause remains unproven. Both full logs are retained locally. No session implementation was changed to obtain this result.
+
+### Preserved baseline and V2 disposition
+
+Read-only check **2026-11-05 01:04:04 UTC** (02:04:04 WAT), finalized testnet height **276272581**, block `AtVjjZtbLNKfURctGqbVbS6r3cpR8zVU3pVHFkqQETvi`: pinned code/owner and no vault keys verified, vault **paused**, worker authorization **revoked**, reserved zero, last attempt one and original payment Paid. Runtime owner signing and payment execution both **false**. Read-only database verification confirms exactly one INV-0002 Paid job, attempt 1, **0.001 NEAR** to `babygoat.testnet`, unchanged pinned payload/signed bytes and transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`. Tests did not migrate/edit the live database or change private runtime configuration. Final read-only recheck at **2026-11-05 01:22:34 UTC**, height **276274457**, block `BNHmjAAiik4JiSJ53E2CE357SaBVwiveVXstFmLtf5Eb`, passed the same chain/DB/gate invariants; payment-worker process count was **zero**.
+
+V2 is byte-for-byte unchanged: **`d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`**. Signer, organization, vault, one exact `fund_storage({})` action, 0.000001 NEAR deposit, 100 Tgas, 0.022 NEAR fee ceiling and 0.022001 total allowance are unchanged. Independent gates, stable consumed authorization, unresolved-outcome exclusion and stop-on-different-hash requirements remain enforced; this repair closes the reproduced discrepancy rather than changing scope. No revised acceptance plan/hash is needed. V1 SHA also unchanged: `ba53956f02f7c50fd74ad2b3535e1da1875fb25f055027635e2c0218135e0488`. Provisioning/checkpoint freshness and owner/payment guards were not weakened.
+
+No signature request, transaction submission, on-chain change, deployment, commit or push occurred. Live Meteor transaction acceptance remains **unexecuted/pending**. Fixture passes do not establish extension byte-preservation compatibility or independent security review. **No independent security review occurred.** Conflicting IDs intentionally remain blocked for manual evidence review; no automated conflict-resolution/unlock authority was added.
+
+
+## Independent transaction gates and one-use owner scope — 5 November 2026
+
+Implemented locally after the explicit shared-gate stop. HEAD remains `70e4f5b`; all prior uncommitted UI, session, RPC and checkpoint work was preserved. Before-diff/status and copies of affected untracked owner-attempt/test sources are local under ignored `artifacts/gates-nov5/`. No private environment edit, wallet request, transaction, chain-setting change, deployment, commit or push occurred.
+
+### Trace and configuration semantics
+
+Before editing, repository search found shared-flag authorization in owner public configuration and reserve/dispatch, worker startup, worker preparation/broadcast, health reporting, payment helper scripts, deployment/measurement guards, the Render blueprint and Linux hosted-readiness environment. Browser controls/builders consumed the public `transactionsEnabled` value. Tests and `.env.example` also referenced it. All active authorization consumers now use independent gates; remaining legacy-variable mentions only clear/reject it in safe deployment/fixture configuration or document deprecation.
+
+- **Owner:** `NNETICS_OWNER_TRANSACTIONS_AUTHORIZED=testnet-reviewed` plus `NNETICS_OWNER_TRANSACTION_PLAN` and exact lowercase `NNETICS_OWNER_TRANSACTION_PLAN_SHA256`. Missing/invalid flags, file, hash, supported policy, fields or action shape fail closed. Public `ownerTransactionsEnabled` and legacy public-field alias `transactionsEnabled` refer only to this owner permission. A reviewed scope does not authenticate a wallet or grant ownership.
+- **Payments:** `NNETICS_PAYMENT_EXECUTION_AUTHORIZED=testnet-reviewed` is independently checked at worker startup and actual preparation/broadcast. It neither enables owner signing nor starts anything automatically. Complete worker configuration, explicit startup, fresh checkpoint, restricted-key permission and all contract/policy guards remain required. Health reports `paymentsEnabled` from this gate and owner permission separately.
+- **Legacy:** `NNETICS_TRANSACTIONS_AUTHORIZED` enables neither gate, even if set to the old reviewed value. It is not a fallback. Hosted configuration rejects nonempty signing/scope values, measurement/contractor/browser fixtures strip both new gates, and Render/CI preparation keeps them empty.
+- **Provisioning:** original `NNETICS_PROVISIONING_ENABLED`, factory/code checks, wallet ownership and approval boundaries remain unchanged. Neither new flag changes provisioning permission.
+
+No unrestricted owner profile is supplied. The supported V2 policy permits only its configured authenticated owner, network, organization, target and code hash, with one Meteor-prepared `fund_storage({})` action, attached deposit `1000000000000000000` yoctoNEAR and gas `100000000000000`. The configured production proposal names Grandtheft and its existing verified vault. The application does not hardcode that wallet as a general identity/organization authorization rule. Extra actions/properties, other methods, changed arguments/deposits/gas/accounts/targets and alternate signing transports are rejected on the server. Dispatch also decodes/re-hashes canonical unsigned bytes and validates action count/content and signing identity. Gates, scope hash, session/key and expiry are checked again after asynchronous reads. Client fields are preselected/read-only for clarity, not relied on as the authorization boundary.
+
+`owner_acceptance_uses` is committed atomically with the existing durable dispatch record before Meteor can open. A stable semantic scope ID survives gate toggles, process/database reopen and plan metadata/reformatting changes. A dispatched/unknown, failed or confirmed acceptance stays consumed; moving a verified terminal attempt to history does not permit another submission. Cancel before dispatch can release only that unsubmitted review. Read-only legacy/current reconciliation remains available with signing disabled. No reset/delete API, timeout unlock or replacement transaction was added. Durable database state must be retained across operational rollback; it must not be discarded to rearm a one-use approval.
+
+During review, a missing/cancelled attempt was found to return null from dispatch; an unchecked acknowledgement could let a stale client continue. The server now rejects missing attempts/unknown operations and the client requires the matching durable ID/hash/unknown-state acknowledgement before requesting Meteor signing. Focused tests cover this race as well as a gate disabled during async preflight. Existing checkpoint freshness and login session behavior are unchanged.
+
+### Actual automated checks
+
+| Executed check | Result |
+| --- | --- |
+| Focused gate/owner/reconciliation/hosting backend checks | 17 passed before the additional missing-attempt race check |
+| Full owner/backend regression suite | **142 passed**, 0 failed/skipped |
+| Root reference suite | **42 passed**, 0 failed/skipped |
+| Typecheck and isolated production build | **Passed** |
+| Initial focused desktop browser run | 8 passed / 1 failed: the scoped action was correctly visible as an accessible combobox, but `getByLabel` could not resolve its select label text with embedded option text. Changed only the locator to the actual combobox role; value/disabled assertions retained. |
+| Corrected focused desktop browser run | **9 passed**, including independent capability states, exact scope review and missing dispatch acknowledgement |
+| Full desktop/mobile browser regression | **138 passed**, 0 failed, 0 skipped (5.7 minutes), on the compiled isolated production build |
+
+Commands from `apps/owner`: `npm test`, `npm run typecheck`, `npm run build`, then `& ../../artifacts/reliability-nov4/browser.ps1` with `NNETICS_BUILD_DIRECTORY=.next-rpc`; root `npm test`. Isolated fixture databases/port 3114 and disabled server runtime gates are used. Focused browser filter: `meteor-owner.spec.ts --project=desktop`. Node/Windows/Edge environment remains as below. Logs are ignored under `artifacts/gates-nov5/`: `focused.log`, `backend.log`, `root.log`, `typecheck.log`, `build.log`, `browser-focused.log`, `browser-focused-fixed.log`, `browser-full.log`. These are fixture-based signatures/RPC/chain evidence, not real Meteor transaction acceptance. No skip, arbitrary sleep, broad timeout increase or suppressed assertion was introduced. Historical Nightly tests now seed and reconcile historical records with gates disabled; new restricted Meteor tests retain concurrent-reserve coverage. Protocol/checkpoint worker tests explicitly use the new payment flag rather than the deprecated shared flag.
+
+### Containment and revised proposal
+
+Read-only checks at **5 November 2026, 01:32:03 WAT** (`2026-11-05T00:32:03.769Z`), finalized height `276269359`, block `GEgyyoB1EM1Zg38zVXUo2aWU7JmcFsAoDsv2AN6s6anf`, confirmed expected code/owner, no vault keys, paused state, null worker authorization, zero reservations and original Paid chain payment. The configured database still has exactly one Paid INV-0002 job, attempt 1, matching original payload/signed-byte pins and transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`. Actual private environment configuration returns owner=false, payment=false, legacy public alias=false. The future V2 profile was separately dry-validated using an in-memory environment argument: owner=true, payment=false; no runtime flag was set and no durable owner attempt was created. Evidence: `artifacts/gates-nov5/containment.json`.
+
+The original V1 plan remains byte-identical, SHA-256 `ba53956f02f7c50fd74ad2b3535e1da1875fb25f055027635e2c0218135e0488`. New proposal [METEOR_OWNER_ACCEPTANCE_PLAN_V2.json](METEOR_OWNER_ACCEPTANCE_PLAN_V2.json), SHA-256 **`d1a23de53593766aa412fbc4614807e769f2a376e7231e9fd806bf39c6f9e00a`**, changes configuration semantics/scope policy and durable one-use rules only. The signer, target, `fund_storage({})`, 0.000001 NEAR deposit, 100 Tgas and 0.022 NEAR fee allowance ceiling are unchanged. V2 requires review before a live test; the original shared-flag instructions must not be used. Exact future configuration is documented in `METEOR_OWNER_TRANSACTIONS.md`. No live acceptance, fresh Meteor proof, actual fee or storage effect is claimed by this implementation. Independent security review has not occurred.
+
+Final post-regression read-only containment repeated at **01:40:50 WAT** (`2026-11-05T00:40:50.281Z`), finalized height `276270230`, block `DBvAgLKCCo7EdtomxLuebx2VvQrrx7xwSK5AKbHdbwo3`: owner=false and payment=false, original one Paid job/attempt/hash intact, vault paused, worker authorization null, expected owner/code/no keys and zero reservations unchanged. Evidence: `artifacts/gates-nov5/containment-final.json`. Zero transactions sent. Implementation ends here, before applying the proposed acceptance configuration or requesting a wallet proof.
+
+## Approved Meteor acceptance preflight — stopped before signing, 5 November 2026
+
+The user approved precisely one `fund_storage({})` transaction with 0.000001 testnet NEAR attached, 100 Tgas, a 0.022 NEAR preflight fee ceiling and 0.022001 NEAR total allowance, conditional on configuration isolating it from payment activation. The saved JSON remains unchanged and matches approved SHA-256 `ba53956f02f7c50fd74ad2b3535e1da1875fb25f055027635e2c0218135e0488`; its account, contract, method, arguments, amounts, gas and maximum transaction count were machine-checked. Approval is recorded here rather than changing the hashed artifact.
+
+**Disposition: blocked by configuration isolation, not by funding or wallet rejection.** Source inspection showed `/api/live/config` reports `transactionsEnabled` from `NNETICS_TRANSACTIONS_AUTHORIZED`, and owner reserve/dispatch require that same flag. `worker-cli.ts`, worker signer preparation/broadcast and `/api/health` payment-enabled status also use it. There is no independent, transaction-scoped owner enablement configuration. The earlier proposal to override the shared flag in only the web process was insufficient to meet the user's stricter isolation condition. It was not performed. A separate, narrowly scoped owner-transaction gate is required before this conditional approval can be executed; no product-code change or gate bypass was attempted after the stop condition was identified.
+
+Fresh read-only evidence at **5 November 2026, 01:07:13 WAT** (`2026-11-05T00:07:13.967Z`), finalized height `276266896`, block `DHoR5c2c1v7NRjsDZqjjsmX3537qiEQ1fhMq5U876842`:
+
+| Check | Actual result |
+| --- | --- |
+| Network / supported protocol | NEAR testnet, protocol 88 |
+| Configuration | Organization, existing vault and pinned code hash match the approved plan; execution flag remains disabled |
+| Chain ownership / code / keys | Grandtheft owns the expected pinned-code vault; no vault access keys |
+| Owner balance | 5.329457227044466499999986 NEAR |
+| Storage collateral | 0.00264 NEAR, using fresh protocol storage-byte cost |
+| Spendable balance | 5.326817227044466499999986 NEAR |
+| Fee allowance estimate | 0.0204 NEAR; below the approved 0.022 NEAR ceiling |
+| Deposit plus estimated allowance | 0.020401 NEAR; sufficient funding, no top-up needed |
+| Paid evidence | Exactly one durable INV-0002 job, paid, attempt 1; original payload/signed-byte pins and transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1` match |
+| Containment | Paused, worker authorization null, zero reservations; original Paid chain payment unchanged |
+| Meteor-selected account / signing key | Not freshly verified: stopped before requesting an off-chain proof or transaction |
+| New owner attempt / transaction / fees | None created, none requested/submitted; no transaction fees incurred |
+
+Ignored local evidence: `artifacts/meteor-owner-acceptance/preflight.mjs` and `preflight.json`. An initial evidence-output path error prevented that first command from launching Node; the corrected read-only script ran successfully. These checks are neither fixture tests nor real-wallet signing acceptance. No current-app restart was attempted because enabling the accepted action would require the shared gate; there was **no policy rejection** of a restart command. No temporary acceptance configuration was installed, so none required restoration. Port 3100 was not listening at inspection. No private keys, alternate signing path, funding, limits, worker authorization, unpause, deployment, commit or push was used. Live transaction outcome, storage effect, actual fee and post-transaction refresh reconciliation remain unverified because the authorized transaction was not executed.
+
+## Meteor owner transaction implementation — 5 November 2026
+
+Local source only; HEAD remains `70e4f5b`. Preserved the existing UI, request/RPC, checkpoint and session changes; tracked before-diff and status were saved under ignored `artifacts/meteor-owner-nov5/`. No private environment edit, dependency installation, contract change, deployment, commit or push. This is implementation/fixture evidence, **not real-Meteor transaction acceptance**. Prior real-wallet login/session results below remain separate.
+
+Root cause: `NearOwnerAdapter.callOnce` explicitly rejected Meteor's message-only connector path. Installed runtime used Wallet Selector core/Nightly 10.1.4 with near-api-js 7.4.0; Meteor connector/SDK copies were audited archives, not an initialized runtime connector. Reviewed official current Meteor guidance/source and the pinned connector 10.1.4 / SDK 1.0.24. Sign-and-send is supported; sign-only, signed-byte interception and public-key lookup are unsupported in the pinned connector. The implementation extends the existing extension sign-and-send bridge without installing incompatible SDK dependencies or changing dashboard login into key-installing wallet login. Source links, flow, limitations and exact unsigned acceptance proposal are in [METEOR_OWNER_TRANSACTIONS.md](METEOR_OWNER_TRANSACTIONS.md).
+
+The owner path now has a native modal review, strict method/deposit schemas, server-prepared exact bytes/hash, three-minute review validity, precise funding/fee amounts, fresh financial-action selected-account proof, fresh ownership/context/key/nonce/fee checks, and atomic durable dispatch exclusion. Server endpoints enforce the existing execution flag for preparation and dispatch, not just disabled buttons. Activation methods retain fresh-checkpoint requirements. No request/signature runs from review mount, focus or navigation. Verified financial-account mismatch clears prior protected views without transferring permissions. Owner review cancellation before dispatch is distinct from post-dispatch wallet rejection/timeout; the latter remains held as unknown. Different reported hashes remain alongside the original and never automatically release the attempt. Read-only reconciliation and cancellation of an unsubmitted review are separate controls from signing.
+
+The Paid badge defect was a presentation source/mapping issue: current eligibility rules labelled historical paid invoices Needs review when the vault was paused, limits exhausted or the order already paid. Shared invoice/payment status mapping now checks matching contract payment, invoice/order/recipient/amount and a paid durable job with the matching transaction reference before showing Paid. Overview, details and history use that mapping, including history filtering. No invoice-specific exception or stored payment mutation was used.
+
+| Executed check | Actual result |
+| --- | --- |
+| New focused backend/transport/status tests, first run | 6 passed; later expanded with different-hash retention coverage |
+| First new browser fixture run | 5 failed because the fake message signature did not meet the existing strict base64 signature-shape check. Corrected the fixture, without relaxing verification. |
+| Corrected focused desktop run | 4 passed / 1 failed: only an inconsistent unknown-transaction wording assertion remained. Unified owner-specific public wording; exclusion assertions retained. |
+| Intermediate complete browser suite | 128 passed, 0 failed, 0 skipped (5.6 minutes) |
+| Final owner/backend tests | **134 passed**, 0 failed/skipped |
+| Root reference tests | **42 passed**, 0 failed/skipped |
+| Final explicit typecheck / isolated production build | **Passed**, using `.next-rpc` to preserve the user's port-3100 development service |
+| Expanded browser suite before final network-message clarification | 132 passed, 0 failed, 0 skipped (4.7 minutes) |
+| Final compiled expanded full browser suite | **132 passed**, 0 failed, 0 skipped (5.3 minutes), including desktop and emulated mobile |
+
+Commands: `npm test`, `npm run typecheck`, `npm run build` in `apps/owner`; `npm test` at root; isolated browser wrapper `& ../../artifacts/reliability-nov4/browser.ps1` with `NNETICS_BUILD_DIRECTORY=.next-rpc` from `apps/owner`. Windows/Node/Edge fixture environment is as recorded below. Browser identities, signatures, approvals, rejection, mismatch, timeout, reconciliation and currency/payment data are controlled fixtures with isolated databases on port 3114, not the real Meteor extension. No tests were skipped or assertions suppressed to obtain a pass.
+
+Final logs are local/ignored under `artifacts/meteor-owner-nov5/`: `backend-final.log`, `root.log`, `typecheck-final.log`, `build-final.log`, `browser-final-compiled.log` and `containment.log`. Wrong-network wallet proofs now receive a specific network recovery message, rather than a generic failure; the final compiled run includes that change. The normal port-3100 service was not running at the last connectivity check (connection refused); it was not restarted or reconfigured by this task. Zero worker CLI processes were observed. Updated-source real-wallet acceptance therefore remains pending starting the owner app and obtaining the transaction approval below. Prior user-confirmed browser restart/login acceptance is not substituted for transaction signing evidence.
+
+Read-only containment at **5 November 2026, 00:39:50 WAT** (`2026-11-04T23:39:50.192Z`), finalized height `276264144`, block `GzR2GaPrnqCuYMYznKEBmjptoHqAwyvRzRG9TCpnHK5j`: `verifyPaid` confirmed exactly one original Paid job, attempt 1, matching pinned invoice/signed-byte hashes and transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`. `verifyChain` confirmed expected code/owner, no vault keys, paused state, null worker authorization, zero reservations and the original Paid payment. Runtime execution remains false. Zero transactions sent; no payout funds, limits or authorization changed.
+
+Proposal only: [METEOR_OWNER_ACCEPTANCE_PLAN.json](METEOR_OWNER_ACCEPTANCE_PLAN.json), SHA-256 `ba53956f02f7c50fd74ad2b3535e1da1875fb25f055027635e2c0218135e0488`. One `fund_storage({})` call by Grandtheft to its existing verified vault, **0.000001 testnet NEAR** attached, **100 Tgas**, **0.022 NEAR fee allowance ceiling** (deposit plus ceiling **0.022001 NEAR**). Sampled balance suffices; fresh checks and explicit approval are required before any enabling/signing. The allowance is an estimate/stop condition, not a protocol token fee cap. No live owner transaction acceptance is claimed. If the installed extension rebuilds bytes or uses a different key/nonce/hash, stop and retain evidence for manual review; automatic compatibility fallback/replacement is intentionally absent. Independent security review has not occurred.
+
+## Real Meteor reliability acceptance — 4–5 November 2026
+
+User restarted the normal development service on port 3100. Browser control directly reached `http://127.0.0.1:3100` in Brave with the real Meteor extension; these observations do not use injected fixture identities. No transaction, funding, payment or vault-authority change is part of this check. The user separately authorized removing Babygoat's off-chain organization viewer grant to meet the isolation criterion. HEAD remains `70e4f5b`; changes remain local and uncommitted.
+
+| Case | Actual evidence / disposition |
+| --- | --- |
+| Grandtheft login | User reported approving the off-chain Meteor proof. Direct browser observation showed `Signed in as grandtheft.testnet` and organization `e3600323-ad40-43c4-a31d-7d53abc4833e`. An initial workspace error recovered with the read-only Retry loading control, without another signature. |
+| Refresh | First attempt failed: the authenticated workspace returned to “Your session has ended.” Acceptance was stopped for diagnosis. After the cancellation fixes below, direct browser observation showed refresh restoring the same account/organization and existing payment history without a new signature. |
+| Navigation | Directly navigated from Overview to Payment history; the authenticated account and original Paid transaction remained visible. |
+| Tab/background return | User manually performed the switch/return and reported “done, it survived,” without another wallet prompt. Subsequent direct browser inspection showed Grandtheft still authenticated on Payment history with the original organization and Paid transaction. The physical tab switch itself was user-confirmed, not directly observed. |
+| Full browser close/reopen | User manually performed the full close/reopen and reported the workspace survived without another wallet prompt. Subsequent direct browser inspection showed the same authenticated Grandtheft workspace and transaction. Closing/reopening the browser itself was user-confirmed, not directly observed. |
+| Explicit Switch wallet to Babygoat | Switch wallet immediately cleared Grandtheft's protected records. Babygoat initially saw Grandtheft because a pre-existing viewer grant was present in configured `grandtheft-payments.db`, granted by Grandtheft; owner invoice entry was disabled. This was authorized read access, not transferred owner credentials. User explicitly requested revocation. After a fresh Grandtheft proof, the owner Access UI reported `Viewer access revoked for babygoat.testnet`; a read-only database query confirmed the grant absent. A fresh Babygoat login then showed only its own `Babies` organization, no Grandtheft records. Refresh preserved that isolated Babygoat workspace without a new proof. A direct browser GET to the Grandtheft snapshot using Babygoat's actual session returned organization access denied. |
+| Switch back to Grandtheft | An accidental additional Babygoat approval authenticated Babygoat only, with owner actions still disabled; it did not satisfy the returning-owner check. Cleared it through Switch wallet, then used a Grandtheft-specific challenge. After the post-revocation Babygoat check, the final Grandtheft proof restored the correct organization and owner Access screen. Directly navigated to Payment history and observed the original Paid invoice, amount, recipient and transaction link. |
+| Explicit sign-out | Directly opened a second real-session tab: it silently restored Grandtheft and the same organization. Clicked Sign out in the primary tab; both tabs immediately showed sign-in with protected records absent. Refresh kept the primary tab signed out. A direct browser GET to identity returned wallet verification required. Closed temporary verification tabs; the user's original tab remains signed out. |
+
+Two cancellation gaps were identified during the failed refresh investigation. In development Strict Mode, dashboard cleanup cancelled an in-flight read, but its old failure could run after the replacement effect became active; the replacement initial read was also suppressed by the old in-flight flag. Dashboard loads now use an effect generation, allowing the replacement read and ignoring obsolete success/error/finally handlers. Separately, an aborted Next request may carry an ordinary `Error` rather than an `AbortError`; the RPC scope previously let that reason escape as an apparent definitive authorization failure. A deterministic production-transport test reproduced this classification failure, then passed after scoped cancellation was normalized to an unavailable-verification result. An interrupted request now blocks that check without deleting the valid session. Conclusive missing/restricted-key and network checks remain unchanged. The real refresh passed after these fixes; no claim is made that browser telemetry independently identified the precise server abort reason in the first attempt.
+
+Follow-up automated evidence is separate: **127 owner/backend tests passed**, including the extended cancellation regression; **typecheck and isolated production build passed**; the isolated full browser rerun passed **118 tests, 0 failed, 0 skipped (4.9 minutes)**. Logs: `artifacts/reliability-nov4/owner-real-acceptance-fix.log`, `typecheck-real-acceptance.log`, `build-real-acceptance.log`, `browser-real-acceptance-fix.log`. These fixtures are not real-wallet evidence. Temporary credential-free browser diagnostics were removed. Existing Paid evidence was directly visible: INV-0002 / ACCEPTANCE-001 / 0.001 NEAR to Babygoat, transaction `6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1`. The displayed vault remained paused with worker access revoked; the public runtime configuration reported transaction execution disabled. No billing or payment records were edited. All seven requested login/persistence/switch/sign-out cases now pass with the evidence attribution above. This is bounded real-wallet acceptance, not independent security review or proof of every possible wallet event. Five-hour expiry boundaries and forced-outage recovery remain fixture-tested; a live five-hour expiry was not staged. Meteor still cannot reliably announce silent external account selection changes: the signed-in account stays explicitly displayed, and changing the selected extension account never transfers its session permissions. Explicit Switch wallet requires the newly selected account to authenticate.
+
+Final containment check at **5 November 2026, 00:09:58 WAT** (`2026-11-04T23:09:58.682Z`), finalized height `276261230`, hash `3jy3KyDbF6W4rqipqyZN5MgFfmnudGigP2rEqmWXFh7E`: read-only `verifyPaid` passed integrity, exactly-one-job and original payload/signed-byte pins; INV-0002 remains paid, attempt 1, with its original transaction. `verifyChain` confirmed expected code/owner, no vault keys, paused vault, null worker authorization, zero reservations and the original Paid payment; runtime execution remained false. Zero transactions were sent. The checkpoint safeguard was not edited. Session limits remain five hours idle and five hours absolute; activity cannot extend the absolute deadline. During the final return, a bounded workspace-read timeout retained the signed-in account and existing records with Retry refresh; it did not request a signature or erase the session. An unrelated pre-existing overview card still labels the invoice Needs review while Payment history correctly shows Paid; it was not changed by this login-only check and does not alter the durable payment evidence.
+
+## Local reliability repair — 4 November 2026
+
+Scope: session/workspace/RPC reliability only. This is not payment activation, Meteor transaction integration, visual acceptance or independent security review. HEAD remains `70e4f5b`. Existing uncommitted UI, RPC/request and checkpoint-safety work was preserved; no commit or push was made. Contracts, policy, funding/limits and private environment files were not changed.
+
+### Baseline, environment and commands
+
+The audit's **94 passed / 11 failed / 1 skipped** result was the earlier 106-case shared-tree `npx playwright test` run in `artifacts/design-runtime/polish-phase1-browser-all.log`. Four action-state cases and public error/metadata changes followed before this repair. Reproducing the current pre-fix build yielded **67 passed / 42 failed / 1 skipped (110 cases)**. The six original logical recovery failures reproduced on both projects, including the mobile temporary-outage case that happened to pass in the earlier audit. Thirty additional failures exposed stale presentation assertions or lost error specificity in the preserved UI work.
+
+Actual environment: Windows 11 Pro 10.0.26200 x64; PowerShell 7.6.5; Node 24.18.0; Playwright 1.64.1; Microsoft Edge 156.0.4314.58. Playwright settings remain one worker, 45-second test timeout, desktop 1440×1080 and emulated mobile 390×844 with touch. No dependency installation, broad timeout increase, coverage deletion or added skip was used.
+
+Repair runs use a dedicated local service at `http://127.0.0.1:3114`, matching `NNETICS_APP_ORIGIN`, isolated invoice/identity/contractor/demo databases under ignored `artifacts/reliability-nov4/`, and disabled transaction/provisioning flags in that test process only. No real session, private invitation or billing text was imported into fixtures. Private `.env.local` and the normal service's execution settings were not edited. Before-change tracked diffs and originals of edited untracked request helpers were retained locally.
+
+The first diagnostic wrapper dropped its positional filter arguments, so its actual child command was `npx playwright test` and it ran the full 110-case baseline. This harness issue was corrected using an explicit named argument array and direct Node CLI invocation. The subsequent filtered runs executed exactly 16 and 10 cases.
+
+Commands from `apps/owner` (the wrapper supplies only the dedicated test environment above):
+
+```powershell
+& ../../artifacts/reliability-nov4/browser.ps1
+# Actual full-suite child command:
+node node_modules/@playwright/test/cli.js test
+npm test
+npm run typecheck
+npm run build
+```
+
+Root reference checks: `npm test` from the repository root. No Linux CI execution is claimed.
+
+### Each original failing case
+
+D = desktop; M = emulated mobile. Original names identify the audit cases; some current names now describe the agreed behavior more accurately.
+
+| Original failure | Expected / actual and cause | Repair / evidence |
+| --- | --- | --- |
+| D — slow verification / heartbeat overlap | Expected one held request across 60 seconds and raw `NEAR RPC HTTP 429`. This crosses the new 15-second first-attempt deadline; the fixture also returned HTTP 503 while its text claimed 429. | Hold within the attempt deadline, then return actual HTTP 429 and Retry-After. Assert four sequential attempts, no overlapping heartbeat, rate-limit explanation and retained session. |
+| M — slow verification / heartbeat overlap | Same incorrect timeout/raw-message assumptions. | Same deterministic policy and retention checks on mobile. |
+| D — temporary RPC failure | Expected an immediate unavailable screen and disappearing workspace after one 503; bounded read retries were still active. | Observe retries, retain verified records, temporarily make actions inert, then recover through an authorized read without a wallet proof. The equivalent mobile case also failed in the new baseline. |
+| D — explicit pre-session proof retry | Expected two login POSTs; observed one. | Outdated expectation: writes must not be replayed. Test now asserts one POST and one wallet proof, also after focus changes. Safe server-side verification reads retain bounded retries. |
+| M — explicit pre-session proof retry | Same two-POST expectation. | Same one-shot assertion; no automatic replay was added. |
+| D — reload-time saved-session outage | Expected a retry button within the normal assertion interval while restoration was still retrying. | Exhaust the actual bounded read policy with controlled virtual time, then restore without another signature. |
+| M — reload-time saved-session outage | Same timing expectation. | Same deterministic response/backoff synchronization; no larger timeout. |
+| D — accepted proof / workspace failure | Expected immediate accepted-message/retry feedback while the read was unfinished; error mapping could imply failed wallet verification. | The historical fixture's initial pre-login outage had already been corrected to 401 in `70e4f5b`. This repair fixes the remaining timing race and distinguishes accepted identity from failed workspace loading. Retry never signs again. |
+| M — accepted proof / workspace failure | Same causes. | Same verified-identity recovery checks. |
+| D — unreadable service response | Expected failure after one response and no workspace; safe GET retries were active. Advancing time before response parsing missed timer registration. | Wait for each classified response, advance exact backoff, retain data/session and recover without rendering response HTML. |
+| M — unreadable service response | Same fixture and retention assumptions. | Same bounded and deterministic recovery checks. |
+
+The other 30 current-tree failures were also addressed: conflicting-amount clarification lost its specific explanation; signature rejection, wallet switch, configuration drift and missing-extension assertions expected old/raw wording; genuine expiry and its boundary lost the five-hour explanation; five owner tests per project shared one obsolete title assertion; protocol-89 rejection expected a raw string; and two owner-portal tests per project expected server text instead of the public mapper. Known conditions now have specific safe messages. Tests retain their input-preservation, zero-login/payment, cancellation, rejected-currency, previous-context removal and blocked-signing assertions. No assertion was suppressed merely to obtain a pass.
+
+### Product fixes and safety properties
+
+- Valid sessions survive transient failures. Verified workspace records remain mounted and visible, with changes inert while authorization is inconclusive. A newly authenticated identity receives no fabricated organization or records while its initial workspace read is unfinished.
+- Heartbeat and renewal retries cannot overlap. Failed renewal is throttled; manual recovery is disabled during an active check. Old callbacks and pending presentation state cannot affect a replacement identity. Five-hour idle and absolute limits are unchanged. Ordinary focus, navigation, refresh and restoration request no wallet signature.
+- Organization selection aborts the previous request, clears the old selection immediately and rejects late results using a selection generation. Verified configuration/membership changes clear unauthorized active/draft workspaces. New browser tests cover both late organization selection and wallet switching during a held workspace retry.
+- GETs retain 15/25/40/60-second attempt timeouts, jitter/backoff and a 180-second overall budget. POSTs remain one-shot. Browser GET retries still give server RPC reads one attempt per GET; no nested retry multiplication was added.
+- Timeout and rate-limit categories survive exhaustion. Retry-After survives final failure and is honored by subsequent browser reads/provider calls, so a new click or heartbeat cannot immediately query the same limited endpoint. Definitive provider denial remains distinct from an invalid identity and from transient transport failure.
+- Long-wait feedback follows continuous operation activity rather than restarting when stage text changes. The slow-response fixture now uses a held response and virtual clock to verify the exact 10-second message, replacing its former 11.5-second wall-clock delay. Fixtures wait for classified responses before advancing backoff timers; they do not add production delays.
+- Disabled owner actions, unsupported Meteor transaction signing, contract rejection, timeout, rate limit, stale checkpoint and unknown submitted outcome have distinct public explanations. Existing hashes, attempts, reservations and job identities are retained. Timeout never creates a new signature, replacement transaction or job.
+- The pre-existing checkpoint safeguard was not weakened. Missing/malformed/future/boundary tests and stale prepare/broadcast tests passed. Stale evidence cannot reach key loading/submission. Read-only verification of the existing Paid payment remains possible.
+
+### Executed results and formerly skipped case
+
+| Actual run | Result |
+| --- | --- |
+| Current-tree pre-fix full reproduction | 67 passed, 42 failed, 1 skipped |
+| Focused recovery/restart/organization diagnosis | 16 passed |
+| Intermediate complete browser suite | 110 passed, 2 failed, 0 skipped |
+| Remaining two failures | Same old “declined” assertion on desktop/mobile; public copy says “cancelled.” Updated wording, preserving fresh-challenge and zero-login assertions. |
+| Focused cancellation/switch/loading/unsupported/disabled checks | 10 passed |
+| Latest owner/backend suite | 127 passed |
+| Root reference suite | 42 passed |
+| Explicit typecheck and production build | Passed |
+| Final complete browser suite | **118 passed, 0 failed, 0 skipped** (7.6 minutes), on the final compiled build |
+
+The persistent-cookie browser-process test had no unmet prerequisite. Installed Edge supports desktop and emulated-mobile persistent contexts, so it now runs on both projects instead of skipping mobile. It checks the HttpOnly persistent cookie over three launches, signature-free restoration, and logout persistence. Both projects passed in the focused run. This is browser/session-fixture evidence, not real mobile Meteor support.
+
+Actual logs are local/ignored under `artifacts/reliability-nov4/`: `reproduction.log`, `diagnosis-browser-second.log`, `last-focused.log`, `browser-final.log`, `owner-tests-final.log`, `root-tests.log`, `typecheck-final.log`, `build-final.log`. Written tests are not substituted for executed results. No independent security verdict is claimed.
+
+### Paid evidence, containment and real-wallet limits
+
+Read-only verification at `2026-11-04T17:39:41.046Z` (18:39 WAT), finalized block hash `CSWBvoXsmMKfSg5281yTitqoU1iCWww22Rffr7NV3X7v`, checked queue integrity and exactly one job: INV-0002 / ACCEPTANCE-001 / attempt 1, still Paid with its original transaction. Stored invoice payload and signed-transaction hashes match the preserved pins exactly. `WorkerNearTransport.confirmsPayment` verified finalized transaction/receipt linkage without signing or key loading. Vault remained paused, agent null, last attempt 1; execution configuration remained disabled and no worker CLI process was running. No additional production payment job was created.
+
+Existing payment: [6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1](https://testnet.nearblocks.io/txns/6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1). No new recipient balance change or payment is claimed.
+
+Current browser results use intercepted identities/wallet messages and isolated storage. No real Meteor signature, account switch, browser restart or five-hour live-wallet observation was performed in this task. A real-wallet smoke check still requires owner participation: one login, navigation/refresh/browser reopening, and explicit account switching. Meteor does not reliably report selection changes silently. The displayed authenticated account remains authoritative; an unobserved selection never inherits its permissions. Explicit Switch wallet / optional verified-account check remains supported. These limits prevent claiming full real-wallet acceptance.
+
+After the green run, automatic approval review rejected the guarded restart command for the normal port-3100 service with the sole reason **“blocked by policy.”** The command was not executed and was not retried through another mechanism. That normal service remains untouched and may still serve its previously loaded build. Restart it manually before the real-Meteor smoke check. The complete automated suite above exercised the final compiled build on the isolated port-3114 service, not a claimed live-wallet check on port 3100. No automated browser regression remains, but normal-service restart and real-wallet confirmation remain operational follow-up items.
+
+Payment activation, transaction integration, AI work and visual polish remain stopped. No funds, limits, contract deployment, authority state or remote repository was changed.
 
 ### Executed pinned Linux readiness and final instance selection - 3 November 2026
 
@@ -2085,3 +2613,32 @@ Automated payment-core acceptance checks are now satisfied, including retained e
 - Captured 68 route/state cases across four widths: no page exceptions or document overflow. Normal-motion reversal and full-height/help invariance verified. Physical-device profiling, native zoom and screen-reader/real-Meteor visual acceptance remain manual.
 - Read-only chain preflight 2026-11-04T08:53:54.397Z, height 276172619: Grandtheft owner, vault paused, worker authorization null, existing 0.001-NEAR Babygoat Paid transaction unchanged; zero transactions sent. No worker start, payment/job creation, push, deployment or migration.
 - Detailed evidence: [design-review/completion/IMPLEMENTED.md](design-review/completion/IMPLEMENTED.md). Local app remains at http://127.0.0.1:3100.
+
+## Operational acceptance staging and cleanup recovery
+
+5 November 2026. The reviewed V4 file is unchanged at SHA-256 `d6ee7587ed059a22e76ce05cf254d4de33d3066730d5abda7672424add9599f5`. Its execution window ends on 6 November at 05:14:10.901 WAT. There is no executable successor plan.
+
+- **Billing.** The operator submitted the actual bill through Contractor billing. The database showed it as Submitted, then the staging command verified its approval and exact details. Running `node --env-file-if-exists=.env.local scripts/stage-operational-acceptance.mjs` twice from `apps/owner` with both flags unset returned the same binding. SQLite shows one held job for this agreement, with no release, signature, transaction hash or payment attempt. Release requires the exact successor plan hash and binding, a fresh matching finalized chain agreement, owner authorization and the separate payment gate.
+
+| Binding | Value |
+| --- | --- |
+| Organization | `e3600323-ad40-43c4-a31d-7d53abc4833e` |
+| Billing invoice ID | `6278f3d3-87dc-4b48-95b6-e757097c7033` |
+| Billing agreement ID | `cd10a7be-31ce-4af2-a461-2f6be8d896f6` |
+| Durable job and contract invoice ID | `acceptance-6278f3d3-87dc-4b48-95b6-e757097c7033` |
+| Contract agreement ID | `OPERATIONS-ACCEPTANCE-001` |
+| Display reference | `CTR-0001-INV-0003` |
+| Approved recipient and amount | `babygoat.testnet`, `1000000000000000000000` yoctoNEAR |
+| SHA-256 of exact payment argument bytes | `f0c927b113761ab082be2a12b7dbd2c84f510f2a7f9ba1ddb985bb14bd742d6e` |
+
+Exact UTF-8 `execute_payment` arguments retained with the durable binding
+
+```json
+{"order_id":"OPERATIONS-ACCEPTANCE-001","invoice_id":"acceptance-6278f3d3-87dc-4b48-95b6-e757097c7033","recipient":"babygoat.testnet","amount":"1000000000000000000000"}
+```
+- **Cleanup.** The successor-only recovery mode verifies a finalized failure using matching evidence from both configured RPC sources, the reconstructed signed envelope, linked receipts and finalized vault owner/code/state. It retains the original attempt, IDs, receipt evidence and consumed authorization. Unknown, conflicting or unsupported evidence remains held. An independently scoped remaining pause or revocation can proceed after a verified failure if still needed. A replacement requires a distinct, explicitly listed `replaces` step, the original verified failure, a fresh state check showing the effect is still needed, its own fee allowance and an unexpired cleanup window. Cleanup closes payout dispatch for that plan durably at dispatch, including after process restart. Cleanup dispatch also takes the worker lock to exclude a concurrently running signer. The future plan may include a separate cleanup deadline up to 30 minutes after its payment deadline. [NEAR transaction finality and receipts](https://docs.near.org/api/rpc/transactions#the-wait_until-field)
+- **Executed verification.** Focused Windows Node 24.18.0 regression run passed 91 tests with zero failures or skips across reference verification, owner attempts, operation/worker scope, worker recovery, contractor payments and staging. `npx tsc --noEmit` passed. Cleanup results use deterministic RPC fixtures, including failed pause, failed revocation, unavailable evidence, restart and late conflicting evidence. No live failure or cleanup transaction was performed.
+- **Containment.** At finalized height 276390487, Grandtheft remained the vault owner, the vault was paused and worker authorization was absent. Both local runtime gates were disabled and no worker process was running. After staging, the read-only integrity check found exactly two jobs: one unsigned held job for INV-0003 and the original Paid job with its pinned payload, signed bytes and [confirmed INV-0002 payment](https://testnet.nearblocks.io/txns/6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1).
+- **Linux prerequisite.** The existing bundle hash is `7c0031f84d4a7b0d6d4b68c64eb59aab9b3ada80b5dd5ab164ae40249389d813`. At 21:35:59 WAT the bundle's Node audit again passed all seven input integrity checks, and its final checkpoint timestamp was inside the freshness window. This audit does not run the VM. No authorized Linux x86_64 host was available from this Windows environment. Run `bash run-linux.sh` on the authorized host with Rust 1.93.0 and Node 24.22.1 and retain the `work-*` results. The actual billing bindings are ready. A successor still requires fresh checkpoint inputs that pass the pinned VM on their exact bytes. See [V4_CHECKPOINT_VERIFICATION.md](V4_CHECKPOINT_VERIFICATION.md).
+
+The operator reported that approval still displayed “Working.” The Approved billing record and staged job were independently verified in SQLite. The cause of the delayed browser response was not verified.

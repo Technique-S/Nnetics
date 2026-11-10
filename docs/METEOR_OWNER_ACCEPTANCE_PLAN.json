@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "status": "proposal-only-no-transaction-authorized",
+  "network": "testnet",
+  "owner": "grandtheft.testnet",
+  "organization": "e3600323-ad40-43c4-a31d-7d53abc4833e",
+  "contract": "v-848e8ad68232ad34834d145f81c1641e899926aa.v.grandtheft.testnet",
+  "expectedCodeHash": "Fpxm2eovD9cdo5ik6yZURyQEWTbruj6GKJi2XA6UBArJ",
+  "transactions": [{
+    "actions": [{"type": "FunctionCall", "method": "fund_storage", "args": {}, "depositYoctoNEAR": "1000000000000000000", "gas": "100000000000000"}],
+    "expectedEffect": "Add 0.000001 testnet NEAR to storage/operating balance only; leave payout ledger, limits, pause and worker authorization unchanged."
+  }],
+  "maximumTransactionCount": 1,
+  "feeAllowanceCeilingYoctoNEAR": "22000000000000000000000",
+  "maximumDepositPlusFeeAllowanceYoctoNEAR": "22001000000000000000000",
+  "reviewValidityMs": 180000,
+  "signingKey": "Current testnet FullAccess key proven by Meteor for the authenticated owner; pin its key and next nonce before wallet dispatch.",
+  "requiredFreshChecks": ["testnet protocol 88 or separately reviewed compatibility", "expected vault owner and code", "vault paused and worker revoked", "one unchanged Paid INV-0002 job", "no unresolved owner attempt", "owner balance and current gas price", "Meteor selected owner proof", "same organization, target, key, next nonce and exact unsigned bytes"],
+  "executionGate": "No private configuration changes during implementation. Any later approved test enables the existing owner-signing gate only in a temporary owner-web process; worker remains stopped with its existing disabled environment. Restore the web gate immediately afterward, including on failure or unknown outcome.",
+  "stopOn": ["any account/network/organization/vault/key/nonce/byte mismatch", "review expires", "wallet quotes more than fee ceiling", "provider failure", "wallet refusal or deployment/key-install prompt", "ambiguous outcome", "different wallet-reported transaction hash", "any additional transaction or payment request"],
+  "excluded": ["mainnet", "payment funding", "contractor transfers", "new payment jobs", "limits", "unpause", "worker authorization or execution", "checkpoint changes", "keys or contract deployment", "additional signatures for replacement transactions", "push or hosted deployment"],
+  "limitations": ["No independent security review is claimed.", "Meteor sign-only and pre-broadcast signed-byte interception are unsupported by the pinned connector; the wallet performs broadcast internally.", "A post-dispatch refusal, timeout or lost response retains the pinned attempt/hash. No automatic replacement or timeout-based unlock.", "If Meteor reconstructs the transaction and reports a different hash, retain both IDs and stop for manual review.", "The fee allowance is a conservative preflight estimate and stop condition, not a protocol-enforced token fee cap; the transaction enforces a 100 Tgas gas limit."]
+}

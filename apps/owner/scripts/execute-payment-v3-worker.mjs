@@ -4,7 +4,7 @@ import {SignedTransaction} from 'near-api-js';
 import {liveConfig} from '../src/server/config.ts';import {Queue,workerLock} from '../src/server/queue.ts';import {WorkerNearTransport} from '../src/server/signer.ts';import {PaymentWorker} from '../src/server/worker.ts';import {validateBootstrapAge} from '../src/server/bootstrap-inputs.ts';
 const root='../..',dir=root+'/artifacts/payment-acceptance/v3-outbox',load=f=>JSON.parse(fs.readFileSync(f)),digest='9ea7cb9e479d5df6c6cd79793aeb1ea53fb34e6b76a8fc139895afa4b06a27d8';
 const d=load(root+'/docs/PAYMENT_ACCEPTANCE_RESUMPTION_V3.json'),p=d.plan;
-assert.equal(d.digest,digest);assert.equal(crypto.createHash('sha256').update(JSON.stringify(p)).digest('hex'),digest);assert.equal(process.env.NNETICS_APPROVED_PAYMENT_V3,digest);assert.equal(process.env.NNETICS_TRANSACTIONS_AUTHORIZED,'testnet-reviewed');
+assert.equal(d.digest,digest);assert.equal(crypto.createHash('sha256').update(JSON.stringify(p)).digest('hex'),digest);assert.equal(process.env.NNETICS_APPROVED_PAYMENT_V3,digest);assert.equal(process.env.NNETICS_PAYMENT_EXECUTION_AUTHORIZED,'testnet-reviewed');
 const step=p.transactions.find(t=>t.id==='execute_payment'),a=step.actions[0],cfg=liveConfig();
 assert.equal(cfg.contract,p.vault);assert.equal(cfg.worker,p.worker.account);assert.equal(cfg.publicKey,p.worker.public_key);assert.equal(cfg.organization,p.organization);
 const proof=load(root+'/artifacts/payment-acceptance/'+process.env.NNETICS_V3_PROOF);assert.equal(proof.approved_digest,digest);assert.equal(proof.ancestry_verified,true);assert.ok(Date.now()-Date.parse(proof.verified_at)<30*60000);

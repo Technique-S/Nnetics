@@ -391,10 +391,10 @@ test("missing extension and mainnet account errors explain recovery; demo stays 
       .filter({ hasText: "browser with Meteor installed" }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Open explicitly simulated demo" })
+    .getByRole("link", { name: "Try demo" })
     .click();
   await expect(
-    page.getByText(/No funds move/),
+    page.getByText(/Everything below is simulated/),
   ).toBeVisible();
 });
 

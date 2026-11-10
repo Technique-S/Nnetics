@@ -2,6 +2,7 @@ import {NextRequest,NextResponse} from "next/server";
 import path from "node:path";
 import {demoContractors} from "../../../../server/demo-contractors";
 import {Queue,structuredInvoice} from "../../../../server/queue";
+import {isAllowedAppOrigin} from "../../../../server/origin";
 export const runtime="nodejs", dynamic="force-dynamic";
 const cookie="nnetics_demo_portal_owner";
 function queue(token:string) {
@@ -17,7 +18,7 @@ export async function GET(req:NextRequest) {
 export async function POST(req:NextRequest) {
  let q:Queue|undefined;
  try {
-  if(req.headers.get("origin")!==(process.env.NNETICS_APP_ORIGIN||"http://127.0.0.1:3100")) throw Error("Use the same-origin demo form.");
+  if(!isAllowedAppOrigin(req.headers.get("origin"))) throw Error("Use the same-origin demo form.");
   if(!req.headers.get("content-type")?.startsWith("application/json")) throw Error("Use JSON.");
   const reader=req.body?.getReader();if(!reader) throw Error("Missing invoice.");
   const chunks:Uint8Array[]=[];let size=0;

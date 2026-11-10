@@ -31,6 +31,10 @@ jobs:
           NNETICS_HOSTED_MAINTENANCE: '1'
           NNETICS_APP_ORIGIN: https://hosted-readiness.invalid
           NNETICS_TRANSACTIONS_AUTHORIZED: ''
+          NNETICS_OWNER_TRANSACTIONS_AUTHORIZED: ''
+          NNETICS_PAYMENT_EXECUTION_AUTHORIZED: ''
+          NNETICS_OWNER_TRANSACTION_PLAN: ''
+          NNETICS_OWNER_TRANSACTION_PLAN_SHA256: ''
           NNETICS_PROVISIONING_ENABLED: ''
       - name: Measure production under 512 MiB and 2 GiB Linux limits
         shell: bash

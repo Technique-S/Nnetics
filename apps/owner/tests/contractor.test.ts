@@ -139,20 +139,23 @@ test("amount, currency and recipient mismatches require clarification and cannot
 });
 test("missing critical details and duplicate invoices or order submissions are rejected", () => {
     const { store, owner } = setup(), a = invite(store, owner), o = order(store, owner, a.session), input = bill(o.id);
-    for (const key of ["orderId", "amount"] as const) {
-        assert.throws(() => store.command(a.session, { ...input, fields: { ...input.fields, [key]: "" } }));
-    }
+    assert.throws(() => store.command(a.session, { ...input, fields: { ...input.fields, amount: "" } }), /exact/);
     store.command(a.session, input);
     const repeated=store.command(a.session, input).invoice!;
     assert.equal(repeated.id,store.snapshot(a.session).invoices[0].id);
     assert.throws(() => store.command(a.session, bill(o.id, "INV-2")), /already has/);
-    assert.equal(store.snapshot(a.session).invoices.length, 1);
+    // In this demo a missing work order is a direct bill for profile review; it is not an error.
+    const direct=store.command(a.session,{...input,submissionId:"direct-request",fields:{...input.fields,orderId:"",amount:"2",reference:"DIRECT-1"},text:"Urgent fixes delivered.\nAmount: 2 NEAR\nDirect bill without a work order."}).invoice!;
+    assert.equal(direct.orderId, ""); assert.equal(direct.status, "Submitted");
+    assert.equal(store.snapshot(a.session).invoices.length, 2);
     store.db.close();
 });
 test("private uploads enforce format, size, ownership and revoked access", () => {
     const { store, owner } = setup(), a = invite(store, owner), b = invite(store, owner, "Designer");
     const upload = store.upload(a.session, "invoice.txt", "text/plain", Buffer.from("Invoice: INV-1"));
-    assert.equal(store.attachment(upload.id, store.owner(owner)).name, "invoice.txt");
+    const ownerOrg = store.owner(owner);
+    assert.ok(ownerOrg);
+    assert.equal(store.attachment(upload.id, ownerOrg).name, "invoice.txt");
     assert.throws(() => store.attachment(upload.id, store.contractor(b.session).org, b.profile.id), /denied/);
     assert.throws(() => store.upload(a.session, "evil.html", "text/html", Buffer.from("<script>alert(1)</script>")), /not accepted/);
     assert.throws(() => store.upload(a.session, "fake.pdf", "application/pdf", Buffer.from("fake")), /valid/);

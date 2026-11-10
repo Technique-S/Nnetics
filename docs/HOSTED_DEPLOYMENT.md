@@ -1,5 +1,23 @@
 # Nnetics hosted MVP preparation
 
+## Current disposition — 5 November 2026
+
+The owner selected **local demo video; hosting optional**. Hosting is not required by [official Q-012](https://nearhackathon.com/HACKATHON.md). No Render resource or private-data upload is authorized or created. The repository is already public; the latest uncommitted release candidate still needs review and an approved commit/push. See [submission readiness](SUBMISSION_READINESS.md) for current results and blockers. Older preparation stages below are historical; statements about pending Linux execution or a 2 GB candidate are superseded by the recorded Linux run and the following definitive target.
+
+**Optional target:** one Render native Node web service `nnetics-testnet`, Frankfurt, `0.5c-512mb` (0.5 CPU / 512 MB), Node **24.22.1**, one **1 GB** disk mounted at `/var/data`, one instance, no worker, previews/automatic deploys off. Estimated base **$7.25/month** before tax/overages: $7 compute + $0.25 disk, with Hobby workspace. The 2 GB alternative is $25.25; it is not the selected Blueprint. [Official compute IDs](https://render.com/docs/compute-plans), [official $7 compute example](https://render.com/articles/render-vs-railway), [official disk rate](https://render.com/articles/how-much-does-cloud-application-hosting-cost-for-small-businesses), checked 5 November. Confirm checkout before incurring charges.
+
+`render.yaml` already prepares this target, `NNETICS_HOSTED_MAINTENANCE=1`, exact public chain pins, separate owner/payment flags empty and provisioning disabled. Build from repository root: `cd apps/owner && npm ci --include=dev && npm run build`. Start: `node deploy/start.mjs`; health `/api/health`. The launcher verifies a real Linux `/var/data` mount and never starts a worker.
+
+The only mandatory manually supplied application value is `NNETICS_APP_ORIGIN`, the **actual assigned Render HTTPS origin**, with no trailing slash/path. No custom domain or inferred/guessed host is used. `NEXT_PUBLIC_SITE_URL` is optional metadata only: leave unset until the production origin is actually assigned; no absolute canonical/OG origin is emitted while unset. Neither variable is a credential. Meteor's injected message flow has no OAuth callback route to register; the proof recipient is that exact origin. Never upload wallet keys or an AI key for this acceptance.
+
+Required storage remains `/var/data/nnetics/live/{invoices,identities,contractors}.db` and separate `/var/data/nnetics/demo/contractors.db`. Uploads are private contractor-database BLOBs. Ordinary restarts on the **same origin and disk** preserve valid sessions, links and records; migration to a new origin deliberately clears copied sessions/proofs. Owner identity lifetime is five hours; contractor session cookie is one hour, subject to link revocation/expiry. Cookies are HttpOnly, SameSite=Strict and Secure on HTTPS. Real hosted-domain cookies, Meteor login and disk restarts remain unexecuted acceptance steps.
+
+The hosted launcher is intentionally bounded to the existing preserved **single Paid job**. Linking/queueing another live job is not part of the submission demo and may make this narrow startup check fail; broader queue use needs a separately reviewed hosting/startup policy. Billing approval alone never pays. The storage transaction's separate historical V3 acceptance does not enable automatic reconciliation, clear the V2 hold or activate either gate.
+
+Local preparation reuses the final **215 backend / 160 browser / 42 root** passes and same-origin session/restart evidence. The new isolated release build passed on Windows Node **24.18.0**. Its 52 public build files contained no exact matches to the configured sensitive values checked, and no `.env` file copy was found. This is a bounded check, not certified secret detection. Node 24.22.1 Linux memory results below apply to the prior CI revision, not a fresh current-candidate CI run. No current-candidate CI push, service creation, migration or hosted login has occurred.
+
+For the selected local-only submission, **no Render credentials are needed now**. If hosting is later chosen: connect Render to Technique-S/Nnetics, enable billing, approve the exact reviewed revision/cost and private cutover, supply the assigned HTTPS origin, and use scoped operator SSH/SFTP for the quiesced snapshot. Keep maintenance on until its import/preflight and hosted acceptance pass. This never authorizes payment activity.
+
 Prepared 3 November 2026 (Africa/Lagos). **Not deployed. No push, paid hosting
 resource, database upload, wallet signature or payment is authorized by this file.**
 The existing one-payment acceptance is complete; its transaction evidence stays
@@ -265,7 +283,7 @@ must be checked. No automatic down-migration/recovery signing is prepared.
 ## Access/actions needed from the owner
 
 1. A Render account/workspace with billing enabled and confirmation of the
-   **approximately $25.25/month plus tax/overages** configuration; no resource has
+   **approximately $7.25/month plus tax/overages** configuration; no resource has
    been created. Prefer Hobby workspace unless you deliberately choose otherwise.
 2. Connect the Render GitHub app to **Technique-S/Nnetics only**, granting source
    read access through Render's normal UI. No password/token/private key in chat.

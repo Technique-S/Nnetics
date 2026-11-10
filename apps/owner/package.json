@@ -19,6 +19,7 @@
     "testnet:execute": "node --env-file-if-exists=.env.local scripts/testnet-execute.ts",
     "test:browser": "playwright test",
     "test:contractor-acceptance": "node scripts/contractor-acceptance.mjs",
+    "agent:smoke": "node --env-file-if-exists=.env.local scripts/agent-smoke.ts",
     "check:theme": "node scripts/check-theme.mjs"
   },
   "dependencies": {

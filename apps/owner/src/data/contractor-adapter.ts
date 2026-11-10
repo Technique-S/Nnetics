@@ -141,7 +141,7 @@ export interface ContractorPortalAdapter {
 export interface ContractorOwnerAdapter {
  readonly mode:"simulation"|"persistent";
  snapshot(signal?:AbortSignal):Promise<PortalSnapshot>;
- command(input:OwnerPortalCommand):Promise<{token?:string}>;
+ command(input:OwnerPortalCommand):Promise<{token?:string;profileId?:string}>;
  start?():Promise<void>;
 }
 export interface WalletChallenge {nonce:string;message:string;recipient:string;accountId:string;}
@@ -163,7 +163,7 @@ export class PersistentContractorOwnerAdapter implements ContractorOwnerAdapter 
  readonly organization:string;
  constructor(organization:string){this.organization=organization;}
  snapshot(signal?:AbortSignal){return persistentRequest<PortalSnapshot>(`owner?organization=${encodeURIComponent(this.organization)}`,undefined,signal);}
- command(input:OwnerPortalCommand){return persistentRequest<{token?:string}>("owner",{...input,organization:this.organization});}
+ command(input:OwnerPortalCommand){return persistentRequest<{token?:string;profileId?:string}>("owner",{...input,organization:this.organization});}
 }
 async function request<T>(path: string, body?: unknown): Promise<T> {
     const r = await fetch(`/api/demo/contractors/${path}`, { method: body === undefined ? "GET" : "POST", credentials: "same-origin", cache: "no-store",
@@ -197,5 +197,6 @@ export class MockContractorOwnerAdapter {
     snapshot() { return request<PortalSnapshot>("owner"); }
     command(input: OwnerPortalCommand) { return request<{
         token?: string;
+        profileId?: string;
     }>("owner", input); }
 }

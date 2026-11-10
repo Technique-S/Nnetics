@@ -8,8 +8,35 @@ node_modules/
 target/
 .next/
 .next-hosting/
+.next-rpc/
 .tools/
 artifacts/
 *.tsbuildinfo
 test-results/
 playwright-report/
+
+# Alternate local SQLite names remain private too.
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite-journal
+*.sqlite3-journal
+
+# Local process logs and captured output never belong in the repository.
+*.log
+*.err
+*.out
+
+# Editor/agent scratch copies of tracked sources.
+*.bak
+*.bak2
+*.bak3
+*.backup
+*.backup_working
+*.backup2
+*.backup3
+*.backup4
+*.backup5

@@ -10,10 +10,18 @@ import type { OwnerPortalCommand, PortalSnapshot, ContractorOwnerAdapter } from 
 import { PortalShell, BillCard, s } from "./demo/portal-ui";
 import { ContractorPaymentForm, type PayContractor } from "./contractor-payment-draft";
 const adapter = new MockContractorOwnerAdapter();
-export function DemoContractorWorkspace({onPay}:{onPay?:PayContractor}) {return <ContractorOwnerPanel adapter={adapter} embedded onPay={onPay}/>;}
+// Assistant intent: one prepared step from Ask Nnetics, applied inside this
+// panel through the same commands a manual user would take.
+export interface DemoAssistantIntent {
+  // create-contractor → prefill the contractor name field and focus it.
+  ownerName?: string;
+  // prepare-payment-draft → open that contractor's payment review prefilled.
+  draft?: { contractor: string; amount: string; description: string };
+}
+export function DemoContractorWorkspace({onPay, paymentFee, intent}:{onPay?:PayContractor; paymentFee?:string; intent?:DemoAssistantIntent}) {return <ContractorOwnerPanel adapter={adapter} embedded onPay={onPay} paymentFee={paymentFee} demoIntent={intent}/>;}
 export default function DemoContractorOwner() {return <ContractorOwnerPanel adapter={adapter}/>;}
 export function PersistentContractorOwner({organization, embedded = false, readOnly=false, limit}:{organization:string;embedded?:boolean;readOnly?:boolean;limit?:string}){const adapter=useMemo(()=>new PersistentContractorOwnerAdapter(organization),[organization]);return <ContractorOwnerPanel key={organization} adapter={adapter} organization={organization} embedded={embedded} readOnly={readOnly} limit={limit}/>;}
-export function ContractorOwnerPanel({adapter,organization,embedded=false,readOnly=false,onPay,limit}:{adapter:ContractorOwnerAdapter;organization?:string;embedded?:boolean;readOnly?:boolean;onPay?:PayContractor;limit?:string}) {
+export function ContractorOwnerPanel({adapter,organization,embedded=false,readOnly=false,onPay,limit,paymentFee,demoIntent}:{adapter:ContractorOwnerAdapter;organization?:string;embedded?:boolean;readOnly?:boolean;onPay?:PayContractor;limit?:string;paymentFee?:string;demoIntent?:DemoAssistantIntent}) {
     const persistent=adapter.mode === "persistent", generation=useRef(0);
     const [snapshot, setSnapshot] = useState<PortalSnapshot | null>(null), [error, setError] = useState(""), [busy, setBusy] = useState(false), [invite, setInvite] = useState(""), [notice, setNotice] = useState(""), [name, setName] = useState(""), [notes, setNotes] = useState<Record<string, string>>({});
     const [loadState, setLoadState] = useState<"loading" | "ready" | "start" | "error" | "locked">("loading");
@@ -82,8 +90,25 @@ export function ContractorOwnerPanel({adapter,organization,embedded=false,readOn
         channel.onmessage = clear;
         void refresh();
         const timer = setInterval(() => { if (!document.hidden && !accessLocked.current) void refresh(false); }, 15000);
-        return () => { generation.current++;readAbort.current?.abort(); requestVersion.current++; channel.close(); clearInterval(timer); };
+        return () => { generation.current++;readAbort.current?.abort(); requestVersion.current++; readRunning.current=false; channel.close(); clearInterval(timer); };
     }, [adapter]);
+    // An Ask Nnetics create-contractor intent prefills the existing form and
+    // focuses it; submission still goes through the standard review flow.
+    useEffect(() => {
+        if (!readOnly || !demoIntent?.ownerName) return;
+        setName(demoIntent.ownerName);
+        const field = document.getElementById("contractor-name") as HTMLInputElement | null;
+        field?.focus();
+        field?.scrollIntoView({block: "center"});
+    }, [demoIntent, readOnly]);
+    // A prepare-payment-draft intent resolves to exactly one contractor; an
+    // unmatched or ambiguous name never silently attaches to another profile.
+    function draftPresetFor(profileId: string) {
+        const draft = demoIntent?.draft;
+        if (!draft) return undefined;
+        const match = snapshot?.profiles.find(p => p.name.toLowerCase() === draft.contractor.toLowerCase());
+        return match?.id === profileId ? {amount: draft.amount, description: draft.description} : undefined;
+    }
     async function run(command: OwnerPortalCommand) { if(readOnly)return; const mine=generation.current; setError(""); setNotice(""); setBusy(true); try {
         if(command.action==="issue-link")setInvite("");
         const result = await adapter.command(command);
@@ -111,7 +136,7 @@ export function ContractorOwnerPanel({adapter,organization,embedded=false,readOn
  {snapshot.profiles.length === 0 && <p className={s.empty}>No contractors yet. Create your first profile to invite them.</p>}
  {snapshot.profiles.map(p => <article key={p.id} className={s.row}><h3>{p.name}</h3><span className={s.pill}>{p.linkActive ? "Private link active" : "Access not active"}</span><p className={s.meta}>Approved wallet: {p.wallet || "Awaiting initial submission"}</p>{!readOnly && <div className={s.actions}><ActionButton busy={busy} disabled={busy} className={`${s.button} ${s.secondary}`} aria-label={`${p.linkActive ? "Replace private link" : "Create private link"} · ${p.name}`} onClick={() => { if(!p.linkActive || window.confirm("Replace this link? The previous link and its active access will stop working.")) void run({ action: "issue-link", profileId: p.id }); }}>{p.linkActive ? "Replace private link" : "Create private link"}</ActionButton>{p.linkActive && <ActionButton busy={busy} aria-label={`Revoke access · ${p.name}`} disabled={busy} className={`${s.button} ${s.danger}`} onClick={() => { if(window.confirm("Revoke this private link? The contractor will immediately lose access. Existing invoices and approved recipients are preserved.")) void run({ action: "revoke-link", profileId: p.id }); }}>Revoke access</ActionButton>}</div>}
  {!readOnly && p.pendingWallet && <div className={s.notice}><strong>{p.wallet ? "Wallet change request" : "Initial wallet approval"}</strong><p className={s.meta}>{p.pendingWallet.account}</p><p className={s.small}>{persistent ? "Signed wallet control verified; current on-chain key is rechecked at approval." : "Simulated verification only."} Approval affects future work orders; existing recipients stay fixed.</p><div className={s.actions}><ActionButton busy={busy} aria-label={`Approve wallet · ${p.name}`} disabled={busy} className={s.button} onClick={() => run({ action: "approve-wallet", profileId: p.id, requestId: p.pendingWallet!.id })}>Approve wallet</ActionButton><ActionButton busy={busy} aria-label={`Reject wallet · ${p.name}`} disabled={busy} className={`${s.button} ${s.secondary}`} onClick={() => run({ action: "reject-wallet", profileId: p.id, requestId: p.pendingWallet!.id })}>Reject wallet</ActionButton></div></div>}
- {!readOnly && p.wallet && <ContractorPaymentForm key={p.wallet} id={p.id} name={p.name} wallet={p.wallet} onPay={onPay} limit={limit}/>}
+ {!readOnly && p.wallet && <ContractorPaymentForm key={p.wallet} id={p.id} name={p.name} wallet={p.wallet} onPay={onPay} limit={limit} fee={paymentFee} preset={draftPresetFor(p.id)}/>}
  <a className={s.link} href="#Contractors" onClick={event=>{event.preventDefault();setBillProfile(p.id);document.getElementById("contractor-bills")?.focus();}}>View bills for {p.name}</a>
  {!readOnly && p.wallet && <details className="reference-disclosure"><summary>Billing agreement for optional bills</summary><p className={s.small}>The existing bill form needs an agreement. Preparing a direct payment does not.</p><form onSubmit={e => { e.preventDefault(); const f = orders[p.id]; if (f)
                 void run({ action: "create-order", profileId: p.id, ...f }); }}><label>Work order reference<input aria-label={`Work order reference · ${p.name}`} required value={orders[p.id]?.reference || ""} onChange={e => setOrders({ ...orders, [p.id]: { ...orders[p.id], reference: e.target.value } })}/></label><label>Work description<input aria-label={`Work description · ${p.name}`} required value={orders[p.id]?.title || ""} onChange={e => setOrders({ ...orders, [p.id]: { ...orders[p.id], title: e.target.value } })}/></label><label>Exact amount (NEAR)<input inputMode="decimal" aria-label={`Amount · ${p.name}`} required value={orders[p.id]?.amount || ""} onChange={e => setOrders({ ...orders, [p.id]: { ...orders[p.id], amount: e.target.value } })}/></label><div className={s.actions}><ActionButton busy={busy} aria-label={`Approve work order · ${p.name}`} className={s.button} disabled={busy}>Save billing agreement</ActionButton></div></form></details>}</article>)}

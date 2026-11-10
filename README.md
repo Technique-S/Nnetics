@@ -1,128 +1,97 @@
 # Nnetics
 
-An invoice payment desk for small Web3 content teams. An owner approves a vendor and a fixed work order. An agent extracts an invoice, matches it to the work order, and requests payment. A NEAR vault enforces the owner's limits and records the result.
+Pay approved contractor work within limits you set.
 
-**3 November hosting preparation:** a maintenance-first Render configuration,
-private SQLite migration/backup tools and hosted acceptance checklist are prepared
-locally in [HOSTED_DEPLOYMENT.md](docs/HOSTED_DEPLOYMENT.md). No hosted service or
-push is authorized by that preparation. The existing INV-0002 testnet payment is
-confirmed; the vault remains paused, worker authorization revoked, and execution
-disabled. Later entries in [VALIDATION.md](docs/VALIDATION.md) supersede historical
-status statements below. Hosted rollout and pinned-runtime Linux checks remain open.
+Nnetics is a **NEAR testnet MVP** for contractor billing: private invitations, wallet approval, text-first invoices, clarification and owner review, with payment rules independently enforced by a Rust vault. The submission demo uses clearly labeled sample records. **New owner transactions, automated payments and provisioning are disabled.** This is not a mainnet payment service or an independently reviewed contract.
 
-## Current status: fresh-user onboarding under review, 31 October 2026
+Release source is the [live-integration branch](https://github.com/Technique-S/Nnetics/tree/codex/nnetics-live-integration). GitHub's current default branch is the older `codex/payscope-milestone-1`; no default-branch change was made. The latest local candidate and this updated README still require an approved commit/push before judges can review them publicly.
 
-**2 November persistent contractor backend:** the default private contractor
-portal now uses organization-authorized HTTP APIs and persistent SQLite storage,
-with signed wallet verification, owner approval/review and durable invoice/status
-history. A local production-app restart acceptance run passes with controlled
-wallet/RPC fixtures; real Meteor contractor acceptance remains unverified.
-Extraction is deterministic parsing, with no AI provider. Payment execution stays
-gated. See [PERSISTENT_CONTRACTOR_PORTAL.md](docs/PERSISTENT_CONTRACTOR_PORTAL.md).
+## Try it locally — no wallet or secrets required
 
-**2 November contractor mock:** an isolated owner/invitation/contractor workflow
-is available at `/demo/contractors`, also linked from the simulated owner dashboard.
-It includes text-first billing/uploads/clarification, invoice statuses, revocable
-private links and owner-approved simulated wallet requests. It performs no live
-wallet proof, deployment or payment. See [CONTRACTOR_PORTAL.md](docs/CONTRACTOR_PORTAL.md)
-for the journey, access boundaries and validation. The existing transaction expiry
-monitor continues separately; live provisioning remains incomplete.
-Contractor and owner-entered invoices now receive durable server-generated
-references with idempotent retries. Entry is fixed to **NEAR · Testnet**;
-conflicting source currencies require clarification without conversion.
-
-Real Meteor login, empty onboarding, organization persistence and private access
-denial in both directions passed with `babygoat.testnet` and `grandtheft.testnet`.
-Local self-service provisioning source includes **Create vault**, durable progress,
-a guarded factory initializer and a locked factory. These new contracts are **not
-deployed yet**. The vault/initializer passed Linux protocol-86/88 checks; factory
-CI for `c655800` passes compilation, Clippy, six factory unit tests and four
-provisioning sandbox tests **per protocol (86 and 88)**. The receipt-based
-correction passed both runtimes. Real provisioning and recovery remain unverified.
-The reduced unsigned plan requires 11.3324 testnet NEAR in deposits plus fees;
-see [the funding breakdown and transaction plan](docs/FRESH_USER_TESTNET_PLAN.md).
-Deployment
-signing and new-workspace payment
-controls stay disabled. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md).
-Existing deployed vaults are not upgraded. Older deployment/CI results below are
-historical and do not validate this new source. No new push is authorized.
-
-Implemented in source: the Rust native-NEAR vault, account/key authorization, immutable work orders, invoice/order guards, spending reservations, asynchronous settlement and evidence-based reconciliation. Added a bounded historical receipt-proof repair path with a frozen pre-payment trust anchor. SDK unit tests, a local sandbox suite and a Linux CI workflow retain execution logs/proofs. The TypeScript reference policy, synthetic fixtures and MVP specification remain available.
-
-Milestone 1 acceptance is pending the validation gates in [docs/VALIDATION.md](docs/VALIDATION.md). Read [docs/PAYMENT_CORE.md](docs/PAYMENT_CORE.md) for APIs, version decisions, sandbox reproduction and callback repair limits. Passing the TypeScript tests alone does not establish contract security or chain integration.
-
-[Linux verification run 40877809725](https://github.com/Technique-S/Nnetics/actions/runs/40877809725) passed 41 TypeScript, 36 Rust unit and 15 sandbox tests, including real receipt-proof repair and maximum-input/late-failure VM benchmarks. The [bounded author review](docs/M1_REVIEW.md) records measured limits and epoch hardening. Overall acceptance remains open for independent security review. An explicitly approved paused testnet deployment has now finalized; this does not establish security or payment acceptance.
-
-Milestone 3 integration is pushed on `codex/nnetics-live-integration`: a testnet wallet adapter, finalized contract reads, owner actions, structured invoice intake, a durable SQLite queue and a restricted-key payment worker. Demo mode remains explicitly simulated. The [live integration guide](docs/LIVE_INTEGRATION.md) describes setup, restart behavior, transaction approval and remaining gates. It is not accepted as a real testnet workflow.
-
-Linux [contract CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948285) for `30bafa3` passed on protocols 86 and 88 (42 root tests, 36 Rust unit and 15 sandbox tests per runtime); [owner CI](https://github.com/Technique-S/Nnetics/actions/runs/40949948396) passed 26 Node tests, strict TypeScript, the dashboard build and 12 browser executions. The [bounded compatibility comparison](docs/PROTOCOL_88_REVIEW.md) is not independent security approval. The user approved four testnet setup transactions, all FINAL: three subaccounts and pinned vault deployment. CLI signatures verified the selected owner key; browser message login and real payment acceptance remain open. The vault is paused, no agent, zero payout funds. This setup approval is consumed and conveys no payment authorization. AI extraction, legacy migration and production deployment remain absent. See [current setup evidence](docs/BABYGOAT_TESTNET_PLAN.md); [earlier faucet history](docs/NEW_OWNER_ACCOUNT_PLAN.md) is preserved separately.
-
-## Try the local owner dashboard
-
-Verified wallets can create private organizations without a configured vault.
-Vault provisioning is implemented and passed Linux contract verification; it
-awaits funding, factory deployment/review and explicit transaction approval.
-The selected testnet owner is now the user's CLI-created `babygoat.testnet`;
-its paused testnet vault is deployed and local configuration active. CLI setup
-control and real Meteor message login are verified; live provisioning is pending.
-See the [executed setup record](docs/BABYGOAT_TESTNET_PLAN.md).
-The [owner acceptance record](docs/OWNER_ONBOARDING_ACCEPTANCE.md) distinguishes
-local checks from blocked real-wallet verification and records the wallet/setup
-gaps. The live contractor portal remains gated on owner acceptance; its explicitly
-simulated adapter is now available for local review.
+Use Node.js **24** and npm (hosting is pinned to 24.22.1; the latest local checks used 24.18.0). From a clean checkout:
 
 ```sh
 cd apps/owner
 npm ci
-npm run dev
+npm run build
+npm run start
 ```
 
-Open http://127.0.0.1:3100 for testnet wallet login and empty onboarding; an existing organization or vault is not required to authenticate. Deployed-workspace access comes from current on-chain vault ownership or an explicit viewer grant; connecting a wallet grants neither. See [ORGANIZATION_ACCESS.md](docs/ORGANIZATION_ACCESS.md). Open http://127.0.0.1:3100/?mode=demo for synthetic session-only data. Deployment remains disabled. Browser fixtures do not establish real deployment or payment acceptance. See [VAULT_PROVISIONING.md](docs/VAULT_PROVISIONING.md) before configuring a factory or enabling signing.
+Open **http://127.0.0.1:3100/?mode=demo** → click **Try demo** on the sign-in screen (top-left) or open the link directly. The walkthrough starts from a blank demo workspace: enter a profile and vault name, then land on the Vault tab, fund the Demo Wallet with any positive exact NEAR amount, run quotes/approvals/settlement with simulated funds, and use the **Ask Nnetics** panel (outside the five tabs) for scripted or optional server-model answers. Open **http://127.0.0.1:3100/demo/contractors** → choose **Start contractor demo** → create a sample contractor and private link → open the link in a separate browser context → complete the simulated wallet/invoice journey. No real wallet signature or funds are involved. [Detailed judge/demo instructions](docs/DEMO_GUIDE.md) include the review/clarification sequence and expected results.
 
-## Try the foundation
+Use one origin consistently; `localhost` and `127.0.0.1` do not share sessions. If this port is occupied, stop your own old preview first. For an already-built isolated final candidate, from `apps/owner` set `NNETICS_BUILD_DIRECTORY=.next-rpc` before `npm run start`. A clean checkout uses the default `.next` build. Local instructions are not approval for signing or public deployment.
 
-Install Node.js 24 or later. No external packages are needed for the reference policy. Node runs the erasable TypeScript directly; this is not a TypeScript type check.
+No `.env.local` is needed for the sample demo. Keep demo records synthetic; their local SQLite files are ignored by Git. To develop the real login flow, copy `.env.example` privately and set the exact application origin; **leave transaction, payment and provisioning flags empty**. A supported, activated Meteor testnet account can authenticate without an existing organization/vault, and can create an off-chain organization. Organization creation does not create or fund a vault. Private live records are never distributed with the repository.
+
+## What works, what is historical, what is simulated
+
+| Capability | Actual status |
+| --- | --- |
+| Meteor identity, persisted sessions and organization isolation | Implemented. Prior real two-wallet checks are recorded separately from fixtures; sessions have a five-hour absolute limit. Explicit Switch wallet authenticates a different account; passive Meteor account reporting is limited |
+| Private contractor billing | Persistent backend: owner profiles, revocable invitations, wallet proof/approval/change requests, original text, upload/preview, clarification, review and status tracking. Contract recipients stay fixed on existing approved orders |
+| Invoice references/currency | Server-generated, durable references and duplicate-submission identities; fixed NEAR/testnet, with conflicting source currencies flagged rather than converted |
+| Parsing | Labeled deterministic parsing is used for the MVP/demo. An optional server-only AI adapter exists but is not enabled or required for submission |
+| Rust vault/queue | Contract independently enforces owner/worker permissions, recipient, exact amount, limits, expiry, pause and single-payment orders. Durable jobs reconcile before retry; browser/TypeScript policy is not the security boundary |
+| Historical contractor transfer | INV-0002: one confirmed **0.001 NEAR** payment to `babygoat.testnet`, transaction below. The existing Paid job/evidence are preserved, not recreated for the demo |
+| Historical Meteor storage call | Accepted separately under reviewed V3 for that one transaction only. V2's original mismatch/manual-review hold, both IDs and consumed authorization remain |
+| Future automatic Meteor reference-block reconciliation | **Not enabled or live-verified**. Historical V3 acceptance does not authorize future envelopes or clear the hold |
+| New owner transactions / automated payouts / new provisioning | **Disabled**. Vault remains paused; worker authorization revoked and process stopped |
+| Demo routes | Explicitly simulated/sample data and wallet proof. Simulated Paid/Pending/Failed examples are not evidence of real transfers |
+| Hosted service | Prepared, **not deployed**. Local video is the selected submission route; hosting is optional |
+
+Billing approval, linking or queueing alone never establishes Paid. Live Paid display requires the durable job and matching finalized transaction/receipt evidence. Unknown outcomes stay blocked; no timeout automatically creates a replacement signature, job or transfer.
+
+Reviewed **fixture-only** previews: [light owner workspace](docs/screenshots/owner-light.png), [dark owner workspace](docs/screenshots/owner-dark.png), [contractor bill preview](docs/screenshots/contractor-dark.png). These are intentional documentation assets, not evidence of new payments. The submission still needs a video.
+
+The [recording guide](docs/DEMO_GUIDE.md) now records a completed final-frontend/source-backed fixture rehearsal. Normal final-server startup was policy-blocked; this is not a new real-Meteor sign-in or complete production-server acceptance. [Publication proposal](docs/PUBLICATION_PROPOSAL.md) gives the exact local package for review, including the owner-confirmed MIT holder **MDBcertified**.
+
+## Public historical evidence
+
+- [Existing contractor payment](https://testnet.nearblocks.io/txns/6nV9YHQxUWLX6yYcPpTEUHyLxoC1K3UEWguSdFzQefR1): **0.001 NEAR**, recipient `babygoat.testnet`, INV-0002 / `ACCEPTANCE-001`.
+- [Existing storage-funding transaction](https://testnet.nearblocks.io/txns/CGmCDGsYimzLz2o9uCDmbsVXwHdUAG6wg1CqUrFLkLEG): **0.000001 NEAR**, `fund_storage({})`, historical acceptance only. [Scope and limitations](docs/METEOR_HISTORICAL_ACCEPTANCE_V3.json).
+- [Validation record](docs/VALIDATION.md): real observations, human confirmations, fixture tests and unverified states are distinguished. Do not repeat either transaction during a demonstration.
+
+The verifier relies on disclosed initial checkpoint trust and, for the storage assessment, corroborated HTTPS RPC evidence rather than an independent consensus proof. **No independent security review has occurred.** See [checkpoint review](docs/PAYMENT_CHECKPOINT_REVIEW.md) and [Meteor policy](docs/METEOR_REFERENCE_POLICY_V3.md).
+
+## Architecture and storage
+
+```text
+Owner / contractor browser
+  -> Next.js Node route handlers
+  -> signed-message identity + organization/owner authorization
+  -> SQLite identities / contractor records / durable payment queue
+  -> read-only NEAR RPC -> existing Rust vault
+
+Separate payment worker (stopped)
+  -> exclusive durable-queue lock + reconciliation
+  -> restricted key and independently gated payment method
+```
+
+`apps/owner/src/server` contains identity, organization, contractor, queue, transaction-attempt and chain services. `src/policy.ts` is a reference policy; `contracts/vault` is the independent Rust enforcement layer; `contracts/factory` handles atomic vault initialization; `contracts/sandbox` exercises WASM/receipts. The web launcher never starts the worker. Uploads and original invoice text live in the contractor database, not public static assets.
+
+SQLite stores and WAL files require persistent local storage and a single coordinated instance. Never publish live database files, private links, credentials, logs or the full artifacts directory. [Hosting/cutover guide](docs/HOSTED_DEPLOYMENT.md) explains three-store snapshots, session handling, rollback and the optional single-instance Render deployment.
+
+## Verification
+
+Latest executed local evidence: **215 owner/backend tests, 160 browser tests and 42 root tests passed**, plus typecheck, production build and `check:theme`. Browser cases use fixtures, not new real-wallet acceptance. [Theme report and screenshots](docs/THEME_REPORT.md). Node 24.22.1 Linux memory/restart results apply to the earlier recorded CI revision; the current uncommitted candidate has not run in remote CI.
 
 ```sh
+# Repository root: policy regressions, no network transactions
 npm test
-npm run demo
+# Owner app: backend, types, theme and production build
+cd apps/owner
+npm test
+npm run typecheck
+npm run check:theme
+npm run build
 ```
 
-Expected: policy tests pass. The demo marks an approved invoice eligible, a changed recipient for review, and a previously paid work order for review. It performs no transfers.
+Use [the isolated fixture recipe](docs/DEMO_GUIDE.md#regressions) or the existing CI workflows for browser tests; do not point mutation tests at a real/private database. Linux Rust checks: `bash scripts/check-core.sh` (rustup and system prerequisites in [PAYMENT_CORE.md](docs/PAYMENT_CORE.md)); these use local Sandbox accounts and do not deploy to public networks. Passing tests are not independent security review.
 
-## Repository map
+## Hackathon provenance and submission
 
-- `docs/BUILD_BRIEF.md`: product decisions, architecture, milestones and acceptance criteria.
-- `src/policy.ts`: pure decision function; no persistence or payment authorization.
-- `fixtures/scenario.ts`: three illustrative vendors and a baseline invoice/order.
-- `tests/policy.test.ts`: executable rules and boundary cases.
-- `src/demo.ts`: three local decision examples.
-- `contracts/vault`: Rust contract and SDK unit tests.
-- `contracts/sandbox`: real WASM/receipt integration tests using ephemeral local accounts.
-- `scripts/check-core.sh`: builds production/fault artifacts and runs all checks on Linux.
-- `docs/PAYMENT_CORE.md`: authorization, accounting, API and recovery procedure.
-- `docs/VALIDATION.md`: observed results, missing evidence and blockers.
-- `docs/HISTORICAL_REPAIR.md`: authoritative evidence, bootstrap trust, permissions and replay protection.
-- `scripts/prepare-repair.ts`: offline RPC-proof normalization; no signing or submissions.
-- `apps/owner`: Next.js dashboard, separate demo/testnet adapters, durable queue and worker.
-- `docs/OWNER_DASHBOARD.md`: local frontend setup, tested behavior and integration boundaries.
-- `docs/M1_REVIEW.md`: pinned official verifier comparison and measured VM limits.
-- `docs/LIVE_INTEGRATION.md`: wallet, persistence, worker recovery, deployment preparation and live acceptance gates.
+Built for NEAR HACKATHON. The repository's first implementation commit is **29 October 2026**, within the permitted post-announcement window beginning 19 October. Dedicated development branch: [codex/nnetics-live-integration](https://github.com/Technique-S/Nnetics/tree/codex/nnetics-live-integration). [Full branch history](https://github.com/Technique-S/Nnetics/commits/codex/nnetics-live-integration/) includes the initial core; subsequent changes are visible in its [development comparison](https://github.com/Technique-S/Nnetics/compare/9206f079ca69b0c8893f5d777f7d3b474b6fda21...codex/nnetics-live-integration). The first commit is part of the entry, not an excluded baseline. Final submission revision remains to be reviewed/committed/pushed; no new tag or release is claimed.
 
-## Guarded NEAR core
+AI assistance: OpenAI Codex. Direct libraries include Next/React, near-api-js 7.4.0, Wallet Selector 10.1.4, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests also use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are in the manifests/lockfiles. [Third-party notices](THIRD_PARTY_NOTICES.md) disclose the isolated Stageshow design illustration. Original code: [MIT](LICENSE), selected by the project owner.
 
-The Rust vault targets native NEAR on testnet after local sandbox validation and deployment approval. It independently enforces amounts, recipients, authorization, budget, expiry, pause and single-payment work orders. A worker may call only the payment method through a restricted function-call key on its caller account. That key's allowance limits gas spending, not vault payouts. The contract validates its authorized account and signer key and pays from its own deposited balance.
-
-On Linux with Node 24 and rustup, run `bash scripts/check-core.sh`. See the payment core guide for system dependencies. Tests use local Sandbox only; the command does not deploy to testnet or mainnet. Fault artifacts are test fixtures and must never be deployed to a public network.
-
-The starter policy intentionally uses named `.testnet` accounts. The Rust contract uses validated SDK account IDs and bounded inputs.
-
-## Hackathon provenance
-
-New Nnetics foundation and guarded core written on 29 October 2026. No StableSplit code or other pre-existing product code has been imported. AI assistance: OpenAI Codex. Runtimes: Node.js and Rust. Added libraries: NEAR Rust SDK 5.29.1, NEAR Workspaces 0.23.0, NEAR Sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests additionally use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are recorded in Cargo manifests and lockfiles. No contract deployment exists. License selection remains open; add the selected license before publishing.
-
-Official rules checked on 29 October 2026: https://nearhackathon.com/HACKATHON.md
-
-The rules allow code from the 19 October announcement. Development ends 14 November 2026 at 23:59 UTC, which is 15 November at 00:59 in Lagos. Testnet-only entries are eligible; own NEAR contracts are sufficient. Proposed track fit: Autonomous Business, AI Security & Defense, Real-World Money; the human selects submission tracks.
-
-Keep work local until the relevant repository action is authorized. The official instructions require explicit confirmation before pushing, making a repository public, signing transactions, spending tokens, mainnet deployment, and final submission. Submission requires review of the exact payload; the human publishes the demo post and supplies prize/contact information. Read the live rules again before submitting.
+[Current official rules](https://nearhackathon.com/HACKATHON.md), checked 5 November 2026, permit a local-only video demo (Q-012). Deadline: **15 November 2026, 00:59 WAT**. The repository must remain public through judging; the human must publish the demo post and approve the exact final submission payload. [Submission draft/checklist](docs/SUBMISSION_DRAFT.md) lists missing human-provided fields and the required post tags. If the team submits another independent project, its disclosure must be added before submission; that fact is not yet confirmed. Testnet-only eligibility does not imply production financial readiness.

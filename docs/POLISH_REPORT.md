@@ -60,3 +60,12 @@ Read-only payment baseline check at `2026-11-04T15:12:25.419Z`, finalized height
 Route inventory and original title/h1 values remain in `UX_AUDIT.md`; metadata was not changed in this phase. Per-route and authorized-view metadata, contractor loading h1, error boundaries, icons, robots exclusions, visible breadcrumbs, vocabulary/error mapping, network-indicator consolidation, `check:seo` and fixture-only `check:links` still require their respective implementation phases. No pass is claimed for those absent checks.
 
 The later display vocabulary is fixed by the user's table: Agreements for work orders, Payment limits for budgets/caps, plain payment/permission/balance wording, and clear separation of Contractors from payment-recipient records. Internal names remain unchanged. Every route stays noindex, and private invitation links/tokens must never enter canonicals, sitemaps or logs.
+
+
+## Remaining-phase work in progress
+
+The next pass is uncommitted so it can be completed as phase-sized commits. Error presentation now uses the shared mapper in sign-in, owner/contractor and provisioning views. Private-route metadata, authorized dashboard/contractor-tab title updates, contractor loading h1, recovery boundaries and robots exclusions have been implemented. No sitemap, public page, JSON-LD or absolute canonical was added. Type-check, production build and the seven presentation unit cases passed for this work.
+
+A fresh fixture-only inspection covered 19 route/view states. The nine owner sections have distinct titles and descriptions (128–140 characters), the contractor portal and demo-owner route have distinct metadata, and 404 has its own title. All inspected states had one h1 and no canonical. Organization selection/setup/restoration and the demo overview still need distinct state metadata; the inspection is not a passing SEO acceptance. Visible breadcrumbs, icons, comprehensive vocabulary cleanup, network-indicator consolidation and the final fixture-only SEO/link scripts remain incomplete. Existing browser assertions also require presentation-only updates before a fresh full regression run.
+
+The Jade & Midnight attachment was read. Its exact palette, no-theme-switch requirement and full route/state coverage are queued after the remaining phases, as requested. The visual identity has not been applied yet. The request/RPC changes remain excluded from this work, and their previously reported integration failures have not been declared resolved. No transactions or pushes were performed.

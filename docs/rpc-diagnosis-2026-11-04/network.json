@@ -1,0 +1,190 @@
+{
+  "checkedAt": "2026-11-04T10:16:46.930Z",
+  "location": "local Windows Node process; browser/extension results may differ",
+  "results": [
+    {
+      "provider": "https://test.rpc.fastnear.com",
+      "checks": [
+        {
+          "operation": "dns",
+          "ok": true,
+          "addresses": [
+            {
+              "address": "104.18.31.232",
+              "family": 4
+            },
+            {
+              "address": "104.18.30.232",
+              "family": 4
+            }
+          ],
+          "duration": 270
+        },
+        {
+          "operation": "status",
+          "http": 200,
+          "rpcError": null,
+          "chain": "testnet",
+          "duration": 693,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "query",
+          "http": 200,
+          "rpcError": null,
+          "accountFound": true,
+          "duration": 220,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "cors-preflight",
+          "http": 200,
+          "allowOrigin": "*",
+          "allowMethods": "*",
+          "allowHeaders": "*",
+          "duration": 219
+        }
+      ]
+    },
+    {
+      "provider": "https://rpc.testnet.fastnear.com",
+      "checks": [
+        {
+          "operation": "dns",
+          "ok": true,
+          "addresses": [
+            {
+              "address": "104.18.30.232",
+              "family": 4
+            },
+            {
+              "address": "104.18.31.232",
+              "family": 4
+            }
+          ],
+          "duration": 323
+        },
+        {
+          "operation": "status",
+          "http": 200,
+          "rpcError": null,
+          "chain": "testnet",
+          "duration": 638,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "query",
+          "http": 200,
+          "rpcError": null,
+          "accountFound": true,
+          "duration": 261,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "cors-preflight",
+          "http": 200,
+          "allowOrigin": "*",
+          "allowMethods": "*",
+          "allowHeaders": "*",
+          "duration": 214
+        }
+      ]
+    },
+    {
+      "provider": "https://rpc.testnet.near.org",
+      "checks": [
+        {
+          "operation": "dns",
+          "ok": true,
+          "addresses": [
+            {
+              "address": "104.18.31.232",
+              "family": 4
+            },
+            {
+              "address": "104.18.30.232",
+              "family": 4
+            }
+          ],
+          "duration": 569
+        },
+        {
+          "operation": "status",
+          "http": 200,
+          "rpcError": null,
+          "chain": "testnet",
+          "duration": 3611,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "query",
+          "http": 200,
+          "rpcError": null,
+          "accountFound": true,
+          "duration": 3279,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "cors-preflight",
+          "http": 200,
+          "allowOrigin": "*",
+          "allowMethods": "*",
+          "allowHeaders": "*",
+          "duration": 211
+        }
+      ]
+    },
+    {
+      "provider": "https://near-testnet.drpc.org",
+      "checks": [
+        {
+          "operation": "dns",
+          "ok": true,
+          "addresses": [
+            {
+              "address": "104.20.46.180",
+              "family": 4
+            },
+            {
+              "address": "172.66.146.203",
+              "family": 4
+            }
+          ],
+          "duration": 410
+        },
+        {
+          "operation": "status",
+          "http": 200,
+          "rpcError": null,
+          "chain": "testnet",
+          "duration": 588,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "query",
+          "http": 200,
+          "rpcError": null,
+          "accountFound": true,
+          "duration": 226,
+          "cors": "*",
+          "retryAfter": null
+        },
+        {
+          "operation": "cors-preflight",
+          "http": 204,
+          "allowOrigin": "http://127.0.0.1:3100",
+          "allowMethods": "POST",
+          "allowHeaders": "content-type",
+          "duration": 188
+        }
+      ]
+    }
+  ]
+}

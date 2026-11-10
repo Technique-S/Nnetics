@@ -6,7 +6,7 @@ import {OperationFeedback} from "./operation-feedback";
 import {LoadingSkeleton} from "./loading-skeleton";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NearOwnerAdapter, LiveApiError, checkMeteorIdentity, api, type PublicConfig } from "../data/near-adapter";
-import { MockOwnerAdapter } from "../data/mock-adapter";
+import { DemoWorkspaceAdapter } from "../data/demo-workspace-adapter";
 import type { OwnerAdapter } from "../data/owner-adapter";
 import {
   initializeMeteorExtension,
@@ -50,7 +50,7 @@ export function Onboarding({
   const [config, setConfig] = useState<PublicConfig | null>(null),
     [who, setWho] = useState<IdentityView | null>(null);
   const [active, setActive] = useState<NearOwnerAdapter | null>(null),
-    [demo, setDemo] = useState<MockOwnerAdapter | null>(null);
+    [demo, setDemo] = useState<DemoWorkspaceAdapter | null>(null);
   const [ready, setReady] = useState(false),
     [busy, setBusy] = useState(false);
   const [error, setError] = useState(""),
@@ -139,7 +139,7 @@ export function Onboarding({
   useEffect(() => {
     if (new URLSearchParams(location.search).get("mode") === "demo") {
       setRestoring(false);
-      setDemo(new MockOwnerAdapter());
+      setDemo(new DemoWorkspaceAdapter());
       return;
     }
     broadcast.current = new BroadcastChannel("nnetics-identity");
@@ -315,7 +315,7 @@ export function Onboarding({
     return (
       <>
         <header className="identity-bar" aria-label="Verified wallet">
-          <span>Signed in as {who.accountId} · NEAR testnet</span>
+          <span>Signed in as {who.accountId} · NEAR network</span>
           <details className="account-menu"><summary>Account & organizations</summary><div className="account-menu-actions"><AppearanceControl inline/>
           {accountActions}
           <details className="wallet-session-notice"><summary>About this wallet session</summary><p>This session belongs to {who.accountId}. Meteor does not reliably report selection changes. Use Switch wallet to sign in as another account.</p></details></div></details>
@@ -340,7 +340,7 @@ export function Onboarding({
         {active ? <div hidden={!!verificationIssue&&!workspaceReady.current} inert={!!verificationIssue}>{renderDashboard(active, who.organizations.find(o=>o.id===active.config.organization)?.name,accountActions)}</div> : (
           <main hidden={!!verificationIssue&&!workspaceReady.current} inert={!!verificationIssue} className="loading-screen onboarding-surface" aria-label="Wallet onboarding">
             <h1>{selectedDraft ? selectedDraft.name : "Your workspace"}</h1>
-            <p>Live testnet identity. No simulated records or balances.</p>
+            <p>Live account identity. No simulated records or balances.</p>
             <p>{who.notice}</p>
             {selectedDraft ? <p>Your organization’s saved billing records appear below. Payment controls remain gated.</p> : who.organizations.length === 0 ? (
               <section aria-label="Account record counts">

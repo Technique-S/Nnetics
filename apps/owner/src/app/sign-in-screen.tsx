@@ -32,7 +32,10 @@ export function SignInScreen({
 }: SignInScreenProps) {
   return (
     <main className="signin-screen">
-      <a className="button secondary signin-demo" href="/?mode=demo">Open explicitly simulated demo</a>
+      <a className="button primary signin-demo" href="/?mode=demo">
+        <strong>Try demo</strong>
+        <span>No account, wallet, keys or tokens needed · simulated funds only</span>
+      </a>
       <div className="signin-art" aria-hidden="true">
         <svg className="signin-art-item signin-art-tl" viewBox="0 0 200 200" fill="none">
           <path d="M100 0L115 65L171 29L143 88L200 100L143 112L171 171L115 135L100 200L85 135L29 171L57 112L0 100L57 88L29 29L85 65Z" />

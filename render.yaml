@@ -56,5 +56,13 @@ services:
         value: ACCEPTANCE-001
       - key: NNETICS_TRANSACTIONS_AUTHORIZED
         value: ""
+      - key: NNETICS_OWNER_TRANSACTIONS_AUTHORIZED
+        value: ""
+      - key: NNETICS_PAYMENT_EXECUTION_AUTHORIZED
+        value: ""
+      - key: NNETICS_OWNER_TRANSACTION_PLAN
+        value: ""
+      - key: NNETICS_OWNER_TRANSACTION_PLAN_SHA256
+        value: ""
       - key: NNETICS_PROVISIONING_ENABLED
         value: ""
