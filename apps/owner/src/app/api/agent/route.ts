@@ -10,6 +10,7 @@ import { AgentToolExecutor } from "../../../server/agent-tool-executor.ts";
 import { identityService } from "../../../server/identity.ts";
 import { demoWorkspace } from "../../../server/demo-workspace.ts";
 import { demoContractors } from "../../../server/demo-contractors.ts";
+import { lifecycleScope, lifecycleSecret } from "../../../server/contractor-lifecycle.ts";
 import { isAllowedAppOrigin } from "../../../server/origin.ts";
 import {
   AgentModelError,
@@ -22,6 +23,7 @@ import {
   actionChips,
   runAgent,
   verifiedContractorReferences,
+  type AgentActionChip,
   type AgentConversationTurn,
   type AgentToolExecution,
   type AgentVerifiedReference,
@@ -215,6 +217,33 @@ function traceHeaders(trace: {
   };
 }
 
+// A prepared contractor lifecycle operation becomes a confirmation chip. The
+// single-use secret travels only in this chip, so the model can never turn
+// its own output into consent: only the owner's browser can complete it.
+function lifecycleChips(executions: AgentToolExecution[], scope: string | undefined): AgentActionChip[] {
+  if (!scope) return [];
+  const chips: AgentActionChip[] = [];
+  for (const execution of executions) {
+    if (!execution.result.success) continue;
+    if (!["archive_contractor", "restore_contractor", "delete_contractor"].includes(execution.name)) continue;
+    const data = execution.result.data && typeof execution.result.data === "object" && !Array.isArray(execution.result.data)
+      ? execution.result.data as Record<string, unknown>
+      : {};
+    const operationId = typeof data.operationId === "string" ? data.operationId : "";
+    if (!operationId) continue;
+    const secret = lifecycleSecret(scope, operationId);
+    if (!secret) continue;
+    const kind = typeof data.kind === "string" ? data.kind : "archive";
+    const contractorName = typeof data.contractorName === "string" ? data.contractorName : "this contractor";
+    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : "Archive";
+    chips.push({
+      action: { kind: "confirm-contractor-lifecycle", operationId, secret },
+      label: `${verb} ${contractorName} — confirm`,
+    });
+  }
+  return chips;
+}
+
 function errorBody(code: string, message: string, requestId: string, retryable: boolean, mayHaveChanged = false) {
   // A write can succeed and a later model step can still fail. In that case a
   // message that claims nothing changed would be false, so the claim is
@@ -381,7 +410,10 @@ export async function POST(req: NextRequest) {
 
     const body: Record<string, unknown> = {
       reply: result.reply,
-      actions: actionChips(result.executions),
+      actions: [
+        ...actionChips(result.executions),
+        ...lifecycleChips(result.executions, context.mode === "demo" && context.demoPortalToken ? lifecycleScope(context.demoPortalToken) : undefined),
+      ],
       mode: context.mode,
       requestId,
       provider: result.provider,

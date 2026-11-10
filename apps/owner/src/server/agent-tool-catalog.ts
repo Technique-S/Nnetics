@@ -8,6 +8,9 @@ export type AgentToolName =
   | "list_contractors"
   | "get_contractor"
   | "create_contractor"
+  | "archive_contractor"
+  | "restore_contractor"
+  | "delete_contractor"
   | "get_contractor_invoices"
   | "get_vault_balance"
   | "get_vault_status"
@@ -35,7 +38,7 @@ const definitions: AgentToolDefinition[] = [
     confirmationRequired: false,
     modes: ["demo"],
     description:
-      "Creates a contractor profile in the current demo organization and persists it immediately. Use this when the user asks to create, add, or register a contractor. Pass only the person's name: remove instruction words such as 'named', 'called', 'name', or 'contractor' from the value, preserve the user's capitalization and every word of the name, and do not invent a wallet or other fields. The demo allows at most three contractor profiles per workspace. A successful result returns the persisted record ID.",
+      "Creates a contractor profile in the current demo organization and persists it immediately. Use this when the user asks to create, add, or register a contractor. Pass only the person's name: remove instruction words such as 'named', 'called', 'name', or 'contractor' from the value, preserve the user's capitalization and every word of the name, and do not invent a wallet or other fields. A demo workspace is not limited in how many contractors it holds. A successful result returns the persisted record ID.",
     inputSchema: {
       type: "object",
       properties: {
@@ -67,6 +70,54 @@ const definitions: AgentToolDefinition[] = [
         id: { type: "string", description: "Persisted contractor record ID." },
         name: { type: "string", description: "The contractor's exact name, matched case-insensitively." },
       },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "archive_contractor",
+    risk: "write",
+    confirmationRequired: true,
+    modes: ["demo"],
+    description:
+      "Prepares the removal of a contractor from the active list in the current demo organization. The contractor's invoices, payment records and receipts are preserved and their portal access is revoked. This tool prepares the operation only: it never changes anything by itself. Pass the contractor's persisted record ID. The result reports whether the operation is allowed and what it will do; the owner then confirms it in the dashboard. Never report the contractor as archived until the confirmation has actually happened.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Persisted contractor record ID." },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "restore_contractor",
+    risk: "write",
+    confirmationRequired: true,
+    modes: ["demo"],
+    description:
+      "Prepares the return of an archived contractor to the active list in the current demo organization. No financial record changes. This tool prepares the operation only: it never changes anything by itself. Pass the contractor's persisted record ID. The owner then confirms it in the dashboard.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Persisted contractor record ID." },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "delete_contractor",
+    risk: "write",
+    confirmationRequired: true,
+    modes: ["demo"],
+    description:
+      "Prepares the permanent deletion of a contractor profile in the current demo organization. Only a profile with no invoices, work orders, attachments or active portal access may be deleted; when the contractor still has records, report that archiving is the available option instead. This tool prepares the operation only: it never changes anything by itself. Pass the contractor's persisted record ID. The owner then confirms it in the dashboard. Never report the contractor as deleted until the confirmation has actually happened.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Persisted contractor record ID." },
+      },
+      required: ["id"],
       additionalProperties: false,
     },
   },
@@ -169,8 +220,7 @@ export function findAgentTool(name: string, mode: AgentMode): AgentToolDefinitio
 }
 
 export const UNSUPPORTED_OPERATIONS = [
-  "Deleting or archiving contractor profiles. There is no deletion or archive operation in the application, and linked invoices, payment records, portal access, and audit requirements must be reviewed before such an operation could exist. Explain that deletion is unavailable; never claim it happened.",
-  "Updating a contractor's name or other profile fields.",
+  "Updating a contractor's other profile fields, such as their payout wallet. A contractor's wallet is approved from the contractor's own request in the dashboard.",
   "Issuing or revoking contractor portal links, approving or rejecting payout wallets, creating work orders, reviewing invoices, preparing payment drafts, or executing payments. These are done in the dashboard, not through this assistant.",
   "Real blockchain, wallet, or live payment operations. Every tool in this build is demo-only and uses simulated funds.",
 ] as const;

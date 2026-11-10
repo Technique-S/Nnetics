@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { demoWorkspace } from "../../../../../server/demo-workspace";
-import type { DemoWorkspaceSnapshot, DemoScenario } from "../../../../../server/demo-workspace";
-import { isAllowedAppOrigin } from "../../../../../server/origin";
+import { NextRequest, NextResponse } from "next/server.js";
+import { demoWorkspace } from "../../../../../server/demo-workspace.ts";
+import type { DemoWorkspaceSnapshot, DemoScenario } from "../../../../../server/demo-workspace.ts";
+import { isAllowedAppOrigin } from "../../../../../server/origin.ts";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const cookieName = "nnetics_demo_workspace";

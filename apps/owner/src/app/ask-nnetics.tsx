@@ -20,6 +20,7 @@ export type AssistantAction =
   | { kind: "get-organization-statistics" }
   | { kind: "create-contractor"; name: string; update?: boolean; contractorId?: string }
   | { kind: "prepare-payment-draft"; contractor: string; amount: string; description: string }
+  | { kind: "confirm-contractor-lifecycle"; operationId: string; secret: string }
   | { kind: "find-receipt"; reference: string; contractor: string }
   | { kind: "summarize-outstanding" };
 
@@ -165,7 +166,7 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
           </header>
           <div className="ask-nnetics-transcript" ref={transcriptRef} aria-live="polite">
             {messages.length === 0 && (
-              <p className="ask-nnetics-empty">Ask in natural language, e.g. “create a contractor named Amara”, “how many contractors do I have?”, “what is my vault balance?”, or “show my invoices”. The configured model reads your request, uses the demo tools it needs, and answers from this simulated workspace. Deleting contractors is not available.</p>
+              <p className="ask-nnetics-empty">Ask in natural language, e.g. “create a contractor named Amara”, “how many contractors do I have?”, “what is my vault balance?”, or “show my invoices”. The configured model reads your request, uses the demo tools it needs, and answers from this simulated workspace. Deleting or archiving a contractor is prepared and then waits for your confirmation in the dashboard.</p>
             )}
             {messages.map((message, index) => (
               <article key={index} className={message.who === "you" ? "ask-nnetics-you" : "ask-nnetics-assistant"}>

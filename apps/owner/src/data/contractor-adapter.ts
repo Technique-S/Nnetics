@@ -17,6 +17,24 @@ export interface ContractorProfile {
     wallet: string | null;
     walletVersion: number;
     pendingWallet: WalletRequest | null;
+    // Lifecycle state. Profiles written before the lifecycle existed read as
+    // active, so an existing workspace keeps working unchanged.
+    archived: boolean;
+    archivedAt: string | null;
+    // Whether the profile may still be deleted outright. Computed for the
+    // owner view from the records that reference it; never persisted.
+    deletable?: boolean;
+}
+
+// An audit record for a contractor lifecycle change. It survives the deletion
+// of the profile it describes.
+export interface ContractorEvent {
+    id: string;
+    profileId: string;
+    profileName: string;
+    action: string;
+    detail: string;
+    at: string;
 }
 export interface ContractorOrder {
     id: string;
@@ -62,6 +80,10 @@ export interface PortalSnapshot {
     profiles: ContractorProfile[];
     orders: ContractorOrder[];
     invoices: ContractorBill[];
+    // Archived contractors are kept out of the active list but stay
+    // inspectable, and their financial history is never removed.
+    archivedProfiles?: ContractorProfile[];
+    events?: ContractorEvent[];
 }
 export interface ContractorSnapshot {
     mode: "simulation" | "persistent";
@@ -89,6 +111,13 @@ export type OwnerPortalCommand = {
     reference: string;
     title: string;
     amount: string;
+} | {
+    action: "update-contractor";
+    profileId: string;
+    name: string;
+} | {
+    action: "archive-contractor" | "restore-contractor" | "delete-contractor";
+    profileId: string;
 } | {
     action: "review-invoice";
     invoiceId: string;

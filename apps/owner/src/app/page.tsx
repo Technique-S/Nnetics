@@ -198,6 +198,29 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     } else if (action.kind === "prepare-payment-draft") {
       setIntent({ draft: { contractor: action.contractor, amount: action.amount, description: action.description } });
       go("Contractors");
+    } else if (action.kind === "confirm-contractor-lifecycle") {
+      // The owner pressed the confirmation chip. The server revalidates the
+      // operation and applies it once. The assistant never completes it.
+      void (async () => {
+        try {
+          const response = await fetch("/api/demo/contractors/owner/confirm-lifecycle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ operationId: action.operationId, secret: action.secret }),
+          });
+          const data = await response.json().catch(() => null) as { error?: string; operation?: { kind: string; contractorName: string } } | null;
+          if (!response.ok || !data) {
+            setError(data?.error || "The confirmed operation could not be completed.");
+            return;
+          }
+          setContractorRevision(n => n + 1);
+          setNotice(`${data.operation?.contractorName ?? "The contractor"} was ${data.operation?.kind === "delete" ? "deleted" : data.operation?.kind === "archive" ? "archived" : "restored"}.`);
+          await refresh();
+        } catch {
+          setError("The confirmed operation could not be completed.");
+        }
+      })();
+      go("Contractors");
     } else if (action.kind === "find-receipt") {
       const found = action.reference ? snapshot?.payments.find(p => p.reference === action.reference) : undefined;
       if (found?.status === "Paid") go("Receipts", found.attempt_id);

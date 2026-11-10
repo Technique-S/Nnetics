@@ -75,7 +75,7 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
     await expect(confirm).toContainText("writer-demo.testnet");
     await expect(confirm).toContainText("0.1 NEAR");
     await expect(confirm).toContainText("SIM-");
-    await expect(page.getByText(/reserved/i).first()).toBeVisible();
+    await expect(confirm).toContainText("is held until this payment settles or is cancelled");
     // Phase two: the owner confirms, and only then does the simulation run.
     await page.getByRole("button",{name:"Confirm and simulate payment"}).click();
     await expect(page.getByText("Simulated payment recorded.",{exact:false})).toBeVisible();

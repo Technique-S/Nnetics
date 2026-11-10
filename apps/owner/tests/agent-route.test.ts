@@ -19,6 +19,7 @@ delete process.env.OPENROUTER_API_KEY;
 delete process.env.NNETICS_ASSISTANT_MODEL;
 
 const { POST } = await import("../src/app/api/agent/route.ts");
+const { POST: POST_DEMO_CONTRACTORS } = await import("../src/app/api/demo/contractors/[...path]/route.ts");
 const { demoWorkspace } = await import("../src/server/demo-workspace.ts");
 const { demoContractors } = await import("../src/server/demo-contractors.ts");
 const { AgentModelError, setAgentModelAdapterForTests } = await import("../src/server/agent-model.ts");
@@ -104,6 +105,28 @@ function agentRequest(
     headers,
     body: typeof body === "string" ? body : JSON.stringify(body),
   });
+}
+
+// The owner-side confirmation endpoint. Only the browser can reach it with the
+// single-use secret that the action chip carries.
+function demoContractorRequest(path: string[], body: unknown) {
+  const headers = new Headers();
+  headers.set("content-type", "application/json");
+  headers.set("origin", ORIGIN);
+  headers.set("cookie", `nnetics_demo_portal_owner=${demo.portalToken}`);
+  return new NextRequest(`${ORIGIN}/api/demo/contractors/${path.join("/")}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+}
+
+async function confirmLifecycle(body: unknown) {
+  const response = await POST_DEMO_CONTRACTORS(
+    demoContractorRequest(["owner", "confirm-lifecycle"], body),
+    { params: Promise.resolve({ path: ["owner", "confirm-lifecycle"] }) },
+  );
+  return { response, data: await response.json() as Record<string, any> };
 }
 
 async function send(
@@ -284,35 +307,56 @@ test("F. follow-up context resolves a real contractor by name", async () => {
   assert.equal(data.toolCalls, 1);
 });
 
-// G. Deletion is unavailable: no tool exists, the model explains it, and the
-// record remains. A model that invents a delete tool is refused by the backend.
-test("G. deletion intent is explained and can never execute", async () => {
+// G. A destructive request never executes on the model's say-so. The lifecycle
+// tools exist, but each one only prepares an operation, a malformed call is
+// refused by the backend, and the record survives until the owner confirms.
+test("G. deletion intent prepares an operation and can never execute on its own", async () => {
   const adapter = new ControlledAdapter([
     (request) => {
-      assert.equal(toolNames(request).some((name) => /delete|archive|remove/i.test(name)), false);
-      return final("Deleting or archiving a contractor is not available. Tia was not removed.");
+      const names = toolNames(request);
+      assert.equal(names.includes("delete_contractor"), true);
+      assert.equal(names.includes("archive_contractor"), true);
+      assert.equal(names.includes("restore_contractor"), true);
+      return final("I can prepare the deletion of Tia, but the owner confirms it in the dashboard.");
     },
   ]);
   setAgentModelAdapterForTests(adapter);
 
   const { response, data } = await send({ message: "Delete the contractor Tia", conversationHistory: [] });
   assert.equal(response.status, 200);
-  assert.match(data.reply, /not available/i);
   assert.equal(data.toolCalls, 0);
+  // The assistant never claims the deletion happened.
+  assert.equal(/has been deleted|was deleted|successfully deleted/i.test(data.reply), false);
   assert.equal(profileNames(demo).includes("Tia"), true);
 
+  // A model that invents a tool is refused by the backend.
   const adversarial = new ControlledAdapter([
-    () => toolTurn("delete_contractor", { name: "Tia" }, "g-delete-1"),
+    () => toolTurn("purge_contractor", { id: "x" }, "g-delete-1"),
     (request) => {
       const payload = lastToolPayload(request);
       assert.equal(payload.success, false);
       assert.equal(payload.code, "unknown_tool");
-      return final("I could not delete Tia because no deletion tool is available.");
+      return final("No such operation exists.");
     },
   ]);
   setAgentModelAdapterForTests(adversarial);
   const second = await send({ message: "Delete Tia anyway", conversationHistory: [] });
   assert.equal(second.response.status, 200);
+  assert.equal(profileNames(demo).includes("Tia"), true);
+
+  // A model that guesses the wrong argument shape is refused before execution.
+  const malformed = new ControlledAdapter([
+    () => toolTurn("delete_contractor", { name: "Tia" }, "g-delete-2"),
+    (request) => {
+      const payload = lastToolPayload(request);
+      assert.equal(payload.success, false);
+      assert.equal(payload.code, "invalid_tool_arguments");
+      return final("I need the contractor record ID.");
+    },
+  ]);
+  setAgentModelAdapterForTests(malformed);
+  const third = await send({ message: "Delete Tia for me", conversationHistory: [] });
+  assert.equal(third.response.status, 200);
   assert.equal(profileNames(demo).includes("Tia"), true);
 });
 
@@ -513,4 +557,132 @@ test("K5. missing provider configuration is explicit, not a scripted fallback", 
   assert.equal(data.code, "provider_not_configured");
   assert.match(data.reply, /not configured/i);
   assert.equal(/Your demo contractors are/.test(data.reply), false);
+});
+
+// L. A destructive request prepares an operation and waits for the owner.
+test("L. a deletion request prepares a pending operation and never applies it", async () => {
+  const tia = demoContractors().ownerSnapshot(demo.portalToken).profiles.find((p: any) => p.name === "Tia")!;
+  let chip: any = null;
+  const adapter = new ControlledAdapter([
+    (request) => {
+      const system = request.messages.find((message) => message.role === "system");
+      assert.ok(system && system.role === "system");
+      // The catalogue offers the lifecycle tool and marks it as needing confirmation.
+      assert.match(system.content, /delete_contractor \[write, confirmation required\]/);
+      return toolTurn("delete_contractor", { id: tia.id }, "l-delete-1");
+    },
+    (request) => {
+      const payload = lastToolPayload(request);
+      assert.equal(payload.success, true);
+      assert.equal(payload.prepared, true);
+      assert.equal(payload.contractorName, "Tia");
+      assert.equal(payload.eligible, true);
+      assert.match(String(payload.note), /never report it as done|not applied/i);
+      return final("I prepared the deletion of Tia. Confirm it in the dashboard.");
+    },
+  ]);
+  setAgentModelAdapterForTests(adapter);
+
+  const { response, data } = await send({ message: "Delete Tia.", conversationHistory: [] });
+
+  assert.equal(response.status, 200);
+  // The assistant reports the operation as pending, never as done.
+  assert.match(data.reply, /prepared/i);
+  assert.equal(data.reply.toLowerCase().includes("tia has been deleted"), false);
+  // Nothing was deleted: the contractor is still there.
+  assert.equal(demoContractors().ownerSnapshot(demo.portalToken).profiles.some((p: any) => p.name === "Tia"), true);
+  // The owner receives a confirmation chip.
+  chip = data.actions.find((item: any) => item.action.kind === "confirm-contractor-lifecycle");
+  assert.ok(chip, "expected a confirmation chip for the prepared deletion");
+  assert.match(chip.label, /Delete Tia/);
+  assert.ok(chip.action.secret, "the chip carries the single-use confirmation secret");
+  // The model never received that secret.
+  const toolMessage = adapter.calls[1].messages.filter((message) => message.role === "tool").pop() as { content: string };
+  assert.equal(toolMessage.content.includes(chip.action.secret), false);
+});
+
+// L2. The owner's confirmation applies the operation exactly once.
+test("L2. the owner's confirmation applies the prepared deletion exactly once", async () => {
+  const tia = demoContractors().ownerSnapshot(demo.portalToken).profiles.find((p: any) => p.name === "Tia")!;
+  const adapter = new ControlledAdapter([
+    () => toolTurn("delete_contractor", { id: tia.id }, "l2-delete-1"),
+    () => final("The deletion of Tia is prepared. Confirm it to apply it."),
+  ]);
+  setAgentModelAdapterForTests(adapter);
+  const { data } = await send({ message: "Remove Tia from my contractors.", conversationHistory: [] });
+  const chip = data.actions.find((item: any) => item.action.kind === "confirm-contractor-lifecycle");
+  assert.ok(chip);
+
+  const confirmed = await confirmLifecycle({ operationId: chip.action.operationId, secret: chip.action.secret });
+  assert.equal(confirmed.response.status, 200);
+  assert.equal(demoContractors().ownerSnapshot(demo.portalToken).profiles.some((p: any) => p.name === "Tia"), false);
+  // The deletion is audited.
+  const events = demoContractors().ownerSnapshot(demo.portalToken).events ?? [];
+  assert.equal(events.some((event: any) => event.action === "deleted" && event.profileName === "Tia"), true);
+
+  // A replay is refused and never deletes anything twice.
+  const replay = await confirmLifecycle({ operationId: chip.action.operationId, secret: chip.action.secret });
+  assert.equal(replay.response.status, 400);
+  assert.equal((demoContractors().ownerSnapshot(demo.portalToken).events ?? []).filter((event: any) => event.action === "deleted" && event.profileName === "Tia").length, 1);
+});
+
+// L3. A wrong confirmation secret never applies the operation.
+test("L3. a confirmation with the wrong secret never applies the operation", async () => {
+  const marcus = demoContractors().ownerSnapshot(demo.portalToken).profiles.find((p: any) => p.name === "Marcus Johnson")!;
+  const adapter = new ControlledAdapter([
+    () => toolTurn("archive_contractor", { id: marcus.id }, "l3-archive-1"),
+    () => final("The archive of Marcus Johnson is prepared. Confirm it to apply it."),
+  ]);
+  setAgentModelAdapterForTests(adapter);
+  const { data } = await send({ message: "Remove Marcus Johnson from my active contractors.", conversationHistory: [] });
+  const chip = data.actions.find((item: any) => item.action.kind === "confirm-contractor-lifecycle");
+  assert.ok(chip);
+
+  const wrong = await confirmLifecycle({ operationId: chip.action.operationId, secret: "not-the-secret" });
+  assert.equal(wrong.response.status, 400);
+  // Marcus is untouched.
+  assert.equal(demoContractors().ownerSnapshot(demo.portalToken).profiles.some((p: any) => p.name === "Marcus Johnson"), true);
+  assert.equal((demoContractors().ownerSnapshot(demo.portalToken).archivedProfiles ?? []).some((p: any) => p.name === "Marcus Johnson"), false);
+
+  // The real confirmation works.
+  const confirmed = await confirmLifecycle({ operationId: chip.action.operationId, secret: chip.action.secret });
+  assert.equal(confirmed.response.status, 200);
+  assert.equal((demoContractors().ownerSnapshot(demo.portalToken).archivedProfiles ?? []).some((p: any) => p.name === "Marcus Johnson"), true);
+  // The archived contractor keeps the portal link revoked and stays inspectable.
+  assert.equal(demoContractors().ownerSnapshot(demo.portalToken).profiles.some((p: any) => p.name === "Marcus Johnson"), false);
+});
+
+// L4. A contractor with linked records cannot be deleted; the assistant is told
+// that archiving is the available option.
+test("L4. a contractor with linked records cannot be deleted and archiving is offered", async () => {
+  const profileId = demoContractors().ownerCommand(demo.portalToken, { action: "create-profile", name: "Linked" }).profileId!;
+  const link = demoContractors().ownerCommand(demo.portalToken, { action: "issue-link", profileId }).token!;
+  const session = demoContractors().enter(link);
+  demoContractors().command(session, {
+    action: "submit-invoice",
+    submissionId: "agent-linked-1",
+    fields: { orderId: "", amount: "0.4", asset: "NEAR", recipient: "writer.testnet" },
+    text: "Delivered urgent fixes beyond the signed scope.",
+    description: "Urgent fixes",
+  });
+
+  const adapter = new ControlledAdapter([
+    () => toolTurn("delete_contractor", { id: profileId }, "l4-delete-1"),
+    (request) => {
+      const payload = lastToolPayload(request);
+      assert.equal(payload.success, false);
+      assert.equal(payload.code, "lifecycle_not_allowed");
+      assert.match(String(payload.error), /Archive it instead/i);
+      return final("That contractor still has records, so it cannot be deleted. I can archive it instead if you want.");
+    },
+  ]);
+  setAgentModelAdapterForTests(adapter);
+
+  const { response, data } = await send({ message: "Delete Linked.", conversationHistory: [] });
+  assert.equal(response.status, 200);
+  assert.match(data.reply, /archive/i);
+  // No confirmation chip is offered for a refused operation.
+  assert.equal(data.actions.some((item: any) => item.action.kind === "confirm-contractor-lifecycle"), false);
+  // The contractor is untouched.
+  assert.equal(demoContractors().ownerSnapshot(demo.portalToken).profiles.some((p: any) => p.name === "Linked"), true);
 });

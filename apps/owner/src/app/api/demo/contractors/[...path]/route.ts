@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { demoContractors } from "../../../../../server/demo-contractors";
-import type { ContractorCommand, OwnerPortalCommand } from "../../../../../data/contractor-adapter";
-import { isAllowedAppOrigin } from "../../../../../server/origin";
+import { NextRequest, NextResponse } from "next/server.js";
+import { demoContractors } from "../../../../../server/demo-contractors.ts";
+import { claimLifecycle, lifecycleScope } from "../../../../../server/contractor-lifecycle.ts";
+import type { ContractorCommand, OwnerPortalCommand } from "../../../../../data/contractor-adapter.ts";
+import { isAllowedAppOrigin } from "../../../../../server/origin.ts";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const ownerCookie = "nnetics_demo_portal_owner", contractorCookie = "nnetics_demo_portal_contractor";
@@ -90,6 +91,33 @@ export async function POST(req: NextRequest, context: Context) {
         }
         if (path === "owner")
             return json(store.ownerCommand(owner, input as OwnerPortalCommand));
+        // The owner confirmed a prepared contractor lifecycle operation. The
+        // single-use secret is bound to the owner session and to that exact
+        // operation, so it can be applied once and only by the owner.
+        if (path === "owner/confirm-lifecycle") {
+            const org = store.owner(owner);
+            if (!org)
+                throw Error("Not an owner workspace.");
+            const operation = claimLifecycle(lifecycleScope(owner), String(input.operationId ?? ""), String(input.secret ?? ""));
+            if (!operation)
+                throw Error("This confirmation is no longer valid. Prepare the operation again.");
+            const snapshot = store.ownerSnapshot(owner);
+            const profile = [...snapshot.profiles, ...(snapshot.archivedProfiles ?? [])].find(p => p.id === operation.contractorId);
+            if (!profile)
+                throw Error("That contractor no longer exists in this demo workspace.");
+            // Revalidate before anything is applied.
+            if (operation.kind === "delete") {
+                const eligibility = store.lifecycleEligibility(operation.contractorId, org);
+                if (!eligibility.eligible)
+                    throw Error(eligibility.reason);
+            }
+            if (operation.kind === "archive" && profile.archived === true)
+                throw Error("This contractor is already archived.");
+            if (operation.kind === "restore" && profile.archived !== true)
+                throw Error("This contractor is not archived.");
+            const result = store.ownerCommand(owner, { action: `${operation.kind}-contractor`, profileId: operation.contractorId } as OwnerPortalCommand);
+            return json({ operation: { kind: operation.kind, contractorId: operation.contractorId, contractorName: operation.contractorName }, result, state: store.ownerSnapshot(owner) });
+        }
         if (path === "contractor")
             return json(store.command(contractor, input as ContractorCommand));
         return json({ error: "Unknown demo endpoint." }, 404);

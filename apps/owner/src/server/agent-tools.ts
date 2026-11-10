@@ -118,6 +118,11 @@ export interface AgentToolExecutor {
   getContractor(args: { id?: string; name?: string }): Promise<ToolResult<ContractorProfile | null>>;
   createContractor(args: { name: string }): Promise<ToolResult<ContractorProfile>>;
   updateContractor(args: { id: string; name?: string }): Promise<ToolResult<ContractorProfile>>;
+  // Lifecycle tools prepare an operation for owner confirmation. They never
+  // mutate anything by themselves.
+  archiveContractor(args: { id: string }): Promise<ToolResult<any>>;
+  restoreContractor(args: { id: string }): Promise<ToolResult<any>>;
+  deleteContractor(args: { id: string }): Promise<ToolResult<any>>;
   getContractorInvoices(args: { contractorId: string }): Promise<ToolResult<any[]>>;
 
   // Vault Tools

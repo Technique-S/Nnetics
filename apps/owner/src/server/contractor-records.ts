@@ -32,6 +32,7 @@ export class ContractorRecordStore {
       CREATE TABLE IF NOT EXISTS demo_bills(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, reference TEXT NOT NULL, order_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, UNIQUE(org,profile,reference));
       CREATE TABLE IF NOT EXISTS demo_bill_history(id INTEGER PRIMARY KEY, bill TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_uploads(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, bytes BLOB NOT NULL);
+      CREATE TABLE IF NOT EXISTS demo_contractor_events(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, profile_name TEXT NOT NULL, action TEXT NOT NULL, detail TEXT NOT NULL DEFAULT '', at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_wallet_proofs(challenge TEXT PRIMARY KEY, session TEXT NOT NULL, profile TEXT NOT NULL, account TEXT NOT NULL, expires INTEGER NOT NULL);`);
         referenceTables(this.db);
         this.db.exec("CREATE TABLE IF NOT EXISTS contractor_store_metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)");
@@ -71,6 +72,12 @@ export class ContractorRecordStore {
         return JSON.parse(row.payload);
     }
     protected save(org: string, profile: ContractorProfile) { this.db.prepare("UPDATE demo_profiles SET payload=? WHERE id=? AND org=?").run(JSON.stringify(profile), profile.id, org); }
+    // The audit trail outlives the profile it describes, so a deleted
+    // contractor still leaves an attributable record behind.
+    private audit(org: string, profile: ContractorProfile, action: string, detail: string) {
+        this.db.prepare("INSERT INTO demo_contractor_events(id,org,profile,profile_name,action,detail,at) VALUES (?,?,?,?,?,?,?)")
+            .run(id(), org, profile.id, profile.name, action, detail, new Date().toISOString());
+    }
     private capability(token: string) {
         const row = this.db.prepare(`SELECT l.profile,l.generation,p.org FROM demo_links l JOIN demo_profiles p ON p.id=l.profile
       WHERE l.token=? AND l.expires>? AND l.revoked=0`).get(hash(token), Date.now()) as {
@@ -122,9 +129,58 @@ export class ContractorRecordStore {
             // Return a blank portal snapshot for demo purposes
             return { mode: "simulation", profiles: [], orders: [], invoices: [] };
         }
-        return { mode: this.mode, profiles: (this.db.prepare("SELECT payload FROM demo_profiles WHERE org=? ORDER BY rowid").all(org) as {
+        const counts = this.linkCounts(org);
+        const all = (this.db.prepare("SELECT payload FROM demo_profiles WHERE org=? ORDER BY rowid").all(org) as {
                 payload: string;
-            }[]).map(r => JSON.parse(r.payload)), orders: this.rows("demo_orders", org), invoices: this.rows("demo_bills", org) };
+            }[]).map(r => JSON.parse(r.payload) as ContractorProfile);
+        const view = (profile: ContractorProfile): ContractorProfile => ({
+            ...profile,
+            archived: profile.archived === true,
+            archivedAt: profile.archivedAt ?? null,
+            deletable: this.eligibilityFor(profile.id, counts).eligible
+        });
+        const profiles = all.filter(profile => profile.archived !== true).map(view);
+        const archivedProfiles = all.filter(profile => profile.archived === true).map(view);
+        const events = (this.db.prepare("SELECT id,profile,profile_name,action,detail,at FROM demo_contractor_events WHERE org=? ORDER BY rowid DESC").all(org) as {
+                id: string; profile: string; profile_name: string; action: string; detail: string; at: string;
+            }[]).map(row => ({ id: row.id, profileId: row.profile, profileName: row.profile_name, action: row.action, detail: row.detail, at: row.at }));
+        return {
+            mode: this.mode, profiles, archivedProfiles,
+            orders: this.rows("demo_orders", org), invoices: this.rows("demo_bills", org), events
+        };
+    }
+
+    // How many records still reference each contractor of this organization.
+    // One aggregate query keeps a large workspace cheap to render.
+    private linkCounts(org: string) {
+        const rows = this.db.prepare(`SELECT p.id id,
+            (SELECT count(*) FROM demo_bills b WHERE b.profile=p.id) bills,
+            (SELECT count(*) FROM demo_orders o WHERE o.profile=p.id) orders,
+            (SELECT count(*) FROM demo_uploads u WHERE u.profile=p.id) uploads,
+            (SELECT count(*) FROM demo_links l WHERE l.profile=p.id AND l.revoked=0) activeLinks
+          FROM demo_profiles p WHERE p.org=?`).all(org) as { id: string; bills: number; orders: number; uploads: number; activeLinks: number }[];
+        return new Map(rows.map(row => [row.id, { bills: row.bills, orders: row.orders, uploads: row.uploads, activeLinks: row.activeLinks }]));
+    }
+
+    private eligibilityFor(profileId: string, counts: Map<string, { bills: number; orders: number; uploads: number; activeLinks: number }>) {
+        const linked = counts.get(profileId) ?? { bills: 0, orders: 0, uploads: 0, activeLinks: 0 };
+        const retained = linked.bills + linked.orders + linked.uploads;
+        const eligible = retained === 0 && linked.activeLinks === 0;
+        const parts: string[] = [];
+        if (linked.bills) parts.push(`${linked.bills} invoice${linked.bills === 1 ? "" : "s"}`);
+        if (linked.orders) parts.push(`${linked.orders} work order${linked.orders === 1 ? "" : "s"}`);
+        if (linked.uploads) parts.push(`${linked.uploads} attachment${linked.uploads === 1 ? "" : "s"}`);
+        if (linked.activeLinks) parts.push(`${linked.activeLinks} active portal link${linked.activeLinks === 1 ? "" : "s"}`);
+        const reason = eligible
+            ? "This contractor has no invoices, work orders, attachments or active portal access, so the profile can be removed permanently."
+            : `This contractor still has ${parts.join(", ")}. Archive it instead: archiving keeps every invoice, payment record and receipt, and revokes portal access.`;
+        return { eligible, reason, linked: { bills: linked.bills, orders: linked.orders, uploads: linked.uploads, activeLinks: linked.activeLinks } };
+    }
+
+    // Whether a contractor may be deleted outright. A contractor with any
+    // financial or operational record must be archived instead.
+    lifecycleEligibility(profileId: string, org: string) {
+        return this.eligibilityFor(profileId, this.linkCounts(org));
     }
     snapshot(token: string): ContractorSnapshot {
         const { org, profile } = this.contractor(token);
@@ -152,14 +208,16 @@ export class ContractorRecordStore {
         token?: string;
         profileId?: string;
     } {
+        // Contractor lifecycle changes are a demo-workspace capability for now.
+        // A verified organization keeps its current behaviour unchanged.
+        if (this.mode !== "simulation" && ["update-contractor", "archive-contractor", "restore-contractor", "delete-contractor"].includes(input.action))
+            throw Error("Contractor lifecycle changes are not available for this organization yet.");
         if (input.action === "create-profile") {
-            const p: ContractorProfile = { id: id(), name: text(input.name, 80, "contractor name"), generation: 0, linkActive: false, wallet: null, walletVersion: 0, pendingWallet: null };
-            const count = this.db.prepare("SELECT count(*) AS n FROM demo_profiles WHERE org=?").get(org) as {
-                n: number;
-            };
-            if (count.n >= 3)
-                throw Error("This MVP demo supports three contractors per workspace.");
+            const p: ContractorProfile = { id: id(), name: text(input.name, 80, "contractor name"), generation: 0, linkActive: false, wallet: null, walletVersion: 0, pendingWallet: null, archived: false, archivedAt: null };
+            // A demo workspace is not limited in how many contractors it holds.
+            // Storage, pagination and rate limits are the real bounds.
             this.db.prepare("INSERT INTO demo_profiles VALUES (?,?,?)").run(p.id, org, JSON.stringify(p));
+            this.audit(org, p, "created", `Contractor ${p.name} was added.`);
             return { profileId: p.id };
         }
         if (input.action === "review-invoice") {
@@ -183,6 +241,52 @@ export class ContractorRecordStore {
         if (!("profileId" in input))
             throw Error("Unsupported demo action.");
         const p = this.profile(input.profileId, org);
+        if (input.action === "update-contractor") {
+            if (p.archived === true)
+                throw Error("Restore the contractor before editing it.");
+            p.name = text(input.name, 80, "contractor name");
+            this.save(org, p);
+            this.audit(org, p, "updated", `The contractor was renamed to ${p.name}.`);
+            return { profileId: p.id };
+        }
+        if (input.action === "archive-contractor") {
+            if (p.archived === true)
+                throw Error("This contractor is already archived.");
+            // Archiving removes the contractor from the active list and revokes
+            // portal access. Every invoice, work order and payment record is
+            // preserved and the contractor stays inspectable.
+            p.archived = true;
+            p.archivedAt = new Date().toISOString();
+            p.generation++;
+            p.linkActive = false;
+            p.pendingWallet = null;
+            this.db.prepare("UPDATE demo_links SET revoked=1 WHERE profile=?").run(p.id);
+            this.save(org, p);
+            this.audit(org, p, "archived", "Portal access revoked. Invoices, work orders and payment history are preserved.");
+            return { profileId: p.id };
+        }
+        if (input.action === "restore-contractor") {
+            if (p.archived !== true)
+                throw Error("This contractor is not archived.");
+            p.archived = false;
+            p.archivedAt = null;
+            this.save(org, p);
+            this.audit(org, p, "restored", "The contractor returned to the active list. No financial record changed.");
+            return { profileId: p.id };
+        }
+        if (input.action === "delete-contractor") {
+            const eligibility = this.lifecycleEligibility(p.id, org);
+            if (!eligibility.eligible)
+                throw Error(eligibility.reason);
+            // Only a profile with no linked record can be removed. Payment
+            // records and receipts live in the separate workspace ledger and
+            // are never touched by this operation.
+            this.db.prepare("DELETE FROM demo_links WHERE profile=?").run(p.id);
+            this.db.prepare("DELETE FROM demo_wallet_proofs WHERE profile=?").run(p.id);
+            this.db.prepare("DELETE FROM demo_profiles WHERE id=? AND org=?").run(p.id, org);
+            this.audit(org, p, "deleted", "The contractor profile was removed. No financial record was affected.");
+            return { profileId: p.id };
+        }
         if (input.action === "issue-link" || input.action === "revoke-link") {
             p.generation++;
             p.linkActive = input.action === "issue-link";

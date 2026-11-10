@@ -6,6 +6,7 @@ import { service } from "./service.ts";
 import { organizationSnapshot } from "./organization-api.ts";
 import { demoContractors } from "./demo-contractors.ts";
 import { demoWorkspace } from "./demo-workspace.ts";
+import { lifecycleScope, lifecycleSummary, prepareLifecycle } from "./contractor-lifecycle.ts";
 import { amountFromNear, formatNear } from "../data/owner-adapter.ts";
 import type { ContractorProfile, OwnerPortalCommand } from "../data/contractor-adapter.ts";
 import type { OwnerSnapshot } from "../data/owner-adapter.ts";
@@ -57,7 +58,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
             id: p.id,
             name: p.name,
             wallet: p.wallet,
-            generation: p.generation
+            generation: p.generation,
+            archived: p.archived === true,
+            deletable: p.deletable === true
           }))
         };
       } else {
@@ -103,7 +106,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
             id: profile.id,
             name: profile.name,
             wallet: profile.wallet,
-            generation: profile.generation
+            generation: profile.generation,
+            archived: profile.archived === true,
+            deletable: profile.deletable === true
           }
         };
       } else {
@@ -141,7 +146,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
             id: createdProfile.id,
             name: createdProfile.name,
             wallet: createdProfile.wallet,
-            generation: createdProfile.generation
+            generation: createdProfile.generation,
+            archived: createdProfile.archived === true,
+            deletable: createdProfile.deletable === true
           }
         };
       } else {
@@ -168,6 +175,66 @@ export class AgentToolExecutor implements AgentToolExecutor {
       return {
         success: false,
         error: error instanceof Error ? error.message : "Failed to update contractor"
+      };
+    }
+  }
+
+  // Contractor lifecycle tools. They never mutate anything: they resolve the
+  // contractor, evaluate whether the operation is allowed and register a
+  // pending operation. The owner completes it with an explicit confirmation
+  // in the dashboard. The confirmation secret never reaches the model.
+  async archiveContractor(args: { id: string }): Promise<ToolResult<any>> {
+    return this.prepareLifecycle("archive", args.id);
+  }
+
+  async restoreContractor(args: { id: string }): Promise<ToolResult<any>> {
+    return this.prepareLifecycle("restore", args.id);
+  }
+
+  async deleteContractor(args: { id: string }): Promise<ToolResult<any>> {
+    return this.prepareLifecycle("delete", args.id);
+  }
+
+  private prepareLifecycle(kind: "archive" | "restore" | "delete", id: string): ToolResult<any> {
+    try {
+      if (!this.isDemoOperation())
+        return { success: false, error: "Live mode not fully implemented" };
+      const store = demoContractors();
+      const ownerToken = this.demoOwnerToken();
+      const org = store.owner(ownerToken);
+      if (!org)
+        return { success: false, code: "demo_owner_required", error: "Demo owner session required. Start the contractor demo first." };
+      const snapshot = store.ownerSnapshot(ownerToken);
+      const profile =
+        (snapshot.profiles as any[]).find((p: any) => p.id === id) ??
+        ((snapshot.archivedProfiles ?? []) as any[]).find((p: any) => p.id === id);
+      if (!profile)
+        return { success: false, code: "contractor_not_found", error: "No contractor with that record ID exists in this demo organization." };
+      const eligibility = store.lifecycleEligibility(profile.id, org);
+      if (kind === "delete" && !eligibility.eligible)
+        return {
+          success: false,
+          code: "lifecycle_not_allowed",
+          error: `${eligibility.reason} Offer to archive the contractor instead.`
+        };
+      if (kind === "archive" && profile.archived === true)
+        return { success: false, code: "lifecycle_not_allowed", error: "This contractor is already archived. Use restore to bring them back." };
+      if (kind === "restore" && profile.archived !== true)
+        return { success: false, code: "lifecycle_not_allowed", error: "This contractor is not archived, so there is nothing to restore." };
+      const operation = prepareLifecycle({
+        scope: lifecycleScope(ownerToken),
+        kind,
+        contractorId: profile.id,
+        contractorName: profile.name,
+        eligibility
+      });
+      // The summary carries no confirmation secret: only the dashboard can
+      // complete the operation.
+      return { success: true, data: lifecycleSummary(operation) };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to prepare the contractor operation"
       };
     }
   }
