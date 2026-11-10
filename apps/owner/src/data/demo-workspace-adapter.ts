@@ -2,7 +2,12 @@
 // OwnerAdapter contract, but every record comes from the visitor's own
 // server-backed demo workspace (Cookie session, SQLite, simulated funds only).
 // Live client code stays untouched: no keys, no signing, no live requests.
-import { account, NEAR, uint } from "./owner-adapter.ts";
+//
+// Money crosses this boundary as canonical yoctoNEAR, exactly like every other
+// monetary field in the application. A NEAR decimal typed by the visitor is
+// converted here, once, at the edge — never inside the ledger and never with
+// floating point.
+import { account, amountFromNear, NEAR, uint } from "./owner-adapter.ts";
 import type {
   Invoice,
   OwnerAdapter,
@@ -18,6 +23,8 @@ export { DEMO_FEE } from "./demo-constants.ts";
 
 // Wire DTOs mirror the JSON the workspace route returns (snapshot with the
 // session token stripped server-side).
+export type DemoWsPaymentStatus = "prepared" | "pending" | "confirmed" | "failed" | "cancelled";
+
 export interface DemoWsPayment {
   id: string;
   contractor: string;
@@ -26,16 +33,17 @@ export interface DemoWsPayment {
   fee: string;
   total: string;
   description: string;
-  status: "pending" | "confirmed" | "failed";
+  status: DemoWsPaymentStatus;
   reason: string;
   reference: string;
   createdAt: string;
   settledAt: string | null;
   billId: string | null;
+  awaitingConfirmation: boolean;
 }
 export interface DemoWsHistory {
   id: string;
-  kind: "funding" | "payment";
+  kind: "funding" | "payment" | "control";
   label: string;
   amount: string;
   status: string;
@@ -55,11 +63,18 @@ export interface DemoWsSnapshot {
   initialized: boolean;
   revision: number;
   profile: { name: string; vaultName: string; createdAt: string };
-  vault: { funded: string; spent: string; reserved: string; limit: string; available: string };
+  vault: { funded: string; spent: string; reserved: string; limit: string; available: string; paused: boolean };
   payments: DemoWsPayment[];
   history: DemoWsHistory[];
   receipts: DemoWsReceipt[];
-  scenario: "success" | "failure";
+  scenario: "success" | "failure" | "unknown";
+}
+
+// A prepared payment and the single-use secret that binds the owner's
+// confirmation to this exact attempt.
+export interface PreparedDemoPayment {
+  payment: DemoWsPayment;
+  confirmationSecret: string;
 }
 
 const DEMO_OWNER = "owner-demo.testnet";
@@ -78,6 +93,14 @@ async function call<T>(path: string, body: unknown, method: "GET" | "POST"): Pro
   if (!response.ok || !data)
     throw new Error(data?.error || `The demo workspace is unavailable. Retry refresh.`);
   return data as T;
+}
+
+// A NEAR decimal from a form becomes a canonical yoctoNEAR integer here.
+// Nothing downstream ever sees a decimal amount.
+function toYocto(amount: string, label: string): string {
+  const text = String(amount ?? "").trim();
+  if (!text) throw new Error(`Enter ${label}.`);
+  return amountFromNear(text).toString();
 }
 
 export class DemoWorkspaceAdapter implements OwnerAdapter {
@@ -129,13 +152,13 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
       recipient: account(p.recipient || DEMO_OWNER),
       amount: uint(p.amount || "0"),
       initiated_at_ns: uint((BigInt(Date.parse(p.createdAt) || 0) * 1_000_000n).toString(), (1n << 64n) - 1n),
-      status: p.status === "pending" ? "Pending" : p.status === "confirmed" ? "Paid" : "Failed",
+      status: p.status === "pending" || p.status === "prepared" ? "Pending" : p.status === "confirmed" ? "Paid" : "Failed",
       reference: p.reference,
     }));
     const vault: Vault = {
       owner: account(DEMO_OWNER),
       agent: structuredClone(DEMO_AGENT),
-      paused: false,
+      paused: raw.vault.paused === true,
       budget: uint((BigInt(raw.vault.funded) + BigInt(raw.vault.spent) + BigInt(raw.vault.reserved) + BigInt(OPEN_CAP)).toString()),
       payment_cap: uint(raw.vault.limit ? raw.vault.limit : OPEN_CAP),
       funded: uint(raw.vault.funded || "0"),
@@ -181,7 +204,7 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
     throw new Error("Demo bills are reviewed in the contractor panel.");
   }
   async simulatePayment(_id: string, _scenario: TransferScenario): Promise<void> {
-    throw new Error("Demo payments are approved in the payment review screen.");
+    throw new Error("Demo payments are prepared in the Payments workspace.");
   }
 
   // --- Demo extras -------------------------------------------------------
@@ -191,7 +214,7 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
   }
   async fund(amount: string): Promise<void> {
     this.check();
-    await call<DemoWsSnapshot>("fund", { amount }, "POST");
+    await call<DemoWsSnapshot>("fund", { amount: toYocto(amount, "a funding amount") }, "POST");
     this.emit();
   }
   async setScenario(scenario: "success" | "failure"): Promise<void> {
@@ -201,7 +224,13 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
   }
   async setLimit(amount: string): Promise<void> {
     this.check();
-    await call<DemoWsSnapshot>("limit", { amount }, "POST");
+    const limit = String(amount ?? "").trim() === "" ? "" : toYocto(amount, "a spending limit");
+    await call<DemoWsSnapshot>("limit", { amount: limit }, "POST");
+    this.emit();
+  }
+  async setPaused(paused: boolean): Promise<void> {
+    this.check();
+    await call<DemoWsSnapshot>("pause", { paused }, "POST");
     this.emit();
   }
   async resetWorkspace(): Promise<void> {
@@ -209,16 +238,37 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
     await call<DemoWsSnapshot>("reset", null, "POST");
     this.emit();
   }
-  async payContractor(draft: ContractorPaymentDraft, _scenario?: TransferScenario): Promise<void> {
+  // Phase one: validate, reserve and wait for the owner's confirmation. The
+  // draft amount is already canonical yoctoNEAR.
+  async preparePayment(draft: ContractorPaymentDraft, billId?: string): Promise<PreparedDemoPayment> {
     this.check();
-    await call<unknown>("payment", {
+    const result = await call<{ payment: DemoWsPayment; confirmationSecret: string }>("payment/prepare", {
       idempotencyKey: draft.id,
       recipient: draft.recipient,
       amount: draft.amount,
       description: draft.description,
-      contractor: draft.name
+      contractor: draft.name,
+      ...(billId ? { billId } : {})
     }, "POST");
     this.emit();
+    return result;
+  }
+  // Phase two: the owner's explicit confirmation. A repeated confirmation
+  // resolves to the same attempt and never debits twice.
+  async confirmPayment(paymentId: string, confirmationSecret: string): Promise<DemoWsPayment> {
+    this.check();
+    const result = await call<{ payment: DemoWsPayment }>("payment/confirm", {
+      paymentId,
+      confirmationSecret
+    }, "POST");
+    this.emit();
+    return result.payment;
+  }
+  async cancelPayment(paymentId: string): Promise<DemoWsPayment> {
+    this.check();
+    const result = await call<{ payment: DemoWsPayment }>("payment/cancel", { paymentId }, "POST");
+    this.emit();
+    return result.payment;
   }
   async assistantStatus(): Promise<{ configured: boolean; model: string | null; provider: string | null }> {
     const response = await fetch("/api/demo/assistant", { cache: "no-store" });

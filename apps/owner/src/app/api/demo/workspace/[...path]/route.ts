@@ -72,10 +72,10 @@ export async function POST(req: NextRequest, context: Context) {
             return json(safe(store.fund(token, String(input.amount ?? ""))));
         if (path === "reset")
             return json(safe(store.reset(token)));
-        // "payment" is the canonical approve action; the plan also called it
-        // "settle" — accepted here as an alias for the same store operation.
-        if (path === "payment" || path === "settle") {
-            const payment = store.approvePayment(token, {
+        // Phase one of a simulated payment: validate, reserve, and wait for the
+        // owner's explicit confirmation. The amount is canonical yoctoNEAR.
+        if (path === "payment/prepare") {
+            const prepared = store.preparePayment(token, {
                 idempotencyKey: String(input.idempotencyKey ?? ""),
                 recipient: String(input.recipient ?? ""),
                 amount: String(input.amount ?? ""),
@@ -83,12 +83,30 @@ export async function POST(req: NextRequest, context: Context) {
                 contractor: typeof input.contractor === "string" ? input.contractor : undefined,
                 billId: typeof input.billId === "string" ? input.billId : undefined
             });
+            return json({ ...prepared, state: safe(store.state(token)) });
+        }
+        // Phase two: the owner's confirmation releases the attempt. The secret is
+        // single-use and bound to the exact prepared record.
+        if (path === "payment/confirm") {
+            const payment = store.confirmPayment(token, {
+                paymentId: String(input.paymentId ?? ""),
+                confirmationSecret: String(input.confirmationSecret ?? "")
+            });
+            return json({ payment, state: safe(store.state(token)) });
+        }
+        if (path === "payment/cancel") {
+            const payment = store.cancelPayment(token, String(input.paymentId ?? ""));
             return json({ payment, state: safe(store.state(token)) });
         }
         if (path === "scenario")
             return json(safe(store.setScenario(token, input.scenario as DemoScenario)));
         if (path === "limit")
             return json(safe(store.setLimit(token, String(input.amount ?? ""))));
+        if (path === "pause") {
+            if (typeof input.paused !== "boolean")
+                throw Error("Choose whether the demo vault is paused.");
+            return json(safe(store.setPaused(token, input.paused)));
+        }
         return json({ error: "Unknown demo endpoint." }, 404);
     }
     catch (e) {

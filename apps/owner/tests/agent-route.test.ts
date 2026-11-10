@@ -34,7 +34,8 @@ interface DemoSession {
 function newDemo(): DemoSession {
   const started = demoWorkspace().start("");
   demoWorkspace().createWorkspace(started.token, { profileName: "Kazi", vaultName: "Kazi Demo Vault" });
-  demoWorkspace().fund(started.token, "5");
+  // The demo ledger carries canonical yoctoNEAR only: 5 NEAR is 5 * 10^24.
+  demoWorkspace().fund(started.token, "5000000000000000000000000");
   const portalToken = demoContractors().ownerStart("");
   return {
     workspaceToken: started.token,

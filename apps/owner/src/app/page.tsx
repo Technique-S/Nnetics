@@ -486,11 +486,38 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
             ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization} readOnly={readOnly} limit={vault.payment_cap}/>
             : <DemoContractorWorkspace
                 key={contractorRevision}
-                onPay={demoWs
-                  ? async draft => { await run("demo-pay", () => demoWs.payContractor(draft)); }
-                  : demo
-                    ? async draft => { await run("demo-pay", async () => { await demo.payContractor(draft, scenario); await refresh(); }); }
-                    : undefined}
+                onPrepare={demoWs
+                  ? async draft => {
+                      // Phase one: the demo ledger validates the request and
+                      // reserves the amount. Nothing is executed yet.
+                      const prepared = await demoWs.preparePayment(draft);
+                      return {
+                        id: prepared.payment.id,
+                        reference: prepared.payment.reference,
+                        contractor: prepared.payment.contractor,
+                        recipient: prepared.payment.recipient,
+                        amount: prepared.payment.amount,
+                        fee: prepared.payment.fee,
+                        total: prepared.payment.total,
+                        description: prepared.payment.description,
+                        confirmationSecret: prepared.confirmationSecret
+                      };
+                    }
+                  : undefined}
+                onConfirm={demoWs
+                  ? async prepared => {
+                      // Phase two: the owner's explicit confirmation releases
+                      // the simulated transfer. The secret is single-use.
+                      await demoWs.confirmPayment(prepared.id, prepared.confirmationSecret);
+                      await refresh();
+                    }
+                  : undefined}
+                onCancel={demoWs
+                  ? async prepared => {
+                      await demoWs.cancelPayment(prepared.id);
+                      await refresh();
+                    }
+                  : undefined}
                 paymentFee={demoWs ? DEMO_FEE : undefined}
                 intent={intent ?? undefined}/>)}
           {demoWs && intent && <button className="text-button" onClick={() => setIntent(null)}>Clear the prepared assistant step</button>}
@@ -600,8 +627,10 @@ function DemoWorkspaceSetup({busy, flowError, onCreate}: {busy: boolean; flowErr
 
 function DemoVaultCard({demoWs, run}: {demoWs: DemoWorkspaceAdapter; run: (key: string, action: () => Promise<void>, message?: string) => Promise<void>}) {
   const raw = demoWs.demo();
+  const paused = raw?.vault.paused === true;
   return <section className="panel payment-workspace-panel">
     <h2>Demo Wallet · simulated funds</h2>
+    {paused && <p><Badge status="Paused"/> New simulated payments are refused while the demo vault is paused.</p>}
     <dl className="payment-draft-details">
       <dt>Available demo funds</dt><dd>{formatNear(raw?.vault.available ?? "0")} NEAR</dd>
       <dt>Funded so far</dt><dd>{formatNear(raw?.vault.funded ?? "0")} NEAR</dd>
@@ -624,6 +653,9 @@ function DemoVaultCard({demoWs, run}: {demoWs: DemoWorkspaceAdapter; run: (key: 
       <p>Demo wallet funding is simulated NEAR only; no blockchain, wallet or token is involved. Fundings stack, so repeat the amount any time.</p>
     </form>
     <div className="actions">
+      <button className="button secondary" aria-label={paused ? "Resume the demo vault" : "Pause the demo vault"} onClick={() => {
+        void run("demo-pause", () => demoWs.setPaused(!paused), paused ? "Demo vault resumed. Simulated payments can be prepared again." : "Demo vault paused. New simulated payments are refused until it is resumed.");
+      }}>{paused ? "Resume demo vault" : "Pause demo vault"}</button>
       <button className="button secondary" onClick={() => { if (window.confirm("Reset the demo workspace? This visitor's funding history, payments and receipts return to a blank walkthrough.")) void run("demo-reset", () => demoWs.resetWorkspace(), "Demo workspace reset. A fresh walkthrough can start."); }}>Reset demo workspace</button>
     </div>
   </section>;

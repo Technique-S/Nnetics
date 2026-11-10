@@ -247,7 +247,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
             reserved: vault.reserved,
             available: vault.available,
             limit: vault.limit || null,
-            paused: false // Demo vaults typically aren't paused
+            // The demo vault's real pause state. A paused demo vault refuses
+            // every new simulated payment until it is resumed.
+            paused: vault.paused === true
           }
         };
       } else {
@@ -443,7 +445,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
               reservedNear: formatNear(workspace.vault.reserved),
               availableYoctoNEAR: workspace.vault.available,
               availableNear: formatNear(workspace.vault.available),
-              paused: false,
+              paused: workspace.vault.paused === true,
             },
           }
         };

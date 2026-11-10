@@ -16,6 +16,16 @@ export function getUserMessage(error:unknown,context:MessageContext="general"):s
  if(matches(/review cancelled/))return "Review cancelled. No wallet transaction was requested.";
  if(matches(/fee allowance|balance does not cover/))return "The account must cover the exact deposit and displayed fee allowance. Check its balance and current fees before proceeding.";
  if(matches(/Conflicting amount/i))return "Your bill contains more than one amount. Confirm one amount before submitting.";
+  // Demo workspace failures. These are checked before the generic amount,
+  // limit and pause rules so a simulated failure never reads as a live one.
+  if(matches(/demo vault (?:is|was) paused/i))return "The demo vault is paused. Resume it in Vault & Controls before preparing a payment.";
+  if(matches(/canonical unsigned integer|exact whole number of yoctoNEAR/i))return "Enter one exact positive amount in NEAR, with no more than 24 decimal places.";
+  if(matches(/already been prepared or paid/i))return "This invoice has already been prepared or paid. Open Activity for the existing record.";
+  if(matches(/does not match the prepared payment/i))return "This confirmation no longer matches the prepared payment. Prepare it again and confirm it once.";
+  if(matches(/no longer awaiting confirmation/i))return "This payment is no longer awaiting confirmation. Open Activity for its record.";
+  if(matches(/Insufficient demo funds/i))return "There isn't enough simulated NEAR for this payment and its demo fee. Fund the demo vault and try again.";
+  if(matches(/exceeds the demo spending limit/i))return "This amount is above the demo spending limit. Raise the limit in Settings or use a smaller amount.";
+  if(matches(/reserved demo funds/i))return "The reserved demo funds for this payment were released. Prepare the payment again.";
  if(matches(/configuration changed|workspace configuration changed/i))return "The workspace configuration changed. Previous records were cleared; reopen your authorized workspace.";
  if(matches(/Wallet switched/i))return "Choose your wallet account in Meteor, then connect again.";
 
