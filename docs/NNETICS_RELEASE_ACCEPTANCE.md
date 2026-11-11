@@ -67,7 +67,7 @@ The full simulated journey passed on the integrated application. The integrated 
 | --- | --- |
 | Repository unit tests | 42 passed, 0 failed. |
 | Owner unit tests | 323 passed, 0 failed. Total: 365. |
-| Browser tests | Complete-directory run: 196 passed, 9 failed, 1 intentional skip. All 9 affected cases subsequently passed on the rebuilt application: 9 passed, 1 duplicate-provider skip. Across these runs, all 205 distinct runnable cases passed. |
+| Browser tests | Complete-directory run against the rebuilt production application with the persisted provider credential: 205 passed, 0 failed, 1 intentional skip (206 desktop and mobile). |
 | Typecheck | `npm run typecheck` passed. |
 | Production build | `npm run build` passed. |
 | Theme | Source-token check and all 42 semantic contrast combinations passed. |
@@ -75,7 +75,7 @@ The full simulated journey passed on the integrated application. The integrated 
 
 Browser evidence logs, traces and test databases remain local under ignored `artifacts` directories. The reproducible capture script and masked screenshot evidence are committed under `docs/design-review/final-design/after`.
 
-The final affected-case replay covered Ask Nnetics, configuration drift, security-update review, conflicted invoice/unknown payment behavior, and refresh recovery on desktop and mobile (`integrated-fixes-final.log`, 57.9 seconds). The mobile provider case is intentionally skipped because desktop exercises the same server model. It is not a skipped product failure. An earlier replay immediately after rebuilding returned HTTP 500 for static JavaScript assets and could not hydrate two pages. The final replay used the steady production server after build/type generation completed. Keep build/type generation separate from running release acceptance.
+The final complete-directory run covered every browser case on desktop and mobile against the steady production server, with the build and type generation completed beforehand. The one skipped case is the intentional duplicate-provider skip: the mobile provider case is skipped because desktop exercises the same server model. It is not a skipped product failure. Keep build/type generation separate from running release acceptance.
 
 ### Assistant provider condition
 

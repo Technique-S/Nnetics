@@ -141,6 +141,7 @@ const SCHEMA = `PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL; PRAGMA synchr
       CREATE TABLE IF NOT EXISTS demo_ws_events(id TEXT PRIMARY KEY, workspace TEXT NOT NULL, kind TEXT NOT NULL, label TEXT NOT NULL, amount TEXT NOT NULL, status TEXT NOT NULL, at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_ws_payments(id TEXT PRIMARY KEY, workspace TEXT NOT NULL, contractor TEXT NOT NULL DEFAULT '', recipient TEXT NOT NULL, amount TEXT NOT NULL, fee TEXT NOT NULL, total TEXT NOT NULL, description TEXT NOT NULL, status TEXT NOT NULL, reason TEXT NOT NULL DEFAULT '', reference TEXT NOT NULL, created_at TEXT NOT NULL, settle_after INTEGER NOT NULL, settled_at TEXT, bill_id TEXT, confirm_secret TEXT NOT NULL DEFAULT '', UNIQUE(workspace, reference));
       CREATE TABLE IF NOT EXISTS demo_ws_idempotency(workspace TEXT NOT NULL, key TEXT NOT NULL, payment TEXT NOT NULL, PRIMARY KEY(workspace, key));
+      CREATE TABLE IF NOT EXISTS demo_intent_ids(id TEXT PRIMARY KEY);
       CREATE TABLE IF NOT EXISTS demo_workspace_meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);`;
 
 const PAYMENT_COLUMNS = "id,contractor,recipient,amount,fee,total,description,status,reason,reference,created_at,settle_after,settled_at,bill_id,confirm_secret";
@@ -165,6 +166,11 @@ export class DemoWorkspaceStore {
         this.db.prepare("INSERT OR IGNORE INTO demo_workspace_meta VALUES ('mode','simulation')").run();
     }
     close() { this.db.close(); }
+    simulationScope(token:string) {
+        const session=this.session(token);
+        const row=this.requiredWorkspaceRow(session.workspace ?? "");
+        return {workspace:row.workspace,vault:this.vaultState(row)};
+    }
 
     // Older demo workspaces predate the two-phase payment lifecycle. Their rows
     // gain the confirmation column without rewriting any recorded money.
@@ -275,7 +281,7 @@ export class DemoWorkspaceStore {
         this.withWrite(() => {
             const vault = this.vaultState(fresh);
             let changed = false;
-            const expired = this.db.prepare("SELECT id,total FROM demo_ws_payments WHERE workspace=? AND status='prepared' AND created_at<=?")
+            const expired = this.db.prepare("SELECT id,total FROM demo_ws_payments WHERE workspace=? AND status='prepared' AND id NOT IN (SELECT id FROM demo_intent_ids) AND created_at<=?")
                 .all(fresh.workspace, new Date(this.now() - PREPARED_TTL_MS).toISOString()) as { id: string; total: string }[];
             for (const payment of expired) {
                 vault.reserved = (BigInt(vault.reserved) - BigInt(payment.total)).toString();
@@ -283,7 +289,7 @@ export class DemoWorkspaceStore {
                     .run("The prepared payment expired before it was confirmed, so the reserved demo funds were released.", new Date(this.now()).toISOString(), payment.id);
                 changed = true;
             }
-            const due = this.db.prepare("SELECT id,total FROM demo_ws_payments WHERE workspace=? AND status='pending' AND settle_after<=?").all(fresh.workspace, this.now()) as { id: string; total: string }[];
+            const due = this.db.prepare("SELECT id,total FROM demo_ws_payments WHERE workspace=? AND status='pending' AND id NOT IN (SELECT id FROM demo_intent_ids) AND settle_after<=?").all(fresh.workspace, this.now()) as { id: string; total: string }[];
             if (due.length && fresh.scenario !== "unknown") {
                 const success = fresh.scenario === "success";
                 for (const payment of due) {
@@ -456,6 +462,7 @@ export class DemoWorkspaceStore {
             const record = this.db.prepare(`SELECT ${PAYMENT_COLUMNS} FROM demo_ws_payments WHERE id=? AND workspace=?`).get(paymentId, row.workspace) as unknown as PaymentRow | undefined;
             if (!record)
                 throw Error("That prepared payment does not exist in this demo workspace.");
+            if(this.db.prepare("SELECT id FROM demo_intent_ids WHERE id=?").get(record.id)) throw Error("Use the simulated Intents authorization endpoint.");
             // Confirming twice resolves to the same attempt.
             if (record.status === "pending" || record.status === "confirmed")
                 return { payment: this.paymentRecord(record) };
@@ -498,6 +505,7 @@ export class DemoWorkspaceStore {
             const record = this.db.prepare(`SELECT ${PAYMENT_COLUMNS} FROM demo_ws_payments WHERE id=? AND workspace=?`).get(id, row.workspace) as unknown as PaymentRow | undefined;
             if (!record)
                 throw Error("That prepared payment does not exist in this demo workspace.");
+            if(this.db.prepare("SELECT id FROM demo_intent_ids WHERE id=?").get(record.id)) throw Error("Use the simulated Intents lifecycle; reservations release on expiry.");
             if (record.status !== "prepared")
                 throw Error("Only a prepared payment can be cancelled. Review its record in Activity.");
             const vault = this.vaultState(row);
@@ -562,6 +570,7 @@ export class DemoWorkspaceStore {
         this.withWrite(() => {
             const session = this.session(token);
             const row = this.requiredWorkspaceRow(session.workspace ?? "");
+            if(this.db.prepare("SELECT id FROM demo_ws_payments WHERE workspace=? AND id IN (SELECT id FROM demo_intent_ids) AND status IN ('prepared','pending')").get(row.workspace)) throw Error("Finish or expire the active simulated Intents payment before resetting.");
             this.db.prepare("DELETE FROM demo_ws_payments WHERE workspace=?").run(row.workspace);
             this.db.prepare("DELETE FROM demo_ws_events WHERE workspace=?").run(row.workspace);
             this.db.prepare("DELETE FROM demo_ws_idempotency WHERE workspace=?").run(row.workspace);

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server.js";
+import {demoIntents} from "../../../../../server/demo-intents.ts";
+import {demoContractors} from "../../../../../server/demo-contractors.ts";
 import { demoWorkspace } from "../../../../../server/demo-workspace.ts";
 import type { DemoWorkspaceSnapshot, DemoScenario } from "../../../../../server/demo-workspace.ts";
 import { isAllowedAppOrigin } from "../../../../../server/origin.ts";
@@ -43,8 +45,11 @@ function safe(snapshot: DemoWorkspaceSnapshot) {
 export async function GET(req: NextRequest, context: Context) {
     try {
         const path = (await context.params).path, store = demoWorkspace();
-        if (path.join("/") === "state")
-            return json(safe(store.state(req.cookies.get(cookieName)?.value || "")));
+        if (path.join("/") === "state") {
+            const token=req.cookies.get(cookieName)?.value || "",owner=req.cookies.get("nnetics_demo_portal_owner")?.value || "";
+            if(demoContractors().owner(owner) && store.state(token).initialized)demoIntents().list(token,owner);
+            return json(safe(store.state(token)));
+        }
         return json({ error: "Unknown demo endpoint." }, 404);
     }
     catch (e) {
@@ -75,6 +80,7 @@ export async function POST(req: NextRequest, context: Context) {
         // Phase one of a simulated payment: validate, reserve, and wait for the
         // owner's explicit confirmation. The amount is canonical yoctoNEAR.
         if (path === "payment/prepare") {
+            if(input.billId) throw Error("Pay approved bills through the validated simulated Intents workflow.");
             const prepared = store.preparePayment(token, {
                 idempotencyKey: String(input.idempotencyKey ?? ""),
                 recipient: String(input.recipient ?? ""),

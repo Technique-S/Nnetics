@@ -29,11 +29,18 @@ export class ContractorRecordStore {
       CREATE TABLE IF NOT EXISTS demo_links(token TEXT PRIMARY KEY, profile TEXT NOT NULL, generation INTEGER NOT NULL, expires INTEGER NOT NULL, revoked INTEGER NOT NULL DEFAULT 0);
       CREATE TABLE IF NOT EXISTS demo_sessions(token TEXT PRIMARY KEY, link TEXT NOT NULL, expires INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_orders(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, reference TEXT NOT NULL, payload TEXT NOT NULL, UNIQUE(org,reference));
-      CREATE TABLE IF NOT EXISTS demo_bills(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, reference TEXT NOT NULL, order_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, UNIQUE(org,profile,reference));
+      CREATE TABLE IF NOT EXISTS demo_bills(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, reference TEXT NOT NULL, order_id TEXT UNIQUE, payload TEXT NOT NULL, UNIQUE(org,profile,reference));
       CREATE TABLE IF NOT EXISTS demo_bill_history(id INTEGER PRIMARY KEY, bill TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_uploads(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, bytes BLOB NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_contractor_events(id TEXT PRIMARY KEY, org TEXT NOT NULL, profile TEXT NOT NULL, profile_name TEXT NOT NULL, action TEXT NOT NULL, detail TEXT NOT NULL DEFAULT '', at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS demo_wallet_proofs(challenge TEXT PRIMARY KEY, session TEXT NOT NULL, profile TEXT NOT NULL, account TEXT NOT NULL, expires INTEGER NOT NULL);`);
+        // SQLite permits multiple NULL associations while preserving one bill per linked order.
+        const orderColumn = (this.db.prepare("PRAGMA table_info(demo_bills)").all() as {name:string;notnull:number}[]).find(c=>c.name==="order_id");
+        if(orderColumn?.notnull) this.db.exec(`BEGIN IMMEDIATE;
+          ALTER TABLE demo_bills RENAME TO demo_bills_required_order;
+          CREATE TABLE demo_bills(id TEXT PRIMARY KEY,org TEXT NOT NULL,profile TEXT NOT NULL,reference TEXT NOT NULL,order_id TEXT UNIQUE,payload TEXT NOT NULL,UNIQUE(org,profile,reference));
+          INSERT INTO demo_bills SELECT id,org,profile,reference,CASE WHEN order_id LIKE 'direct-%' THEN NULL ELSE order_id END,payload FROM demo_bills_required_order;
+          DROP TABLE demo_bills_required_order; COMMIT;`);
         referenceTables(this.db);
         this.db.exec("CREATE TABLE IF NOT EXISTS contractor_store_metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)");
         const storedMode=this.db.prepare("SELECT value FROM contractor_store_metadata WHERE key='mode'").get() as {value:string}|undefined;
@@ -220,6 +227,17 @@ export class ContractorRecordStore {
             this.audit(org, p, "created", `Contractor ${p.name} was added.`);
             return { profileId: p.id };
         }
+        if(input.action === "associate-order") {
+            const bill=this.rows<ContractorBill>("demo_bills",org).find(b=>b.id===input.invoiceId);
+            if(!bill || bill.status==="Paid") throw Error("Invoice access denied or already paid.");
+            const order=input.orderId ? this.rows<ContractorOrder>("demo_orders",org,bill.contractorId).find(o=>o.id===input.orderId) : undefined;
+            if(input.orderId && !order) throw Error("Select this contractor's work order.");
+            if(order && order.amount!==bill.amount) throw Error("Work order amount differs from this bill.");
+            this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id,JSON.stringify(bill));
+            bill.orderId=order?.id || ""; bill.orderReference=order?.reference || "No work order";
+            this.db.prepare("UPDATE demo_bills SET order_id=?,payload=? WHERE id=? AND org=?").run(order?.id || null,JSON.stringify(bill),bill.id,org);
+            return {};
+        }
         if (input.action === "review-invoice") {
             const bill = this.rows<ContractorBill>("demo_bills", org).find(b => b.id === input.invoiceId);
             if (!bill)
@@ -230,7 +248,7 @@ export class ContractorRecordStore {
                 throw Error("Invalid review action.");
             if (input.decision === "approve" && bill.reasons.length)
                 throw Error("Payment-critical mismatches must be clarified; review cannot override the work order.");
-            if(this.mode==="persistent"&&input.decision==="approve"&&sourceOrderQuestions(bill.text,bill.orderId,this.rows<ContractorOrder>("demo_orders",org,bill.contractorId)).length)
+            if(this.mode==="persistent"&&bill.orderId&&input.decision==="approve"&&sourceOrderQuestions(bill.text,bill.orderId,this.rows<ContractorOrder>("demo_orders",org,bill.contractorId)).length)
                 throw Error("Billing text and selected work order conflict. Request clarification; approval cannot override or reassign the invoice claim.");
             this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id, JSON.stringify(bill));
             bill.status = input.decision === "begin-review" ? "Under review" : input.decision === "approve" ? "Approved" : input.decision === "clarify" ? "Needs clarification" : "Rejected";
@@ -370,11 +388,7 @@ export class ContractorRecordStore {
         const f = input.fields as BillFields;
         if (!f || typeof f !== "object")
             throw Error("Clarify the required invoice details.");
-        // Demo visitors may bill without a prior approved work order; the owner
-        // then reviews the claimed amount and recipient inside the profile.
-        // Persistent organizations always keep an approved work order as the
-        // billing basis, so their submission path is unchanged here.
-        const direct = this.mode === "simulation" && !String(f.orderId ?? "").trim();
+        const direct = !String(f.orderId ?? "").trim();
         let order: ContractorOrder | undefined;
         let orderId = "";
         if (!direct) {
@@ -391,7 +405,7 @@ export class ContractorRecordStore {
         // its NEAR request is never eligible while that conflict exists.
         requireNear(f.asset || "NEAR", this.mode === "persistent" ? "" : body);
         const scope = `${org}:${p.id}`, submission = input.submissionId || f.reference || "";
-        const fingerprint = hash(JSON.stringify({action:input.action,invoiceId:input.invoiceId || "",orderId, amount, body, description, recipient:f.recipient || "", attachmentId:input.attachmentId || ""}));
+        const fingerprint = hash(JSON.stringify({action:input.action,invoiceId:input.invoiceId || "",orderId, amount, body, description, attachmentId:input.attachmentId || ""}));
         if (input.action === "submit-invoice" || input.submissionId) {
             const previous = previousSubmission(this.db, scope, submission, fingerprint);
             if (previous) return this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === previous)!;
@@ -404,9 +418,7 @@ export class ContractorRecordStore {
         }
         const old = input.action === "clarify-invoice" ? this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === input.invoiceId) : undefined;
         const reference = old?.reference || nextReference(this.db, scope);
-        const recipient = f.recipient?.trim() || order?.recipient || p.wallet || "";
-        if (!recipient)
-            throw Error("Approve a demo wallet or set an explicit recipient in this bill.");
+        const recipient = p.wallet || ""; // Invoice/AI claims never supply payment authority.
         const reasons: string[] = [];
         if(this.mode === "persistent" && currencyConflict(body)) reasons.push("Currency conflict in source text. Clarification is required; no amount was converted to NEAR.");
         if(this.mode === "persistent")reasons.push(...sourceQuestions(body,amount).filter(q=>!q.startsWith("Which currency")),...sourceOrderQuestions(body,orderId,this.rows<ContractorOrder>("demo_orders",org,p.id)));
@@ -418,8 +430,7 @@ export class ContractorRecordStore {
                 reasons.push("Amount differs from approved work order.");
             if (asset !== "NEAR")
                 reasons.push("Only native NEAR is supported.");
-            if (recipient !== order!.recipient)
-                reasons.push("Wallet differs from the immutable work order recipient.");
+            
         }
         let attachment: BillAttachment | null = null;
         if (input.attachmentId) {
@@ -437,7 +448,7 @@ export class ContractorRecordStore {
         }
         else {
             try {
-                this.db.prepare("INSERT INTO demo_bills VALUES (?,?,?,?,?,?)").run(bill.id, org, p.id, reference, direct ? `direct-${id()}` : orderId, JSON.stringify(bill));
+                this.db.prepare("INSERT INTO demo_bills VALUES (?,?,?,?,?,?)").run(bill.id, org, p.id, reference, direct ? null : orderId, JSON.stringify(bill));
             }
             catch (e) {
                 if (String(e).includes("UNIQUE"))
@@ -447,6 +458,15 @@ export class ContractorRecordStore {
             this.db.prepare("INSERT INTO invoice_submissions VALUES (?,?,?,?)").run(scope, submission, fingerprint, bill.id);
         }
         return bill;
+    }
+    markSimulatedPaid(org:string,billId:string,reference:string) {
+        if(this.mode!=="simulation") throw Error("Simulation cannot update real invoices.");
+        const bill=this.rows<ContractorBill>("demo_bills",org).find(b=>b.id===billId);
+        if(!bill || bill.status==="Paid") return;
+        if(bill.status!=="Approved") throw Error("Approved invoice required.");
+        this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id,JSON.stringify(bill));
+        bill.status="Paid";bill.ownerNote=`Simulated settlement completed · ${reference}. No blockchain transaction.`;
+        this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill),bill.id,org);
     }
     upload(session: string, name: string, mime: string, bytes: Uint8Array): BillAttachment {
         const { org, profile } = this.contractor(session);
