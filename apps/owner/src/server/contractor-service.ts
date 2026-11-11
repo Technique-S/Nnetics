@@ -102,7 +102,7 @@ export class ContractorBackend extends ContractorRecordStore {
   const current=this.contractor(session);if(current.profile.generation!==profile.generation)throw Error("Link changed; extract again.");
   const snapshot=this.snapshot(session),questions=[...sourceQuestions(input.text),...result.fields.questions];
   if(!result.fields.amount)questions.push("How much are you requesting? Enter one exact amount; no work-order allowance was substituted.");
-  if(result.fields.currency&&result.fields.currency!=="NEAR")questions.push("The extracted currency is unsupported. Clarify the source; no conversion was made.");
+  if(result.fields.currency&&result.fields.currency!=="NEAR")questions.push("Confirm the invoice denomination and preferred crypto payout separately. Live settlement supports native NEAR only.");
   const mentioned=mentionedOrders(input.text,snapshot.orders);
   if(mentioned.length>1){result.fields.workOrderReference=null;questions.push("The text mentions multiple approved work orders. Which single order covers this bill? Select it explicitly.");}
   const matches=snapshot.orders.filter(o=>o.reference===result.fields.workOrderReference);

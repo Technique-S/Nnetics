@@ -14,6 +14,7 @@ test("Payables retains invoice context through approval, authorization, settleme
     await statuses.getByRole("button",{name:/^Awaiting Approval/}).click();
     await page.getByRole("button",{name:`Open payable · ${bill.reference}`,exact:true}).click();
     const details=page.getByRole("region",{name:"Payable Details"});
+    await details.getByText("View details",{exact:true}).click();
     const facts=details.locator(".payable-facts");
     await expect(facts.locator('dt:text-is("Contractor") + dd')).toHaveText("Action contractor");
     await expect(facts.locator('dt:text-is("Originally requested") + dd')).toHaveText("3 NEAR");
@@ -40,7 +41,7 @@ test("Payables retains invoice context through approval, authorization, settleme
     await details.getByText("Invoice audit timeline",{exact:true}).click();await expect(details.getByText("approve",{exact:true})).toBeVisible();
     expect(page.url()).toContain(`#Payables/${bill.id}`);
     await page.screenshot({path:info.outputPath("payables-paid.png"),fullPage:true});
-    await page.reload();await expect(details).toContainText(bill.reference);await expect(details.locator('dt:text-is("Remaining payable") + dd')).toHaveText("0 NEAR");
+    await page.reload();await details.getByText("View details",{exact:true}).click();await expect(details).toContainText(bill.reference);await expect(details.locator('dt:text-is("Remaining payable") + dd')).toHaveText("0 NEAR");
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
     // Old invoice/payment links retain access to the same authoritative payable.
     for(const hash of ["Invoices","Payments","Invoice%20review"]){await page.goto(`/?mode=demo#${hash}`);await expect(page.getByRole("heading",{name:"Payables",exact:true,level:1})).toBeVisible();await expect(page.getByRole("button",{name:`Open payable · ${bill.reference}`,exact:true})).toBeVisible();}

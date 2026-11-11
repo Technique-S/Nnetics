@@ -52,6 +52,8 @@ export interface BillFields {
     orderId: string;
     amount: string;
     asset: string;
+    payoutAsset?:string;
+    denominationConfirmed?:boolean;
     recipient?: string; // Deprecated input; server ignores all invoice recipient claims.
 }
 export interface BillAttachment {
@@ -68,6 +70,8 @@ export interface ContractorBill extends BillFields {
     dueAt?:string|null;
     approval?:{amount:string;asset:string;by:string|null;at:string;adjustmentReason?:string|null};
     reviewEvents?:{action:string;at:string;by:string|null;note:string}[];
+    settlementLock?:string;
+    amendments?:{id:string;oldAmount:string;amount:string;asset:string;reason:string;actor:string|null;at:string;state:"proposed"|"accepted"|"declined";acknowledgedAt?:string;approvedAt?:string;authorizedAt?:string}[];
     orderReference?:string;
     extractionId?:string;
     extractionMode?:"ai"|"deterministic";
@@ -101,7 +105,7 @@ export interface ContractorSnapshot {
     orders: ContractorOrder[];
     invoices: ContractorBill[];
 }
-export type OwnerPortalCommand = {action:"associate-order";invoiceId:string;orderId:string} | {
+export type OwnerPortalCommand = {action:"propose-amendment";invoiceId:string;amount:string;reason:string;kind:"revised-approval"} | {action:"associate-order";invoiceId:string;orderId:string} | {
     action:"queue-invoice";
     invoiceId:string;
     orderId:string;
@@ -139,7 +143,7 @@ export type OwnerPortalCommand = {action:"associate-order";invoiceId:string;orde
     decision: "approve" | "clarify" | "reject" | "begin-review";
     note: string;
 };
-export type ContractorCommand = {
+export type ContractorCommand = {action:"respond-amendment";invoiceId:string;amendmentId:string;accept:boolean} | {
     action: "wallet-challenge";
     account: string;
 } | {

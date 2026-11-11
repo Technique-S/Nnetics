@@ -1052,3 +1052,7 @@ html[data-theme=light] body:has(.app-shell) { background: var(--background); }
 .other-payments > summary { min-height:44px; padding-block:var(--space-md); font-weight:650; cursor:pointer; }
 @media(max-width:900px) { .payables-layout { grid-template-columns:1fr; } .payables-list { max-height:420px; overflow:auto; } }
 @media(max-width:480px) { .payable-facts { grid-template-columns:1fr; gap:4px; } .payable-facts dd { margin-bottom:var(--space-sm); } }
+
+.payable-summary{padding-block:8px 20px}.payable-summary h3{margin-bottom:4px}.payable-summary-amounts{display:grid;grid-template-columns:1fr auto;gap:8px 24px;max-width:480px;margin-block:16px}.payable-summary-amounts dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}.payable-summary-amounts dt{color:var(--text-muted)}
+
+.payable-amendment{display:contents}

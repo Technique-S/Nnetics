@@ -1,3 +1,4 @@
+import {billingAsset,NEAR_ASSET} from "../data/billing-assets.ts";
 import {PAYABLE_FILTERS,projectPayables,matchesPayable,type PayableFilter} from "../data/payables.ts";
 import { assertNoDemoPaymentRecords } from "./agent-deletion.ts";
 import { executeContractorTool, contractorView } from "./agent-contractor-tools.ts";
@@ -57,12 +58,12 @@ export class AgentToolExecutor implements AgentToolExecutor {
     return projectPayables(portal,ledger.payments).map(item=>{
       const blockers=[...item.blockers];
       if(item.stage==="Ready to Pay") {
-        const quote=previewDemoQuote(item.bill.amount,"near",demoIntents().rates);
+        const quote=previewDemoQuote(item.bill.amount,"near",demoIntents().rates,item.bill.payoutAsset??NEAR_ASSET,item.bill.asset);
         if(ledger.vault.paused)blockers.push("Demo vault is paused.");
         if(BigInt(quote.total)>BigInt(ledger.vault.available))blockers.push("Insufficient simulated funds including fees.");
         if(ledger.vault.limit&&BigInt(quote.total)>BigInt(ledger.vault.limit))blockers.push("Spending policy limit exceeded.");
       }
-      return {...item,blockers};
+      return {...item,invoiceDenomination:item.bill.asset,payoutAsset:billingAsset(item.bill.payoutAsset??NEAR_ASSET),amendments:item.bill.amendments??[],fundingAsset:"Selected separately by owner during payment review",blockers};
     });
   }
   async listPayables(args:{status?:string;query?:string;overdue?:boolean}):Promise<ToolResult<unknown>> {
@@ -77,22 +78,23 @@ export class AgentToolExecutor implements AgentToolExecutor {
       const record=this.payableRecords().find(item=>item.id===args.id||item.invoiceNumber===args.id);
       if(!record)throw Error("Payable access denied or not found.");
       const {bill,payment,...item}=record;
-      return {success:true,data:{...item,originalInvoiceReference:bill.sourceReference??bill.reference,originalInvoiceText:bill.originalText??bill.text,attachment:bill.attachment,reviewEvents:bill.reviewEvents??[],dueAt:bill.dueAt??null,paymentReference:payment?.reference??null}};
+      return {success:true,data:{...item,originalInvoiceReference:bill.sourceReference??bill.reference,originalInvoiceText:bill.originalText??bill.text,conversionQuotes:demoIntents().list(this.demoWorkspaceToken(),this.demoOwnerToken()).filter(v=>v.intent.billId===bill.id).map(({intent})=>({state:intent.state,invoiceAmount:intent.invoiceAmount??bill.amount,invoiceCurrency:intent.invoiceCurrency??bill.asset,fundingAssetId:intent.sourceAssetId??intent.sourceAsset,fundingNetwork:intent.sourceChain,sourceAmount:intent.sourceAmount,payoutAssetId:intent.destinationAssetId??NEAR_ASSET,payoutNetwork:intent.destinationChain,destinationAmount:intent.destinationAmount,deliveredAmount:intent.deliveredAmount??null,feeNearEquivalent:intent.fee,simulated:true})),attachment:bill.attachment,reviewEvents:bill.reviewEvents??[],dueAt:bill.dueAt??null,paymentReference:payment?.reference??null}};
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Payable access denied."};}
   }
   async listUnlinkedInvoices():Promise<ToolResult<unknown>> {
     try {
       if(!this.demoMode)throw Error("Simulation tools are demo-only.");
       if(!demoContractors().owner(this.demoOwnerToken()))throw Error("Valid demo owner authorization required.");
+      if(this.orgContext.demoWorkspaceToken)demoIntents().list(this.demoWorkspaceToken(),this.demoOwnerToken());
       const invoices=demoContractors().ownerSnapshot(this.demoOwnerToken()).invoices.filter(b=>!b.orderId);
-      return {success:true,data:invoices.map(b=>({id:b.id,reference:b.reference,amount:b.amount,status:b.status,workOrder:"No work order"}))};
+      return {success:true,data:invoices.map(b=>({id:b.id,reference:b.reference,amount:b.amount,currency:b.asset,requestedAmount:b.requestedAmount??b.amount,requestedCurrency:b.requestedAsset??b.asset,payoutAsset:billingAsset(b.payoutAsset??NEAR_ASSET),status:b.status,workOrder:"No work order"}))};
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
   }
   async getSimulatedPaymentStatus():Promise<ToolResult<unknown>> {
     try {
       if(!this.demoMode)throw Error("Simulation tools are demo-only.");
       const attempts=demoIntents().list(this.demoWorkspaceToken(),this.demoOwnerToken());
-      return {success:true,data:attempts.map(({intent,audit})=>({reference:intent.reference,billId:intent.billId,state:intent.state,reason:intent.reason,audit}))};
+      return {success:true,data:attempts.map(({intent,audit})=>({reference:intent.reference,billId:intent.billId,state:intent.state,invoiceAmount:intent.invoiceAmount??intent.destinationAmount,invoiceCurrency:intent.invoiceCurrency??"NEAR",fundingAssetId:intent.sourceAssetId??intent.sourceAsset,fundingNetwork:intent.sourceChain,sourceAmount:intent.sourceAmount,payoutAssetId:intent.destinationAssetId??NEAR_ASSET,payoutNetwork:intent.destinationChain,destinationAmount:intent.destinationAmount,deliveredAmount:intent.deliveredAmount??null,reason:intent.reason,audit}))};
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
   }
   async previewSimulatedIntent(args:{id:string;sourceAsset:string}):Promise<ToolResult<unknown>> {
@@ -105,9 +107,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
       if(!bill)throw Error("Invoice access denied.");
       const profile=snapshot.profiles.find(p=>p.id===bill.contractorId),asset=DEMO_ASSETS.find(a=>a.id===args.sourceAsset);
       if(!asset)throw Error("Unsupported simulated asset.");
-      const quote=previewDemoQuote(bill.amount,args.sourceAsset,demoIntents().rates),fee=BigInt(quote.fee),total=BigInt(quote.total);
-      const blockers=[...(bill.status!=="Approved"?["Owner invoice approval required"]:[]),...bill.reasons,...(!profile?.wallet?["Approved wallet required in Wallet Details"]:[]),...(profile?.archived?["Contractor archived"]:[]),...(ledger.vault.paused?["Demo vault paused"]:[]),...(BigInt(ledger.vault.available)<total?["Insufficient simulated funds"]:[]),...(ledger.vault.limit&&total>BigInt(ledger.vault.limit)?["Spending policy limit exceeded"]:[]),...(ledger.payments.some(p=>p.billId===bill.id&&["prepared","pending","confirmed"].includes(p.status))?["Existing active or completed payment"]:[])];
-      return {success:true,data:{mode:"Demo / Simulated",billId:bill.id,reference:bill.reference,workOrder:bill.orderReference||"No work order",eligible:!blockers.length,blockers,recipient:profile?.wallet||null,source:asset,sourceAmount:quote.sourceAmount,illustrativeRate:quote.rate,mockSolver:quote.solver,savedQuote:false,destination:{chain:"NEAR",asset:"NEAR",amount:bill.amount},illustrativeFeeNear:formatNear(fee.toString()),totalNearEquivalent:formatNear(total.toString()),proposal:bill.status==="Approved"?"Review and authorize simulated payment":"Review invoice for owner approval",confirmationRequired:true,nextStep:"Open View payables. Owner approval and structured confirmation of the saved quote are required. This preview does not approve or authorize payment."}};
+      const quote=previewDemoQuote(bill.amount,args.sourceAsset,demoIntents().rates,bill.payoutAsset??NEAR_ASSET,bill.asset),fee=BigInt(quote.fee),total=BigInt(quote.total);
+      const blockers=[...projectPayables(snapshot,ledger.payments).find(p=>p.id===bill.id)!.blockers,...(bill.status!=="Approved"?["Owner invoice approval required"]:[]),...bill.reasons,...(!profile?.wallet?["Approved wallet required in Wallet Details"]:[]),...(profile?.archived?["Contractor archived"]:[]),...(ledger.vault.paused?["Demo vault paused"]:[]),...(BigInt(ledger.vault.available)<total?["Insufficient simulated funds"]:[]),...(ledger.vault.limit&&total>BigInt(ledger.vault.limit)?["Spending policy limit exceeded"]:[]),...(ledger.payments.some(p=>p.billId===bill.id&&["prepared","pending","confirmed"].includes(p.status))?["Existing active or completed payment"]:[])];
+      return {success:true,data:{mode:"Demo / Simulated",billId:bill.id,reference:bill.reference,workOrder:bill.orderReference||"No work order",eligible:!blockers.length,blockers,recipient:profile?.wallet||null,source:asset,sourceAmount:quote.sourceAmount,illustrativeRate:quote.rate,mockSolver:quote.solver,savedQuote:false,invoice:{amount:bill.amount,currency:bill.asset},quoteType:"EXACT_OUTPUT",destination:{chain:quote.destination.chain,asset:quote.destination.symbol,assetId:quote.destination.id,amount:quote.destinationAmount},illustrativeFeeNear:formatNear(fee.toString()),totalNearEquivalent:formatNear(total.toString()),proposal:bill.status==="Approved"?"Review and authorize simulated payment":"Review invoice for owner approval",confirmationRequired:true,nextStep:"Open View payables. Owner approval and structured confirmation of the saved quote are required. This preview does not approve or authorize payment."}};
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
   }
   // Contractor Tools
@@ -440,12 +442,14 @@ export class AgentToolExecutor implements AgentToolExecutor {
   // confirmed payment receipts in the vault ledger. Keeping the two apart stops
   // the model from reporting a paid receipt as an outstanding invoice.
   private demoInvoices() {
+    if(this.orgContext.demoWorkspaceToken)demoIntents().list(this.demoWorkspaceToken(),this.demoOwnerToken());
     const snapshot = demoContractors().ownerSnapshot(this.demoOwnerToken());
     const names = new Map([...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].map((profile) => [profile.id, profile.name]));
     return snapshot.invoices.map((bill) => ({
       id: bill.id,
       reference: bill.reference,
       amount: bill.amount,
+      currency:bill.asset,requestedAmount:bill.requestedAmount??bill.amount,requestedCurrency:bill.requestedAsset??bill.asset,payoutAsset:billingAsset(bill.payoutAsset??NEAR_ASSET),approvedAmount:bill.approval?.amount??null,amendments:bill.amendments??[],
       status: bill.status,
       description: bill.description,
       contractorId: bill.contractorId,

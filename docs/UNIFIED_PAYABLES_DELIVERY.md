@@ -1,5 +1,9 @@
 # Unified Payables
 
+Follow-up: `MULTICURRENCY_BILLING_DELIVERY.md` documents the current multi-currency
+billing, compact details and controlled approval-amendment flow. This report
+records the earlier Payables integration.
+
 Implemented in the main `payscope` application on `feature/nnetics-v3`, November
 11, 2026. The existing contractor/assistant work was preserved in checkpoint
 `9397cf7` and branch `checkpoint/nnetics-before-payables-20261111`. Additional

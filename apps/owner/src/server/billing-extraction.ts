@@ -1,4 +1,5 @@
 // Server only: no credentials, provider requests or model output enter payment authority.
+import {parseNaturalBill} from "../data/billing-assets.ts";
 import {parseBill} from "../data/contractor-adapter.ts";
 import {currencyConflict} from "../data/invoice-currency.ts";
 import {amountFromNear} from "../data/owner-adapter.ts";
@@ -42,8 +43,9 @@ export function sourceOrderQuestions(text:string,selected:string,orders:{id:stri
 }
 function deterministic(text:string):ExtractedBilling {
  let parsed:ReturnType<typeof parseBill>={};
- const questions=sourceQuestions(text);
- try{parsed=parseBill(text);}catch{questions.push("Conflicting labeled details require clarification.");}
+ const questions=sourceQuestions(text).map(q=>q.startsWith("Which currency")?"Confirm invoice denomination and preferred crypto payout. Live settlement supports NEAR only; no conversion was made.":q);
+ if(parseNaturalBill(text).ambiguousDollar)questions.push("Confirm invoice denomination and preferred crypto payout; $ does not identify USDC.");
+ try{parsed={...parseBill(text),...Object.fromEntries(Object.entries(parseNaturalBill(text)).filter(([,v])=>typeof v==="string"))};}catch{questions.push("Conflicting labeled details require clarification.");}
  const monies=Array.from(text.matchAll(/\b(\d+(?:\.\d+)?)\s+NEAR\b/gi));
  const amount=parsed.amount||(monies.length===1?monies[0][1]:null);
  const bounded=(s:string|null|undefined)=>s&&s.length<=1000?s:null;

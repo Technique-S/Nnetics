@@ -1,3 +1,4 @@
+import {NEAR_ASSET} from "../data/billing-assets.ts";
 import type {ContractorBill,ContractorOrder} from "../data/contractor-adapter.ts";
 import {amountFromNear} from "../data/owner-adapter.ts";
 import type {OwnerSnapshot} from "../data/owner-adapter.ts";
@@ -9,6 +10,7 @@ import {sourceQuestions} from "./billing-extraction.ts";
 // No AI field can supply payment authority. Caller supplies a pinned, verified
 // chain snapshot; actual recipient, vendor and amount all come from that order.
 export function reviewedPayment(bill:ContractorBill,local:ContractorOrder,snapshot:OwnerSnapshot,orderId:string){
+ if(bill.asset!=="NEAR"||(bill.payoutAsset??NEAR_ASSET)!==NEAR_ASSET)throw Error("Live settlement supports native NEAR only; invoice review remains available.");
  if(bill.status!=="Approved"||bill.reasons.length||bill.orderId!==local.id||bill.contractorId!==local.contractorId)throw Error("One reviewed invoice and its own approved billing order are required.");
  if(sourceQuestions(bill.text,bill.amount).length)throw Error("Source billing details still require clarification; no queue entry created.");
  const order=snapshot.orders.find(o=>o.id===boundedId(orderId));

@@ -1,3 +1,4 @@
+import {billingAsset,NEAR_ASSET} from "./billing-assets.ts";
 import type {ContractorBill,ContractorProfile,PortalSnapshot} from "./contractor-adapter.ts";
 import type {DemoWsPayment} from "./demo-workspace-adapter.ts";
 
@@ -19,11 +20,15 @@ export function payableFor(bill:ContractorBill,profile:ContractorProfile|undefin
     const paid=payment?.status==="confirmed" || bill.payment?.confirmed===true || (mode==="simulation"&&bill.status==="Paid");
     const processing=!!payment&&["prepared","pending"].includes(payment.status) || !!bill.payment&&["queued","prepared","preparing","signing","pending","broadcast","submitted","confirming","unknown","paid","retry","reconciling"].includes(bill.payment.state);
     const failed=payment?.status==="failed"||payment?.status==="cancelled"||["failed","blocked"].includes(bill.payment?.state??"");
-    const approved=!!bill.approval||["Approved","Paid"].includes(bill.status);
+    const approved=["Approved","Paid"].includes(bill.status);
     const stage:PayableStage=paid?"Paid":bill.status==="Rejected"?"Rejected / Failed":processing?"Processing":bill.status==="Approved"?"Ready to Pay":bill.status==="Paid"?"Processing":"Awaiting Approval";
     const requestedAmount=bill.requestedAmount??bill.amount,requestedCurrency=bill.requestedAsset??bill.asset;
     const approvedAmount=approved?(bill.approval?.amount??bill.amount):null,approvedCurrency=approved?(bill.approval?.asset??bill.asset):null;
     const blockers=[...bill.reasons];
+    const payout=billingAsset(bill.payoutAsset??NEAR_ASSET);
+    if(bill.amendments?.some(a=>a.state==="proposed"))blockers.push("Contractor acknowledgment of the proposed revised amount is required.");
+    if(!payout||payout.chain!=="NEAR")blockers.push("Unsupported payout route: Wallet Details currently approves NEAR destinations only.");
+    if(mode==="persistent"&&(bill.asset!=="NEAR"||(bill.payoutAsset??NEAR_ASSET)!==NEAR_ASSET))blockers.push("Live settlement supports native NEAR only. Invoice review is available; multi-currency settlement is not enabled.");
     if(!approved)blockers.push("Invoice approval required.");
     if(!profile?.wallet)blockers.push("Approved wallet required in Wallet Details.");
     if(profile?.archived)blockers.push("Contractor is archived.");

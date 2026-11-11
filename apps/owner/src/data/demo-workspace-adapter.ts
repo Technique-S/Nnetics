@@ -174,7 +174,7 @@ export class DemoWorkspaceAdapter implements OwnerAdapter {
       recipient: account(p.recipient || DEMO_OWNER),
       amount: uint(p.amount || "0"),
       asset: "NEAR",
-      text: `${p.description} · Demo · simulated funds, no live transfer.`,
+      text: `${(p as DemoWsPayment & {label?:string}).label??p.description} · Demo · simulated funds, no live transfer.`,
       reviewed: true,
     }));
     this.current = {

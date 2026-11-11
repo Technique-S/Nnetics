@@ -134,5 +134,5 @@ test("invoice review loading stays on its action while navigation remains usable
     await expect(page.getByRole("navigation",{name:"Owner dashboard"}).locator("[aria-busy=true]")).toHaveCount(0);
     await expect(page.getByRole("heading",{name:"Payables",exact:true})).toBeVisible();
   } finally {release();}
-  await expect(page.locator('[data-status="Approved"]')).toBeVisible();
+  await expect(page.locator(".payable-summary")).toContainText("Ready to Pay");
 });

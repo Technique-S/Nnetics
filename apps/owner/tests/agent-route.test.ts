@@ -61,6 +61,9 @@ test("Intents assistant tools are scoped read-only proposals; model cannot injec
   const bill=store.command(session,{action:"submit-invoice",submissionId:"agent-intent",fields:{orderId:"",amount:"1",asset:"NEAR"},text:"Article delivered for 1 NEAR",description:"Article"}).invoice!;
   const {AgentToolExecutor}=await import("../src/server/agent-tool-executor.ts");
   const executor=new AgentToolExecutor(true,{orgId:"demo",isDemo:true,demoWorkspaceToken:scoped.workspaceToken,demoPortalToken:scoped.portalToken});
+  const foreignCurrency=store.command(session,{action:"submit-invoice",submissionId:"agent-usdc",fields:{orderId:"",amount:"500",asset:"USDC",payoutAsset:"nep141:usdc.near",denominationConfirmed:true},text:"$500 for 2 edited videos",description:"2 videos"}).invoice!;
+  const records=await executor.listInvoices({});assert.equal(records.success,true);if(records.success){const record=records.data?.find(i=>i.id===foreignCurrency.id);assert.equal(record.currency,"USDC");assert.equal(record.payoutAsset.id,"nep141:usdc.near");}
+  const unlinked=await executor.listUnlinkedInvoices();assert.equal(unlinked.success,true);if(unlinked.success){assert.ok((unlinked.data as {currency:string}[]).some(b=>b.currency==="USDC"));}
   const preview=await executor.previewSimulatedIntent({id:bill.id,sourceAsset:"usdc-ethereum"});
   assert.equal(preview.success,true);
   if(preview.success){const data=preview.data as {eligible:boolean;blockers:string[];confirmationRequired:boolean};assert.equal(data.eligible,false);assert.equal(data.confirmationRequired,true);assert.ok(data.blockers.some(b=>/wallet/.test(b)));}

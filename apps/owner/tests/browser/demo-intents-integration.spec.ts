@@ -43,8 +43,8 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
             await page.getByRole("button",{name:"Refresh workspace",exact:true}).click();
             await page.getByRole("button",{name:`Open payable · ${bill.reference}`,exact:true}).click();
             await expect(page.getByRole("heading",{name:bill.reference,exact:true})).toBeVisible();
-            const card=page.locator("article").filter({has:page.getByRole("heading",{name:bill.reference,exact:true})});
-            await expect(card).toContainText("No work order");
+            const card=page.getByRole("region",{name:"Payable Details"});
+            await card.getByText("View details",{exact:true}).click();await expect(card).toContainText("No work order");
             await card.getByRole("button",{name:`Approve bill · ${bill.reference}`,exact:true}).click();
             return {bill,card};
         }
@@ -63,7 +63,7 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
         await expect(page.getByRole("heading",{name:"Payables",exact:true,level:1})).toBeVisible();
         async function pay(card:Locator,outcome="success",open=true) {
             if(open)await card.getByText("Simulated NEAR Intents",{exact:true}).click();
-            await card.getByLabel("Simulation outcome").selectOption(outcome);
+            await card.getByLabel("Funding asset and network").selectOption("usdc-ethereum");await card.getByLabel("Simulation outcome").selectOption(outcome);
             await card.getByRole("button",{name:"Preview simulated quote",exact:true}).click();
             await expect(card.getByText("4.01 USDC · Ethereum",{exact:true})).toBeVisible();
             await expect(card.getByText("integrated-designer.testnet · version 1",{exact:true})).toBeVisible();
@@ -73,7 +73,7 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
         }
         await pay(first.card);
         await expect(first.card.getByRole("status").filter({hasText:"COMPLETED"})).toBeVisible({timeout:15_000});
-        await expect(first.card.getByText("Paid",{exact:true})).toBeVisible();
+        await expect(first.card.locator(".payable-summary")).toContainText("Paid");
         await first.card.getByText(/Payment audit history/).click();
         await expect(first.card.getByText("EXECUTING",{exact:true})).toBeVisible();
         await page.screenshot({path:info.outputPath("main-invoice-intents.png"),fullPage:true});
@@ -94,7 +94,7 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
         for(const scenario of ["failure","refund"]) {
             const next=await submit(`Integrated ${scenario}`);await pay(next.card,scenario);
             await expect(next.card.getByRole("status").filter({hasText:scenario==="refund"?"REFUNDED":"FAILED"})).toBeVisible({timeout:15_000});
-            await expect(next.card.getByText("Approved",{exact:true})).toBeVisible();
+            await expect(next.card.locator(".payable-summary")).toContainText("Ready to Pay");
             const state=await (await page.request.get("/api/demo/workspace/state")).json();
             expect(state.vault.reserved).toBe("0");
             await pay(next.card,"success",false);

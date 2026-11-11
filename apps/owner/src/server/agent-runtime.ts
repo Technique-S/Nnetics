@@ -1,3 +1,4 @@
+import {DEMO_ASSETS} from "../data/demo-intents.ts";
 import { contractorTools, validateContractorTool } from "./agent-contractor-tools.ts";
 // Model-driven Ask Nnetics runtime. The model receives the authorized tool
 // catalog, chooses tools, and receives their real results. The backend validates
@@ -231,7 +232,7 @@ function validateToolArguments(name: AgentToolName, raw: unknown): Validation {
     const unexpected=checkKeys(args,["id","sourceAsset"]);
     if(unexpected)return {ok:false,error:unexpected};
     const id=stringArg(args.id,"id",1,120),sourceAsset=stringArg(args.sourceAsset,"sourceAsset",1,40);
-    if(!id || !sourceAsset || !["near","usdc-ethereum","eth"].includes(sourceAsset))return {ok:false,error:"Exact invoice ID and supported demo source asset required."};
+    if(!id || !sourceAsset || !DEMO_ASSETS.some(a=>a.id===sourceAsset))return {ok:false,error:"Exact invoice ID and supported demo source asset required."};
     return {ok:true,args:{id,sourceAsset}};
   }
   if (name === "get_invoice") {

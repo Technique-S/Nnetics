@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { nextReference, previousSubmission, referenceTables } from "./invoice-references.ts";
-import { requireNear, currencyConflict } from "../data/invoice-currency.ts";
+import { currencyConflict } from "../data/invoice-currency.ts";
+import {billingAsset,NEAR_ASSET,normalizeInvoiceAmount,validateInvoiceClaim} from "../data/billing-assets.ts";
 import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -260,6 +261,22 @@ export class ContractorRecordStore {
             this.db.prepare("UPDATE demo_bills SET order_id=?,payload=? WHERE id=? AND org=?").run(order?.id || null,JSON.stringify(bill),bill.id,org);
             return {};
         }
+        if(input.action==="propose-amendment") {
+            if(this.mode!=="simulation")throw Error("Live approval amendments are not configured; existing immutable NEAR agreements remain unchanged.");
+            const bill=this.rows<ContractorBill>("demo_bills",org).find(b=>b.id===input.invoiceId);
+            if(!bill||bill.status!=="Approved"||bill.settlementLock)throw Error("An approved invoice without an active payment is required. Finish or expire its reservation first.");
+            if(bill.orderId)throw Error("Unlink the optional billing agreement before proposing a revised invoice amount. Existing work-order amounts are immutable.");
+            if(input.kind!=="revised-approval")throw Error("Partial payments and reduced final settlements are not supported. Propose a revised approval for contractor acknowledgment instead.");
+            const amount=normalizeInvoiceAmount(input.amount,bill.asset),reason=text(input.reason,1000,"amendment reason");
+            if(amount===bill.amount)throw Error("Propose a different amount.");
+            this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id,JSON.stringify(bill));
+            const at=new Date().toISOString();
+            bill.amendments=[...(bill.amendments??[]),{id:id(),oldAmount:bill.amount,amount,asset:bill.asset,reason,actor,at,state:"proposed"}];
+            bill.status="Needs clarification";bill.ownerNote="Revised approval proposed. Contractor acknowledgment and a fresh owner approval are required; no payment authorized.";
+            bill.reviewEvents=[...(bill.reviewEvents??[]),{action:"amendment-proposed",by:actor,at,note:reason}];
+            this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill),bill.id,org);
+            return {};
+        }
         if (input.action === "review-invoice") {
             const bill = this.rows<ContractorBill>("demo_bills", org).find(b => b.id === input.invoiceId);
             if (!bill)
@@ -268,6 +285,7 @@ export class ContractorRecordStore {
                 throw Error("Invoice review is already complete.");
             if (!["approve", "clarify", "reject", "begin-review"].includes(input.decision))
                 throw Error("Invalid review action.");
+            if(bill.amendments?.some(a=>a.state==="proposed"))throw Error("Contractor must acknowledge or decline the proposed amount first.");
             if (input.decision === "approve" && bill.reasons.length)
                 throw Error("Payment-critical mismatches must be clarified; review cannot override the work order.");
             if(this.mode==="persistent"&&bill.orderId&&input.decision==="approve"&&sourceOrderQuestions(bill.text,bill.orderId,this.rows<ContractorOrder>("demo_orders",org,bill.contractorId)).length)
@@ -275,7 +293,11 @@ export class ContractorRecordStore {
             this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id, JSON.stringify(bill));
             const reviewedAt=new Date().toISOString();
             bill.reviewEvents=[...(bill.reviewEvents??[]),{action:input.decision,at:reviewedAt,by:actor,note:input.note||""}];
-            if(input.decision==="approve")bill.approval={amount:bill.amount,asset:bill.asset,by:actor,at:reviewedAt};
+            if(input.decision==="approve") {
+                const amendment=bill.amendments?.findLast(a=>a.state==="accepted"&&!a.approvedAt);
+                if(amendment)amendment.approvedAt=reviewedAt;
+                bill.approval={amount:bill.amount,asset:bill.asset,by:actor,at:reviewedAt,...(amendment?{adjustmentReason:amendment.reason}:{})};
+            }
             bill.status = input.decision === "begin-review" ? "Under review" : input.decision === "approve" ? "Approved" : input.decision === "clarify" ? "Needs clarification" : "Rejected";
             bill.ownerNote = input.decision === "begin-review" ? "Owner review started. No payment initiated." : input.decision === "approve" ? "Invoice approved. Payment authorization is separate." : text(input.note, 1000, "review note");
             this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill), bill.id, org);
@@ -385,6 +407,18 @@ export class ContractorRecordStore {
         this.db.exec("BEGIN IMMEDIATE");
         try {
             const { org, profile: p } = this.contractor(session);
+            if(input.action==="respond-amendment") {
+                const bill=this.rows<ContractorBill>("demo_bills",org,p.id).find(b=>b.id===input.invoiceId);
+                const amendment=bill?.amendments?.find(a=>a.id===input.amendmentId&&a.state==="proposed");
+                if(!bill||!amendment||bill.status!=="Needs clarification"||bill.settlementLock||typeof input.accept!=="boolean")throw Error("Pending amendment access denied.");
+                this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id,JSON.stringify(bill));
+                amendment.state=input.accept?"accepted":"declined";amendment.acknowledgedAt=new Date().toISOString();
+                if(input.accept){bill.amount=amendment.amount;delete bill.approval;bill.status="Submitted";}else bill.status="Approved";
+                bill.ownerNote=input.accept?"Contractor accepted revised amount. Fresh owner approval required.":"Contractor declined the change. Original approval retained.";
+                bill.reviewEvents=[...(bill.reviewEvents??[]),{action:input.accept?"amendment-accepted":"amendment-declined",by:null,at:amendment.acknowledgedAt,note:"Acknowledged through the authenticated contractor portal."}];
+                this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill),bill.id,org);
+                this.db.exec("COMMIT");return {invoice:bill};
+            }
             if (input.action === "wallet-challenge") {
                 if(this.mode!=="simulation") throw Error("Use verified wallet message proof.");
                 if (p.pendingWallet)
@@ -437,15 +471,21 @@ export class ContractorRecordStore {
             if (!order)
                 throw Error("Select your own approved work order.");
         }
-        const asset = "NEAR";
-        const amount = formatNear(amountFromNear(f.amount)), description = text(input.description, 1000, "work description");
+        const asset = f.asset || "NEAR";
+        const amount = normalizeInvoiceAmount(f.amount,asset), description = text(input.description, 1000, "work description");
         text(input.text,24000,"bill text");
         const body=input.text;
         // Persistent billing may retain conflicting source text for clarification;
         // its NEAR request is never eligible while that conflict exists.
-        requireNear(f.asset || "NEAR", this.mode === "persistent" ? "" : body);
+        const legacyConflict=this.mode==="persistent"&&asset==="NEAR"&&!f.denominationConfirmed&&currencyConflict(body);
+        if(this.mode==="simulation"&&asset==="NEAR"&&!f.denominationConfirmed&&currencyConflict(body))throw Error("Currency conflict: confirm the invoice denomination and preferred payout before submission.");
+        const payoutAsset=f.payoutAsset??(asset==="NEAR"?NEAR_ASSET:undefined);
+        const payout=payoutAsset?billingAsset(payoutAsset):undefined;
+        if(!payout)throw Error("Select the preferred payout cryptocurrency and network.");
         const scope = `${org}:${p.id}`, submission = input.submissionId || f.reference || "";
-        const fingerprint = hash(JSON.stringify({action:input.action,invoiceId:input.invoiceId || "",orderId, amount, body, description, attachmentId:input.attachmentId || ""}));
+        const legacyDetails={action:input.action,invoiceId:input.invoiceId || "",orderId,amount,body,description,attachmentId:input.attachmentId||""};
+        const legacyFingerprint=hash(JSON.stringify(legacyDetails));
+        const fingerprint=asset==="NEAR"&&!f.payoutAsset&&!f.denominationConfirmed?legacyFingerprint:hash(JSON.stringify({...legacyDetails,asset,payoutAsset:payout.id,denominationConfirmed:f.denominationConfirmed===true}));
         if (input.action === "submit-invoice" || input.submissionId) {
             const previous = previousSubmission(this.db, scope, submission, fingerprint);
             if (previous) return this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === previous)!;
@@ -456,11 +496,12 @@ export class ContractorRecordStore {
             if (existing)
                 throw Error("This work order already has a submission. Open its status instead.");
         }
+        if(!legacyConflict&&(direct||asset!=="NEAR"||f.denominationConfirmed)&&(this.mode==="simulation"||asset!=="NEAR"||f.denominationConfirmed))validateInvoiceClaim(body,amount,asset,f.denominationConfirmed===true);
         const old = input.action === "clarify-invoice" ? this.rows<ContractorBill>("demo_bills", org, p.id).find(b => b.id === input.invoiceId) : undefined;
         const reference = old?.reference || nextReference(this.db, scope);
         const recipient = p.wallet || ""; // Invoice/AI claims never supply payment authority.
         const reasons: string[] = [];
-        if(this.mode === "persistent" && currencyConflict(body)) reasons.push("Currency conflict in source text. Clarification is required; no amount was converted to NEAR.");
+        if(legacyConflict) reasons.push("Currency conflict in source text. Clarification is required; no amount was converted to NEAR.");
         if(this.mode === "persistent")reasons.push(...sourceQuestions(body,amount).filter(q=>!q.startsWith("Which currency")),...sourceOrderQuestions(body,orderId,this.rows<ContractorOrder>("demo_orders",org,p.id)));
         if (direct) {
             // No work order exists to compare against; owner review stands in for it.
@@ -468,8 +509,7 @@ export class ContractorRecordStore {
         else {
             if (amount !== order!.amount)
                 reasons.push("Amount differs from approved work order.");
-            if (asset !== "NEAR")
-                reasons.push("Only native NEAR is supported.");
+            if (asset !== "NEAR") reasons.push("Invoice denomination differs from the NEAR work order. Use an unlinked invoice or clarify the agreement.");
 
         }
         let attachment: BillAttachment | null = null;
@@ -477,9 +517,9 @@ export class ContractorRecordStore {
             const a = this.attachment(input.attachmentId, org, p.id);
             attachment = { id: input.attachmentId, name: a.name, mime: a.mime, size: a.bytes.length };
         }
-        let bill: ContractorBill = { requestedAmount:old?.requestedAmount??old?.amount??amount, requestedAsset:old?.requestedAsset??old?.asset??asset, reviewEvents:old?.reviewEvents??[], sourceReference:old?.sourceReference??(/^Invoice:[ \t]*(.+)$/im.exec(old?.originalText??old?.text??body)?.[1]?.trim()), id: id(), contractorId: p.id, reference, orderId, orderReference: order ? order.reference : "No work order", amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: direct ? "Submitted" : this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
+        let bill: ContractorBill = { payoutAsset:payout.id,denominationConfirmed:f.denominationConfirmed===true,requestedAmount:old?.requestedAmount??old?.amount??amount, requestedAsset:old?.requestedAsset??old?.asset??asset, reviewEvents:old?.reviewEvents??[],amendments:old?.amendments, sourceReference:old?.sourceReference??(/^Invoice:[ \t]*(.+)$/im.exec(old?.originalText??old?.text??body)?.[1]?.trim()), id: id(), contractorId: p.id, reference, orderId, orderReference: order ? order.reference : "No work order", amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: direct ? "Submitted" : this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
         if (input.action === "clarify-invoice") {
-            if (!old || old.status !== "Needs clarification" || old.orderId !== orderId)
+            if (!old || old.amendments?.some(a=>a.state==="proposed") || old.status !== "Needs clarification" || old.orderId !== orderId)
                 throw Error("Only a requested clarification of the same invoice and work order is allowed.");
             this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(old.id, JSON.stringify(old));
             bill = { ...bill, id: old.id, originalText: old.originalText ?? old.text, attachment: attachment || old.attachment };
@@ -498,6 +538,21 @@ export class ContractorRecordStore {
             this.db.prepare("INSERT INTO invoice_submissions VALUES (?,?,?,?)").run(scope, submission, fingerprint, bill.id);
         }
         return bill;
+    }
+    lockSimulatedSettlement(org:string,billId:string,intentId:string,release=false,expected?:{amount:string;asset:string;payoutAsset:string;recipient:string;walletVersion:number}) {
+        if(this.mode!=="simulation")throw Error("Simulation cannot lock real invoices.");
+        this.db.exec("BEGIN IMMEDIATE");
+        try {
+        const bill=this.rows<ContractorBill>("demo_bills",org).find(b=>b.id===billId);
+        if(!bill)throw Error("Invoice access denied.");
+        if(release){if(bill.settlementLock!==intentId){this.db.exec("COMMIT");return;}delete bill.settlementLock;}
+        else {if(bill.status!=="Approved"||bill.settlementLock&&bill.settlementLock!==intentId)throw Error("Invoice already reserved or no longer approved.");bill.settlementLock=intentId;
+            const profile=this.profile(bill.contractorId,org);
+            if(!expected||bill.amount!==expected.amount||bill.asset!==expected.asset||(bill.payoutAsset??NEAR_ASSET)!==expected.payoutAsset||profile.wallet!==expected.recipient||profile.walletVersion!==expected.walletVersion)throw Error("Invoice or approved wallet changed before reservation. Request a fresh quote.");
+            const amendment=bill.amendments?.findLast(a=>a.state==="accepted"&&a.approvedAt);if(amendment)amendment.authorizedAt=new Date().toISOString();}
+        this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill),bill.id,org);
+        this.db.exec("COMMIT");
+        }catch(error){this.db.exec("ROLLBACK");throw error;}
     }
     markSimulatedPaid(org:string,billId:string,reference:string) {
         if(this.mode!=="simulation") throw Error("Simulation cannot update real invoices.");

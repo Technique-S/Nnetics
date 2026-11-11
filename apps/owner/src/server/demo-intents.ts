@@ -1,5 +1,6 @@
 // A local SQLite simulation. No RPC, SDK, signing, deposits or live executors.
 import crypto from "node:crypto";
+import {billingAsset,NEAR_ASSET,decimalUnits,unitsDecimal} from "../data/billing-assets.ts";
 import { DEMO_ASSETS } from "../data/demo-intents.ts";
 import type { DemoIntentsAdapter, IntentEvent, IntentScenario, IntentState, IntentView, SimulatedIntent } from "../data/demo-intents.ts";
 import { amountFromNear, formatNear, account } from "../data/owner-adapter.ts";
@@ -10,20 +11,24 @@ import { demoContractors } from "./demo-contractors.ts";
 const terminal = new Set<IntentState>(["COMPLETED","FAILED","EXPIRED","REFUNDED"]);
 const hash = (value:string) => crypto.createHash("sha256").update(value).digest("hex");
 const ceilDiv = (a:bigint,b:bigint) => (a+b-1n)/b;
-function decimal(units:bigint, decimals:number) {
-    const text=units.toString().padStart(decimals+1,"0");
-    return `${text.slice(0,-decimals)}.${text.slice(-decimals)}`.replace(/\.?0+$/,"");
-}
-
-export function previewDemoQuote(destinationAmount:string,sourceAsset:string,rates:Readonly<Record<string,string>>=Object.fromEntries(DEMO_ASSETS.map(a=>[a.id,a.nearPerUnit]))) {
-    const asset=DEMO_ASSETS.find(a=>a.id===sourceAsset);
+export function previewDemoQuote(invoiceAmount:string,sourceAsset:string,rates:Readonly<Record<string,string>>=Object.fromEntries(DEMO_ASSETS.map(a=>[a.id,a.nearPerUnit])),payoutAsset:string=NEAR_ASSET,invoiceCurrency="NEAR") {
+    const asset=DEMO_ASSETS.find(a=>a.id===sourceAsset)||billingAsset(sourceAsset),destination=billingAsset(payoutAsset);
     if(!asset)throw Error("Unsupported simulated source asset.");
-    const amount=BigInt(amountFromNear(destinationAmount)),fee=ceilDiv(amount*25n,10_000n),total=amount+fee;
-    const rate=rates[asset.id],perUnit=BigInt(amountFromNear(rate));
+    if(!destination)throw Error("Unsupported simulated payout route.");
+    const rateFor=(id:string,symbol:string,fallback:string)=>rates[id]??rates[DEMO_ASSETS.find(a=>a.symbol===symbol&&billingAsset(a.id)?.id===id)?.id??""]??fallback;
+    const destinationRate=rateFor(destination.id,destination.symbol,destination.nearPerUnit);
+    const fiat:Record<string,string>={USD:"0.25",EUR:"0.27",GBP:"0.32",NGN:"0.00016"};
+    const denominationRate=fiat[invoiceCurrency]??(invoiceCurrency===destination.symbol?destinationRate:DEMO_ASSETS.find(a=>a.symbol===invoiceCurrency)?.nearPerUnit);
+    if(!denominationRate)throw Error("Unsupported simulated invoice conversion.");
+    const targetUnits=invoiceCurrency===destination.symbol?decimalUnits(invoiceAmount,destination.decimals):ceilDiv(decimalUnits(invoiceAmount,24)*BigInt(amountFromNear(denominationRate))*10n**BigInt(destination.decimals),10n**24n*BigInt(amountFromNear(destinationRate)));
+    const destinationAmount=unitsDecimal(targetUnits,destination.decimals);
+    const amount=ceilDiv(targetUnits*BigInt(amountFromNear(destinationRate)),10n**BigInt(destination.decimals));
+    const modeledFee=ceilDiv(amount*25n,10_000n),rate=rates[asset.id]??rates[billingAsset(asset.id)?.id??""]??asset.nearPerUnit,perUnit=BigInt(amountFromNear(rate));
     if(perUnit<=0n)throw Error("Invalid illustrative exchange rate.");
-    return {asset,amount:amount.toString(),fee:fee.toString(),total:total.toString(),rate,
-        sourceAmount:decimal(ceilDiv(total*10n**BigInt(asset.decimals),perUnit),asset.decimals),
-        solver:asset.chain==="NEAR"?"Mock Cedar Solver":"Mock Emerald Solver"};
+    const sourceUnits=ceilDiv((amount+modeledFee)*10n**BigInt(asset.decimals),perUnit);
+    const total=ceilDiv(sourceUnits*perUnit,10n**BigInt(asset.decimals)),fee=total-amount;
+    return {asset,destination,destinationAmount,amount:amount.toString(),fee:fee.toString(),total:total.toString(),rate,destinationRate,
+        sourceAmount:unitsDecimal(sourceUnits,asset.decimals),solver:asset.chain==="NEAR"?"Mock Cedar Solver":"Mock Emerald Solver"};
 }
 
 export class LocalDemoIntents implements DemoIntentsAdapter {
@@ -77,6 +82,8 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
         if(!bill || bill.status!=="Approved" || bill.reasons.length) throw Error("Approved invoice without unresolved clarification required.");
         const profile=snapshot.profiles.find(p=>p.id===bill.contractorId);
         if(!profile?.wallet || profile.archived) throw Error("Approved recipient wallet required in Wallet Details.");
+        const destination=billingAsset(bill.payoutAsset??NEAR_ASSET);
+        if(!destination||destination.chain!=="NEAR")throw Error("Unsupported payout route: Wallet Details currently approves NEAR recipients only. Invoice review remains available.");
         account(profile.wallet);
         return {bill,profile};
     }
@@ -84,7 +91,7 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
         const result=this.recipient(owner,intent.billId);
         if(result.profile.walletVersion!==intent.walletVersion || result.profile.wallet!==intent.recipient)
             throw Error("Wallet changed after quote/authorization. Revalidate recipient with a new quote.");
-        if(amountFromNear(result.bill.amount)!==intent.amount) throw Error("Invoice amount changed; request a new quote.");
+        if((intent.invoiceAmount??intent.destinationAmount)!==result.bill.amount||(intent.invoiceCurrency??"NEAR")!==result.bill.asset||(intent.destinationAssetId??NEAR_ASSET)!==(result.bill.payoutAsset??NEAR_ASSET)) throw Error("Invoice amount or payout changed; request a new quote.");
         return result;
     }
     private policy(vault:{paused:boolean;limit:string},intent:SimulatedIntent) {
@@ -95,17 +102,18 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
         return this.write(()=>{
             const scope=this.scope(token,owner);
             if(typeof input.key!=="string" || !input.key || input.key.length>80) throw Error("A simulation idempotency key is required.");
-            const asset=DEMO_ASSETS.find(a=>a.id===input.sourceAsset);
+            const asset=DEMO_ASSETS.find(a=>a.id===input.sourceAsset)||billingAsset(input.sourceAsset);
             if(!asset) throw Error("Unsupported simulated source asset.");
-            if(!["success","failure","refund"].includes(input.scenario)) throw Error("Select a deterministic simulation scenario.");
+            if(!["success","failure","refund","quote-failure"].includes(input.scenario)) throw Error("Select a deterministic simulation scenario.");
+            if(input.scenario==="quote-failure")throw Error("Mock quote failed before authorization. No simulated funds reserved. Choose another outcome and retry.");
             const fingerprint=hash(JSON.stringify([input.billId,asset.id,input.scenario]));
             const prior=this.ledger.db.prepare("SELECT id,fingerprint FROM demo_intents WHERE workspace=? AND key=?").get(scope.workspace,input.key) as {id:string;fingerprint:string}|undefined;
             if(prior){if(prior.fingerprint!==fingerprint)throw Error("Idempotency key reused with different simulation details.");return this.view(this.load(scope.workspace,scope.org,prior.id));}
             const {bill,profile}=this.recipient(owner,input.billId);
-            const {amount,fee,total,rate,sourceAmount,solver}=previewDemoQuote(bill.amount,asset.id,this.rates);
+            const {amount,fee,total,rate,sourceAmount,solver,destination,destinationAmount}=previewDemoQuote(bill.amount,asset.id,this.rates,bill.payoutAsset??NEAR_ASSET,bill.asset);
             const intent:SimulatedIntent={id:crypto.randomUUID(),reference:`SIM-INT-${crypto.randomUUID().slice(0,8)}`,billId:bill.id,organization:scope.org,workspace:scope.workspace,
                 state:"CREATED",sourceAsset:asset.id,sourceChain:asset.chain,sourceSymbol:asset.symbol,sourceAmount,
-                destinationAmount:bill.amount,destinationAsset:"NEAR",destinationChain:"NEAR",recipient:profile.wallet!,walletVersion:profile.walletVersion,
+                destinationAmount,destinationAsset:destination.symbol,destinationSymbol:destination.symbol,destinationChain:destination.chain,destinationAssetId:destination.id,sourceAssetId:billingAsset(asset.id)!.id,invoiceAmount:bill.amount,invoiceCurrency:bill.asset,quoteType:"EXACT_OUTPUT",recipient:profile.wallet!,walletVersion:profile.walletVersion,
                 amount:amount.toString(),fee:fee.toString(),total:total.toString(),rate,solver,
                 expiresAt:this.now()+this.quoteTtl,authorizationExpiresAt:0,scenario:input.scenario,settleAt:0,reason:"",createdAt:this.now()};
             this.ledger.db.prepare("INSERT INTO demo_intents VALUES (?,?,?,?,?,?)").run(intent.id,scope.workspace,scope.org,input.key,fingerprint,JSON.stringify(intent));
@@ -125,6 +133,7 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
             const duplicate=this.ledger.db.prepare("SELECT id FROM demo_ws_payments WHERE workspace=? AND bill_id=? AND status IN ('prepared','pending','confirmed')").get(scope.workspace,bill.id);
             if(duplicate) throw Error("This invoice already has an active or completed payment.");
             if(BigInt(scope.vault.funded)-BigInt(scope.vault.spent)-BigInt(scope.vault.reserved)<BigInt(intent.total)) throw Error("Insufficient simulated funds. Fund the demo vault first.");
+            this.portal.lockSimulatedSettlement(scope.org,bill.id,intent.id,false,{amount:intent.invoiceAmount??intent.destinationAmount,asset:intent.invoiceCurrency??"NEAR",payoutAsset:intent.destinationAssetId??NEAR_ASSET,recipient:intent.recipient,walletVersion:intent.walletVersion});
             scope.vault.reserved=(BigInt(scope.vault.reserved)+BigInt(intent.total)).toString();
             this.ledger.db.prepare("INSERT INTO demo_ws_payments(id,workspace,contractor,recipient,amount,fee,total,description,status,reason,reference,created_at,settle_after,settled_at,bill_id,confirm_secret) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,0,NULL,?,'')")
                 .run(intent.id,scope.workspace,profile.name,intent.recipient,intent.amount,intent.fee,intent.total,`Simulated NEAR Intents · ${bill.description}`,"prepared","",intent.reference,new Date(this.now()).toISOString(),bill.id);
@@ -168,6 +177,7 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
             this.ledger.db.prepare("UPDATE demo_ws_workspaces SET vault=?,revision=revision+1 WHERE workspace=?").run(JSON.stringify(vault),intent.workspace);
             this.ledger.db.prepare("UPDATE demo_ws_payments SET status=?,reason=?,settled_at=? WHERE id=?").run(state==="COMPLETED"?"confirmed":"failed",reason,new Date(this.now()).toISOString(),intent.id);
         }
+        if(state==="COMPLETED"){intent.deliveredAmount=intent.destinationAmount;intent.deliveredAssetId=intent.destinationAssetId??NEAR_ASSET;}
         intent.reason=reason;this.event(intent,state,reason);this.save(intent);
     }
     list(token:string,owner:string):IntentView[] {
@@ -200,7 +210,7 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
     }
     reconcile() {
         const rows=this.ledger.db.prepare("SELECT payload FROM demo_intents").all() as {payload:string}[];
-        for(const row of rows){const i=JSON.parse(row.payload) as SimulatedIntent;if(i.state==="COMPLETED")this.portal.markSimulatedPaid(i.organization,i.billId,i.reference);}
+        for(const row of rows){const i=JSON.parse(row.payload) as SimulatedIntent;if(i.state==="COMPLETED")this.portal.markSimulatedPaid(i.organization,i.billId,i.reference);if(terminal.has(i.state))this.portal.lockSimulatedSettlement(i.organization,i.billId,i.id,true);}
     }
 }
 let singleton:LocalDemoIntents|undefined;

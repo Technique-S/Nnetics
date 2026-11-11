@@ -43,6 +43,7 @@ test("unlinked contractor bill → simulated intent settlement, refresh and fail
     }
     async function quote(card:ReturnType<Page["locator"]>,outcome="success"){
         await card.getByText("Simulated NEAR Intents",{exact:true}).click();
+        await card.getByLabel("Funding asset and network").selectOption("usdc-ethereum");
         await card.getByLabel("Simulation outcome").selectOption(outcome);
         await card.getByRole("button",{name:"Preview simulated quote",exact:true}).click();
         await expect(card.getByText("Mock Emerald Solver",{exact:true})).toBeVisible();

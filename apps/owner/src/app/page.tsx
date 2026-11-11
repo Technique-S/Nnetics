@@ -513,7 +513,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                   <button className="text-button" onClick={() => go("Contractors")}>Open contractors <Icon name="arrow" size={14}/></button>
                 </section>
                 <section className="overview-card overview-paid">
-                  <h2>Total paid</h2>
+                  <h2>Total paid</h2>{demoWs&&<p className="muted">NEAR equivalent · payout assets shown in receipts</p>}
                   <p className="overview-metric"><Amount value={totalPaid.toString()}/></p>
                   <p>{confirmed.length} confirmed {confirmed.length === 1 ? "payout" : "payouts"}</p>
                 </section>
@@ -663,7 +663,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                     {visibleReceipts.length === 0 && <p className="empty">{confirmed.length ? "No receipts match this search." : "Receipts appear here after payment is confirmed."}</p>}
                     {visibleReceipts.map(p => {
                       const info = details(p);
-                      const summary = [live ? "Nnetics testnet receipt" : "Nnetics demo receipt · simulated funds", p.reference, info.contractor, p.recipient, `${formatNear(p.amount)} NEAR`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
+                      const summary = [live ? "Nnetics testnet receipt" : "Nnetics demo receipt · simulated funds", p.reference, info.contractor, p.recipient, `${formatNear(p.amount)} ${demoWs?"NEAR equivalent":"NEAR"}`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
                       return <article className="payment-record" key={p.attempt_id} id={`receipt-${p.attempt_id}`} tabIndex={-1}>
                         <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {live ? "Payment initiated" : "Simulated receipt"} · {p.invoice_id}</p>{info.description && <p className="payment-record-description">{info.description}</p>}</div>
                         <div className="payment-record-actions"><Amount value={p.amount}/><Badge status="Paid"/>

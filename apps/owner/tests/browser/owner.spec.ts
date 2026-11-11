@@ -48,7 +48,7 @@ test('invoice review cannot override a source conflict; unknown payment outcomes
   await expect(page.getByRole('button',{name:/Approve bill/})).toBeDisabled();
   await page.getByRole('textbox',{name:/Review note/}).fill('Confirm the amount against the work order.');
   await page.getByRole('button',{name:/Request clarification/}).click();
-  await expect(page.locator('article [data-status="Needs clarification"]')).toBeVisible();
+  await page.getByText("View details",{exact:true}).click();await expect(page.locator('article [data-status="Needs clarification"]')).toBeVisible();
   await navigateOwner(page,'Vault & Controls');
   await page.locator('input[name=amount]').fill('5');await page.getByRole('button',{name:'Fund vault',exact:true}).click();
   // The diagnostic unknown outcome remains an API fixture; ordinary Settings
@@ -75,7 +75,7 @@ test('load failures recover and untrusted invoice text stays literal',async({pag
   down=false;await page.getByRole('button',{name:'Retry refresh'}).click();
   await expect(page.getByRole('alert',{name:'Simulation error'})).toHaveCount(0);
   await navigateOwner(page,'Invoices');
-  await page.getByText('Original billing text',{exact:true}).click();
+  await page.getByText('View details',{exact:true}).click();await page.getByText('Original billing text',{exact:true}).click();
   await expect(page.locator('pre')).toHaveText(text);await expect(page.locator('pre img')).toHaveCount(0);
   expect(await page.evaluate(()=>('injected' in window))).toBe(false);
 });

@@ -335,9 +335,13 @@ export class DemoWorkspaceStore {
     }
 
     private paymentRecord(r: PaymentRow, label?: string): DemoLedgerPayment {
+        const hasIntents=this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='demo_intents'").get();
+        const saved=hasIntents?this.db.prepare("SELECT payload FROM demo_intents WHERE id=?").get(r.id) as {payload:string}|undefined:undefined;
+        const intent=saved?JSON.parse(saved.payload):null;
+        const payout=intent?`${intent.destinationAmount} ${intent.destinationSymbol??intent.destinationAsset} on ${intent.destinationChain}`:null;
         return {
             id: r.id, kind: "payment",
-            label: label ?? r.description,
+            label: label ?? (payout?`${r.description} · payout ${payout} · funding ${intent.sourceAmount} ${intent.sourceSymbol} on ${intent.sourceChain} · simulated`:r.description),
             contractor: r.contractor,
             recipient: r.recipient,
             amount: r.amount, fee: r.fee, total: r.total,
@@ -369,7 +373,7 @@ export class DemoWorkspaceStore {
         const receipts = payments.filter(p => p.status === "confirmed").map(p => ({
             id: p.id, contractor: p.contractor, recipient: p.recipient, amount: p.amount,
             reference: p.reference, at: p.createdAt,
-            summary: `${p.contractor || p.recipient} · ${formatNear(p.amount)} NEAR · ${p.reference} · ${p.description} · Demo receipt: simulated funds, no live transfer.`
+            summary: `${p.contractor || p.recipient} · ${formatNear(p.amount)} ${p.label.includes(" · payout ")?"NEAR equivalent":"NEAR"} · ${p.reference} · ${p.label} · Demo receipt: simulated funds, no live transfer.`
         }));
         return {
             mode: "simulation", token, initialized: !!profile,

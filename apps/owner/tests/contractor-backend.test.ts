@@ -24,6 +24,18 @@ function fixture(){
  function input(orderId:string){return {action:"submit-invoice" as const,submissionId:"request-1",fields:{orderId,amount:"1",asset:"NEAR",recipient:""},text:"  Delivered the original article.\n\n",description:"An article"};}
  return {identity,keys,get backend(){return backend;},login,organization,invite,wallet,order,input,sign,setRemoved:(v:boolean)=>removed=v,setOwner:(v:string)=>chainOwner=v,restart:()=>{backend.db.close();backend=new ContractorBackend(file,identity);},close:()=>{backend.db.close();identity.db.close();fs.rmSync(directory,{recursive:true});}};
 }
+test("persistent USDC bill is reviewable without a wallet or work order; live NEAR settlement remains gated",async()=>{
+ const f=fixture();try{
+  const token=await f.login(),org=await f.organization(token),a=await f.invite(token,org);
+  const bill=(await f.backend.write(a.session,{action:"submit-invoice",submissionId:"multi",fields:{orderId:"",amount:"500",asset:"USDC",payoutAsset:"nep141:usdc.near",denominationConfirmed:true},text:"$500 for 2 edited videos",description:"2 edited videos"})).invoice!;
+  assert.equal(bill.asset,"USDC");assert.equal(bill.recipient,"");assert.equal(bill.status,"Submitted");assert.deepEqual(bill.reasons,[]);
+  await f.backend.ownerWrite(token,org,{action:"review-invoice",invoiceId:bill.id,decision:"approve",note:""});
+  f.restart();const snapshot=await f.backend.ownerRead(token,org);assert.equal(snapshot.invoices[0].approval?.by,"owner.testnet");
+  const {projectPayables}=await import("../src/data/payables.ts");assert.ok(projectPayables(snapshot)[0].blockers.some(b=>b.includes("native NEAR only")));
+  const {reviewedPayment}=await import("../src/server/contractor-payments.ts");assert.throws(()=>reviewedPayment(snapshot.invoices[0],{} as never,{} as never,"1"),/native NEAR only/);
+  await assert.rejects(()=>f.backend.ownerWrite(token,org,{action:"propose-amendment",invoiceId:bill.id,amount:"400",reason:"test",kind:"revised-approval"}),/Live approval amendments/);
+ }finally{f.close();}
+});
 test("persistent owner invite → verified wallet → invoice review survives restart and preserves original billing",async()=>{
  const f=fixture();try{
   const token=await f.login(),org=await f.organization(token),a=await f.invite(token,org);await f.wallet(a.session);const order=await f.order(token,org,a.session),draft=f.input(order.id);

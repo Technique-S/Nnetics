@@ -42,7 +42,7 @@ test("owner invite → contractor upload and clarification → owner review, wal
     await expect(page.getByText("WO-ARTICLE · One article")).toBeVisible();
     await contractor.bringToFront();
     await contractor.getByRole("button", { name: "Send a bill", exact: true }).click();
-    await expect(contractor.getByText("Currency: NEAR · Testnet",{exact:true})).toBeVisible();
+    await expect(contractor.getByLabel("Invoice denomination",{exact:true})).toHaveValue("NEAR");
     await contractor.getByText("Attachments and extraction (optional)",{exact:true}).click();
     await contractor.getByLabel("Attach an invoice", { exact: true }).setInputFiles({ name: "article.txt", mimeType: "text/plain", buffer: Buffer.from("Invoice: INV-ARTICLE\nWork order: WO-ARTICLE\nAmount: 2 NEAR\nArticle delivered.") });
     await expect(contractor.getByText("article.txt ·", { exact: false })).toBeVisible();
@@ -61,8 +61,10 @@ test("owner invite → contractor upload and clarification → owner review, wal
     await contractor.bringToFront();
     await contractor.getByRole("button", { name: "Refresh status" }).click();
     await contractor.getByRole("button", { name: `Answer clarification · ${reference}` }).click();
+    await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: WO-ARTICLE\nAmount: 1 NEAR\nArticle delivered.");
     await contractor.getByLabel("Amount (as invoiced)").fill("1");
     await contractor.getByRole("button", { name: "Send clarification", exact: true }).click();
+    const clarified=(await(await contractor.request.get("/api/demo/contractors/contractor")).json()).invoices[0];expect(clarified.originalText).toContain("Amount: 2 NEAR");expect(clarified.text).toContain("Amount: 1 NEAR");
     await page.getByRole("button", { name: "Refresh owner records" }).click();
     await page.getByRole("button", { name: `Approve bill · ${reference}`, exact: true }).click();
     await contractor.bringToFront();
@@ -182,8 +184,8 @@ test("pasted currency conflicts block NEAR submission until the source is clarif
  await contractor.bringToFront(); await contractor.getByRole("button",{name:"Send a bill",exact:true}).click();
  await expect(contractor.getByLabel("Work order (optional)",{exact:true})).toContainText("CURRENCY-WO");
  await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 USD\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByLabel("Work description",{exact:true}).fill("Article");
- await expect(contractor.locator("#submission-guidance")).toContainText("Currency conflict: clarify");await expect(contractor.getByRole("button",{name:"Submit bill for review"})).toBeDisabled();
- await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 NEAR\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByRole("button",{name:"Submit bill for review"}).click();
+ await contractor.getByLabel("Invoice denomination",{exact:true}).selectOption("NEAR");await expect(contractor.locator("#submission-guidance")).toContainText("Currency conflict");await expect(contractor.getByRole("button",{name:"Submit bill for review"})).toBeDisabled();
+ await contractor.getByLabel("Bill text",{exact:true}).fill("Work order: CURRENCY-WO\nAmount: 1 NEAR\nArticle delivered");await contractor.getByRole("button",{name:"Format labeled details"}).click();await contractor.getByLabel("Preferred payout cryptocurrency and network",{exact:true}).selectOption("nep141:wrap.near");await contractor.getByRole("button",{name:"Submit bill for review"}).click();
  await expect(contractor.getByText(/^CTR-\d+-INV-0001$/,{exact:true})).toBeVisible();
  const saved=(await(await contractor.request.get("/api/demo/contractors/contractor")).json()).invoices[0];
  await contractor.reload();await contractor.getByRole("button",{name:"My payments",exact:true}).click();await expect(contractor.getByText(saved.reference,{exact:true})).toBeVisible();await ctx.close();

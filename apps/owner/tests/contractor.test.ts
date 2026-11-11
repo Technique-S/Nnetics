@@ -117,7 +117,7 @@ test("amount and currency mismatches require clarification; invoice recipients c
     bad.fields.amount = "2";
     bad.fields.asset = "USDC";
     bad.fields.recipient = "attacker.testnet";
-    assert.throws(() => store.command(a.session, bad), /Currency conflict/);
+    assert.throws(() => store.command(a.session, bad), /Currency conflict|preferred payout/);
     bad.fields.asset="NEAR";
     store.command(a.session, bad);
     let invoice = store.snapshot(a.session).invoices[0];
