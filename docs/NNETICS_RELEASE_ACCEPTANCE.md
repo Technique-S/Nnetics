@@ -1,5 +1,7 @@
 # Nnetics integration and release acceptance
 
+The subsequent [assistant local production acceptance](NNETICS_ASSISTANT_RELEASE_READINESS.md) resolves the provider configuration condition below for the owner's selected local production target. The integration results in this report remain the historical baseline.
+
 ## Integration plan and compatibility
 
 The functional checkout was `feature/nnetics-v3` at `7657c9f`. The design worktree started at the same commit. The older `feature/task-dashboard-demo` branch at `cab265c` is an ancestor of V3 and has uncommitted experimental route and component files. Those files remain in their original checkout.
