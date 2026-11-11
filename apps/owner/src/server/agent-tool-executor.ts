@@ -1,3 +1,4 @@
+import { executeContractorTool, contractorView } from "./agent-contractor-tools.ts";
 // Agent Tool Executor - Implements the tool interface by connecting to existing backend services
 import {demoIntents,previewDemoQuote} from "./demo-intents.ts";
 import {DEMO_ASSETS} from "../data/demo-intents.ts";
@@ -77,35 +78,17 @@ export class AgentToolExecutor implements AgentToolExecutor {
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
   }
   // Contractor Tools
-  async listContractors(args: {}): Promise<ToolResult<any[]>> {
+  async listContractors(args: {query?:string;archived?:boolean;offset?:number;limit?:number}): Promise<ToolResult<any>> {
     try {
-      if (this.isDemoOperation()) {
-        const store = demoContractors();
-        // Get contractor profiles from demo store
-        // In a real implementation, we'd get the token from demoContext
-        const snapshot = store.ownerSnapshot(this.demoOwnerToken()); // TODO: get from context
-        return {
-          success: true,
-          data: (snapshot as any).profiles.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            wallet: p.wallet,
-            generation: p.generation,
-            archived: p.archived === true,
-            deletable: p.deletable === true
-          }))
-        };
-      } else {
-        // Live mode - would get from organization context
-        // For now, return not implemented to focus on demo mode
-        return { success: false, error: "Live mode not fully implemented" };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to list contractors"
-      };
-    }
+      if (!this.isDemoOperation()) return {success:false,error:"Live mode not fully implemented"};
+      const store=demoContractors(),token=this.demoOwnerToken();
+      if(!store.owner(token)) return {success:false,code:"owner_required",error:"Owner session required."};
+      const snapshot=store.ownerSnapshot(token);
+      const all=(args.archived ? snapshot.archivedProfiles ?? [] : snapshot.profiles).filter(p => !args.query || p.name.toLocaleLowerCase().includes(args.query.toLocaleLowerCase()));
+      const offset=args.offset ?? 0,limit=Math.min(args.limit ?? 100,100);
+      const items=all.slice(offset,offset+limit).map(contractorView);
+      return {success:true,data:Object.keys(args).length ? {count:all.length,contractors:items,nextOffset:offset+limit<all.length ? offset+limit : null} : items};
+    } catch(error) {return {success:false,error:error instanceof Error ? error.message : "Failed to list contractors"};}
   }
 
   async getContractor(args: { id?: string; name?: string }): Promise<ToolResult<any | null>> {
@@ -114,11 +97,11 @@ export class AgentToolExecutor implements AgentToolExecutor {
         const store = demoContractors();
         const snapshot = store.ownerSnapshot(this.demoOwnerToken());
         let profile = args.id
-          ? (snapshot as any).profiles.find((p: any) => p.id === args.id)
+          ? [...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].find((p: any) => p.id === args.id)
           : undefined;
-        if (!profile && args.name) {
+        if (!args.id && args.name) {
           const needle = args.name.trim().toLocaleLowerCase();
-          const matches = (snapshot as any).profiles.filter((p: any) =>
+          const matches = [...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].filter((p: any) =>
             String(p.name).trim().toLocaleLowerCase() === needle);
           if (matches.length > 1) {
             return {
@@ -135,8 +118,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
         return {
           success: true,
           data: {
-            id: profile.id,
-            name: profile.name,
+            ...contractorView(profile),
             wallet: profile.wallet,
             generation: profile.generation,
             archived: profile.archived === true,
@@ -197,9 +179,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
   async updateContractor(args: { id: string; name?: string }): Promise<ToolResult<any>> {
     try {
       if (this.isDemoOperation()) {
-        // For demo mode update, we would need to modify the profile
-        // This is simplified - in reality we'd fetch, update, and save
-        return { success: false, error: "Update not implemented in demo mode" };
+        return this.contractorLifecycleTool("update_contractor",args);
       } else {
         return { success: false, error: "Live mode not fully implemented" };
       }
@@ -209,6 +189,11 @@ export class AgentToolExecutor implements AgentToolExecutor {
         error: error instanceof Error ? error.message : "Failed to update contractor"
       };
     }
+  }
+
+  async contractorLifecycleTool(name: string, args: Record<string, unknown>): Promise<ToolResult<unknown>> {
+    if (!this.isDemoOperation()) return {success:false,code:"mode_unavailable",error:"Lifecycle agent tools are demo-only."};
+    return executeContractorTool(this.demoOwnerToken(),name,args);
   }
 
   // Contractor lifecycle tools. They never mutate anything: they resolve the

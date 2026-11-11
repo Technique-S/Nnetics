@@ -157,7 +157,7 @@ function authenticate(req: NextRequest): VerifiedContext {
     // Resolve the real contractor records once for pronoun follow-ups. The
     // model only receives names that exist in the authenticated organization.
     const snapshot = demoContractors().ownerSnapshot(demo.portalToken);
-    const references = snapshot.profiles.map((profile) => ({ id: profile.id, name: profile.name }));
+    const references = [...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].map((profile) => ({ id: profile.id, name: profile.name }));
     return {
       mode: "demo",
       orgId: "demo",
@@ -225,7 +225,7 @@ function lifecycleChips(executions: AgentToolExecution[], scope: string | undefi
   const chips: AgentActionChip[] = [];
   for (const execution of executions) {
     if (!execution.result.success) continue;
-    if (!["archive_contractor", "restore_contractor", "delete_contractor"].includes(execution.name)) continue;
+    if (!["archive_contractor", "restore_contractor", "delete_contractor", "prepare_delete_contractor", "create_contractor_portal_invitation", "revoke_contractor_portal_invitation", "prepare_wallet_change_decision"].includes(execution.name)) continue;
     const data = execution.result.data && typeof execution.result.data === "object" && !Array.isArray(execution.result.data)
       ? execution.result.data as Record<string, unknown>
       : {};
@@ -235,13 +235,20 @@ function lifecycleChips(executions: AgentToolExecution[], scope: string | undefi
     if (!secret) continue;
     const kind = typeof data.kind === "string" ? data.kind : "archive";
     const contractorName = typeof data.contractorName === "string" ? data.contractorName : "this contractor";
-    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : "Archive";
+    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : kind === "archive" ? "Archive" : kind === "replace-portal" ? "Replace portal invitation for" : "Revoke portal access for";
     chips.push({
-      action: { kind: "confirm-contractor-lifecycle", operationId, secret },
+      action: { kind: "confirm-contractor-lifecycle", operationId, secret, contractorId:data.contractorId, contractorName, actionKind:kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision ?? "review"}-wallet-change` : kind, consequence:data.consequence, expiresAt:data.expiresAt, details:data.details },
       label: `${verb} ${contractorName} — confirm`,
     });
   }
   return chips;
+}
+
+function invitationChips(executions: AgentToolExecution[]): AgentActionChip[] {
+  return executions.flatMap(execution=>{
+    const data=execution.result.success ? execution.result.data as {invitationReference?:string;contractorName?:string} : null;
+    return data?.invitationReference ? [{action:{kind:"reveal-contractor-invitation",reference:data.invitationReference,contractorName:data.contractorName},label:"View private invitation"}] : [];
+  });
 }
 
 function errorBody(code: string, message: string, requestId: string, retryable: boolean, mayHaveChanged = false) {
@@ -412,6 +419,7 @@ export async function POST(req: NextRequest) {
       reply: result.reply,
       actions: [
         ...actionChips(result.executions),
+        ...invitationChips(result.executions),
         ...lifecycleChips(result.executions, context.mode === "demo" && context.demoPortalToken ? lifecycleScope(context.demoPortalToken) : undefined),
       ],
       mode: context.mode,

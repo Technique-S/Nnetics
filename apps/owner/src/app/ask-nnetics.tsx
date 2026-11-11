@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { AgentInvitation } from "./agent-invitation";
+import { AgentConfirmation, type ContractorConfirmation } from "./agent-confirmation";
 import { ActionButton } from "./action-button";
 
 export type AssistantAction =
@@ -20,7 +22,8 @@ export type AssistantAction =
   | { kind: "get-organization-statistics" }
   | { kind: "create-contractor"; name: string; update?: boolean; contractorId?: string }
   | { kind: "prepare-payment-draft"; contractor: string; amount: string; description: string }
-  | { kind: "confirm-contractor-lifecycle"; operationId: string; secret: string }
+  | {kind:"reveal-contractor-invitation";reference:string;contractorName?:string}
+  | ContractorConfirmation
   | { kind: "find-receipt"; reference: string; contractor: string }
   | { kind: "summarize-outstanding" };
 
@@ -125,6 +128,7 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
         if (!data || data.retryable || response.status >= 500) setFailedRequest({message, key});
         throw new Error(data?.error || data?.reply || "The agent is unavailable. Try again in a moment.");
       }
+      window.dispatchEvent(new Event("nnetics-contractor-changed"));
       setConversationHistory(prev => {
         const updated = [...prev, {user: message, assistant: data.reply!}].slice(-5);
         try { window.localStorage.setItem(CONVERSATION_KEY, JSON.stringify(updated)); } catch {}
@@ -171,7 +175,7 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
             <strong className="ask-nnetics-mode">{message.who === "you" ? "You" : message.mode === "error" ? "Request failed" : "Nnetics"}</strong>
             <p>{message.text}</p>
             {message.chips && message.chips.length > 0 && <div className="ask-nnetics-actions">
-              {message.chips.map((item, chipIndex) => <button key={chipIndex} type="button" className="button secondary" onClick={() => {
+              {message.chips.map((item, chipIndex) => item.action.kind === "reveal-contractor-invitation" ? <AgentInvitation key={chipIndex} reference={item.action.reference} contractorName={item.action.contractorName}/> : item.action.kind === "confirm-contractor-lifecycle" ? <AgentConfirmation key={chipIndex} action={item.action}/> : <button key={chipIndex} type="button" className="button secondary" onClick={() => {
                 onAction(item.action);
                 if (panelRef.current?.matches(":modal")) setOpen(false);
               }}>{item.label}</button>)}

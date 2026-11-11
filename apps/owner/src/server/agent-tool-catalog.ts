@@ -1,3 +1,4 @@
+import { contractorTools } from "./agent-contractor-tools.ts";
 // Authoritative catalog of application tools exposed to the model. A tool is
 // listed only when the existing executor has a real implementation for that
 // mode. Descriptions are written for model selection; authorization remains in
@@ -5,6 +6,13 @@
 export type AgentMode = "demo" | "live";
 
 export type AgentToolName =
+  | "list_pending_wallet_changes"
+  | "get_wallet_change_request"
+  | "prepare_wallet_change_decision"
+  | "create_contractor_portal_invitation"
+  | "revoke_contractor_portal_invitation"
+  | "update_contractor"
+  | "get_contractor_wallet_status"
   | "list_unlinked_invoices"
   | "preview_simulated_intent"
   | "get_simulated_payment_status"
@@ -14,6 +22,7 @@ export type AgentToolName =
   | "archive_contractor"
   | "restore_contractor"
   | "delete_contractor"
+  | "prepare_delete_contractor"
   | "get_contractor_invoices"
   | "get_vault_balance"
   | "get_vault_status"
@@ -35,6 +44,7 @@ export interface AgentToolDefinition {
 const noArgs = { type: "object", properties: {}, additionalProperties: false } as const;
 
 const definitions: AgentToolDefinition[] = [
+  ...contractorTools,
   {name:"list_unlinked_invoices",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:noArgs,description:"Lists demo bills without a work order, including unpaid bills. Work orders are optional; the owner can review these bills directly."},
   {name:"get_simulated_payment_status",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:noArgs,description:"Returns persisted Demo / Simulated NEAR Intents attempts, payment states and audit events. No live payment access."},
   {name:"preview_simulated_intent",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:{type:"object",properties:{id:{type:"string"},sourceAsset:{type:"string",enum:["near","usdc-ethereum","eth"]}},required:["id","sourceAsset"],additionalProperties:false},description:"Explains a demo bill's eligibility and previews an illustrative intent payment, or proposes invoice approval. This read-only tool does not approve an invoice, create an authorization or execute payment. Direct the user to View invoices to explicitly approve the bill, generate a saved quote, confirm its exact terms and execute in the dashboard. Wallets only come from Wallet Details."},
@@ -60,8 +70,8 @@ const definitions: AgentToolDefinition[] = [
     confirmationRequired: false,
     modes: ["demo"],
     description:
-      "Returns every contractor profile in the current demo organization, including the exact count. Use this to list contractors, count them, search for a contractor, or find the first contractor. Never answer a contractor count from memory; call this tool.",
-    inputSchema: noArgs,
+      "Returns a bounded page (default 100) of active contractor profiles; set archived=true for archived profiles and query to search. offset and limit support pagination. Returns the matching count. Returns contractor profiles in the current demo organization, including the exact count. Use this to list contractors, count them, search for a contractor, or find the first contractor. Never answer a contractor count from memory; call this tool.",
+    inputSchema: {type:"object",properties:{query:{type:"string"},archived:{type:"boolean"},offset:{type:"integer",minimum:0},limit:{type:"integer",minimum:1,maximum:100}},additionalProperties:false},
   },
   {
     name: "get_contractor",
@@ -112,7 +122,7 @@ const definitions: AgentToolDefinition[] = [
     },
   },
   {
-    name: "delete_contractor",
+    name: "prepare_delete_contractor",
     risk: "write",
     confirmationRequired: true,
     modes: ["demo"],
@@ -215,6 +225,8 @@ const definitions: AgentToolDefinition[] = [
   },
 ];
 
+definitions.push({...definitions.find(tool => tool.name === "prepare_delete_contractor")!, name:"delete_contractor"});
+
 export const ALL_AGENT_TOOLS: readonly AgentToolDefinition[] = Object.freeze(definitions);
 
 export function catalogForMode(mode: AgentMode): AgentToolDefinition[] {
@@ -226,8 +238,8 @@ export function findAgentTool(name: string, mode: AgentMode): AgentToolDefinitio
 }
 
 export const UNSUPPORTED_OPERATIONS = [
-  "Updating a contractor's other profile fields, such as their payout wallet. A contractor's wallet is approved from the contractor's own request in the dashboard.",
-  "Issuing or revoking contractor portal links, approving or rejecting payout wallets, creating work orders, reviewing invoices, preparing payment drafts, or executing payments. These are done in the dashboard, not through this assistant.",
+  "Directly changing contractor payout wallets, roles or financial fields. Wallet changes must use the contractor request and confirmed owner decision workflow.",
+  "Creating work orders, reviewing invoices, preparing payment drafts or executing payments. These are done in the dashboard.",
   "Real blockchain, wallet, or live payment operations. Every tool in this build is demo-only and uses simulated funds.",
 ] as const;
 

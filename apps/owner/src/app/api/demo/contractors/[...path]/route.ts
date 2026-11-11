@@ -1,3 +1,4 @@
+import { issueAgentInvitation, revealAgentInvitation } from "../../../../../server/agent-invitations.ts";
 import { NextRequest, NextResponse } from "next/server.js";
 import {demoIntents} from "../../../../../server/demo-intents.ts";
 import { demoContractors } from "../../../../../server/demo-contractors.ts";
@@ -91,18 +92,20 @@ export async function POST(req: NextRequest, context: Context) {
             store.logoutContractor(contractor);
             return cookie(json({ mode: "simulation" }), contractorCookie, store.enter(input.token), 3600);
         }
+        if(path === "owner/reveal-invitation") return json(revealAgentInvitation(owner,String(input.reference ?? "")));
         if (path === "owner")
             return json(store.ownerCommand(owner, input as OwnerPortalCommand));
         // The owner confirmed a prepared contractor lifecycle operation. The
         // single-use secret is bound to the owner session and to that exact
         // operation, so it can be applied once and only by the owner.
-        if (path === "owner/confirm-lifecycle") {
+        if (path === "owner/confirm-lifecycle" || path === "owner/cancel-lifecycle") {
             const org = store.owner(owner);
             if (!org)
                 throw Error("Not an owner workspace.");
             const operation = claimLifecycle(lifecycleScope(owner), String(input.operationId ?? ""), String(input.secret ?? ""));
             if (!operation)
                 throw Error("This confirmation is no longer valid. Prepare the operation again.");
+            if (path === "owner/cancel-lifecycle") return json({state:"cancelled"});
             const snapshot = store.ownerSnapshot(owner);
             const profile = [...snapshot.profiles, ...(snapshot.archivedProfiles ?? [])].find(p => p.id === operation.contractorId);
             if (!profile)
@@ -117,6 +120,20 @@ export async function POST(req: NextRequest, context: Context) {
                 throw Error("This contractor is already archived.");
             if (operation.kind === "restore" && profile.archived !== true)
                 throw Error("This contractor is not archived.");
+            if(operation.kind === "wallet-decision") {
+                const d=operation.details;
+                const pending=profile.pendingWallet;
+                if(!d || !pending || pending.id!==d.requestId || pending.account!==d.newWallet || profile.wallet!==d.oldWallet || pending.baseVersion!==d.baseVersion || pending.generation!==d.generation || profile.generation!==d.generation || store.portalStatus(owner,profile.id).status!=="active") throw Error("Wallet request changed or is no longer actionable. Prepare a fresh decision.");
+                if(d.decision!=="approve" && d.decision!=="reject") throw Error("Invalid wallet decision.");
+                store.ownerCommand(owner,{action:d.decision === "approve" ? "approve-wallet" : "reject-wallet",profileId:profile.id,requestId:pending.id,reason:String(d.reason),expectedAccount:String(d.newWallet),expectedWallet:d.oldWallet as string|null});
+                const updated=store.ownerSnapshot(owner).profiles.find(p=>p.id===profile.id)!;
+                return json({state:"completed",operation:{kind:operation.kind,contractorName:profile.name},decision:updated.lastWalletDecision,wallet:updated.wallet});
+            }
+            if(operation.kind === "revoke-portal" || operation.kind === "replace-portal") {
+                if(profile.archived || profile.generation!==operation.details?.generation) throw Error("Portal access changed. Prepare this operation again.");
+                const invitation=operation.kind === "replace-portal" ? issueAgentInvitation(owner,profile.id) : (store.ownerCommand(owner,{action:"revoke-link",profileId:profile.id}),null);
+                return json({state:"completed",invitation,operation:{kind:operation.kind,contractorName:profile.name}});
+            }
             const result = store.ownerCommand(owner, { action: `${operation.kind}-contractor`, profileId: operation.contractorId } as OwnerPortalCommand);
             return json({ operation: { kind: operation.kind, contractorId: operation.contractorId, contractorName: operation.contractorName }, result, state: store.ownerSnapshot(owner) });
         }

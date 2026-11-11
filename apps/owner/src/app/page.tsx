@@ -172,6 +172,12 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     } finally { if(generation===dashboardGeneration.current){refreshing.current=false;if(!contextInvalid.current)setLoading(false);} }
   }
   useEffect(() => {
+    const changed=()=>{setContractorRevision(n=>n+1);void refresh();};
+    window.addEventListener("nnetics-contractor-changed",changed);
+    return ()=>window.removeEventListener("nnetics-contractor-changed",changed);
+  });
+
+  useEffect(() => {
     dashboardGeneration.current++;refreshing.current=false;
     contextInvalid.current=false;live?.activate();
     void refresh();

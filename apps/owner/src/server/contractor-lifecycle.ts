@@ -8,7 +8,7 @@
 // operation. A model can never turn its own output into consent.
 import crypto from "node:crypto";
 
-export type LifecycleKind = "archive" | "restore" | "delete";
+export type LifecycleKind = "archive" | "restore" | "delete" | "revoke-portal" | "replace-portal" | "wallet-decision";
 
 export interface LifecycleEligibility {
     eligible: boolean;
@@ -26,6 +26,7 @@ export interface LifecycleOperation {
     reason: string;
     consequence: string;
     secret: string;
+    details?: Record<string, string | number | null>;
     expiresAt: number;
     used: boolean;
 }
@@ -53,6 +54,9 @@ function prune(now: number) {
 }
 
 export const LIFECYCLE_CONSEQUENCE: Record<LifecycleKind, string> = {
+    "wallet-decision": "Apply the exact displayed wallet decision using the existing owner approval workflow. Approval changes the recipient for future work; historical work orders and receipts keep their original recipient. Rejection preserves the current approved recipient.",
+    "revoke-portal": "Revoke contractor portal access and invalidate current sessions. A fresh invitation will be required. Pending wallet requests tied to this access become invalid.",
+    "replace-portal": "Revoke all previous portal credentials and issue a fresh seven-day invitation. Existing sessions and pending wallet proofs become invalid.",
     archive: "The contractor leaves the active list, portal access is revoked and an audit record is kept. Invoices and payment history are preserved.",
     restore: "The contractor returns to the active list. No financial record changes.",
     delete: "The contractor profile is permanently removed, portal access is revoked and an audit record is kept. This cannot be undone.",
@@ -68,6 +72,7 @@ export function prepareLifecycle(input: {
     contractorId: string;
     contractorName: string;
     eligibility: LifecycleEligibility;
+    details?: Record<string, string | number | null>;
 }): LifecycleOperation {
     const now = Date.now();
     prune(now);
@@ -80,6 +85,7 @@ export function prepareLifecycle(input: {
         eligible: input.eligibility.eligible,
         reason: input.eligibility.reason,
         consequence: LIFECYCLE_CONSEQUENCE[input.kind],
+        details: input.details,
         secret: crypto.randomBytes(32).toString("hex"),
         expiresAt: now + TTL_MS,
         used: false,
@@ -92,6 +98,8 @@ export function prepareLifecycle(input: {
 export function lifecycleSummary(operation: LifecycleOperation) {
     return {
         operationId: operation.id,
+        details: operation.details,
+        state: "awaiting_confirmation",
         kind: operation.kind,
         contractorId: operation.contractorId,
         contractorName: operation.contractorName,

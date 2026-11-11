@@ -145,7 +145,7 @@ export class ContractorRecordStore {
             ...profile,
             archived: profile.archived === true,
             archivedAt: profile.archivedAt ?? null,
-            deletable: this.eligibilityFor(profile.id, counts).eligible
+            deletable: this.eligibilityFor(profile.id, counts).eligible && !profile.pendingWallet && !profile.wallet && !profile.lastWalletDecision
         });
         const profiles = all.filter(profile => profile.archived !== true).map(view);
         const archivedProfiles = all.filter(profile => profile.archived === true).map(view);
@@ -188,7 +188,20 @@ export class ContractorRecordStore {
     // Whether a contractor may be deleted outright. A contractor with any
     // financial or operational record must be archived instead.
     lifecycleEligibility(profileId: string, org: string) {
-        return this.eligibilityFor(profileId, this.linkCounts(org));
+        const profile = this.profile(profileId, org);
+        const result = this.eligibilityFor(profileId, this.linkCounts(org));
+        if (profile.pendingWallet || profile.wallet || profile.lastWalletDecision) {
+            return {...result, eligible:false, reason:"Wallet approval or recipient history requires retention. Archive this contractor instead."};
+        }
+        return result;
+    }
+    portalStatus(owner: string, profileId: string) {
+        const org=this.owner(owner);
+        if(!org) throw Error("Owner access required.");
+        const profile=this.profile(profileId,org);
+        const link=this.db.prepare("SELECT expires,revoked FROM demo_links WHERE profile=? AND generation=? ORDER BY rowid DESC LIMIT 1").get(profileId,profile.generation) as {expires:number;revoked:number}|undefined;
+        const status=profile.archived ? "revoked" : !link ? profile.generation ? "revoked" : "not_issued" : link.revoked || !profile.linkActive ? "revoked" : link.expires<=Date.now() ? "expired" : "active";
+        return {status,generation:profile.generation,expiresAt:link?.expires ?? null};
     }
     snapshot(token: string): ContractorSnapshot {
         const { org, profile } = this.contractor(token);
@@ -263,9 +276,18 @@ export class ContractorRecordStore {
         if (input.action === "update-contractor") {
             if (p.archived === true)
                 throw Error("Restore the contractor before editing it.");
-            p.name = text(input.name, 80, "contractor name");
+            const allowed = ["action", "profileId", "name", "email", "company"];
+            if (Object.keys(input).some(key => !allowed.includes(key))) throw Error("Unsupported profile field.");
+            if (!["name", "email", "company"].some(key => key in input)) throw Error("Specify a profile field to update.");
+            if (input.name !== undefined) p.name = text(input.name, 80, "contractor name");
+            if (input.email !== undefined) {
+                const email = text(input.email, 254, "email");
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw Error("Enter a valid email address.");
+                p.email = email;
+            }
+            if (input.company !== undefined) p.company = text(input.company, 160, "company name");
             this.save(org, p);
-            this.audit(org, p, "updated", `The contractor was renamed to ${p.name}.`);
+            this.audit(org, p, "updated", `Contractor profile updated: ${["name", "email", "company"].filter(key => key in input).join(", ")}.`);
             return { profileId: p.id };
         }
         if (input.action === "archive-contractor") {
@@ -278,7 +300,6 @@ export class ContractorRecordStore {
             p.archivedAt = new Date().toISOString();
             p.generation++;
             p.linkActive = false;
-            p.pendingWallet = null;
             this.db.prepare("UPDATE demo_links SET revoked=1 WHERE profile=?").run(p.id);
             this.save(org, p);
             this.audit(org, p, "archived", "Portal access revoked. Invoices, work orders and payment history are preserved.");
@@ -306,12 +327,14 @@ export class ContractorRecordStore {
             this.audit(org, p, "deleted", "The contractor profile was removed. No financial record was affected.");
             return { profileId: p.id };
         }
+        if (p.archived === true) throw Error("Restore this contractor before using the active profile.");
         if (input.action === "issue-link" || input.action === "revoke-link") {
             p.generation++;
             p.linkActive = input.action === "issue-link";
             p.pendingWallet = null;
             this.db.prepare("UPDATE demo_links SET revoked=1 WHERE profile=?").run(p.id);
             this.save(org, p);
+            this.audit(org,p,p.linkActive ? "portal-issued" : "portal-revoked","Previous portal credentials are invalidated; wallet requests tied to them cannot be approved.");
             if (!p.linkActive)
                 return {};
             const token = secret();
@@ -322,12 +345,17 @@ export class ContractorRecordStore {
             const request = p.pendingWallet;
             if (!request || request.id !== input.requestId || request.baseVersion !== p.walletVersion || request.generation !== p.generation || !p.linkActive)
                 throw Error("Wallet request is stale or access was revoked.");
+            if ((input.expectedAccount !== undefined && request.account !== input.expectedAccount) || ("expectedWallet" in input && p.wallet !== input.expectedWallet)) throw Error("Wallet recipient changed. Prepare a fresh decision.");
+            const decision = input.action === "approve-wallet" ? "approved" : "rejected";
+            const reason = input.reason === undefined ? decision === "approved" ? "Approved by owner." : "Rejected by owner." : text(input.reason,1000,"decision reason");
+            p.lastWalletDecision = {requestId:request.id,account:request.account,previousWallet:p.wallet,decision,reason,at:new Date().toISOString()};
             if (input.action === "approve-wallet") {
                 p.wallet = request.account;
                 p.walletVersion++;
             }
             p.pendingWallet = null;
             this.save(org, p);
+            this.audit(org,p,`wallet-${decision}`,JSON.stringify(p.lastWalletDecision));
             return {};
         }
         if (input.action === "create-order") {

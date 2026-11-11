@@ -1017,3 +1017,10 @@ html[data-theme=light] body:has(.app-shell) { background: var(--background); }
   .payment-draft .payment-draft-details dt { margin-top: 8px; }
   .payment-draft .payment-draft-details dd { margin: 0 0 8px; }
 }
+
+.agent-confirmation { width: 100%; min-width: 0; padding: var(--space-md); border: 1px solid var(--border); border-radius: 12px; overflow-wrap: anywhere; }
+.agent-confirmation h3 { margin: 0 0 var(--space-sm); font-size: var(--type-body); text-transform: capitalize; }
+.agent-confirmation dl { margin-block: var(--space-sm); }
+.agent-confirmation dt { color: var(--text-muted); }
+.agent-confirmation dd { margin: 0 0 var(--space-sm); }
+.agent-confirmation [role="status"] { font-weight: 600; }

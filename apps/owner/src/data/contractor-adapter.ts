@@ -12,6 +12,9 @@ export interface WalletRequest {
 export interface ContractorProfile {
     id: string;
     name: string;
+    email?: string;
+    company?: string;
+    lastWalletDecision?: { requestId: string; account: string; previousWallet: string | null; decision: "approved" | "rejected"; reason: string; at: string };
     generation: number;
     linkActive: boolean;
     wallet: string | null;
@@ -106,6 +109,9 @@ export type OwnerPortalCommand = {action:"associate-order";invoiceId:string;orde
     action: "approve-wallet" | "reject-wallet";
     profileId: string;
     requestId: string;
+    reason?: string;
+    expectedAccount?: string;
+    expectedWallet?: string | null;
 } | {
     action: "create-order";
     profileId: string;
@@ -115,7 +121,9 @@ export type OwnerPortalCommand = {action:"associate-order";invoiceId:string;orde
 } | {
     action: "update-contractor";
     profileId: string;
-    name: string;
+    name?: string;
+    email?: string;
+    company?: string;
 } | {
     action: "archive-contractor" | "restore-contractor" | "delete-contractor";
     profileId: string;
