@@ -209,7 +209,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   // The Invoices and Activity surfaces read the same portal records the
   // contractor panel uses, so there is one source of truth for a bill.
   useEffect(() => {
-    if (view !== "Invoices" && view !== "Activity" && view !== "Overview") return;
+    if (view !== "Payables" && view !== "Activity" && view !== "Overview") return;
     const source = live
       ? new PersistentContractorOwnerAdapter(live.config.organization)
       : new MockContractorOwnerAdapter();
@@ -219,14 +219,17 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   }, [view, live, snapshot?.revision, billingRefreshVersion]);
   // Ask Nnetics actions run through the same UI commands a manual visit would.
   function handleAssistantAction(action: AssistantAction) {
-    if (action.kind === "create-contractor") {
+    if(action.kind==="open-payables") {
+      setInvoiceContractor("");go("Payables");
+      if(action.id)location.hash=`Payables/${encodeURIComponent(action.id)}`;
+    } else if (action.kind === "create-contractor") {
       // The agent already persisted the record; remount the contractor panel so
       // its snapshot reflects the new contractor instead of prefilling a duplicate.
       setContractorRevision(n => n + 1);
       go("Contractors");
     } else if (action.kind === "prepare-payment-draft") {
       setIntent({ draft: { contractor: action.contractor, amount: action.amount, description: action.description } });
-      go("Payments");
+      go("Payables");
     } else if (action.kind === "confirm-contractor-lifecycle") {
       // The owner pressed the confirmation chip. The server revalidates the
       // operation and applies it once. The assistant never completes it.
@@ -268,7 +271,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       action.kind === "get-overdue-invoices"
     ) {
       setInvoiceContractor(action.kind === "get-contractor-invoices" ? action.contractorId : "");
-      go("Invoices");
+      go("Payables");
     } else if (
       action.kind === "get-vault-balance" ||
       action.kind === "get-vault-status" ||
@@ -280,7 +283,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       go("Overview");
     } else {
       setInvoiceContractor("");
-      go("Invoices");
+      go("Payables");
     }
   }
   async function run(
@@ -375,8 +378,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const subtitles: Record<View,string> = {
     Overview: "Your demo vault, payouts and next steps at a glance.",
     Contractors: "Invite people, verify their payout wallets and keep their records tidy.",
-    Invoices: "Submitted, approved and paid invoices, with the agreement behind each one.",
-    Payments: "Prepare, confirm and follow every simulated payment.",
+    Payables: "Review the request, approve the invoice and authorize payment in one place.",
     Activity: "Every payment, invoice and audit event, with proof of completed transfers.",
     "Vault & Controls": "Check your available funds, payment limits and anything that needs your attention.",
     Settings: "Manage workspace access and choose how Nnetics looks.",
@@ -414,7 +416,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const portalContractorName = (id: string) => portalNameById.get(id) ?? "Contractor";
   const paymentLabels = {prepared: "Prepared", pending: "Pending", confirmed: "Paid", failed: "Failed", cancelled: "Cancelled"} as const;
   const demoPayments = demoWs?.demo()?.payments ?? [];
-  const queueMatches = demoPayments.filter(payment =>
+  const queueMatches = demoPayments.filter(payment => !payment.billId &&
     (!paymentFilter || payment.status === paymentFilter) &&
     matchesRecords(paymentSearch, payment.contractor, payment.recipient, payment.reference, payment.description, shortDate(payment.createdAt), formatNear(payment.amount)))
     .sort((a,b) => paymentSort === "oldest" ? a.createdAt.localeCompare(b.createdAt) : b.createdAt.localeCompare(a.createdAt));
@@ -503,7 +505,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 <section className="overview-card">
                   <h2>Pending invoices</h2>
                   <p className="overview-metric">{pendingInvoiceCount}</p>
-                  <button className="text-button" onClick={() => go("Invoices")}>Open invoices <Icon name="arrow" size={14}/></button>
+                  <button className="text-button" onClick={() => go("Payables")}>Open payables <Icon name="arrow" size={14}/></button>
                 </section>
                 <section className="overview-card">
                   <h2>Active contractors</h2>
@@ -564,7 +566,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 <h2>Quick actions</h2>
                 <div className="actions">
                   <button className="button secondary" onClick={() => go("Contractors")}>Add contractor</button>
-                  <button className="button secondary" onClick={() => go("Payments")}>Prepare a payment</button>
+                  <button className="button secondary" onClick={() => go("Payables")}>Prepare a payment</button>
                   <button className="button secondary" onClick={() => go("Vault & Controls")}>Fund the vault</button>
                 </div>
               </section>
@@ -592,7 +594,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
             ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization} readOnly={readOnly} limit={vault.payment_cap}/>
             : <DemoContractorWorkspace
                 key={contractorRevision}
-                onViewBills={demoWs ? id => {setInvoiceContractor(id);go("Invoices");} : undefined}
+                onViewBills={demoWs ? id => {setInvoiceContractor(id);go("Payables");} : undefined}
                 onPrepare={demoWs
                   ? async draft => {
                       // Phase one: the demo ledger validates the request and
@@ -705,9 +707,9 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
               {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
             </div>
           )}
-          {view === "Invoices" && demoWs && <DemoContractorWorkspace key={invoiceContractor} focus="invoices" invoiceContractor={invoiceContractor} refreshVersion={billingRefreshVersion} onPaymentChanged={()=>void refresh()}/>}
-          {view === "Invoices" && live && <PersistentContractorOwner embedded focus="invoices" refreshVersion={billingRefreshVersion} organization={s.access?.organization || live.config.organization} readOnly={readOnly}/> }
-          {view === "Invoices" && !demoWs && !live && (
+          {view === "Payables" && demoWs && <DemoContractorWorkspace key={invoiceContractor} focus="payables" invoiceContractor={invoiceContractor} paymentRecords={demoPayments} demoVault={demoWs?.demo()?.vault} refreshVersion={billingRefreshVersion} onPaymentChanged={()=>void refresh()}/>}
+          {view === "Payables" && live && <PersistentContractorOwner embedded focus="payables" refreshVersion={billingRefreshVersion} organization={s.access?.organization || live.config.organization} readOnly={readOnly}/> }
+          {view === "Payables" && !demoWs && !live && (
             <section className="panel payment-workspace-panel" aria-label="Invoices">
               <label className="filter-label">Status<select aria-label="Filter invoices" value={invoiceFilter} onChange={e => setInvoiceFilter(e.target.value)}>
                 {["All invoices","Submitted","Under review","Needs clarification","Approved","Rejected","Paid"].map(option=><option key={option}>{option}</option>)}
@@ -719,11 +721,11 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
               </article>)}
             </section>
           )}
-          {view === "Payments" && (
-            <div className="payment-surface">
+          {view === "Payables" && (
+            <details className="other-payments" open={intent?.draft||(typeof location!=="undefined"&&location.hash.startsWith("#Payments"))?true:undefined}><summary>Other payments · no invoice</summary><div className="payment-surface">
               <section className="panel payment-workspace-panel" aria-label="Payment queue">
                 <h2>Payment queue</h2>
-                {demoWs && <><p>Pay approved invoices with simulated NEAR Intents. Review each quote and recipient in Invoices.</p><ActionButton className="button secondary" onClick={()=>go("Invoices")}>Open invoice payments</ActionButton></>}
+                <p>Direct contractor payments without an invoice. Invoice-linked attempts stay with their payable above.</p>
                 {demoWs && <>
                   <RecordSearch label="Search payments" query={paymentSearch} onQuery={setPaymentSearch} onReset={paymentSearch || paymentFilter || paymentSort !== "newest" ? () => {setPaymentSearch("");setPaymentFilter("");setPaymentSort("newest");} : undefined}>
                     <label className="filter-label">Status<select value={paymentFilter} onChange={event => setPaymentFilter(event.target.value)}>
@@ -731,7 +733,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                     </select></label>
                     <label className="filter-label">Sort payments<select value={paymentSort} onChange={event => setPaymentSort(event.target.value)}><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
                   </RecordSearch>
-                  <p className="record-count" role="status">{queueMatches.length} of {demoPayments.length} payments</p>
+                  <p className="record-count" role="status">{queueMatches.length} of {demoPayments.filter(p=>!p.billId).length} payments</p>
                 </>}
                 {demoWs ? queueMatches.map(p => <article className="payment-record" key={p.id}>
                   <div><h2>{p.contractor || p.recipient}</h2><p>{p.reference} · {p.description}</p><p className="payment-record-description">{new Date(p.createdAt).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}{p.awaitingConfirmation ? " · awaiting your confirmation" : ""}{p.reason ? ` · ${p.reason}` : ""}</p></div>
@@ -752,7 +754,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 onCancel={demoWs ? async prepared => { await demoWs.cancelPayment(prepared.id); await refresh(); } : undefined}
                 paymentFee={demoWs ? DEMO_FEE : undefined}
                 intent={intent ?? undefined}/>}
-            </div>
+            </div></details>
           )}
 {view === "Settings" && <>
             {live && <section className="panel payment-workspace-panel"><h2>Account and wallet</h2><p>Signed in as {s.access?.accountId}</p><div className="actions">{accountActions}</div></section>}

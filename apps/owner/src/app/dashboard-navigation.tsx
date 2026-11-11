@@ -7,7 +7,7 @@ import {useEffect, useLayoutEffect, useRef, useState} from "react";
 // budgets and the safety controls. Settings, organization switching and the
 // account options live in the persistent utility navigation instead of being
 // duplicated as a primary workflow.
-const destinations = ["Overview", "Contractors", "Invoices", "Payments", "Activity", "Vault & Controls"] as const;
+const destinations = ["Overview", "Contractors", "Payables", "Activity", "Vault & Controls"] as const;
 const utilities = ["Settings"] as const;
 export type View = typeof destinations[number] | typeof utilities[number];
 
@@ -15,7 +15,9 @@ export type View = typeof destinations[number] | typeof utilities[number];
 const legacy = new Map<string,View>([
   ["Vendors","Contractors"],
   ["Work orders","Contractors"],
-  ["Invoice review","Invoices"],
+  ["Invoices","Payables"],
+  ["Payments","Payables"],
+  ["Invoice review","Payables"],
   ["Payment history","Activity"],
   ["Recovery","Activity"],
   ["Access","Settings"],
@@ -43,11 +45,11 @@ export function receiptView(hash:string):string {
   } catch {return "";}
 }
 
-const paths = ["M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z", "M4 21v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8", "M5 3h14v18l-4-2-3 2-3-2-4 2z M8 8h8 M8 12h6", "M12 2v20 M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", "M3 12a9 9 0 1 0 3-6 M3 3v6h6 M12 7v5l3 2", "M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z"];
+const paths = ["M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z", "M4 21v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4 M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8", "M5 3h14v18l-4-2-3 2-3-2-4 2z M8 8h8 M8 12h6", "M3 12a9 9 0 1 0 3-6 M3 3v6h6 M12 7v5l3 2", "M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z"];
 
 // The mobile bar shows five primary destinations. The lower-frequency ones
 // stay reachable from the More sheet, and nothing is hidden behind hover.
-const mobilePrimary = ["Overview", "Contractors", "Invoices", "Payments", "Activity"] as const;
+const mobilePrimary = ["Overview", "Contractors", "Payables", "Activity"] as const;
 
 export function DashboardNavigation({view,onNavigate,live,organization,demo=false}:{view:View;onNavigate:(name:View)=>void;live:boolean;organization:string;demo?:boolean}) {
   const [collapsed,setCollapsed]=useState(false),[open,setOpen]=useState(false),[mobile,setMobile]=useState(false),[more,setMore]=useState(false);

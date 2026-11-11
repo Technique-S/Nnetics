@@ -26,6 +26,7 @@ export interface LifecycleOperation {
     reason: string;
     consequence: string;
     secret: string;
+    workspaceToken?: string;
     details?: Record<string, string | number | null>;
     expiresAt: number;
     used: boolean;
@@ -72,6 +73,7 @@ export function prepareLifecycle(input: {
     contractorId: string;
     contractorName: string;
     eligibility: LifecycleEligibility;
+    workspaceToken?: string;
     details?: Record<string, string | number | null>;
 }): LifecycleOperation {
     const now = Date.now();
@@ -86,6 +88,7 @@ export function prepareLifecycle(input: {
         reason: input.eligibility.reason,
         consequence: LIFECYCLE_CONSEQUENCE[input.kind],
         details: input.details,
+        workspaceToken: input.workspaceToken,
         secret: crypto.randomBytes(32).toString("hex"),
         expiresAt: now + TTL_MS,
         used: false,

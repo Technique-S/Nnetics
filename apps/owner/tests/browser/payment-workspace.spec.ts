@@ -2,13 +2,15 @@ import {test,expect,type Page} from "@playwright/test";
 import path from "node:path";
 
 async function tab(page: Page, name: string) {
+  const requested=name;name=["Invoices","Payments"].includes(name)?"Payables":name;
   const nav=page.getByRole("navigation",{name:"Owner dashboard"});
   if(!await nav.isVisible())await page.getByRole("button",{name:"Toggle navigation"}).click();
   await nav.getByRole("link",{name,exact:true}).click();
   await expect(page.getByRole("heading",{name,exact:true,level:1})).toBeVisible();
+  if(requested==="Payments")await page.getByText("Other payments · no invoice",{exact:true}).click();
 }
 
-test("six tabs, synced appearance and a contractor payment without a bill",async({page,browser},info)=>{
+test("five tabs, synced appearance and a contractor payment without a bill",async({page,browser},info)=>{
   await page.emulateMedia({colorScheme:"light",reducedMotion:"reduce"});
   await page.goto("/?mode=demo");
   // fresh demo visitors create the workspace first, then land on Overview
@@ -18,7 +20,7 @@ test("six tabs, synced appearance and a contractor payment without a bill",async
   await page.getByRole("button",{name:"Create demo workspace"}).click();
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
   const nav=page.locator('nav[aria-label="Owner dashboard"]');
-  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Invoices","Payments","Activity","Vault & Controls"]);
+  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Payables","Activity","Vault & Controls"]);
   const shots=path.resolve("../../artifacts/payment-workspace-redesign");
   await page.screenshot({path:path.join(shots,`${info.project.name}-overview-light.png`)});
   // the vault is funded before the first payout so the ledger isn't degenerate

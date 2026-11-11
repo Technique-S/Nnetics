@@ -76,7 +76,7 @@ export class ContractorBackend extends ContractorRecordStore {
   return {mode:"persistent",profiles,orders,invoices};
  }
  async ownerWrite(token:string,org:string,input:OwnerPortalCommand):Promise<{token?:string;payment?:{state:string;orderId:string};ok?:boolean}> {
-  await this.authorizeOwner(token,org);
+  const authority=await this.authorizeOwner(token,org);
   if(input.action==="queue-invoice")return this.queueInvoice(token,org,input.invoiceId,input.orderId);
   if(input.action==="approve-wallet") {
    const p=this.profile(input.profileId,org),proof=p.pendingWallet;
@@ -85,7 +85,7 @@ export class ContractorBackend extends ContractorRecordStore {
    this.identities.verify(token);
   }
   this.db.exec("BEGIN IMMEDIATE");
-  try{const result=this.ownerMutation(org,input);this.db.exec("COMMIT");return result;}catch(e){this.db.exec("ROLLBACK");throw e;}
+  try{const result=this.ownerMutation(org,input,authority.owner);this.db.exec("COMMIT");return result;}catch(e){this.db.exec("ROLLBACK");throw e;}
  }
  async contractorAccess(session:string) {
   const who=this.contractor(session),scope=await this.scope(who.org);

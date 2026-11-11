@@ -15,10 +15,10 @@ test('fresh demo setup lands on Overview', async ({page}, info) => {
   if(await page.locator('.navigation-backdrop').isVisible()) { await page.keyboard.press('Escape'); }
   // collapsed rail keeps all six destinations
   const railLinks=page.locator('nav[aria-label="Owner dashboard"] a');
-  await expect(railLinks).toHaveCount(6);
+  await expect(railLinks).toHaveCount(5);
   if(info.project.name==='desktop'){
     await page.getByRole('button',{name:'Toggle navigation'}).click(); // collapse
-    await expect(railLinks).toHaveCount(6);
+    await expect(railLinks).toHaveCount(5);
     await page.getByRole('button',{name:'Toggle navigation'}).click(); // expand back
   }
   await expect(page.getByText('Demo · simulated funds · no wallets, keys or tokens involved')).toBeVisible();

@@ -169,6 +169,17 @@ function stringArg(value: unknown, label: string, min: number, max: number): str
 function validateToolArguments(name: AgentToolName, raw: unknown): Validation {
   if (!plainObject(raw)) return { ok: false, error: "Tool arguments must be a JSON object." };
   const args = raw as Record<string, unknown>;
+  if(name==="list_payables") {
+    const unexpected=checkKeys(args,["status","query","overdue"]);
+    if(unexpected)return {ok:false,error:unexpected};
+    if(args.status!==undefined&&!["All","Awaiting Approval","Ready to Pay","Processing","Paid","Rejected / Failed"].includes(String(args.status)))return {ok:false,error:"Invalid payable filter."};
+    if(args.query!==undefined&&(typeof args.query!=="string"||args.query.length>160)||args.overdue!==undefined&&typeof args.overdue!=="boolean")return {ok:false,error:"Invalid payable query."};
+    return {ok:true,args};
+  }
+  if(name==="get_payable") {
+    const unexpected=checkKeys(args,["id"]),id=stringArg(args.id,"id",1,120);
+    return unexpected?{ok:false,error:unexpected}:id?{ok:true,args:{id}}:{ok:false,error:"Payable ID required."};
+  }
   if (contractorTools.some(tool => tool.name === name)) {
     const error = validateContractorTool(name,args);
     return error ? {ok:false,error} : {ok:true,args};
@@ -391,6 +402,8 @@ async function executeValidated(name: AgentToolName, args: Record<string, unknow
   try {
     if (contractorTools.some(tool => tool.name === name)) return executor.contractorLifecycleTool ? await executor.contractorLifecycleTool(name,args) : {success:false,error:"Tool unavailable."};
     switch (name) {
+      case "list_payables": return executor.listPayables ? await executor.listPayables(args as {status?:string;query?:string;overdue?:boolean}) : {success:false,error:"Tool unavailable."};
+      case "get_payable": return executor.getPayable ? await executor.getPayable({id:String(args.id)}) : {success:false,error:"Tool unavailable."};
       case "list_unlinked_invoices": return executor.listUnlinkedInvoices ? await executor.listUnlinkedInvoices({}) : {success:false,error:"Tool unavailable."};
       case "get_simulated_payment_status": return executor.getSimulatedPaymentStatus ? await executor.getSimulatedPaymentStatus({}) : {success:false,error:"Tool unavailable."};
       case "preview_simulated_intent": return executor.previewSimulatedIntent ? await executor.previewSimulatedIntent({id:String(args.id),sourceAsset:String(args.sourceAsset)}) : {success:false,error:"Tool unavailable."};
@@ -673,6 +686,11 @@ export function actionChips(executions: AgentToolExecution[]): AgentActionChip[]
   for (const execution of executions) {
     if (!execution.result.success) continue;
     switch (execution.name) {
+      case "list_payables":
+      case "get_payable": {
+        const data=execution.result.data as {id?:string};
+        chips.push({action:{kind:"open-payables",...(data?.id?{id:data.id}:{})},label:"View payables"});break;
+      }
       case "create_contractor": {
         const item = execution.result.data as { id?: unknown; name?: unknown } | null;
         if (item && typeof item.name === "string")
@@ -700,7 +718,7 @@ export function actionChips(executions: AgentToolExecution[]): AgentActionChip[]
       case "list_invoices":
       case "get_invoice":
       case "get_contractor_invoices":
-        chips.push({ action: { kind: "list-invoices" }, label: "View invoices" });
+        chips.push({ action: { kind: "list-invoices" }, label: "View payables" });
         break;
       case "get_organization_overview":
         chips.push({ action: { kind: "get-organization-overview" }, label: "Open overview" });

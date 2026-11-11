@@ -6,6 +6,8 @@ import { contractorTools } from "./agent-contractor-tools.ts";
 export type AgentMode = "demo" | "live";
 
 export type AgentToolName =
+  | "list_payables"
+  | "get_payable"
   | "list_pending_wallet_changes"
   | "get_wallet_change_request"
   | "prepare_wallet_change_decision"
@@ -45,9 +47,11 @@ const noArgs = { type: "object", properties: {}, additionalProperties: false } a
 
 const definitions: AgentToolDefinition[] = [
   ...contractorTools,
+  {name:"list_payables",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read the authorized unified Payables list. Use for awaiting approval, ready to pay, processing, paid, failed or overdue questions. A failed attempt does not revoke invoice approval. Return only recorded approvers, amounts and dates; overdue is unknown when no due date exists. This tool cannot approve or pay.",inputSchema:{type:"object",properties:{status:{type:"string",enum:["All","Awaiting Approval","Ready to Pay","Processing","Paid","Rejected / Failed"]},query:{type:"string"},overdue:{type:"boolean"}},additionalProperties:false}},
+  {name:"get_payable",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read one payable by exact invoice ID or invoice number: original purpose/text, requested amount, approved amount, recorded approver and time, approved wallet, remaining payable, payment status, due-date availability and blocking reasons. Unknown provenance must remain unknown. Open View payables for review and payment; never execute payment through this tool.",inputSchema:{type:"object",properties:{id:{type:"string"}},required:["id"],additionalProperties:false}},
   {name:"list_unlinked_invoices",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:noArgs,description:"Lists demo bills without a work order, including unpaid bills. Work orders are optional; the owner can review these bills directly."},
   {name:"get_simulated_payment_status",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:noArgs,description:"Returns persisted Demo / Simulated NEAR Intents attempts, payment states and audit events. No live payment access."},
-  {name:"preview_simulated_intent",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:{type:"object",properties:{id:{type:"string"},sourceAsset:{type:"string",enum:["near","usdc-ethereum","eth"]}},required:["id","sourceAsset"],additionalProperties:false},description:"Explains a demo bill's eligibility and previews an illustrative intent payment, or proposes invoice approval. This read-only tool does not approve an invoice, create an authorization or execute payment. Direct the user to View invoices to explicitly approve the bill, generate a saved quote, confirm its exact terms and execute in the dashboard. Wallets only come from Wallet Details."},
+  {name:"preview_simulated_intent",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:{type:"object",properties:{id:{type:"string"},sourceAsset:{type:"string",enum:["near","usdc-ethereum","eth"]}},required:["id","sourceAsset"],additionalProperties:false},description:"Explains a demo bill's eligibility and previews an illustrative intent payment, or proposes invoice approval. This read-only tool does not approve an invoice, create an authorization or execute payment. Direct the user to View payables to explicitly approve the bill, generate a saved quote, confirm its exact terms and execute in the dashboard. Wallets only come from Wallet Details."},
   {
     name: "create_contractor",
     risk: "write",

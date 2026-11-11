@@ -41,7 +41,8 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
             const bill=data.invoices.find((b:{description:string})=>b.description===description);
             await navigateOwner(page,"Invoices");
             await page.getByRole("button",{name:"Refresh workspace",exact:true}).click();
-            await expect(page.getByText(bill.reference,{exact:true})).toBeVisible();
+            await page.getByRole("button",{name:`Open payable · ${bill.reference}`,exact:true}).click();
+            await expect(page.getByRole("heading",{name:bill.reference,exact:true})).toBeVisible();
             const card=page.locator("article").filter({has:page.getByRole("heading",{name:bill.reference,exact:true})});
             await expect(card).toContainText("No work order");
             await card.getByRole("button",{name:`Approve bill · ${bill.reference}`,exact:true}).click();
@@ -58,8 +59,8 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
         await navigateOwner(page,"Contractors");
         await page.getByRole("button",{name:"Approve wallet · Integrated Designer",exact:true}).click();
         await navigateOwner(page,"Payments");
-        await page.getByRole("button",{name:"Open invoice payments",exact:true}).click();
-        await expect(page.getByRole("heading",{name:"Invoices",exact:true,level:1})).toBeVisible();
+
+        await expect(page.getByRole("heading",{name:"Payables",exact:true,level:1})).toBeVisible();
         async function pay(card:Locator,outcome="success",open=true) {
             if(open)await card.getByText("Simulated NEAR Intents",{exact:true}).click();
             await card.getByLabel("Simulation outcome").selectOption(outcome);
@@ -82,7 +83,7 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
         const balance=await (await page.request.get("/api/demo/workspace/state")).json();
         expect(balance.vault.spent).toBe("1002500000000000000000000");expect(balance.vault.reserved).toBe("0");
         await navigateOwner(page,"Payments");
-        await expect(page.getByRole("region",{name:"Payment queue"})).toContainText("SIM-INT-");
+        await expect(page.getByRole("region",{name:"Payable Details"})).toContainText("Paid");
         await navigateOwner(page,"Activity");
         const audits=page.getByRole("region",{name:"Audit events"});
         await expect(audits).toContainText("Simulated NEAR Intents");await expect(audits).toContainText("COMPLETED");
@@ -134,9 +135,9 @@ test("existing Ask Nnetics interface previews an integrated demo invoice through
     const response=await completed,body=await response.json();expect(response.status(),body.error||body.reply).toBe(200);
     await expect(panel.locator(".ask-nnetics-assistant").last()).toContainText("4.01");
     await expect(panel.locator(".ask-nnetics-assistant").last()).toContainText("assistant-designer.testnet");
-    await panel.getByRole("button",{name:"View invoices",exact:true}).click();
+    await panel.getByRole("button",{name:"View payables",exact:true}).click();
     if(await panel.isVisible())await panel.getByRole("button",{name:"Close the demo assistant"}).click();
-    await expect(page.getByText(invoice.reference,{exact:true})).toBeVisible();
+    await expect(page.getByRole("button",{name:`Open payable · ${invoice.reference}`,exact:true})).toBeVisible();
     const state=await (await page.request.get("/api/demo/workspace/state")).json();
     expect(state.payments).toHaveLength(0);expect(state.vault.reserved).toBe("0");
 });

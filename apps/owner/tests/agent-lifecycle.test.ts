@@ -1,3 +1,5 @@
+import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -19,7 +21,7 @@ function session() {
   const workspace = demoWorkspace().start("");
   demoWorkspace().createWorkspace(workspace.token,{profileName:"Owner",vaultName:"Demo"});
   const owner = demoContractors().ownerStart("");
-  return {owner,cookie:`nnetics_demo_workspace=${workspace.token}; nnetics_demo_portal_owner=${owner}`};
+  return {owner,workspaceToken:workspace.token,cookie:`nnetics_demo_workspace=${workspace.token}; nnetics_demo_portal_owner=${owner}`};
 }
 function request(url:string,body:unknown,cookie:string) {return new NextRequest(origin+url,{method:"POST",headers:{origin,"content-type":"application/json",cookie},body:JSON.stringify(body)});}
 async function run(s:ReturnType<typeof session>, message:string, calls:Array<{name:string;args:Record<string,unknown>}>, inspect?:(request:AgentModelRequest)=>void,key=crypto.randomUUID()) {
@@ -78,6 +80,10 @@ test("B: delete cancellation, exact single-use confirmation, archive/restore and
   for(const name of ["archive_contractor","restore_contractor"]) {
     const prepared=await run(s,name,[{name,args:{id:marcus}}]);
     assert.equal((await decide(s,confirmation(prepared.body))).status,200);
+    if(name === "archive_contractor") {
+      const invoices=await run(s,"Show archived Marcus invoices",[{name:"get_contractor_invoices",args:{contractorId:marcus}}]);
+      assert.equal(invoices.body.executions[0].result.data[0].status,"Paid");
+    }
   }
   const profile=store.ownerSnapshot(s.owner).profiles[0];
   assert.equal(profile.archived,false);assert.equal(profile.linkActive,false);
@@ -151,6 +157,9 @@ test("E: 25 agent-created profiles persist, bounded search distinguishes similar
   }
   const reopened=new DemoContractorStore(process.env.NNETICS_DEMO_PORTAL_DB!);
   assert.equal(reopened.ownerSnapshot(s.owner).profiles.length,25);reopened.db.close();
+  const moduleUrl=pathToFileURL(path.resolve("src/server/demo-contractors.ts")).href;
+  const child=spawnSync(process.execPath,["--input-type=module","-e",`import {DemoContractorStore} from ${JSON.stringify(moduleUrl)}; const store=new DemoContractorStore(process.env.NNETICS_DEMO_PORTAL_DB); console.log(store.ownerSnapshot(process.env.NNETICS_TEST_OWNER).profiles.length); store.db.close();`],{env:{...process.env,NNETICS_TEST_OWNER:s.owner},encoding:"utf8",timeout:15000});
+  assert.equal(child.status,0);assert.equal(child.stdout.trim(),"25");
   const page=await run(s,"Find Writer 2",[{name:"list_contractors",args:{query:"Writer 2",limit:3}},{name:"get_contractor",args:{name:"Writer 2"}}]);
   assert.equal(page.body.executions[0].result.data.count,7);assert.equal(page.body.executions[0].result.data.contractors.length,3);
   assert.equal(page.body.executions[1].result.data.name,"Writer 2");
@@ -199,4 +208,20 @@ test("E: provider failure after prepare cannot confirm; expiry and changed eligi
     const foreign=await run(session(),"Access another organization",[{name,args:{id}}]);
     assert.equal(foreign.body.executions[0].result.success,false,name);
   }
+});
+
+test("E: standalone payment reservations block deletion and are rechecked at confirmation",async()=>{
+  const s=session(),store=demoContractors(),ws=demoWorkspace();
+  const id=store.ownerCommand(s.owner,{action:"create-profile",name:"Reserved Writer"}).profileId!;
+  const prepared=await run(s,"Delete Reserved Writer",[{name:"prepare_delete_contractor",args:{id}}]);
+  ws.fund(s.workspaceToken,"5000000000000000000000000");
+  const payment=ws.preparePayment(s.workspaceToken,{contractor:"Reserved Writer",recipient:"reserved.testnet",amount:"1000000000000000000000000",description:"Standalone work",idempotencyKey:crypto.randomUUID()});
+  assert.equal((await decide(s,confirmation(prepared.body))).status,400);
+  const blocked=await run(s,"Delete Reserved Writer",[{name:"prepare_delete_contractor",args:{id}}]);
+  assert.equal(blocked.body.executions[0].result.success,false);assert.match(blocked.body.executions[0].result.error,/reservation|history/);
+  await run(s,"Rename Reserved Writer to Renamed Writer",[{name:"update_contractor",args:{id,name:"Renamed Writer"}}]);
+  const renamed=await run(s,"Delete Renamed Writer",[{name:"prepare_delete_contractor",args:{id}}]);
+  assert.equal(renamed.body.executions[0].result.success,false);
+  assert.equal(ws.state(s.workspaceToken).payments[0].id,payment.payment.id);
+  assert.equal(store.ownerSnapshot(s.owner).profiles.length,1);
 });

@@ -165,6 +165,7 @@ test("persistent mode supports optional work orders without bypassing organizati
         assert.equal(direct.orderId, "");assert.equal(direct.recipient, "");
         await backend.ownerWrite(token,org,{action:"review-invoice",invoiceId:direct.id,decision:"approve",note:""});
         assert.equal((await backend.ownerRead(token,org)).invoices[0].status,"Approved");
+        assert.equal((await backend.ownerRead(token,org)).invoices[0].approval?.by,"owner.testnet");
         assert.equal((await backend.write(session,directInput("direct-2",{recipient:"writer.testnet"}))).invoice!.recipient,"");
         // Persistent order-based billing continues to reject any orderId it cannot match.
         await assert.rejects(() => backend.write(session, directInput("direct-3", {orderId: "ghost-order"})), /approved work order/);

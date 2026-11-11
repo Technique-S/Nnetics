@@ -129,7 +129,15 @@ export class ContractorRecordStore {
     protected rows<T>(table: "demo_orders" | "demo_bills", org: string, profile?: string): T[] {
         return (this.db.prepare(`SELECT payload FROM ${table} WHERE org=?${profile ? " AND profile=?" : ""} ORDER BY rowid DESC`).all(...(profile ? [org, profile] : [org])) as {
             payload: string;
-        }[]).map(r => JSON.parse(r.payload));
+        }[]).map(r => {
+            const value=JSON.parse(r.payload);
+            if(table==="demo_bills"&&!value.requestedAmount){
+                const original=this.db.prepare("SELECT payload FROM demo_bill_history WHERE bill=? ORDER BY id LIMIT 1").get(value.id) as {payload:string}|undefined;
+                const first=original?JSON.parse(original.payload):value;
+                value.requestedAmount=first.amount;value.requestedAsset=first.asset;
+            }
+            return value;
+        });
     }
     ownerSnapshot(token: string): PortalSnapshot {
         const org = this.owner(token);
@@ -225,7 +233,7 @@ export class ContractorRecordStore {
             throw e;
         }
     }
-    protected ownerMutation(org: string, input: OwnerPortalCommand): {
+    protected ownerMutation(org: string, input: OwnerPortalCommand, actor: string|null = null): {
         token?: string;
         profileId?: string;
     } {
@@ -265,8 +273,11 @@ export class ContractorRecordStore {
             if(this.mode==="persistent"&&bill.orderId&&input.decision==="approve"&&sourceOrderQuestions(bill.text,bill.orderId,this.rows<ContractorOrder>("demo_orders",org,bill.contractorId)).length)
                 throw Error("Billing text and selected work order conflict. Request clarification; approval cannot override or reassign the invoice claim.");
             this.db.prepare("INSERT INTO demo_bill_history(bill,payload) VALUES (?,?)").run(bill.id, JSON.stringify(bill));
+            const reviewedAt=new Date().toISOString();
+            bill.reviewEvents=[...(bill.reviewEvents??[]),{action:input.decision,at:reviewedAt,by:actor,note:input.note||""}];
+            if(input.decision==="approve")bill.approval={amount:bill.amount,asset:bill.asset,by:actor,at:reviewedAt};
             bill.status = input.decision === "begin-review" ? "Under review" : input.decision === "approve" ? "Approved" : input.decision === "clarify" ? "Needs clarification" : "Rejected";
-            bill.ownerNote = input.decision === "begin-review" ? "Owner review started. No payment initiated." : input.decision === "approve" ? "Approved for review only. Payment execution is disabled." : text(input.note, 1000, "review note");
+            bill.ownerNote = input.decision === "begin-review" ? "Owner review started. No payment initiated." : input.decision === "approve" ? "Invoice approved. Payment authorization is separate." : text(input.note, 1000, "review note");
             this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill), bill.id, org);
             return {};
         }
@@ -466,7 +477,7 @@ export class ContractorRecordStore {
             const a = this.attachment(input.attachmentId, org, p.id);
             attachment = { id: input.attachmentId, name: a.name, mime: a.mime, size: a.bytes.length };
         }
-        let bill: ContractorBill = { id: id(), contractorId: p.id, reference, orderId, orderReference: order ? order.reference : "No work order", amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: direct ? "Submitted" : this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
+        let bill: ContractorBill = { requestedAmount:old?.requestedAmount??old?.amount??amount, requestedAsset:old?.requestedAsset??old?.asset??asset, reviewEvents:old?.reviewEvents??[], sourceReference:old?.sourceReference??(/^Invoice:[ \t]*(.+)$/im.exec(old?.originalText??old?.text??body)?.[1]?.trim()), id: id(), contractorId: p.id, reference, orderId, orderReference: order ? order.reference : "No work order", amount, asset, recipient, text: body, originalText: body, description, ...(input.extractionId?{extractionId:input.extractionId}:{}), status: direct ? "Submitted" : this.mode === "persistent" ? (reasons.length ? "Needs clarification" : "Submitted") : "In review", reasons, ownerNote: "", attachment, transactionUrl: null, submittedAt: new Date().toISOString() };
         if (input.action === "clarify-invoice") {
             if (!old || old.status !== "Needs clarification" || old.orderId !== orderId)
                 throw Error("Only a requested clarification of the same invoice and work order is allowed.");

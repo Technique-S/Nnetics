@@ -1,10 +1,12 @@
 import {test,expect,type Page} from "@playwright/test";
 
 async function navTo(page:Page, name:string){
+  const requested=name;name=["Invoices","Payments"].includes(name)?"Payables":name;
   const nav=page.getByRole("navigation",{name:"Owner dashboard"});
   if(!await nav.isVisible())await page.getByRole("button",{name:"Toggle navigation"}).click();
   await nav.getByRole("link",{name,exact:true}).click();
   await expect(page.getByRole("heading",{name,exact:true,level:1})).toBeVisible();
+  if(requested==="Payments")await page.getByText("Other payments · no invoice",{exact:true}).click();
 }
 
 async function open(page:Page,url:string){
@@ -21,11 +23,11 @@ async function workspace(page:Page){
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
 }
 
-test("the workspace offers the six consolidated destinations",async({page})=>{
+test("the workspace offers the five consolidated destinations",async({page})=>{
   await workspace(page);
   const nav=page.getByRole("navigation",{name:"Owner dashboard"});
   if(!await nav.isVisible())await page.getByRole("button",{name:"Toggle navigation"}).click();
-  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Invoices","Payments","Activity","Vault & Controls"]);
+  expect(await nav.locator("a").allTextContents()).toEqual(["Overview","Contractors","Payables","Activity","Vault & Controls"]);
   // Settings is a utility destination, not a primary workflow.
   expect(await nav.locator("a").filter({hasText:"Settings"}).count()).toBe(0);
   const close=page.getByRole("button",{name:"Close navigation"});
@@ -36,7 +38,7 @@ test("the workspace offers the six consolidated destinations",async({page})=>{
 
 test("each destination opens its own surface",async({page})=>{
   await workspace(page);
-  for(const name of ["Contractors","Invoices","Payments","Activity","Vault & Controls","Overview"]){
+  for(const name of ["Contractors","Payables","Activity","Vault & Controls","Overview"]){
     await navTo(page,name);
     await expect(page.getByRole("heading",{name,exact:true,level:1})).toHaveText(name);
   }
@@ -51,7 +53,7 @@ test("the old History and Receipts links still reach Activity",async({page})=>{
   await open(page,"/?mode=demo#Vault");
   await expect(page.getByRole("heading",{name:"Vault & Controls",exact:true})).toBeVisible();
   await open(page,"/?mode=demo#Invoice%20review");
-  await expect(page.getByRole("heading",{name:"Invoices",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Payables",exact:true})).toBeVisible();
 });
 
 test("a receipt deep link opens the completed record in Activity",async({page})=>{
@@ -99,7 +101,7 @@ test("the mobile bar shows five destinations and a More sheet",async({page})=>{
   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
   const bar=page.getByRole("navigation",{name:"Workspace destinations"});
   await expect(bar).toBeVisible();
-  expect(await bar.locator("a").allTextContents()).toEqual(["Overview","Contractors","Invoices","Payments","Activity"]);
+  expect(await bar.locator("a").allTextContents()).toEqual(["Overview","Contractors","Payables","Activity"]);
   await expect(bar.getByRole("button",{name:"More"})).toBeVisible();
   // The lower-frequency destinations are reachable from the sheet.
   await bar.getByRole("button",{name:"More"}).click();

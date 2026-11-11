@@ -1,3 +1,5 @@
+import {PAYABLE_FILTERS,projectPayables,matchesPayable,type PayableFilter} from "../data/payables.ts";
+import { assertNoDemoPaymentRecords } from "./agent-deletion.ts";
 import { executeContractorTool, contractorView } from "./agent-contractor-tools.ts";
 // Agent Tool Executor - Implements the tool interface by connecting to existing backend services
 import {demoIntents,previewDemoQuote} from "./demo-intents.ts";
@@ -47,6 +49,37 @@ export class AgentToolExecutor implements AgentToolExecutor {
     return token;
   }
 
+  private payableRecords() {
+    if(!this.demoMode)throw Error("Payables tools do not grant live organization or payment authority.");
+    const owner=this.demoOwnerToken(),token=this.demoWorkspaceToken();
+    demoIntents().list(token,owner);
+    const portal=demoContractors().ownerSnapshot(owner),ledger=demoWorkspace().state(token);
+    return projectPayables(portal,ledger.payments).map(item=>{
+      const blockers=[...item.blockers];
+      if(item.stage==="Ready to Pay") {
+        const quote=previewDemoQuote(item.bill.amount,"near",demoIntents().rates);
+        if(ledger.vault.paused)blockers.push("Demo vault is paused.");
+        if(BigInt(quote.total)>BigInt(ledger.vault.available))blockers.push("Insufficient simulated funds including fees.");
+        if(ledger.vault.limit&&BigInt(quote.total)>BigInt(ledger.vault.limit))blockers.push("Spending policy limit exceeded.");
+      }
+      return {...item,blockers};
+    });
+  }
+  async listPayables(args:{status?:string;query?:string;overdue?:boolean}):Promise<ToolResult<unknown>> {
+    try {
+      if(args.status&&!PAYABLE_FILTERS.includes(args.status as PayableFilter))throw Error("Unsupported payable status.");
+      const all=this.payableRecords(),items=all.filter(item=>matchesPayable(item,(args.status??"All") as PayableFilter,args.query??"")&&(!args.overdue||item.overdue===true));
+      return {success:true,data:{count:items.length,dueDatesUnknown:all.filter(item=>item.overdue===null).length,payables:items.map(({bill,payment,...item})=>({...item,originalInvoiceReference:bill.sourceReference??bill.reference,dueAt:bill.dueAt??null,paymentReference:payment?.reference??null}))}};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Payables access denied."};}
+  }
+  async getPayable(args:{id:string}):Promise<ToolResult<unknown>> {
+    try {
+      const record=this.payableRecords().find(item=>item.id===args.id||item.invoiceNumber===args.id);
+      if(!record)throw Error("Payable access denied or not found.");
+      const {bill,payment,...item}=record;
+      return {success:true,data:{...item,originalInvoiceReference:bill.sourceReference??bill.reference,originalInvoiceText:bill.originalText??bill.text,attachment:bill.attachment,reviewEvents:bill.reviewEvents??[],dueAt:bill.dueAt??null,paymentReference:payment?.reference??null}};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Payable access denied."};}
+  }
   async listUnlinkedInvoices():Promise<ToolResult<unknown>> {
     try {
       if(!this.demoMode)throw Error("Simulation tools are demo-only.");
@@ -74,7 +107,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
       if(!asset)throw Error("Unsupported simulated asset.");
       const quote=previewDemoQuote(bill.amount,args.sourceAsset,demoIntents().rates),fee=BigInt(quote.fee),total=BigInt(quote.total);
       const blockers=[...(bill.status!=="Approved"?["Owner invoice approval required"]:[]),...bill.reasons,...(!profile?.wallet?["Approved wallet required in Wallet Details"]:[]),...(profile?.archived?["Contractor archived"]:[]),...(ledger.vault.paused?["Demo vault paused"]:[]),...(BigInt(ledger.vault.available)<total?["Insufficient simulated funds"]:[]),...(ledger.vault.limit&&total>BigInt(ledger.vault.limit)?["Spending policy limit exceeded"]:[]),...(ledger.payments.some(p=>p.billId===bill.id&&["prepared","pending","confirmed"].includes(p.status))?["Existing active or completed payment"]:[])];
-      return {success:true,data:{mode:"Demo / Simulated",billId:bill.id,reference:bill.reference,workOrder:bill.orderReference||"No work order",eligible:!blockers.length,blockers,recipient:profile?.wallet||null,source:asset,sourceAmount:quote.sourceAmount,illustrativeRate:quote.rate,mockSolver:quote.solver,savedQuote:false,destination:{chain:"NEAR",asset:"NEAR",amount:bill.amount},illustrativeFeeNear:formatNear(fee.toString()),totalNearEquivalent:formatNear(total.toString()),proposal:bill.status==="Approved"?"Review and authorize simulated payment":"Review invoice for owner approval",confirmationRequired:true,nextStep:"Open View invoices. Owner approval and structured confirmation of the saved quote are required. This preview does not approve or authorize payment."}};
+      return {success:true,data:{mode:"Demo / Simulated",billId:bill.id,reference:bill.reference,workOrder:bill.orderReference||"No work order",eligible:!blockers.length,blockers,recipient:profile?.wallet||null,source:asset,sourceAmount:quote.sourceAmount,illustrativeRate:quote.rate,mockSolver:quote.solver,savedQuote:false,destination:{chain:"NEAR",asset:"NEAR",amount:bill.amount},illustrativeFeeNear:formatNear(fee.toString()),totalNearEquivalent:formatNear(total.toString()),proposal:bill.status==="Approved"?"Review and authorize simulated payment":"Review invoice for owner approval",confirmationRequired:true,nextStep:"Open View payables. Owner approval and structured confirmation of the saved quote are required. This preview does not approve or authorize payment."}};
     }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
   }
   // Contractor Tools
@@ -87,7 +120,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
       const all=(args.archived ? snapshot.archivedProfiles ?? [] : snapshot.profiles).filter(p => !args.query || p.name.toLocaleLowerCase().includes(args.query.toLocaleLowerCase()));
       const offset=args.offset ?? 0,limit=Math.min(args.limit ?? 100,100);
       const items=all.slice(offset,offset+limit).map(contractorView);
-      return {success:true,data:Object.keys(args).length ? {count:all.length,contractors:items,nextOffset:offset+limit<all.length ? offset+limit : null} : items};
+      return {success:true,data:{count:all.length,contractors:items,nextOffset:offset+limit<all.length ? offset+limit : null}};
     } catch(error) {return {success:false,error:error instanceof Error ? error.message : "Failed to list contractors"};}
   }
 
@@ -227,6 +260,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
         ((snapshot.archivedProfiles ?? []) as any[]).find((p: any) => p.id === id);
       if (!profile)
         return { success: false, code: "contractor_not_found", error: "No contractor with that record ID exists in this demo organization." };
+      if(kind === "delete") assertNoDemoPaymentRecords(this.demoWorkspaceToken(),profile,(snapshot.events ?? []).filter(event=>event.profileId===profile.id).map(event=>event.profileName));
       const eligibility = store.lifecycleEligibility(profile.id, org);
       if (kind === "delete" && !eligibility.eligible)
         return {
@@ -240,10 +274,11 @@ export class AgentToolExecutor implements AgentToolExecutor {
         return { success: false, code: "lifecycle_not_allowed", error: "This contractor is not archived, so there is nothing to restore." };
       const operation = prepareLifecycle({
         scope: lifecycleScope(ownerToken),
+        workspaceToken: kind === "delete" ? this.demoWorkspaceToken() : undefined,
         kind,
         contractorId: profile.id,
         contractorName: profile.name,
-        eligibility
+        eligibility: kind === "delete" ? eligibility : {...eligibility,eligible:true,reason:kind === "archive" ? "Archival is allowed and preserves linked records." : "Restoration is allowed; revoked portal credentials stay revoked."}
       });
       // The summary carries no confirmation secret: only the dashboard can
       // complete the operation.
@@ -263,7 +298,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
         // Owner-scoped snapshot: a contractor session token is not an owner
         // capability, and contractor invoices must stay inside this owner org.
         const snapshot = store.ownerSnapshot(this.demoOwnerToken());
-        const contractor = (snapshot as any).profiles.find((p: any) => p.id === args.contractorId);
+        const contractor = [...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].find((p: any) => p.id === args.contractorId);
         if (!contractor) {
           return { success: false, code: "contractor_not_found", error: "No contractor with that record ID exists in this demo organization." };
         }
@@ -406,7 +441,7 @@ export class AgentToolExecutor implements AgentToolExecutor {
   // the model from reporting a paid receipt as an outstanding invoice.
   private demoInvoices() {
     const snapshot = demoContractors().ownerSnapshot(this.demoOwnerToken());
-    const names = new Map(snapshot.profiles.map((profile) => [profile.id, profile.name]));
+    const names = new Map([...snapshot.profiles,...(snapshot.archivedProfiles ?? [])].map((profile) => [profile.id, profile.name]));
     return snapshot.invoices.map((bill) => ({
       id: bill.id,
       reference: bill.reference,

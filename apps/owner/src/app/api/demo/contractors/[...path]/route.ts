@@ -1,3 +1,4 @@
+import { assertNoDemoPaymentRecords } from "../../../../../server/agent-deletion.ts";
 import { issueAgentInvitation, revealAgentInvitation } from "../../../../../server/agent-invitations.ts";
 import { NextRequest, NextResponse } from "next/server.js";
 import {demoIntents} from "../../../../../server/demo-intents.ts";
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest, context: Context) {
                 throw Error("That contractor no longer exists in this demo workspace.");
             // Revalidate before anything is applied.
             if (operation.kind === "delete") {
+                assertNoDemoPaymentRecords(operation.workspaceToken ?? req.cookies.get("nnetics_demo_workspace")?.value ?? "",profile,(snapshot.events ?? []).filter(event=>event.profileId===profile.id).map(event=>event.profileName));
                 const eligibility = store.lifecycleEligibility(operation.contractorId, org);
                 if (!eligibility.eligible)
                     throw Error(eligibility.reason);

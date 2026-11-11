@@ -235,7 +235,7 @@ function lifecycleChips(executions: AgentToolExecution[], scope: string | undefi
     if (!secret) continue;
     const kind = typeof data.kind === "string" ? data.kind : "archive";
     const contractorName = typeof data.contractorName === "string" ? data.contractorName : "this contractor";
-    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : kind === "archive" ? "Archive" : kind === "replace-portal" ? "Replace portal invitation for" : "Revoke portal access for";
+    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : kind === "archive" ? "Archive" : kind === "replace-portal" ? "Replace portal invitation for" : kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision === "approve" ? "Approve" : "Reject"} wallet change for` : "Revoke portal access for";
     chips.push({
       action: { kind: "confirm-contractor-lifecycle", operationId, secret, contractorId:data.contractorId, contractorName, actionKind:kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision ?? "review"}-wallet-change` : kind, consequence:data.consequence, expiresAt:data.expiresAt, details:data.details },
       label: `${verb} ${contractorName} — confirm`,

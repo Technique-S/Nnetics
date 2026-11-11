@@ -7,7 +7,9 @@ const current: Record<string,string> = {
   History:'Activity',
   'Payment history':'Activity',
   Recovery:'Activity',
-  'Invoice review':'Invoices',
+  'Invoice review':'Payables',
+  Invoices:'Payables',
+  Payments:'Payables',
   Vendors:'Contractors',
   'Work orders':'Contractors',
   Access:'Settings',
@@ -26,6 +28,7 @@ export async function navigateOwner(page:Page,name:string){
   const destination=page.getByRole('navigation',{name:'Owner dashboard'}).locator(`a[href="#${encodeURIComponent(target)}"]`);
   if(!await destination.isVisible())await page.getByRole('button',{name:'Toggle navigation',exact:true}).click();
   await destination.click();
+  if(name==='Payments'){const direct=page.getByText("Other payments · no invoice",{exact:true});if(await direct.count()&&!await direct.locator("..").evaluate(e=>(e as HTMLDetailsElement).open))await direct.click();}
 }
 export async function openAccountMenu(page:Page){
   const menu=page.locator('details.account-menu');

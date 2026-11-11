@@ -25,7 +25,7 @@ export function validateContractorTool(name: string, raw: Record<string, unknown
   const definition = contractorTools.find(tool => tool.name === name);
   if (!definition) return "Unknown contractor tool.";
   const schema = definition.inputSchema as { properties: Record<string, {type:string;minLength?:number;maxLength?:number;enum?:string[]}>; required: string[] };
-  for (const key of Object.keys(raw)) if (!(key in schema.properties)) return `Unexpected argument "${key}".`;
+  for (const key of Object.keys(raw)) if (!Object.hasOwn(schema.properties,key)) return `Unexpected argument "${key}".`;
   for (const key of schema.required) if (!(key in raw)) return `Missing argument "${key}".`;
   for (const [key,value] of Object.entries(raw)) {
     const rule = schema.properties[key];
@@ -52,14 +52,14 @@ export function executeContractorTool(ownerToken: string, name: string, args: Re
     const profiles = [...snapshot.profiles,...(snapshot.archivedProfiles ?? [])];
     const profile = profiles.find(p => p.id === args.id);
     if (args.id && !profile) return {success:false,code:"contractor_not_found",error:"No contractor with that ID exists in this organization."};
-    if (name === "list_pending_wallet_changes") return {success:true,data:profiles.filter(p=>p.pendingWallet).slice(0,100).map(walletView)};
+    if (name === "list_pending_wallet_changes") return {success:true,data:{count:profiles.filter(p=>p.pendingWallet).length,contractors:profiles.filter(p=>p.pendingWallet).slice(0,100).map(walletView),truncated:profiles.filter(p=>p.pendingWallet).length>100}};
     if (["get_wallet_change_request","prepare_wallet_change_decision"].includes(name) && profile) {
       const request=profile.pendingWallet;
       if(!request || (args.requestId && args.requestId!==request.id)) return {success:false,code:"request_not_found",error:"No matching pending wallet change exists for this contractor."};
       const wallet=walletView(profile);
       if(name === "get_wallet_change_request") return {success:true,data:wallet};
       if(!wallet.canDecide || store.portalStatus(ownerToken,profile.id).status!=="active") throw Error("Wallet request is stale, archived or access is unavailable.");
-      const operation=prepareLifecycle({scope:lifecycleScope(ownerToken),kind:"wallet-decision",contractorId:profile.id,contractorName:profile.name,eligibility:store.lifecycleEligibility(profile.id,store.owner(ownerToken)!),details:{requestId:request.id,decision:String(args.decision),reason:String(args.reason ?? "Approved by owner."),oldWallet:profile.wallet,newWallet:request.account,baseVersion:request.baseVersion,generation:request.generation,proof:request.simulatedProof ? "Demo simulated ownership proof" : "Verified ownership proof"}});
+      const operation=prepareLifecycle({scope:lifecycleScope(ownerToken),kind:"wallet-decision",contractorId:profile.id,contractorName:profile.name,eligibility:{...store.lifecycleEligibility(profile.id,store.owner(ownerToken)!),eligible:true,reason:"The exact operation is prepared for owner confirmation."},details:{requestId:request.id,decision:String(args.decision),reason:String(args.reason ?? "Approved by owner."),oldWallet:profile.wallet,newWallet:request.account,baseVersion:request.baseVersion,generation:request.generation,proof:request.simulatedProof ? "Demo simulated ownership proof" : "Verified ownership proof"}});
       return {success:true,data:lifecycleSummary(operation)};
     }
     if (["create_contractor_portal_invitation","revoke_contractor_portal_invitation"].includes(name) && profile) {
@@ -67,7 +67,7 @@ export function executeContractorTool(ownerToken: string, name: string, args: Re
       const portal=store.portalStatus(ownerToken,profile.id);
       if(name === "create_contractor_portal_invitation" && portal.status === "not_issued") return {success:true,data:issueAgentInvitation(ownerToken,profile.id)};
       if(name === "revoke_contractor_portal_invitation" && ["not_issued","revoked"].includes(portal.status)) return {success:true,data:{contractorId:profile.id,contractorName:profile.name,status:portal.status,changed:false}};
-      const operation=prepareLifecycle({scope:lifecycleScope(ownerToken),kind:name === "create_contractor_portal_invitation" ? "replace-portal" : "revoke-portal",contractorId:profile.id,contractorName:profile.name,eligibility:store.lifecycleEligibility(profile.id,store.owner(ownerToken)!),details:{previousStatus:portal.status,generation:portal.generation}});
+      const operation=prepareLifecycle({scope:lifecycleScope(ownerToken),kind:name === "create_contractor_portal_invitation" ? "replace-portal" : "revoke-portal",contractorId:profile.id,contractorName:profile.name,eligibility:{...store.lifecycleEligibility(profile.id,store.owner(ownerToken)!),eligible:true,reason:"The exact operation is prepared for owner confirmation."},details:{previousStatus:portal.status,generation:portal.generation}});
       return {success:true,data:lifecycleSummary(operation)};
     }
     if (name === "update_contractor" && profile) {
@@ -75,7 +75,7 @@ export function executeContractorTool(ownerToken: string, name: string, args: Re
       store.ownerCommand(ownerToken,{action:"update-contractor",profileId:String(id),...fields});
       return {success:true,data:contractorView(store.ownerSnapshot(ownerToken).profiles.find(p => p.id === id)!)};
     }
-    if (name === "get_contractor_wallet_status") return {success:true,data:profile ? walletView(profile) : profiles.slice(0,100).map(walletView)};
+    if (name === "get_contractor_wallet_status") return {success:true,data:profile ? walletView(profile) : {count:profiles.length,contractors:profiles.slice(0,100).map(walletView),truncated:profiles.length>100}};
     return {success:false,code:"tool_unavailable",error:"Unsupported contractor operation."};
   } catch (error) { return {success:false,code:"contractor_operation_failed",error:error instanceof Error ? error.message : "Contractor operation failed."}; }
 }

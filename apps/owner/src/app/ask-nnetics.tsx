@@ -5,6 +5,7 @@ import { AgentConfirmation, type ContractorConfirmation } from "./agent-confirma
 import { ActionButton } from "./action-button";
 
 export type AssistantAction =
+  | {kind:"open-payables";id?:string}
   | { kind: "create-contractor"; name: string }
   | { kind: "list-contractors" }
   | { kind: "get-contractor"; id: string }
@@ -165,7 +166,7 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
           <h3>What would you like to check?</h3>
           <p>Ask about your vault, contractors or invoices. Actions that need approval open for review in the workspace.</p>
           <div className="ask-nnetics-actions">
-            {["What is my vault balance?", "Show my invoices", "How many contractors do I have?"].map(prompt => (
+            {["What is my vault balance?", "Show my payables", "How many contractors do I have?"].map(prompt => (
               <button key={prompt} type="button" className="button secondary" onClick={() => {setInput(prompt);inputRef.current?.focus();}}>{prompt}</button>
             ))}
           </div>

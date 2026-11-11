@@ -62,6 +62,12 @@ export interface BillAttachment {
 }
 export interface ContractorBill extends BillFields {
     recipient: string;
+    requestedAmount?:string;
+    requestedAsset?:string;
+    sourceReference?:string;
+    dueAt?:string|null;
+    approval?:{amount:string;asset:string;by:string|null;at:string;adjustmentReason?:string|null};
+    reviewEvents?:{action:string;at:string;by:string|null;note:string}[];
     orderReference?:string;
     extractionId?:string;
     extractionMode?:"ai"|"deterministic";

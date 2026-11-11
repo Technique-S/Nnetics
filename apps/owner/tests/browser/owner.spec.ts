@@ -15,7 +15,7 @@ test('labels simulations, disables deployment, navigates and fits the viewport',
   page.on('request',request=>{if(new URL(request.url()).origin!==new URL(page.url()).origin)external.push(request.url());});
   await expect(page.getByText('Demo · simulated funds · no wallets, keys or tokens involved')).toBeVisible();
   await expect(page.getByRole('button',{name:'Deployment disabled'})).toHaveCount(0);
-  for(const view of ['Contractors','Invoices','Payments','Activity','Vault & Controls','Overview']) {
+  for(const view of ['Contractors','Payables','Activity','Vault & Controls','Overview']) {
     await navigateOwner(page,view);
     await expect(page.getByRole('heading',{name:view,exact:true,level:1})).toBeVisible();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -88,6 +88,6 @@ test('submitted invoices receive durable server references and reject source cur
   expect((await post(page,'contractors/contractor',{action:'submit-invoice',submissionId:crypto.randomUUID(),fields,text:'Amount: 3 NEAR',description:'Delivered work'})).status).toBe(200);
   const saved=await (await page.request.get('/api/demo/contractors/owner')).json();
   expect(saved.invoices).toHaveLength(1);expect(saved.invoices[0].reference).toMatch(/^CTR-\d+-INV-0001$/);
-  await navigateOwner(page,'Invoices');await expect(page.getByText(saved.invoices[0].reference,{exact:true})).toBeVisible();
-  await page.reload();await expect(page.getByText(saved.invoices[0].reference,{exact:true})).toBeVisible();
+  await navigateOwner(page,'Invoices');await expect(page.getByRole("button",{name:`Open payable · ${saved.invoices[0].reference}`,exact:true})).toBeVisible();
+  await page.reload();await expect(page.getByRole("button",{name:`Open payable · ${saved.invoices[0].reference}`,exact:true})).toBeVisible();
 });

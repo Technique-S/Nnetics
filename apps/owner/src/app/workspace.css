@@ -914,7 +914,7 @@ html[data-theme=light] body:has(.app-shell) { background: var(--background); }
   inset: auto 0 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   padding: 5px 4px calc(5px + env(safe-area-inset-bottom, 0px));
   background: var(--surface);
@@ -1024,3 +1024,31 @@ html[data-theme=light] body:has(.app-shell) { background: var(--background); }
 .agent-confirmation dt { color: var(--text-muted); }
 .agent-confirmation dd { margin: 0 0 var(--space-sm); }
 .agent-confirmation [role="status"] { font-weight: 600; }
+
+/* Payables extends the existing desk: one source record, list and persistent detail. */
+.unified-payables { min-width:0; padding:var(--space-lg); }
+.payable-filters { display:flex; flex-wrap:wrap; gap:var(--space-sm); margin-block:var(--space-lg); }
+.payable-filter { display:inline-flex; gap:var(--space-sm); align-items:center; min-height:44px; padding:8px 12px; color:var(--text-muted); background:var(--surface); border:1px solid var(--control-border); border-radius:var(--radius-control); }
+.payable-filter[aria-pressed=true] { color:var(--action-text); background:var(--action); border-color:var(--action); }
+.payable-filter span { font-variant-numeric:tabular-nums; }
+.payables-layout { display:grid; grid-template-columns:minmax(230px,.7fr) minmax(0,1.3fr); gap:var(--space-xl); align-items:start; }
+.payables-list { min-width:0; }
+.payable-row { display:grid; width:100%; gap:var(--space-xs); padding:var(--space-lg) var(--space-md); border:0; border-top:1px solid var(--border); background:transparent; color:var(--text); text-align:left; overflow-wrap:anywhere; }
+.payable-row:hover { background:var(--surface-muted); }
+.payable-row[data-selected=true] { background:var(--selection); }
+.payable-row-heading { display:flex; justify-content:space-between; align-items:center; gap:var(--space-sm); flex-wrap:wrap; }
+.payable-row .badge { font-size:var(--type-caption); }
+.payable-purpose,.payable-row-amount span { color:var(--text-muted); font-size:var(--type-label); }
+.payable-row-amount { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-sm); margin-top:var(--space-sm); font-variant-numeric:tabular-nums; }
+.payable-details { min-width:0; scroll-margin-top:90px; }
+.payable-details h2 { margin-top:0; }
+.payable-facts { display:grid; grid-template-columns:minmax(130px,.7fr) minmax(0,1fr); gap:var(--space-sm) var(--space-lg); margin-block:var(--space-lg); font-size:var(--type-label); }
+.payable-facts dt { color:var(--text-muted); }
+.payable-facts dd { margin:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.payable-context-note,.payable-eligibility { padding:var(--space-md); border-radius:var(--radius-control); background:var(--surface-muted); color:var(--text-muted); }
+.payable-eligibility h3 { color:var(--text); margin:0; }
+.payable-timeline { display:grid; gap:var(--space-md); padding-left:var(--space-lg); }
+.other-payments { margin-top:var(--space-xl); }
+.other-payments > summary { min-height:44px; padding-block:var(--space-md); font-weight:650; cursor:pointer; }
+@media(max-width:900px) { .payables-layout { grid-template-columns:1fr; } .payables-list { max-height:420px; overflow:auto; } }
+@media(max-width:480px) { .payable-facts { grid-template-columns:1fr; gap:4px; } .payable-facts dd { margin-bottom:var(--space-sm); } }

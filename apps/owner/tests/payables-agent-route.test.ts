@@ -1,0 +1,30 @@
+import {test,after} from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {NextRequest} from "next/server.js";
+const folder=fs.mkdtempSync(path.join(os.tmpdir(),"payables-agent-"));
+process.env.NNETICS_DEMO_WORKSPACE_DB=path.join(folder,"workspace.db");process.env.NNETICS_DEMO_PORTAL_DB=path.join(folder,"portal.db");process.env.NNETICS_AGENT_TRACE="0";
+const {POST}=await import("../src/app/api/agent/route.ts");
+const {demoWorkspace}=await import("../src/server/demo-workspace.ts");
+const {demoContractors}=await import("../src/server/demo-contractors.ts");
+const {setAgentModelAdapterForTests}=await import("../src/server/agent-model.ts");
+const ledger=demoWorkspace(),portal=demoContractors();
+after(()=>{ledger.close();portal.db.close();fs.rmSync(folder,{recursive:true,force:true});});
+test("Ask Nnetics dispatches read-only Payables tools and opens the same record without approval or execution",async()=>{
+    const token=ledger.start("").token;ledger.createWorkspace(token,{profileName:"Owner",vaultName:"Vault"});
+    const owner=portal.ownerStart(""),profileId=portal.ownerCommand(owner,{action:"create-profile",name:"Writer"}).profileId!;
+    const session=portal.enter(portal.ownerCommand(owner,{action:"issue-link",profileId}).token!);
+    const invoice=portal.command(session,{action:"submit-invoice",submissionId:"bill",fields:{orderId:"",amount:"1",asset:"NEAR"},text:"Original invoice purpose",description:"Article"}).invoice!;
+    let turn=0;
+    setAgentModelAdapterForTests({provider:"controlled",model:"controlled",async complete(request){
+        if(turn++===0)return {content:null,toolCalls:[{id:"payable",type:"function",function:{name:"get_payable",arguments:JSON.stringify({id:invoice.id})}}],finishReason:"tool_calls"};
+        const tool=request.messages.filter(m=>m.role==="tool").at(-1) as {content:string};const result=JSON.parse(tool.content);
+        assert.equal(result.success,true);assert.equal(result.data.stage,"Awaiting Approval");assert.equal(result.data.approver,null);assert.equal(result.data.approvedAmount,null);assert.equal(result.data.originalInvoiceText,"Original invoice purpose");assert.equal(result.data.overdue,null);
+        return {content:"Awaiting approval. Originally requested: 1 NEAR for Article. No approver or due date is recorded. Payment requires owner authorization in Payables.",toolCalls:[],finishReason:"stop"};
+    }});
+    const response=await POST(new NextRequest("http://127.0.0.1:3100/api/agent",{method:"POST",headers:{"Content-Type":"application/json",Origin:"http://127.0.0.1:3100",Cookie:`nnetics_demo_workspace=${token}; nnetics_demo_portal_owner=${owner}`},body:JSON.stringify({message:`Who approved payable ${invoice.id}, and why is it blocked?`,idempotencyKey:crypto.randomUUID()})}));
+    assert.equal(response.status,200);const body=await response.json();assert.ok(body.actions.some((chip:{action:{kind:string;id:string}})=>chip.action.kind==="open-payables"&&chip.action.id===invoice.id));
+    assert.equal(portal.ownerSnapshot(owner).invoices[0].status,"Submitted");assert.equal(ledger.state(token).payments.length,0);
+});
