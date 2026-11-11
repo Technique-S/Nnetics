@@ -114,7 +114,7 @@ test("the mobile bar shows five destinations and a More sheet",async({page})=>{
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
 
-test("the Overview reports the state after a payment",async({page})=>{
+test("the Overview reports the funded vault and displays every metric",async({page})=>{
   await workspace(page);
   await navTo(page,"Vault & Controls");
   await page.locator('input[name="amount"]').fill("2");
@@ -127,5 +127,5 @@ test("the Overview reports the state after a payment",async({page})=>{
   await expect(page.getByRole("heading",{name:"Active contractors",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Quick actions",exact:true})).toBeVisible();
   // The balance card shows the funded amount.
-  await expect(page.getByRole("heading",{name:"Available vault balance",exact:true}).locator("..")).toContainText("2");
+  await expect(page.locator(".overview-balance .payment-workspace-amount")).toContainText("2");
 });

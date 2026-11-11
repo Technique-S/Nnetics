@@ -2,9 +2,14 @@ import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 test.beforeEach(async({page})=>{page.on("dialog",dialog=>dialog.accept());});
 const origin = process.env.NNETICS_BROWSER_BASE_URL || "http://127.0.0.1:3100";
-async function start(page: Page, name = "Writer") {
+async function openOwner(page: Page) {
     await page.goto("/demo/contractors");
-    await page.getByRole("button", { name: "Start contractor demo" }).click();
+    const start = page.getByRole("button", {name: "Start contractor demo"});
+    await expect(start.or(page.getByLabel("Contractor name", {exact: true}))).toBeVisible();
+    if (await start.isVisible()) await start.click();
+}
+async function start(page: Page, name = "Writer") {
+    await openOwner(page);
     await page.getByLabel("Contractor name", { exact: true }).fill(name);
     await page.getByRole("button", { name: "Add contractor" }).click();
     await page.getByRole("button", { name: `Create private link · ${name}`, exact: true }).click();
@@ -117,8 +122,7 @@ test("demo API isolates owners/contractors, blocks forged authority, CSRF and du
     const csrf = await page.request.post("/api/demo/contractors/owner", { headers: { Origin: "https://unrelated.example" }, data: { action: "revoke-link", profileId: profile.id } });
     expect(csrf.status()).toBe(400);
     const otherCtx = await browser.newContext({ baseURL: origin }), other = await otherCtx.newPage();
-    await other.goto("/demo/contractors");
-    await other.getByRole("button", { name: "Start contractor demo" }).click();
+    await openOwner(other);
     const wrong = await other.request.post("/api/demo/contractors/owner", { headers: { Origin: origin }, data: { action: "issue-link", profileId: profile.id } });
     expect(wrong.status()).toBe(400);
     // Owner records survive refresh; invalid private-link switching clears the old capability.
@@ -134,6 +138,7 @@ test("demo API isolates owners/contractors, blocks forged authority, CSRF and du
 test("conflicting invoice labels require clarification; uploaded markup cannot become executable", async ({ page, browser }) => {
     const link = await start(page), ctx = await browser.newContext({ baseURL: origin }), contractor = await ctx.newPage();
     await contractor.goto(link);
+    await contractor.getByRole("button", {name: "Send a bill", exact: true}).click();
     await contractor.getByLabel("Bill text", { exact: true }).fill("Invoice: INV-1\nAmount: 1 NEAR\nAmount: 99 NEAR\n<script>window.stolen=true</script>");
     await contractor.getByRole("button", { name: "Format labeled details" }).click();
     await expect(contractor.getByRole("alert").filter({ hasText: "more than one amount" })).toBeVisible();

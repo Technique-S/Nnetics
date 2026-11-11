@@ -26,7 +26,7 @@ test('fresh demo setup lands on Overview', async ({page}, info) => {
   // right column / empty states
   await expect(page.getByRole('heading',{name:'Available vault balance',exact:true})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Needs attention',exact:true})).toBeVisible();
-  await expect(page.getByText('No items need your attention.')).toBeVisible();
+  await expect(page.getByText(/There are no available demo funds/)).toBeVisible();
   await expect(page.getByRole('heading',{name:'Total paid',exact:true})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Recent activity',exact:true})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Confirmed payouts over time',exact:true})).toBeVisible();
@@ -36,7 +36,10 @@ test('fresh demo setup lands on Overview', async ({page}, info) => {
   const legendItems=page.locator('.payment-status-legend li');
   await expect(legendItems).toHaveCount(3);
   await expect(legendItems.first()).toContainText('Paid');
-  await expect(page.locator('.overview-hero').getByRole('heading',{name:'Needs attention',exact:true})).toBeVisible();
+  await expect(page.locator('.overview-attention').getByRole('heading',{name:'Needs attention',exact:true})).toBeVisible();
+  for (const title of ['Reserved funds','Pending invoices','Active contractors','Quick actions']) {
+    await expect(page.getByRole('heading',{name:title,exact:true})).toBeVisible();
+  }
   await expect(page.getByRole('button',{name:'Fund vault'})).toBeVisible();
 });
 
@@ -49,7 +52,7 @@ test('funded demo overview (mobile viewport)', async ({page}) => {
   await page.getByRole('button',{name:'Create demo workspace'}).click();
   // drawer navigation is the nav path on phones
   await page.getByRole('button',{name:'Toggle navigation'}).click();
-  await page.getByRole('link',{name:'Contractors',exact:true}).click();
+  await page.getByRole('navigation',{name:'Owner dashboard'}).getByRole('link',{name:'Contractors',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Contractors',exact:true})).toBeVisible();
   // fund vault
   await page.goto('/?mode=demo#Vault');
@@ -58,7 +61,7 @@ test('funded demo overview (mobile viewport)', async ({page}) => {
   await page.getByRole('button',{name:'Fund vault'}).click();
   await page.goto('/?mode=demo#Overview');
   await expect(page.getByRole('heading',{name:'Overview',exact:true})).toBeVisible();
-  await expect(page.getByText('5 NEAR',{exact:true})).toBeVisible();
+  await expect(page.locator('.overview-balance .payment-workspace-amount')).toHaveText('5 NEAR');
   await expect(page.getByRole('button',{name:'Add contractor'})).toBeVisible();
 });
 

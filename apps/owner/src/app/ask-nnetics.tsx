@@ -62,51 +62,55 @@ function requestKey() {
 
 export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) => void }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<PanelMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState("");
-  const [conversationHistory, setConversationHistory] = useState<Array<{ user: string; assistant: string }>>(readStoredConversation);
+  const [failedRequest, setFailedRequest] = useState<{message: string; key: string} | null>(null);
+  const [conversationHistory, setConversationHistory] = useState<Array<{user: string; assistant: string}>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (open) {
-      const id = window.requestAnimationFrame(() => inputRef.current?.focus());
-      return () => window.cancelAnimationFrame(id);
-    }
-    launcherRef.current?.focus();
-  }, [open]);
-  useEffect(() => {
-    if (open) transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight });
-  }, [messages, open]);
+    const turns = readStoredConversation();
+    setConversationHistory(turns);
+    setMessages(turns.flatMap(turn => [{who: "you", text: turn.user}, {who: "assistant", text: turn.assistant, mode: "demo"}]));
+  }, []);
+
   useEffect(() => {
     if (!open) return;
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setOpen(false);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const panel = panelRef.current;
+    const narrow = window.matchMedia("(max-width: 760px)");
+    if (narrow.matches) panel?.showModal();
+    else panel?.show();
+    inputRef.current?.focus();
+    return () => {
+      panel?.close();
+      launcherRef.current?.focus();
+    };
   }, [open]);
 
-  async function send() {
-    const message = input.trim().slice(0, 500);
+  useEffect(() => {
+    if (open) transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight });
+  }, [messages, open, busy]);
+
+  async function send(retry?: {message: string; key: string}) {
+    const message = retry?.message ?? input.trim().slice(0, 500);
     if (!message || busy) return;
-    setMessages(old => [...old, { who: "you", text: message }]);
+    const key = retry?.key ?? requestKey();
+    if (!retry) setMessages(old => [...old, {who: "you", text: message}]);
     setInput("");
     setBusy(true);
-    setNote("");
+    setFailedRequest(null);
     try {
       const response = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message,
-          idempotencyKey: requestKey(),
+          idempotencyKey: key,
           conversationHistory: conversationHistory.slice(-5)
         })
       });
@@ -115,82 +119,79 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
         actions?: ActionChip[];
         mode?: string;
         error?: string;
-        code?: string;
         retryable?: boolean;
       } | null;
-      if (!response.ok || !data || typeof data.reply !== "string")
+      if (!response.ok || !data || typeof data.reply !== "string") {
+        if (!data || data.retryable || response.status >= 500) setFailedRequest({message, key});
         throw new Error(data?.error || data?.reply || "The agent is unavailable. Try again in a moment.");
-
+      }
       setConversationHistory(prev => {
-        const updated = [...prev, { user: message, assistant: data.reply || "" }].slice(-5);
-        if (typeof window !== "undefined") {
-          try {
-            window.localStorage.setItem(CONVERSATION_KEY, JSON.stringify(updated));
-          } catch {
-            // Storage may be unavailable or full; the chat still works.
-          }
-        }
+        const updated = [...prev, {user: message, assistant: data.reply!}].slice(-5);
+        try { window.localStorage.setItem(CONVERSATION_KEY, JSON.stringify(updated)); } catch {}
         return updated;
       });
-
       setMessages(old => [...old, {
-        who: "assistant",
-        text: data.reply!,
+        who: "assistant", text: data.reply!,
         mode: data.mode === "demo" ? "demo" : data.mode === "live" ? "live" : "error",
         chips: data.actions ?? []
       }]);
-    } catch (e) {
-      setMessages(old => [...old, {
-        who: "assistant",
-        text: e instanceof Error ? e.message : "The agent is unavailable. Try again in a moment.",
-        mode: "error"
-      }]);
+    } catch (error) {
+      if (error instanceof TypeError) setFailedRequest({message, key});
+      setMessages(old => [...old, {who: "assistant", text: error instanceof Error ? error.message : "The agent is unavailable. Try again in a moment.", mode: "error"}]);
     } finally {
       setBusy(false);
     }
   }
 
-  return (
-    <>
-      {!open && (
-        <button type="button" ref={launcherRef} className="ask-nnetics" aria-expanded={false} onClick={() => setOpen(true)}>
-          Ask Nnetics<span className="ask-nnetics-sub">demo · simulated funds</span>
-        </button>
-      )}
-      {open && (
-        <section className="ask-nnetics-panel" role="dialog" aria-modal="true" aria-label="Ask Nnetics demo assistant">
-          <header className="ask-nnetics-head">
-            <h2>Ask Nnetics</h2>
-            <span className="ask-nnetics-badge">Demo · simulated funds · model-driven, records stay in this demo</span>
-            <button type="button" className="text-button" autoFocus onClick={() => setOpen(false)} aria-label="Close the demo assistant">Close</button>
-          </header>
-          <div className="ask-nnetics-transcript" ref={transcriptRef} aria-live="polite">
-            {messages.length === 0 && (
-              <p className="ask-nnetics-empty">Ask in natural language, e.g. “create a contractor named Amara”, “how many contractors do I have?”, “what is my vault balance?”, or “show my invoices”. The configured model reads your request, uses the demo tools it needs, and answers from this simulated workspace. Deleting or archiving a contractor is prepared and then waits for your confirmation in the dashboard.</p>
-            )}
-            {messages.map((message, index) => (
-              <article key={index} className={message.who === "you" ? "ask-nnetics-you" : "ask-nnetics-assistant"}>
-                <p>{message.text}</p>
-                {message.mode && <span className="ask-nnetics-mode">{message.mode === "demo" ? "Demo · simulated funds" : message.mode === "live" ? "Live" : "Error"}</span>}
-                {message.chips && message.chips.length > 0 && (
-                  <div className="ask-nnetics-actions">
-                    {message.chips.map((item, chipIndex) => (
-                      <button key={chipIndex} type="button" className="text-button" onClick={() => onAction(item.action)}>{item.label}</button>
-                    ))}
-                  </div>
-                )}
-              </article>
+  return <>
+    <button type="button" ref={launcherRef} className="ask-nnetics" aria-haspopup="dialog" aria-expanded={open} aria-controls="ask-nnetics-panel" onClick={() => setOpen(value => !value)}>
+      <AssistantMark/>Ask Nnetics
+    </button>
+    {open && <dialog ref={panelRef} id="ask-nnetics-panel" className={`ask-nnetics-panel${expanded ? " is-expanded" : ""}`}
+      aria-label="Ask Nnetics demo assistant" onCancel={event => {event.preventDefault();setOpen(false);}}
+      onKeyDown={event => {if (event.key === "Escape") {event.preventDefault();setOpen(false);}}}>
+      <header className="ask-nnetics-head">
+        <AssistantMark/>
+        <div><h2>Ask Nnetics</h2><p>Demo workspace · simulated funds</p></div>
+        <button type="button" className="text-button ask-nnetics-expand" aria-pressed={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Shrink" : "Expand"}</button>
+        <button type="button" className="text-button" onClick={() => setOpen(false)} aria-label="Close the demo assistant">Close</button>
+      </header>
+      <div className="ask-nnetics-transcript" ref={transcriptRef} role="log" aria-label="Conversation" tabIndex={0}>
+        {messages.length === 0 && <div className="ask-nnetics-empty">
+          <h3>What would you like to check?</h3>
+          <p>Ask about your vault, contractors or invoices. Actions that need approval open for review in the workspace.</p>
+          <div className="ask-nnetics-actions">
+            {["What is my vault balance?", "Show my invoices", "How many contractors do I have?"].map(prompt => (
+              <button key={prompt} type="button" className="button secondary" onClick={() => {setInput(prompt);inputRef.current?.focus();}}>{prompt}</button>
             ))}
-            {busy && <p role="status">Thinking in this simulated workspace…</p>}
           </div>
-          {note && <p className="ask-nnetics-note" role="status">{note}</p>}
-          <form className="ask-nnetics-form" onSubmit={e => { e.preventDefault(); void send(); }}>
-            <label className="ask-nnetics-input-label" htmlFor="ask-nnetics-message">Message the demo assistant</label>
-            <input id="ask-nnetics-message" ref={inputRef} value={input} onChange={e => setInput(e.target.value)} maxLength={500} placeholder="e.g. create a contractor named Amara" disabled={busy} />
-            <ActionButton type="submit" className="button primary" busy={busy} disabled={busy || !input.trim()}>Send</ActionButton>
-          </form>
-        </section>
-      )}
-    </>
-  );
+        </div>}
+        {messages.map((message, index) => (
+          <article key={index} data-mode={message.mode} className={message.who === "you" ? "ask-nnetics-you" : "ask-nnetics-assistant"}>
+            <strong className="ask-nnetics-mode">{message.who === "you" ? "You" : message.mode === "error" ? "Request failed" : "Nnetics"}</strong>
+            <p>{message.text}</p>
+            {message.chips && message.chips.length > 0 && <div className="ask-nnetics-actions">
+              {message.chips.map((item, chipIndex) => <button key={chipIndex} type="button" className="button secondary" onClick={() => {
+                onAction(item.action);
+                if (panelRef.current?.matches(":modal")) setOpen(false);
+              }}>{item.label}</button>)}
+            </div>}
+          </article>
+        ))}
+        {busy && <p className="ask-nnetics-progress" role="status">Waiting for Nnetics…</p>}
+        {failedRequest && <button type="button" className="button secondary" onClick={() => void send(failedRequest)}>Retry request</button>}
+      </div>
+      <form className="ask-nnetics-form" onSubmit={event => {event.preventDefault();void send();}}>
+        <label className="ask-nnetics-input-label" htmlFor="ask-nnetics-message">Message the demo assistant</label>
+        <input id="ask-nnetics-message" ref={inputRef} value={input} onChange={event => setInput(event.target.value)} maxLength={500} placeholder="Ask about your workspace" readOnly={busy}/>
+        <ActionButton type="submit" className="button primary" busy={busy} disabled={busy || !input.trim()}>Send</ActionButton>
+      </form>
+    </dialog>}
+  </>;
+}
+
+function AssistantMark() {
+  return <svg className="assistant-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5Z"/>
+  </svg>;
 }

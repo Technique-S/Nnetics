@@ -199,6 +199,9 @@ export function Onboarding({
         setRestoreAvailable(true);
         setError("Saved-session verification is temporarily unavailable. Retry it before signing another message.");
       }
+      else if (e instanceof LiveApiError && (e.status === 401 || (e.status === 400 && e.message.startsWith("Wallet verification required.")))) {
+        setError("");
+      }
       else setError(e instanceof Error ? e.message : "Your session could not be restored. Sign in again.");
     }).finally(()=>setRestoring(false));
   }, [config]);

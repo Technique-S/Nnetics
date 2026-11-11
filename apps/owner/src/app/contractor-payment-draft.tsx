@@ -3,6 +3,7 @@
 import {useEffect, useRef, useState} from "react";
 import {amountFromNear, formatNear} from "../data/owner-adapter";
 import type {ContractorPaymentDraft} from "../data/mock-adapter";
+import type {DemoWsPayment} from "../data/demo-workspace-adapter";
 import {ActionButton} from "./action-button";
 
 export type PayContractor = (draft: ContractorPaymentDraft) => Promise<void>;
@@ -31,7 +32,7 @@ export type PrepareContractorPayment = (draft: ContractorPaymentDraft) => Promis
 export type ConfirmContractorPayment = (prepared: PaymentPreparation) => Promise<void>;
 export type CancelContractorPayment = (prepared: PaymentPreparation) => Promise<void>;
 
-export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCancel,limit,blocked,fee,preset,scrollAnchor}:{
+export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCancel,limit,blocked,fee,preset,scrollAnchor,paymentRecords}:{
   id:string; name:string; wallet:string;
   onPrepare?:PrepareContractorPayment;
   onConfirm?:ConfirmContractorPayment;
@@ -43,6 +44,7 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
   // preset: a prefilled draft, e.g. prepared by the Ask Nnetics demo assistant.
   preset?: ContractorPaymentPreset;
   scrollAnchor?: boolean;
+  paymentRecords?: DemoWsPayment[];
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [initial] = useState<ContractorPaymentPreset | undefined>(preset
@@ -68,7 +70,8 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
   }, [preset, id, name, wallet, onPrepare]);
   const [error,setError] = useState("");
   const [prepared,setPrepared] = useState<PaymentPreparation|null>(null);
-  const [confirmed,setConfirmed] = useState(false);
+  const [submitted,setSubmitted] = useState(false);
+  const paymentStatus = paymentRecords?.find(payment => payment.id === prepared?.id)?.status;
   const [busy,setBusy] = useState(false);
   const locked = useRef(false);
   const total = (amount: string) => (BigInt(amount) + BigInt(fee ?? "0")).toString();
@@ -79,26 +82,37 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
     catch (err) { setError(err instanceof Error ? err.message : "The simulated request failed. No payment was executed."); }
     finally { setBusy(false); locked.current = false; }
   }
-  return <details className="reference-disclosure" ref={detailsRef}>
+  return <details className="reference-disclosure payment-draft" ref={detailsRef}>
     <summary>Prepare payment</summary>
     {prepared ? <section aria-label="Confirm simulated payment">
-      <h4>Confirm simulated payment</h4>
+      <h4>{paymentStatus === "confirmed" || paymentStatus === "failed" || paymentStatus === "cancelled" ? "Payment result" : paymentStatus === "pending" ? "Simulated payment pending" : "Confirm simulated payment"}</h4>
       <dl className="payment-draft-details">
         <dt>Contractor</dt><dd>{prepared.contractor}</dd>
         <dt>Payout wallet</dt><dd>{prepared.recipient}</dd>
         <dt>Amount</dt><dd>{formatNear(prepared.amount)} NEAR</dd>
         {fee !== undefined && <><dt>Simulated demo fee</dt><dd>{formatNear(prepared.fee)} NEAR</dd></>}
-        <dt>Total debit from the demo vault</dt><dd>{formatNear(prepared.total)} NEAR · simulated funds only</dd>
+        <dt>Payment plus demo fee</dt><dd>{formatNear(prepared.total)} NEAR · simulated funds only</dd>
         <dt>Description</dt><dd>{prepared.description}</dd>
         <dt>Reference</dt><dd>{prepared.reference}</dd>
-        <dt>Reserved now</dt><dd>{formatNear(prepared.total)} NEAR is held until this payment settles or is cancelled</dd>
+        <dt>Reservation</dt><dd>{
+          paymentStatus === "confirmed" ? "Settled from the reserved demo balance."
+          : paymentStatus === "failed" || paymentStatus === "cancelled" ? "Released to the demo vault."
+          : formatNear(prepared.total) + " NEAR is held until this payment settles or is cancelled"
+        }</dd>
       </dl>
-      {confirmed ? <p role="status">Simulated payment recorded. Check Activity for the completed transaction and its receipt.</p> : <>
+      {submitted || paymentStatus === "pending" || paymentStatus === "confirmed" || paymentStatus === "failed" || paymentStatus === "cancelled" ? (
+        <p className="payment-progress" role="status" data-payment-status={paymentStatus}>
+          {paymentStatus === "confirmed" ? "Simulated payment recorded. Its receipt is available in Activity."
+            : paymentStatus === "failed" ? "Simulation failed. Check the payment record in Activity."
+            : paymentStatus === "cancelled" ? "Payment cancelled. The reservation was released."
+            : "Confirmation accepted. The simulated payment is pending."}
+        </p>
+      ) : <>
         <p role="status">This payment is prepared and its amount is reserved. Confirm to run the simulation.</p>
-        <ActionButton type="button" className="button primary" busy={busy} disabled={busy || !onConfirm} onClick={() => void once(async () => {
+        <ActionButton type="button" className="button primary" busy={busy} pendingLabel="Confirming payment…" disabled={busy || !onConfirm} onClick={() => void once(async () => {
           if (!onConfirm) return;
           await onConfirm(prepared);
-          setConfirmed(true);
+          setSubmitted(true);
         })}>Confirm and simulate payment</ActionButton>
         {onCancel && <button type="button" className="text-button" disabled={busy} onClick={() => void once(async () => {
           await onCancel(prepared);
@@ -112,7 +126,7 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
         <dt>Payout wallet</dt><dd>{draft.recipient}</dd>
         <dt>Amount</dt><dd>{formatNear(draft.amount)} NEAR</dd>
         {fee !== undefined && <><dt>Simulated demo fee</dt><dd>{formatNear(fee)} NEAR</dd>
-          <dt>Total debit from the demo vault</dt><dd>{formatNear(total(draft.amount))} NEAR · simulated funds only</dd></>}
+          <dt>Payment plus demo fee</dt><dd>{formatNear(total(draft.amount))} NEAR · simulated funds only</dd></>}
         <dt>Description</dt><dd>{draft.description}</dd>
         <dt>Network</dt><dd>{onPrepare ? "Local simulation · no funds move" : "NEAR testnet"}</dd>
         <dt>Fees</dt><dd>{fee !== undefined ? "Only the simulated demo fee; no network fee." : onPrepare ? "No network fee" : "No fee quoted. A reviewed transaction plan is required before signing."}</dd>

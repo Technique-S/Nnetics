@@ -135,7 +135,7 @@ test("a paused demo vault refuses new payments and resumes cleanly",async({page}
   await expect(page.getByText(/Funded the Demo Wallet with 2 NEAR/)).toBeVisible();
   // The owner pauses the demo vault.
   await page.getByRole("button",{name:"Pause the demo vault"}).click();
-  await expect(page.getByText("Paused").first()).toBeVisible();
+  await expect(page.locator(".demo-vault-controls [data-status=Paused]")).toBeVisible();
   // A new payment is refused with the precise reason and nothing is recorded.
   const refused=await page.evaluate(async()=>{
     const r=await fetch("/api/demo/workspace/payment/prepare",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({idempotencyKey:"browser-paused-1",recipient:"writer-demo.testnet",amount:"100000000000000000000000",description:"Refused while paused"})});

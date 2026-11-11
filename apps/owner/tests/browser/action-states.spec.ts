@@ -1,3 +1,4 @@
+import {fixtureWorkspace} from "./release-fixture";
 import {test, expect} from "@playwright/test";
 
 test("one wallet action stays pending, cancels, and cannot submit a login after cancellation", async ({page}) => {
@@ -69,19 +70,20 @@ test("saved-session recovery never opens a wallet or signs out while its read is
   expect(logouts).toBe(0);
 });
 
-test("a dialog has one cancel control and keeps its recipient and exact amount fields", async ({page}) => {
-  await page.route("**/api/demo/owner-invoices", route => route.fulfill({json: []}));
-  await page.goto("/?mode=demo");
-  await page.getByRole("button", {name: "Add sample invoice", exact: true}).click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog.getByRole("button", {name: "Cancel", exact: true})).toHaveCount(1);
-  await expect(dialog.getByRole("alert")).toHaveCount(0);
-  await expect(dialog.getByRole("button", {name: "Close dialog", exact: true})).toHaveCount(0);
-  await expect(dialog.getByLabel("Requested amount in NEAR")).toHaveValue("3");
-  await expect(dialog.getByLabel("Invoice recipient")).toHaveValue("editor-demo.testnet");
-  await expect(dialog.getByText("Currency: NEAR · Testnet", {exact: true})).toBeVisible();
-  await dialog.getByRole("button", {name: "Cancel", exact: true}).click();
-  await expect(dialog).not.toBeVisible();
+test("payment review preserves exact recipient and amount and offers one edit action", async ({page}) => {
+  await fixtureWorkspace(page);
+  await page.goto("/?mode=demo#Payments");
+  await page.getByText("Prepare payment",{exact:true}).click();
+  await page.getByLabel("Amount (NEAR)",{exact:true}).fill("3");
+  await page.getByLabel("Payment description").fill("Action work");
+  await page.getByRole("button",{name:"Review payment",exact:true}).click();
+  const review=page.getByRole("region",{name:"Review payment",exact:true});
+  await expect(review).toContainText("editor-demo.testnet");
+  await expect(review).toContainText("3 NEAR");
+  await expect(review.getByRole("button",{name:"Edit payment",exact:true})).toHaveCount(1);
+  await expect(review.getByRole("alert")).toHaveCount(0);
+  await review.getByRole("button",{name:"Edit payment",exact:true}).click();
+  await expect(page.getByLabel("Amount (NEAR)",{exact:true})).toBeVisible();
 });
 
 test("a recorded provisioning transaction offers only a status check, never another signing request", async ({page}) => {
@@ -115,16 +117,22 @@ test("a recorded provisioning transaction offers only a status check, never anot
   expect(dispatched).toBe(0);
 });
 
-test("selecting invoices cannot turn their navigation controls into later loading actions", async ({page}) => {
-  await page.emulateMedia({reducedMotion: "reduce"});
-  await page.route("**/api/demo/owner-invoices", route => route.fulfill({json: []}));
-  await page.goto("/?mode=demo#Invoice%20review");
-  await page.getByRole("button", {name: /Miles Chen.*INV-1043/}).click();
-  await page.getByRole("button", {name: /Noor Okafor.*INV-1042/}).click();
-  await page.clock.install();
-  await page.clock.pauseAt(new Date());
-  await page.getByRole("button", {name: "Mark reviewed", exact: true}).click();
-  await expect(page.locator(".queue-row[aria-busy=true]")).toHaveCount(0);
-  await expect(page.locator(".invoice-detail button[aria-busy=true]")).toHaveCount(1);
-  await page.clock.runFor(1000);
+test("invoice review loading stays on its action while navigation remains usable", async ({page}) => {
+  await fixtureWorkspace(page);
+  await page.goto("/?mode=demo#Invoices");
+  const approve=page.getByRole("button",{name:/^Approve bill ·/});
+  await expect(approve).toBeVisible();
+  let release!:()=>void;
+  const gate=new Promise<void>(resolve=>{release=resolve;});
+  await page.route("**/api/demo/contractors/owner",async route=>{
+    if(route.request().method()==="POST" && route.request().postDataJSON().action==="review-invoice")await gate;
+    await route.continue();
+  });
+  await approve.click();
+  try {
+    await expect(approve).toHaveAttribute("aria-busy","true");
+    await expect(page.getByRole("navigation",{name:"Owner dashboard"}).locator("[aria-busy=true]")).toHaveCount(0);
+    await expect(page.getByRole("heading",{name:"Invoices",exact:true})).toBeVisible();
+  } finally {release();}
+  await expect(page.locator('[data-status="Approved"]')).toBeVisible();
 });

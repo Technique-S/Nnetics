@@ -37,6 +37,7 @@ export function getUserMessage(error:unknown,context:MessageContext="general"):s
  if(matches(/checkpoint.*(?:expired|future|ahead|valid|reviewed)|recovery.*checkpoint/i))return "Payments are blocked until the owner refreshes and reviews the recovery security check. No payment was sent.";
  if(matches(/rate.limit|HTTP 429/i))return "The network provider is limiting requests. Wait before retrying verification; your session is retained.";
  if(matches(/network request timed out|verification timed out/i))return "The network request timed out. Retry verification; your session is retained.";
+ if(matches(/private (?:link|access|contractor session).*(?:revoked|expired|invalid)|invalid private link/i))return "This private link has expired or was revoked. Ask the owner for a new link.";
  if(matches(/five.hour.*expir/i))return "Your five-hour session has expired. Sign in again to continue.";
 
  if(text==='We couldn’t confirm this transaction yet. Check its status before trying again.')return "This owner transaction is not confirmed. Check its recorded transaction status before requesting another signature.";

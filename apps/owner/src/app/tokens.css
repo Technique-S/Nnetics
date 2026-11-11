@@ -1,80 +1,83 @@
-/* Jade & Midnight / Jade Night: one semantic system, aliases support existing components. */
+/* Emerald Precision. Semantic values are shared by the owner and private portal. */
 :root {
-  color-scheme:light;
-  --color-bg:#F6F8F7;
-  --color-surface:#FFFFFF;
-  --color-surface-raised:#F0F4F2;
-  --color-tint:#D9F99D;
-  --color-header:#0C2215;
-  --color-line:#E2E7E4;
-  --color-line-strong:#708789;
-  --color-ink:#17231A;
-  --color-muted:#5F6F66;
-  --color-disabled:#66736A;
-  --color-primary:#84CC16;
-  --color-primary-hover:#6EBB13;
+  color-scheme: light;
+  --color-bg:#F6F3EC;
+  --color-surface:#FFFDF8;
+  --color-surface-raised:#EFEFE6;
+  --color-tint:#E4F0E5;
+  --color-header:#0B1D17;
+  --color-line:#D9DFD3;
+  --color-line-strong:#748578;
+  --color-ink:#13261E;
+  --color-muted:#4D6156;
+  --color-disabled:#53655A;
+  --color-primary:#087453;
+  --color-primary-hover:#075E44;
   --color-on-primary:#FFFFFF;
-  --color-primary-deep:#5EA610;
-  --color-primary-soft:#EAF6D8;
-  --color-accent:#A3E635;
-  --color-accent-bg:#EFF9DC;
-  --color-danger:#B94837;
-  --color-danger-bg:#FCE9E6;
-  --color-overlay:rgba(16,47,51,.48);
+  --color-primary-deep:#054A36;
+  --color-primary-soft:#DCECE0;
+  --color-accent:#D9C4A6;
+  --color-accent-bg:#EAF0F5;
+  --color-danger:#9C352E;
+  --color-danger-bg:#F9E8E3;
+  --color-overlay:rgb(11 29 23 / 58%);
+
   --background:var(--color-bg);--surface:var(--color-surface);--surface-muted:var(--color-surface-raised);
   --text:var(--color-ink);--text-muted:var(--color-muted);--border:var(--color-line);--control-border:var(--color-line-strong);
   --action:var(--color-primary);--action-hover:var(--color-primary-hover);--action-pressed:var(--color-primary-deep);--action-text:var(--color-on-primary);
-  --selection:var(--color-primary-soft);--selection-hover:#E0F1CC;--focus:var(--color-primary);
-  --sidebar:var(--color-header);--sidebar-hover:#143422;--sidebar-text:#E9F6F0;--sidebar-muted:#A7C2B0;--sidebar-border:#2B5E39;
-  --accent:var(--color-accent);--info:#51476B;--info-bg:var(--color-accent-bg);
-  --success:#286346;--success-bg:#E5F1E8;--warning:#785820;--warning-bg:#FCF5E3;--warning-border:#967537;
-  --danger:var(--color-danger);--danger-bg:var(--color-danger-bg);--danger-hover:#F9E2DC;--danger-border:#AD6B60;
-  --shadow-dialog:rgb(16 47 51 / 18%);--shadow-soft:rgb(16 47 51 / 8%);--backdrop:var(--color-overlay);
-  --signin-cta:#0D63E6; --signin-cta-hover:#0A55C0; --signin-cta-pressed:#084A9F; --signin-cta-text:#FFFFFF;
-  --signin-link:#0D63E6;
-  --shadow-card:0 10px 40px -10px rgb(16 47 51 / 8%), 0 2px 10px -2px rgb(16 47 51 / 8%);
-  --signin-cta-shadow:0 4px 16px rgb(13 99 230 / 25%);
-  --art-soft:#EDF2F9; --art-soft-2:#E9ECF3; --art-highlight:#F3F5F9;
-  --art-line:#3B82F6; --art-accent:#75D625; --art-rose:#FF6B8B;
-  --art-pencil-shade:#D9DFEA; --art-pencil-dark:#334155;
-  --brand-dot:#E58A72;
+  --selection:var(--color-primary-soft);--selection-hover:var(--color-tint);--focus:var(--color-primary);
+  --sidebar:var(--color-header);--sidebar-hover:#1A392D;--sidebar-text:#F5F6ED;--sidebar-muted:#B4C6BA;--sidebar-border:#315142;
+  --accent:var(--color-accent);--info:#375573;--info-bg:var(--color-accent-bg);
+  --success:#216441;--success-bg:var(--color-tint);--warning:#725118;--warning-bg:#FAEFD8;--warning-border:#967537;
+  --danger:var(--color-danger);--danger-bg:var(--color-danger-bg);--danger-hover:#F4DCD5;--danger-border:#A6594E;
+  --shadow-dialog:rgb(11 29 23 / 24%);--shadow-soft:rgb(11 29 23 / 8%);--backdrop:var(--color-overlay);
+  --shadow-card:0 12px 28px -18px var(--shadow-dialog);
+  --shadow-overlay:0 20px 56px var(--shadow-dialog);
+  --hero-surface:#112D23;--hero-line:#426456;--hero-muted:#C4D6C8;--hero-ink:#FBF9F0;
+  --hero-accent:#D7E8D9;--hero-action:#123126;
+  --brand-dot:var(--color-accent);
+
+  --font-interface:var(--font-jakarta, Arial), Helvetica, sans-serif;
+  --font-data:ui-monospace, Consolas, monospace;
+  --type-caption:.75rem;--type-label:.8125rem;--type-body:.875rem;--type-section:1.125rem;
+  --type-heading:clamp(1.875rem, 3vw, 2.625rem);
+  --type-display:clamp(2.75rem, 5vw, 4.75rem);
+  --type-metric:clamp(2.125rem, 5vw, 3.875rem);
+  --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:24px;--space-2xl:32px;--space-3xl:48px;
+  --radius-control:8px;--radius-panel:14px;--radius-feature:18px;
+  --workspace-gutter:clamp(16px, 3vw, 48px);
+  --motion-press:120ms;--motion-hover:160ms;--motion-panel:220ms;--motion-dialog:260ms;
+  --motion-ease:cubic-bezier(.22,.72,.24,1);
 }
-/* Only essential-boundary lightness differs from the supplied dark table; measured below. */
+
+/* Night uses a raised surface and an emerald with a dark foreground. */
 html[data-theme=dark] {
   color-scheme:dark;
-  --color-bg:#0A1513;
-  --color-surface:#101F1C;
-  --color-surface-raised:#162A26;
-  --color-tint:#12332D;
-  --color-header:#0D1B18;
-  --color-line:#213834;
-  --color-line-strong:#4B796F;
-  --color-ink:#E7F2EF;
-  --color-muted:#8FA8A1;
-  --color-disabled:#5E7871;
-  --color-primary:#3DC5A3;
-  --color-primary-hover:#5AD6B7;
-  --color-on-primary:#04201A;
-  --color-primary-deep:#2A9C82;
-  --color-primary-soft:#BFEFE3;
-  --color-accent:#E58A72;
-  --color-accent-bg:#33201C;
-  --color-danger:#F26B84;
-  --color-danger-bg:#3A1A22;
-  --color-overlay:rgba(4,12,10,.72);
-  --selection-hover:var(--color-surface-raised);--focus:var(--color-accent);
-  --sidebar-hover:var(--color-surface-raised);--sidebar-text:var(--color-ink);--sidebar-muted:var(--color-muted);--sidebar-border:var(--color-line-strong);
-  --info:var(--color-primary-soft);--info-bg:var(--color-tint);--success:var(--color-primary);--success-bg:var(--color-tint);
-  --warning:var(--color-accent);--warning-bg:var(--color-accent-bg);--warning-border:var(--color-accent);
-  --danger-hover:var(--color-danger-bg);--danger-border:var(--color-danger);--shadow-dialog:transparent;--shadow-soft:transparent;
-  --signin-cta:#2E6BE6; --signin-cta-hover:#335FCC; --signin-cta-pressed:#2458C4; --signin-cta-text:#FFFFFF;
-  --signin-link:#8FBAFF;
-  --shadow-card:none;
-  --signin-cta-shadow:0 4px 16px rgb(0 0 0 / 35%);
-  --art-soft:#162A26; --art-soft-2:#182B28; --art-highlight:#1E322E;
-  --art-line:#6EA0F8; --art-accent:#75D625; --art-rose:#FF7FA0;
-  --art-pencil-shade:#1E322E; --art-pencil-dark:#7E93A6;
-  --brand-dot:#E58A72;
+  --color-bg:#0D1A15;
+  --color-surface:#14241C;
+  --color-surface-raised:#1C2F25;
+  --color-tint:#203F32;
+  --color-header:#0A1712;
+  --color-line:#30473A;
+  --color-line-strong:#658574;
+  --color-ink:#EEF4EC;
+  --color-muted:#B1C3B7;
+  --color-disabled:#A5B8AB;
+  --color-primary:#63C9A2;
+  --color-primary-hover:#85DAB9;
+  --color-on-primary:#0A261B;
+  --color-primary-deep:#43B488;
+  --color-primary-soft:#25463A;
+  --color-accent:#E3C799;
+  --color-accent-bg:#253845;
+  --color-danger:#FFAA9D;
+  --color-danger-bg:#412621;
+  --color-overlay:rgb(3 12 8 / 75%);
+  --sidebar-hover:#1A392D;--sidebar-text:#F5F6ED;--sidebar-muted:#B4C6BA;--sidebar-border:#315142;
+  --info:#BCDEF5;--info-bg:var(--color-accent-bg);--success:var(--action);--success-bg:var(--color-tint);
+  --warning:var(--color-accent);--warning-bg:#3E3220;--warning-border:var(--color-accent);
+  --danger-hover:var(--color-danger-bg);--danger-border:var(--color-danger);
+  --shadow-dialog:rgb(0 0 0 / 35%);--shadow-soft:transparent;--shadow-card:none;
 }
 /* Existing names are aliases, not a second palette. */
 :root { --canvas:var(--background);--ink:var(--text);--muted:var(--text-muted);--line:var(--border);--green:var(--action);--mint:var(--selection);--ink-muted:var(--text-muted);--danger-ink:var(--danger) }
@@ -151,3 +154,24 @@ html[data-theme=dark] .sidebar :is(a,button):focus-visible{outline-color:var(--f
 
 .sidebar .drawer-close{color:var(--sidebar-text)}.sidebar-note,.sidebar nav button:hover{background:var(--sidebar-hover)}
 html[data-theme=dark] .badge[data-status=Revoked]{color:var(--accent);background:var(--warning-bg)}
+
+/* Shared controls and number formatting. Structural layouts live with their views. */
+body { font: 400 var(--type-body)/1.55 var(--font-interface); }
+.page-heading h1 { font: 650 var(--type-heading)/1.12 var(--font-interface); letter-spacing: -.035em; }
+:where(.panel,.task-form,.vault-onboarding,.stat-card) { border-radius: var(--radius-panel); }
+.amount, .payment-workspace-amount, .payment-draft-details dd, .record-count { font-variant-numeric: tabular-nums; }
+:where(input, textarea, select):not([type=checkbox]):not([type=radio]) { border-radius: var(--radius-control); }
+:where(button, a, summary, input, select, textarea) { scroll-margin-block: 88px; }
+:where(.button, .text-button, .icon-button, .theme-control) {
+  transition: background-color var(--motion-hover) var(--motion-ease),
+    border-color var(--motion-hover) var(--motion-ease), color var(--motion-hover) var(--motion-ease),
+    transform var(--motion-press) var(--motion-ease);
+}
+.button, .theme-control { min-height: 44px; }
+.button { border-radius: var(--radius-control); }
+.notice > button { flex: none; white-space: nowrap; }
+@media (max-width: 760px) {
+  :where(input, textarea, select):not([type=checkbox]):not([type=radio]) { font-size: 16px; }
+}
+
+:is(.button.primary, .button.secondary, .button.danger):disabled { color: var(--color-disabled); background: var(--surface-muted); border-color: var(--border); }
