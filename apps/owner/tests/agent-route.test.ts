@@ -53,6 +53,34 @@ const demo = newDemo();
 addContractor(demo, "Tia");
 addContractor(demo, "Marcus Johnson");
 
+test("Intents assistant tools are scoped read-only proposals; model cannot inject a recipient or execute",async()=>{
+  const scoped=newDemo(),store=demoContractors();
+  const profileId=store.ownerCommand(scoped.portalToken,{action:"create-profile",name:"Intent writer"}).profileId!;
+  const link=store.ownerCommand(scoped.portalToken,{action:"issue-link",profileId}).token!;
+  const session=store.enter(link);
+  const bill=store.command(session,{action:"submit-invoice",submissionId:"agent-intent",fields:{orderId:"",amount:"1",asset:"NEAR"},text:"Article delivered for 1 NEAR",description:"Article"}).invoice!;
+  const {AgentToolExecutor}=await import("../src/server/agent-tool-executor.ts");
+  const executor=new AgentToolExecutor(true,{orgId:"demo",isDemo:true,demoWorkspaceToken:scoped.workspaceToken,demoPortalToken:scoped.portalToken});
+  const preview=await executor.previewSimulatedIntent({id:bill.id,sourceAsset:"usdc-ethereum"});
+  assert.equal(preview.success,true);
+  if(preview.success){const data=preview.data as {eligible:boolean;blockers:string[];confirmationRequired:boolean};assert.equal(data.eligible,false);assert.equal(data.confirmationRequired,true);assert.ok(data.blockers.some(b=>/wallet/.test(b)));}
+  assert.equal(store.ownerSnapshot(scoped.portalToken).invoices[0].status,"Submitted");
+  assert.equal(demoWorkspace().state(scoped.workspaceToken).payments.length,0);
+  const outsider=new AgentToolExecutor(true,{orgId:"demo",isDemo:true,demoWorkspaceToken:scoped.workspaceToken,demoPortalToken:newDemo().portalToken});
+  assert.equal((await outsider.previewSimulatedIntent({id:bill.id,sourceAsset:"near"})).success,false);
+  const live=new AgentToolExecutor(false,{orgId:"live",isDemo:false});assert.equal((await live.previewSimulatedIntent({id:bill.id,sourceAsset:"near"})).success,false);
+  const adapter=new ControlledAdapter([
+    ()=>toolTurn("preview_simulated_intent",{id:bill.id,sourceAsset:"near",recipient:"attacker.testnet"},"bad-recipient"),
+    request=>{assert.equal(lastToolPayload(request).success,false);return toolTurn("execute_simulated_payment",{id:bill.id},"bad-execute");},
+    request=>{assert.equal(lastToolPayload(request).success,false);return final("Open invoice review for owner approval and simulated payment confirmation.");},
+  ]);
+  setAgentModelAdapterForTests(adapter);
+  const response=await POST(agentRequest({message:"pay this invoice now",idempotencyKey:crypto.randomUUID()},{cookie:scoped.cookie}));
+  assert.equal(response.status,200);assert.equal(demoWorkspace().state(scoped.workspaceToken).payments.length,0);
+  const {catalogForMode}=await import("../src/server/agent-tool-catalog.ts");
+  assert.equal(catalogForMode("live").some(t=>t.name.includes("simulated")),false);
+});
+
 class ControlledAdapter implements AgentModelAdapter {
   readonly provider = "controlled-openrouter";
   readonly model = "openai/gpt-4o-mini";
