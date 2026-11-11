@@ -132,6 +132,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   const [scenario, setScenario] = useState<TransferScenario>("success");
   const [intent, setIntent] = useState<DemoAssistantIntent | null>(null);
   const [contractorRevision, setContractorRevision] = useState(0);
+  const [billingRefreshVersion,setBillingRefreshVersion]=useState(0);
   const [assistantConfigured, setAssistantConfigured] = useState<boolean | null>(null);
   const [assistantModel, setAssistantModel] = useState<string | null>(null);
   const [historyFilter, setHistoryFilter] = useState("All outcomes");
@@ -156,6 +157,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
       const next = await adapter.snapshot();
       if(contextInvalid.current || generation!==dashboardGeneration.current)return;
       autoRefreshBlocked.current=false;
+      setBillingRefreshVersion(version=>version+1);
       setSnapshot((old) =>
         !old || next.revision >= old.revision ? next : old,
       );
@@ -208,7 +210,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     let cancelled = false;
     void source.snapshot().then(value => { if (!cancelled) setPortal(value); }).catch(() => {});
     return () => { cancelled = true; };
-  }, [view, live]);
+  }, [view, live, snapshot?.revision, billingRefreshVersion]);
   // Ask Nnetics actions run through the same UI commands a manual visit would.
   function handleAssistantAction(action: AssistantAction) {
     if (action.kind === "create-contractor") {
@@ -697,8 +699,9 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
               {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
             </div>
           )}
-          {view === "Invoices" && demoWs && <DemoContractorWorkspace key={invoiceContractor} focus="invoices" invoiceContractor={invoiceContractor}/>}
-          {view === "Invoices" && !demoWs && (
+          {view === "Invoices" && demoWs && <DemoContractorWorkspace key={invoiceContractor} focus="invoices" invoiceContractor={invoiceContractor} refreshVersion={billingRefreshVersion} onPaymentChanged={()=>void refresh()}/>}
+          {view === "Invoices" && live && <PersistentContractorOwner embedded focus="invoices" refreshVersion={billingRefreshVersion} organization={s.access?.organization || live.config.organization} readOnly={readOnly}/> }
+          {view === "Invoices" && !demoWs && !live && (
             <section className="panel payment-workspace-panel" aria-label="Invoices">
               <label className="filter-label">Status<select aria-label="Filter invoices" value={invoiceFilter} onChange={e => setInvoiceFilter(e.target.value)}>
                 {["All invoices","Submitted","Under review","Needs clarification","Approved","Rejected","Paid"].map(option=><option key={option}>{option}</option>)}
@@ -714,6 +717,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
             <div className="payment-surface">
               <section className="panel payment-workspace-panel" aria-label="Payment queue">
                 <h2>Payment queue</h2>
+                {demoWs && <><p>Pay approved invoices with simulated NEAR Intents. Review each quote and recipient in Invoices.</p><ActionButton className="button secondary" onClick={()=>go("Invoices")}>Open invoice payments</ActionButton></>}
                 {demoWs && <>
                   <RecordSearch label="Search payments" query={paymentSearch} onQuery={setPaymentSearch} onReset={paymentSearch || paymentFilter || paymentSort !== "newest" ? () => {setPaymentSearch("");setPaymentFilter("");setPaymentSort("newest");} : undefined}>
                     <label className="filter-label">Status<select value={paymentFilter} onChange={event => setPaymentFilter(event.target.value)}>

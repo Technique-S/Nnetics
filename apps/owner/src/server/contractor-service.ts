@@ -106,7 +106,7 @@ export class ContractorBackend extends ContractorRecordStore {
   const mentioned=mentionedOrders(input.text,snapshot.orders);
   if(mentioned.length>1){result.fields.workOrderReference=null;questions.push("The text mentions multiple approved work orders. Which single order covers this bill? Select it explicitly.");}
   const matches=snapshot.orders.filter(o=>o.reference===result.fields.workOrderReference);
-  if(matches.length!==1&&snapshot.orders.length!==1)questions.push("Which one approved work order does this bill cover? Select it explicitly.");
+
   const id=crypto.randomUUID(),payload={id,...result,questions:[...new Set(questions)],source:"contractor-confirmation-required" as const};
   this.db.prepare("INSERT INTO contractor_extractions VALUES (?,?,?,?,?,?,?)").run(id,profile.id,profile.generation,this.identities.hash(session),input.text,JSON.stringify(payload),Date.now()+900000);
   return payload;

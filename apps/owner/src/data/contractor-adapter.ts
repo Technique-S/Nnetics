@@ -49,7 +49,7 @@ export interface BillFields {
     orderId: string;
     amount: string;
     asset: string;
-    recipient: string;
+    recipient?: string; // Deprecated input; server ignores all invoice recipient claims.
 }
 export interface BillAttachment {
     id: string;
@@ -58,6 +58,7 @@ export interface BillAttachment {
     size: number;
 }
 export interface ContractorBill extends BillFields {
+    recipient: string;
     orderReference?:string;
     extractionId?:string;
     extractionMode?:"ai"|"deterministic";
@@ -91,7 +92,7 @@ export interface ContractorSnapshot {
     orders: ContractorOrder[];
     invoices: ContractorBill[];
 }
-export type OwnerPortalCommand = {
+export type OwnerPortalCommand = {action:"associate-order";invoiceId:string;orderId:string} | {
     action:"queue-invoice";
     invoiceId:string;
     orderId:string;

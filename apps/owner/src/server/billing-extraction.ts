@@ -34,6 +34,7 @@ export function mentionedOrders(text:string,orders:{id:string;reference:string}[
  });
 }
 export function sourceOrderQuestions(text:string,selected:string,orders:{id:string;reference:string}[]){
+ if(!selected)return [];
  const matches=mentionedOrders(text,orders);
  if(matches.length>1)return ["Billing text names multiple approved work orders. Clarify the single order covered by this invoice."];
  if(matches.length===1&&matches[0].id!==selected)return [`Billing text names a different approved work-order reference: ${matches[0].reference}. This invoice is linked to ${orders.find(o=>o.id===selected)?.reference||selected}. Correct the current text; the invoice claim cannot be reassigned.`];

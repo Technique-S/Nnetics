@@ -107,11 +107,11 @@ test("wallet changes require owner approval and never rewrite existing approved 
     const next = order(store, owner, a.session, "WO-2");
     assert.equal(next.recipient, "new-writer.testnet");
     store.command(a.session, bill(old.id));
-    assert.equal(store.snapshot(a.session).invoices[0].recipient, old.recipient);
+    assert.equal(store.snapshot(a.session).invoices[0].recipient, "new-writer.testnet");
     assert.throws(() => store.ownerCommand(owner, { action: "approve-wallet", profileId: a.profile.id, requestId: request.id }), /stale/);
     store.db.close();
 });
-test("amount, currency and recipient mismatches require clarification and cannot be approved", () => {
+test("amount and currency mismatches require clarification; invoice recipients cannot override Wallet Details", () => {
     const { store, owner } = setup(), a = invite(store, owner), o = order(store, owner, a.session);
     const bad = bill(o.id);
     bad.fields.amount = "2";
@@ -121,7 +121,8 @@ test("amount, currency and recipient mismatches require clarification and cannot
     bad.fields.asset="NEAR";
     store.command(a.session, bad);
     let invoice = store.snapshot(a.session).invoices[0];
-    assert.equal(invoice.reasons.length, 2);
+    assert.equal(invoice.reasons.length, 1);
+    assert.equal(invoice.recipient, "writer-demo.testnet");
     assert.throws(() => store.ownerCommand(owner, { action: "review-invoice", invoiceId: invoice.id, decision: "approve", note: "" }), /cannot override/);
     store.ownerCommand(owner, { action: "review-invoice", invoiceId: invoice.id, decision: "clarify", note: "Use the approved details." });
     const fix = bill(o.id);

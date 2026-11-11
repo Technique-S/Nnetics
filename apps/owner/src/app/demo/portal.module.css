@@ -115,3 +115,8 @@
   .preview dl { grid-template-columns: minmax(0, 1fr); }
   .preview dd { margin-bottom: var(--space-xs); }
 }
+
+.intentDetails { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,2fr); gap:var(--space-sm) var(--space-md); font-variant-numeric:tabular-nums; }
+.intentDetails dt { color:var(--text-muted); }
+.intentDetails dd { margin:0; overflow-wrap:anywhere; }
+@media(max-width:480px) { .intentDetails { grid-template-columns:1fr; } .intentDetails dd { margin-bottom:var(--space-sm); } }

@@ -113,6 +113,9 @@ export type AgentTool =
 
 // Tool Executor Interface
 export interface AgentToolExecutor {
+  listUnlinkedInvoices?(args:{}):Promise<ToolResult<unknown>>;
+  getSimulatedPaymentStatus?(args:{}):Promise<ToolResult<unknown>>;
+  previewSimulatedIntent?(args:{id:string;sourceAsset:string}):Promise<ToolResult<unknown>>;
   // Contractor Tools
   listContractors(args: {}): Promise<ToolResult<ContractorProfile[]>>;
   getContractor(args: { id?: string; name?: string }): Promise<ToolResult<ContractorProfile | null>>;

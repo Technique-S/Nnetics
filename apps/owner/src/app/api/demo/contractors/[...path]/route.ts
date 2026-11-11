@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server.js";
+import {demoIntents} from "../../../../../server/demo-intents.ts";
 import { demoContractors } from "../../../../../server/demo-contractors.ts";
 import { claimLifecycle, lifecycleScope } from "../../../../../server/contractor-lifecycle.ts";
 import type { ContractorCommand, OwnerPortalCommand } from "../../../../../data/contractor-adapter.ts";
@@ -35,6 +36,7 @@ async function bytes(req: NextRequest, max: number) {
 export async function GET(req: NextRequest, context: Context) {
     try {
         const path = (await context.params).path, store = demoContractors();
+        demoIntents().reconcile();
         if (path.join("/") === "owner")
             return json(store.ownerSnapshot(req.cookies.get(ownerCookie)?.value || ""));
         if (path.join("/") === "contractor")

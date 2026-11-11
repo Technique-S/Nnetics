@@ -115,14 +115,13 @@ test("clarification on a direct bill stays tied to the same bill and preserves t
     } finally { f.close(); }
 });
 
-test("a direct bill needs a destination: the approved demo wallet or an explicit recipient", async () => {
+test("direct bills do not require wallets and ignore invoice recipient claims", async () => {
     const f = fixture(); try {
         const a = seeded(f); // No wallet proof at all.
-        await assert.rejects(async () => f.store.command(a.session, directInput("direct-1")),
-            /recipient/);
-        // An explicit recipient is accepted and shown to the owner for review.
+        assert.equal(f.store.command(a.session, directInput("direct-1")).invoice!.recipient, "");
+        // An explicit recipient is ignored; only Wallet Details can supply it.
         const explicit = f.store.command(a.session, directInput("direct-2", {recipient: "writer.demo.testnet"})).invoice!;
-        assert.equal(explicit.recipient, "writer.demo.testnet");
+        assert.equal(explicit.recipient, "");
         // With an approved demo wallet, the bill defaults to that wallet.
         wallet(f, a);
         const defaulted = f.store.command(a.session, directInput("direct-3")).invoice!;
@@ -130,7 +129,7 @@ test("a direct bill needs a destination: the approved demo wallet or an explicit
     } finally { f.close(); }
 });
 
-test("persistent mode keeps requiring an approved work order; direct bills stay demo-only", async () => {
+test("persistent mode supports optional work orders without bypassing organization identity", async () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "nnetics-persistent-direct-"));
     const {IdentityAuth} = await import("../src/server/identity.ts");
     const {ContractorBackend} = await import("../src/server/contractor-service.ts");
@@ -162,9 +161,11 @@ test("persistent mode keeps requiring an approved work order; direct bills stay 
         const profile = (await backend.ownerRead(token, org)).profiles.find(p => p.name === "Writer")!;
         const link = (await backend.ownerWrite(token, org, {action: "issue-link", profileId: profile.id})).token!;
         const session = await backend.enterVerifiedLink(link);
-        // No wallet proof, no work order: a direct bill attempt must be refused.
-        await assert.rejects(() => backend.write(session, directInput("direct-1")), /approved work order/);
-        await assert.rejects(() => backend.write(session, directInput("direct-2", {recipient: "writer.testnet"})), /approved work order/);
+        const direct=(await backend.write(session, directInput("direct-1"))).invoice!;
+        assert.equal(direct.orderId, "");assert.equal(direct.recipient, "");
+        await backend.ownerWrite(token,org,{action:"review-invoice",invoiceId:direct.id,decision:"approve",note:""});
+        assert.equal((await backend.ownerRead(token,org)).invoices[0].status,"Approved");
+        assert.equal((await backend.write(session,directInput("direct-2",{recipient:"writer.testnet"}))).invoice!.recipient,"");
         // Persistent order-based billing continues to reject any orderId it cannot match.
         await assert.rejects(() => backend.write(session, directInput("direct-3", {orderId: "ghost-order"})), /approved work order/);
     } finally {
