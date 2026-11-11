@@ -8,6 +8,8 @@ The shared baseline includes guarded prepare/confirm demo payments (`ab210c5`), 
 
 Compatibility was confirmed before merging. The reviewed design and initial acceptance fixes were committed as `b9036dc`, and the clean functional checkout was fast-forwarded to that commit. Acceptance runs against the integrated functional checkout. The backup branch `codex/nnetics-before-design-integration` preserves `7657c9f`. No history was rewritten.
 
+The expanded browser reconciliation is recorded in `34d0137`. The final acceptance follow-up records the unknown-outcome fixture correction and these results. Both the functional and design branches are synchronized by fast-forward after the clean-worktree checks; the experimental task-dashboard checkout remains untouched.
+
 | Area | Compatibility result |
 | --- | --- |
 | Demo payments | Existing prepare, single-use confirmation, reservation, settlement, failure and unknown-outcome controls preserved. |
@@ -53,22 +55,36 @@ Additional browser acceptance covers unlinked contractor deletion, linked contra
 
 All 115 supplied screenshots were reviewed in ten labelled contact sheets, with larger views used for payment details and compact layouts. The screens cover 39 mobile, 38 tablet and 38 desktop states. Typography, palette and component treatment are coherent across the workspace and portal. The invitation fields are masked in evidence.
 
-Two concrete payment-detail issues were identified. The total label described a debit even for failed outcomes, so it now says “Payment plus demo fee.” Phone confirmations gave long values a narrow second column, so payment review labels and values now stack on phones. Entry screenshots are regenerated after the fresh-session correction. All 115 final captures were regenerated from the integrated checkout: 39 phone, 38 tablet, 38 desktop; zero capture errors and zero overflow failures. Fixed navigation appearing partway down a full-page screenshot reflects viewport anchoring during capture. Browser expansion also found the dashboard error alert had lost its accessible name; the mode-specific label was restored.
+Two concrete payment-detail issues were identified. The total label described a debit even for failed outcomes, so it now says “Payment plus demo fee.” Phone confirmations gave long values a narrow second column, so payment review labels and values now stack on phones. Entry screenshots are regenerated after the fresh-session correction. All 115 final captures were regenerated from the integrated checkout: 39 phone, 38 tablet, 38 desktop; zero capture errors and zero overflow failures. Fixed navigation appearing partway down a full-page screenshot reflects viewport anchoring during capture. Browser expansion also found the dashboard error alert had lost its accessible name; the mode-specific label was restored. An inherited first-child CSS rule hid the live workspace refresh control. Its action container is now explicitly visible, with desktop and phone screenshots and refresh-recovery tests confirming the correction.
 
 ## Verification and readiness
 
-Final browser acceptance is in progress; readiness will be recorded when it completes.
+The full simulated journey passed on the integrated application. The integrated source is accepted for demo integration. Deployment remains conditional on a working assistant provider configuration, as described below. This assessment grants no live-transaction readiness.
 
 | Check | Integrated result |
 | --- | --- |
 | Repository unit tests | 42 passed, 0 failed. |
 | Owner unit tests | 323 passed, 0 failed. Total: 365. |
-| Browser tests | Pending final complete-directory run. |
+| Browser tests | Complete-directory run: 196 passed, 9 failed, 1 intentional skip. All 9 affected cases subsequently passed on the rebuilt application: 9 passed, 1 duplicate-provider skip. Across these runs, all 205 distinct runnable cases passed. |
 | Typecheck | `npm run typecheck` passed. |
 | Production build | `npm run build` passed. |
 | Theme | Source-token check and all 42 semantic contrast combinations passed. |
 | Screenshots | 115, zero capture errors, zero page-overflow failures. |
 
 Browser evidence logs, traces and test databases remain local under ignored `artifacts` directories. The reproducible capture script and masked screenshot evidence are committed under `docs/design-review/final-design/after`.
+
+The final affected-case replay covered Ask Nnetics, configuration drift, security-update review, conflicted invoice/unknown payment behavior, and refresh recovery on desktop and mobile (`integrated-fixes-final.log`, 57.9 seconds). The mobile provider case is intentionally skipped because desktop exercises the same server model. It is not a skipped product failure. An earlier replay immediately after rebuilding returned HTTP 500 for static JavaScript assets and could not hydrate two pages. The final replay used the steady production server after build/type generation completed. Keep build/type generation separate from running release acceptance.
+
+### Assistant provider condition
+
+The existing local `openai/gpt-4o-mini` configuration reached an OpenRouter HTTP 402 credit limit on the real tool-calling prompt. This was reproduced outside the browser: the provider reported that the prompt exceeded the remaining credit allowance. No credits were purchased and no request was automatically replayed as a write.
+
+The final local server explicitly overrides `NNETICS_ASSISTANT_MODEL=nvidia/nemotron-3.5-super-vl:free`. That model is listed with tool support and zero token pricing in the [OpenRouter model metadata](https://openrouter.ai/api/v1/models), verified during acceptance. Its genuine browser run passed contractor creation, the navigation action, vault balance, contextual follow-up, persisted contractor records and conversation history. The paid `.env.local` setting was not changed or committed. Before deployment, select a valid provider/model configuration or fund the intended paid model; the exhausted paid configuration is not release-ready.
+
+### Reproduction
+
+Run repository `npm test`, then in `apps/owner` run `npm test`, `npm run typecheck`, `npm run build` and `npm run check:theme`. Start the completed production build with `NNETICS_APP_ORIGIN=http://127.0.0.1:3112`, isolated demo database paths, the tested assistant model override, and `NNETICS_TRANSACTIONS_AUTHORIZED`, `NNETICS_OWNER_TRANSACTIONS_AUTHORIZED`, `NNETICS_PAYMENT_EXECUTION_AUTHORIZED` and `NNETICS_PROVISIONING_ENABLED` all set to `false`.
+
+Set `NNETICS_BROWSER_BASE_URL=http://127.0.0.1:3112`, then run `npx playwright test --workers=2` for the complete suite, and `node scripts/capture-final-design.mjs after` for the three-width journey. The final affected-case replay used `npx playwright test --grep 'configuration drift|reviewed security update|invoice review cannot|refresh retries|Ask Nnetics uses' --workers=1`.
 
 Accessibility verification includes keyboard navigation, drawer focus containment, forced colors, reduced motion, semantic contrast checks and responsive reflow. Full screen-reader validation, physical touch-device testing and a complete WCAG conformance assessment remain outstanding. Financial acceptance uses simulated payments. Live signing and transfers are outside this release acceptance.

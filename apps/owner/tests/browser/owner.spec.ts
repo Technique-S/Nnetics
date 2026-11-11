@@ -51,9 +51,9 @@ test('invoice review cannot override a source conflict; unknown payment outcomes
   await expect(page.locator('article [data-status="Needs clarification"]')).toBeVisible();
   await navigateOwner(page,'Vault & Controls');
   await page.locator('input[name=amount]').fill('5');await page.getByRole('button',{name:'Fund vault',exact:true}).click();
-  await navigateOwner(page,'Settings');
-  await page.getByLabel('Simulated settlement outcome').selectOption('unknown');
-  await expect(page.getByText(/Set to unknown/)).toBeVisible();
+  // The diagnostic unknown outcome remains an API fixture; ordinary Settings
+  // offers successful and failed settlement choices only.
+  expect((await post(page,'workspace/scenario',{scenario:'unknown'})).status).toBe(200);
   const prepared=await post(page,'workspace/payment/prepare',{idempotencyKey:crypto.randomUUID(),recipient:'editor-demo.testnet',amount:'1000000000000000000000000',description:'Unknown outcome'});
   expect(prepared.status).toBe(200);
   expect((await post(page,'workspace/payment/confirm',{paymentId:prepared.body.payment.id,confirmationSecret:prepared.body.confirmationSecret})).status).toBe(200);
