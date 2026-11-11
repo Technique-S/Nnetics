@@ -468,7 +468,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
             {view === "Vault & Controls" && !readOnly && <button className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</button>}
           </div>
           <OperationFeedback active={loading || busy.length > 0} message="Checking workspace records…"/>
-          {error && <div className="error-banner" role="alert">{getUserMessage(error)} <button onClick={() => void refresh()}>Retry refresh</button></div>}
+          {error && <div className="error-banner" role="alert" aria-label={live ? "Testnet error" : "Simulation error"}>{getUserMessage(error)} <button onClick={() => void refresh()}>Retry refresh</button></div>}
           {notice && <div className="notice" role="status">{notice} <button className="text-button" onClick={() => setNotice("")}>Dismiss</button></div>}
           {view === "Overview" && (
             <div className="overview-grid">

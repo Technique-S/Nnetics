@@ -21,7 +21,7 @@ test("a clean visitor sees sign-in and enters a persisted demo workspace", async
 });
 
 test("unavailable session verification keeps recovery feedback", async ({page}) => {
-  await page.route("**/api/live/identity", route => route.fulfill({status: 503, json: {error: "Session provider unavailable", automaticRetry: false, retryable: true}}));
+  await page.route("**/api/live/identity", route => route.fulfill({status: 503, json: {error: "Session provider unavailable", automaticRetry: false, retryable: true, verificationUnavailable: true}}));
   await page.goto("/");
   await expect(page.getByRole("button", {name: "Continue to workspace", exact: true})).toBeVisible();
   await expect(page.getByRole("alert").filter({hasText: /try again|temporarily|couldn't check/i})).toBeVisible();

@@ -2,6 +2,8 @@
 
 The [baseline audit](NNETICS_FINAL_DESIGN_AUDIT.md) inventories the routes, roles, states and protected behavior. The [design system](NNETICS_DESIGN_SYSTEM.md) defines the tokens, components and motion.
 
+The [integration and release acceptance](NNETICS_RELEASE_ACCEPTANCE.md) records the integrated application results and supersedes the earlier design-stage verification below.
+
 ## Browser evidence
 
 - [Before screenshots](design-review/final-design/before/) and [capture results](design-review/final-design/before/results.json)
@@ -16,7 +18,7 @@ Scores are 1–5, where 5 means the inspected state consistently met the criteri
 
 | Surface | Audited and changed | H | T | S | C | I | R | A | O | M | B | Review notes |
 | --- | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
-| Entry and wallet sign-in | Demo-first entry, workflow preview, sign-in states | 5 | 5 | 4 | 5 | 4 | 4 | 4 | 5 | 4 | 5 | Signed-out session copy can still appear for a new browser. |
+| Entry and wallet sign-in | Demo-first entry, workflow preview, sign-in states | 5 | 5 | 4 | 5 | 4 | 4 | 4 | 5 | 4 | 5 | Fresh-browser session warning corrected and entry screenshots refreshed during integration acceptance. |
 | Demo onboarding and recovery | Workspace and vault steps, setup completion, optional first steps, loading and retry | 5 | 4 | 4 | 5 | 4 | 5 | 4 | 5 | 4 | 5 | The first-action guide is inline on Overview. The existing create call still creates the workspace and vault together. |
 | Owner shell and Settings | Six destinations, desktop rail, mobile More, workspace name and appearance | 5 | 4 | 4 | 5 | 5 | 5 | 4 | 5 | 4 | 5 | The same route hashes and utility menu are retained. |
 | Overview | Available/reserved balance, attention, metrics, recent activity, payout chart, shortcuts | 5 | 5 | 4 | 5 | 4 | 4 | 4 | 5 | 4 | 5 | The mobile view is intentionally stacked. A fresh workspace shows zero counts and explains how to populate them. |
@@ -45,5 +47,5 @@ Scores are 1–5, where 5 means the inspected state consistently met the criteri
 - The configured OpenRouter browser test passed contractor creation, its navigation chip, available vault balance, a contextual follow-up and record/history persistence after reload.
 - The screenshot acceptance verifies entry, workspace creation, funding, pause/resume, contractor creation, link issuance, wallet request and owner approval, work order, invoice submission and approval, payment preparation and settlement, Activity, receipt download and revoked access.
 - The acceptance evidence uses demo records and mocked live-wallet fixtures. Live wallet signatures, network transfers and transaction provisioning were not executed.
-- Two legacy action-state tests still expect the pre-V3 sample invoice button and seeded invoice rows. The V3 browser workspace opens without sample records. A persistent-browser theme test timed out during one parallel run and passed in another run.
+- Integration acceptance replaced obsolete seeded-data fixtures with actual isolated demo records, retaining the action-state assertions. The persistent-browser theme test now waits for restored setup before toggling appearance. See the release acceptance report for final results.
 - The portal has an expired/revoked recovery state. The captured portal failure used revocation. Time-based expiration and browser-specific screen-reader behavior were not captured.

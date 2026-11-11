@@ -25,11 +25,11 @@ test('slow workspace read gives accessible feedback, recovers and retains sessio
  await page.clock.pauseAt(new Date((await page.evaluate(()=>Date.now()))+1000));await page.clock.runFor(10000);
  try {await expect(page.getByText('This process is taking longer than expected. We’re still trying.',{exact:true})).toBeVisible();expect(requests).toBe(1);}
  finally {release();}
- await expect(page.getByRole('heading',{name:/^(Your payment desk|Your payments)$/})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Overview',exact:true})).toBeVisible();
  expect(requests).toBe(1);expect(f.logout).toBe(0);expect(f.signing).toBe(0);
 });
 
-test('refresh retries keep funding form and existing data; wallet switch ignores stale result',async({page})=>{
+test('refresh retries keep funding form and existing data; wallet switch ignores stale result',async({page},info)=>{
   const f=await fixture(page);await page.goto('/');await navigateOwner(page,'Vault');
   const amount=page.getByLabel('Amount (NEAR)',{exact:true});await amount.fill('0.234');
   let calls=0;
@@ -37,12 +37,13 @@ test('refresh retries keep funding form and existing data; wallet switch ignores
     calls++;if(calls===1)return route.fulfill({status:503,json:{error:'Temporary provider timeout',retryable:true}});
     return route.fulfill({json:f.snapshot});
   });
-  await page.getByRole('button',{name:/^Refresh (finalized|confirmed) state$/}).click();
+  await page.getByRole('button',{name:'Refresh workspace',exact:true}).click();
   await expect.poll(()=>calls).toBeGreaterThanOrEqual(2);
   await expect(amount).toHaveValue('0.234');expect(f.logout).toBe(0);
+  await page.screenshot({path:info.outputPath('live-vault.png'),fullPage:true});
   let release!:()=>void;const held=new Promise<void>(resolve=>{release=resolve;});
   await page.route('**/api/live/snapshot**',async route=>{await held;await route.fulfill({json:f.snapshot}).catch(()=>{});});
-  await page.getByRole('button',{name:/^Refresh (finalized|confirmed) state$/}).click();
+  await page.getByRole('button',{name:'Refresh workspace',exact:true}).click();
   await openAccountMenu(page);await page.getByRole('button',{name:'Switch wallet',exact:true}).click();release();
   await expect(amount).toHaveCount(0);expect(f.signing).toBe(0);
 });

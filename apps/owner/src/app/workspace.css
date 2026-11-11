@@ -150,6 +150,8 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
 .topbar {
   top:12px;
   right:24px}
+.topbar > div.topbar-actions {
+  display:flex}
 .page-heading .heading-actions {
   padding-right:28px}
 .eyebrow {

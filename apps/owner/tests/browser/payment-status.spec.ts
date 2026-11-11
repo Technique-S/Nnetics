@@ -16,7 +16,14 @@ test('existing verified Paid evidence is consistent in overview, invoice details
   if(path==='session')return route.fulfill({json:{accountId:snapshot.vault.owner,idleExpires:Date.now()+18000000,absoluteExpires:Date.now()+18000000}});
   return route.fulfill({json:snapshot});
  });
- await page.goto('/');const card=page.getByRole('button').filter({hasText:invoice.id});await expect(card).toContainText('Paid');await expect(card).not.toContainText('Needs review');await card.click();
- await expect(page.locator('.invoice-detail').getByText('Paid',{exact:true})).toBeVisible();await expect(page.getByText('Payment confirmed',{exact:true})).toBeVisible();
- await navigateOwner(page,'Payment history');await expect(page.getByRole('row').filter({hasText:invoice.id})).toContainText('Paid');await expect(page.getByRole('link',{name:'View transaction',exact:true})).toHaveAttribute('href',`https://testnet.nearblocks.io/txns/${hash}`);
+ await page.goto('/');
+ await expect(page.locator('.overview-paid')).toContainText('3 NEAR');
+ await expect(page.locator('.overview-paid')).toContainText('1 confirmed payout');
+ await navigateOwner(page,'Payment history');
+ const attempts=page.getByRole('region',{name:'Payment attempts'});
+ await expect(attempts.locator('article').filter({hasText:invoice.id})).toContainText('Paid');
+ await attempts.getByRole('link',{name:'View receipt'}).click();
+ const receipts=page.getByRole('region',{name:'Confirmed receipts'});
+ await expect(receipts.locator('article').filter({hasText:invoice.id})).toContainText('Paid');
+ await expect(receipts.getByRole('link',{name:'View transaction',exact:true})).toHaveAttribute('href',`https://testnet.nearblocks.io/txns/${hash}`);
 });

@@ -1,8 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('fresh demo setup lands on Overview', async ({page}, info) => {
   await page.goto('/?mode=demo');
-  // Siohioma demo shell wraps the setup screen and the dashboard alike.
-  await expect(page.locator('.app-shell.demo-shell')).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Try the Nnetics demo',exact:true})).toBeVisible();
   await page.getByLabel('Owner name').fill('Alex');
   await page.getByRole('button',{name:'Continue'}).click();
   await page.getByLabel('Vault name').fill('Team budget');
@@ -40,7 +39,7 @@ test('fresh demo setup lands on Overview', async ({page}, info) => {
   for (const title of ['Reserved funds','Pending invoices','Active contractors','Quick actions']) {
     await expect(page.getByRole('heading',{name:title,exact:true})).toBeVisible();
   }
-  await expect(page.getByRole('button',{name:'Fund vault'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Fund the vault',exact:true})).toBeVisible();
 });
 
 test('funded demo overview (mobile viewport)', async ({page}) => {
@@ -78,5 +77,5 @@ test('dark theme demo overview after setup', async ({page}) => {
   await expect(page.getByText('Demo · simulated funds · no wallets, keys or tokens involved')).toBeVisible();
   await expect(page.locator('.payment-status-donut')).toBeVisible();
   await expect(page.locator('.payment-status-legend li')).toHaveCount(3);
-  await expect(page.getByRole('button',{name:'Fund vault'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Fund the vault',exact:true})).toBeVisible();
 });

@@ -48,6 +48,7 @@ test("organization viewers can navigate but cannot invoke owner or invoice mutat
   await page.route("**/api/live/snapshot**", (route) =>
     route.fulfill({ json: snapshot }),
   );
+  await page.route("**/api/live/contractors/owner**",route=>route.fulfill({json:{mode:"persistent",profiles:[{id:"visible",reference:"CTR-0001",name:"Visible contractor",wallet:null,linkActive:false,generation:1,walletVersion:0,pendingWallet:null}],orders:[],invoices:[]}}));
   await page.goto("/");
   await navigateOwner(page, "Vault");
   await expect(
@@ -61,26 +62,22 @@ test("organization viewers can navigate but cannot invoke owner or invoice mutat
     page.getByRole("button", { name: "Grant viewer access" }),
   ).toBeDisabled();
   await navigateOwner(page, "Overview");
-  await expect(
-    page.getByRole("button", { name: "Enter structured invoice" }),
-  ).toBeDisabled();
-  await expect(
-    page.getByRole("switch", { name: "Allow new testnet payments" }),
-  ).toBeDisabled();
+  await expect(page.getByRole("button",{name:"Review owner transaction in wallet"})).toHaveCount(0);
   await navigateOwner(page, "Vendors");
+  await expect(page.getByRole("heading",{name:"Visible contractor",exact:true})).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Manage vendor" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: "Add contractor", exact:true }),
+  ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Disable future payments" }).first(),
-  ).toBeDisabled();
+    page.getByRole("button", { name: /Archive contractor|Delete contractor/ }),
+  ).toHaveCount(0);
   await navigateOwner(page, "Invoice review");
   await expect(
-    page.getByRole("button", { name: "Mark reviewed" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: /Approve bill/ }),
+  ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Queue reviewed invoice" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: /Link reviewed invoice/ }),
+  ).toHaveCount(0);
 });
 test("controlled live adapter reads show finality and block unverified protocol-89 signing before opening wallet", async ({
   page,
@@ -131,7 +128,7 @@ test("controlled live adapter reads show finality and block unverified protocol-
   );
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Your payment desk", exact: true }),
+    page.getByRole("heading", { name: "Overview", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByLabel("Verified wallet"),

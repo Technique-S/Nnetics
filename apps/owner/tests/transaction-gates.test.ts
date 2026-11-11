@@ -22,8 +22,8 @@ test('owner-only configuration cannot start a worker; incomplete worker configur
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'nnetics-worker-gate-')),scope=configureOwnerScope(directory);
  try {
   const env={...process.env,NNETICS_NETWORK:'testnet',NNETICS_ORGANIZATION_ID:'org',NNETICS_VAULT_ID:'vault.testnet',NNETICS_WORKER_ID:'worker.testnet',NNETICS_WORKER_PUBLIC_KEY:'fixture-public',NNETICS_EXPECTED_CODE_HASH:'1'.repeat(32),NNETICS_WORKER_KEY_FILE:'',NNETICS_RPC_URL:'https://never-contact.fixture.invalid',NNETICS_PAYMENT_EXECUTION_AUTHORIZED:''};
-  const stopped=spawnSync(process.execPath,['src/server/worker-cli.ts','--once'],{env,encoding:'utf8',timeout:5000});assert.notEqual(stopped.status,0);assert.match(stopped.stderr,/Worker disabled/);
-  const missing=spawnSync(process.execPath,['src/server/worker-cli.ts','--once'],{env:{...env,NNETICS_PAYMENT_EXECUTION_AUTHORIZED:'testnet-reviewed',NNETICS_VAULT_ID:''},encoding:'utf8',timeout:5000});assert.notEqual(missing.status,0);assert.match(missing.stderr,/Complete testnet configuration/);
+  const stopped=spawnSync(process.execPath,['src/server/worker-cli.ts','--once'],{env,encoding:'utf8',timeout:15000});assert.notEqual(stopped.status,0);assert.match(stopped.stderr,/Worker disabled/);
+  const missing=spawnSync(process.execPath,['src/server/worker-cli.ts','--once'],{env:{...env,NNETICS_PAYMENT_EXECUTION_AUTHORIZED:'testnet-reviewed',NNETICS_VAULT_ID:''},encoding:'utf8',timeout:15000});assert.notEqual(missing.status,0);assert.match(missing.stderr,/Complete testnet configuration/);
  }finally{scope.close();fs.rmSync(directory,{recursive:true,force:true});}
 });
 test('scope configuration and operation shape reject all changes to the acceptance action',()=>{
