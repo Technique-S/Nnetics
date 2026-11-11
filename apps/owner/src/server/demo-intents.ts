@@ -16,9 +16,16 @@ function decimal(units:bigint, decimals:number) {
 }
 
 export class LocalDemoIntents implements DemoIntentsAdapter {
-    constructor(readonly ledger:DemoWorkspaceStore, readonly portal:ContractorRecordStore,
-        readonly now:()=>number=Date.now, readonly quoteTtl=60_000, readonly delay=1500,
-        readonly rates:Readonly<Record<string,string>>=Object.fromEntries(DEMO_ASSETS.map(a=>[a.id,a.nearPerUnit]))) {
+    readonly ledger:DemoWorkspaceStore;
+    readonly portal:ContractorRecordStore;
+    readonly now:()=>number;
+    readonly quoteTtl:number;
+    readonly delay:number;
+    readonly rates:Readonly<Record<string,string>>;
+    constructor(ledger:DemoWorkspaceStore, portal:ContractorRecordStore,
+        now:()=>number=Date.now, quoteTtl=60_000, delay=1500,
+        rates:Readonly<Record<string,string>>=Object.fromEntries(DEMO_ASSETS.map(a=>[a.id,a.nearPerUnit]))) {
+        this.ledger=ledger;this.portal=portal;this.now=now;this.quoteTtl=quoteTtl;this.delay=delay;this.rates=rates;
         if(portal.mode!=="simulation") throw Error("Demo Intents requires a simulation contractor store.");
         ledger.db.exec(`CREATE TABLE IF NOT EXISTS demo_intents(id TEXT PRIMARY KEY,workspace TEXT NOT NULL,org TEXT NOT NULL,key TEXT NOT NULL,fingerprint TEXT NOT NULL,payload TEXT NOT NULL,UNIQUE(workspace,key));
           CREATE TABLE IF NOT EXISTS demo_intent_bindings(workspace TEXT PRIMARY KEY,org TEXT NOT NULL UNIQUE);
@@ -76,7 +83,7 @@ export class LocalDemoIntents implements DemoIntentsAdapter {
     quote(token:string,owner:string,input:{billId:string;sourceAsset:string;key:string;scenario:IntentScenario}):IntentView {
         return this.write(()=>{
             const scope=this.scope(token,owner);
-            if(!input.key || input.key.length>80) throw Error("A simulation idempotency key is required.");
+            if(typeof input.key!=="string" || !input.key || input.key.length>80) throw Error("A simulation idempotency key is required.");
             const asset=DEMO_ASSETS.find(a=>a.id===input.sourceAsset);
             if(!asset) throw Error("Unsupported simulated source asset.");
             if(!["success","failure","refund"].includes(input.scenario)) throw Error("Select a deterministic simulation scenario.");

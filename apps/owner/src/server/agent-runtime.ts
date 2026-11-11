@@ -170,7 +170,7 @@ function validateToolArguments(name: AgentToolName, raw: unknown): Validation {
   const args = raw as Record<string, unknown>;
   if (name === "list_contractors" || name === "get_vault_balance" || name === "get_vault_status" ||
       name === "get_vault_available_balance" || name === "get_vault_transaction_history" ||
-      name === "list_invoices" || name === "get_organization_overview") {
+      name === "list_invoices" || name === "get_organization_overview" || name === "list_unlinked_invoices" || name === "get_simulated_payment_status") {
     const unexpected = checkKeys(args, []);
     return unexpected ? { ok: false, error: unexpected } : { ok: true, args: {} };
   }
@@ -204,6 +204,13 @@ function validateToolArguments(name: AgentToolName, raw: unknown): Validation {
     const value = stringArg(args.contractorId, "contractorId", 1, 120);
     if (!value) return { ok: false, error: "get_contractor_invoices requires a contractorId." };
     return { ok: true, args: { contractorId: value } };
+  }
+  if(name === "preview_simulated_intent") {
+    const unexpected=checkKeys(args,["id","sourceAsset"]);
+    if(unexpected)return {ok:false,error:unexpected};
+    const id=stringArg(args.id,"id",1,120),sourceAsset=stringArg(args.sourceAsset,"sourceAsset",1,40);
+    if(!id || !sourceAsset || !["near","usdc-ethereum","eth"].includes(sourceAsset))return {ok:false,error:"Exact invoice ID and supported demo source asset required."};
+    return {ok:true,args:{id,sourceAsset}};
   }
   if (name === "get_invoice") {
     const unexpected = checkKeys(args, ["id"]);
@@ -368,6 +375,9 @@ function modelPayload(name: AgentToolName, result: ToolResult<unknown>): unknown
 async function executeValidated(name: AgentToolName, args: Record<string, unknown>, executor: AgentToolExecutor): Promise<ToolResult<unknown>> {
   try {
     switch (name) {
+      case "list_unlinked_invoices": return executor.listUnlinkedInvoices ? await executor.listUnlinkedInvoices({}) : {success:false,error:"Tool unavailable."};
+      case "get_simulated_payment_status": return executor.getSimulatedPaymentStatus ? await executor.getSimulatedPaymentStatus({}) : {success:false,error:"Tool unavailable."};
+      case "preview_simulated_intent": return executor.previewSimulatedIntent ? await executor.previewSimulatedIntent({id:String(args.id),sourceAsset:String(args.sourceAsset)}) : {success:false,error:"Tool unavailable."};
       case "list_contractors":
         return await executor.listContractors({});
       case "get_contractor":
@@ -667,6 +677,9 @@ export function actionChips(executions: AgentToolExecution[]): AgentActionChip[]
       case "get_vault_transaction_history":
         chips.push({ action: { kind: "get-vault-status" }, label: "Open vault" });
         break;
+      case "list_unlinked_invoices":
+      case "preview_simulated_intent":
+      case "get_simulated_payment_status":
       case "list_invoices":
       case "get_invoice":
       case "get_contractor_invoices":

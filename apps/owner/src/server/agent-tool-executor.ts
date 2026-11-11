@@ -1,4 +1,6 @@
 // Agent Tool Executor - Implements the tool interface by connecting to existing backend services
+import {demoIntents} from "./demo-intents.ts";
+import {DEMO_ASSETS} from "../data/demo-intents.ts";
 import { contractorService } from "./contractor-service.ts";
 import type { ToolResult } from "./agent-tools.ts";
 import { identityService } from "./identity.ts";
@@ -44,6 +46,35 @@ export class AgentToolExecutor implements AgentToolExecutor {
     return token;
   }
 
+  async listUnlinkedInvoices():Promise<ToolResult<unknown>> {
+    try {
+      if(!this.demoMode)throw Error("Simulation tools are demo-only.");
+      if(!demoContractors().owner(this.demoOwnerToken()))throw Error("Valid demo owner authorization required.");
+      const invoices=demoContractors().ownerSnapshot(this.demoOwnerToken()).invoices.filter(b=>!b.orderId);
+      return {success:true,data:invoices.map(b=>({id:b.id,reference:b.reference,amount:b.amount,status:b.status,workOrder:"No work order"}))};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
+  }
+  async getSimulatedPaymentStatus():Promise<ToolResult<unknown>> {
+    try {
+      if(!this.demoMode)throw Error("Simulation tools are demo-only.");
+      const attempts=demoIntents().list(this.demoWorkspaceToken(),this.demoOwnerToken());
+      return {success:true,data:attempts.map(({intent,audit})=>({reference:intent.reference,billId:intent.billId,state:intent.state,reason:intent.reason,audit}))};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
+  }
+  async previewSimulatedIntent(args:{id:string;sourceAsset:string}):Promise<ToolResult<unknown>> {
+    try {
+      if(!this.demoMode)throw Error("Simulation tools are demo-only.");
+      const ledger=demoWorkspace().state(this.demoWorkspaceToken()),store=demoContractors(),owner=this.demoOwnerToken();
+      if(!store.owner(owner))throw Error("Valid demo owner authorization required.");
+      const snapshot=store.ownerSnapshot(owner),bill=snapshot.invoices.find(b=>b.id===args.id);
+      if(!bill)throw Error("Invoice access denied.");
+      const profile=snapshot.profiles.find(p=>p.id===bill.contractorId),asset=DEMO_ASSETS.find(a=>a.id===args.sourceAsset);
+      if(!asset)throw Error("Unsupported simulated asset.");
+      const amount=BigInt(amountFromNear(bill.amount)),fee=(amount*25n+9999n)/10000n,total=amount+fee;
+      const blockers=[...(bill.status!=="Approved"?["Owner invoice approval required"]:[]),...bill.reasons,...(!profile?.wallet?["Approved wallet required in Wallet Details"]:[]),...(profile?.archived?["Contractor archived"]:[]),...(ledger.vault.paused?["Demo vault paused"]:[]),...(BigInt(ledger.vault.available)<total?["Insufficient simulated funds"]:[]),...(ledger.vault.limit&&total>BigInt(ledger.vault.limit)?["Spending policy limit exceeded"]:[]),...(ledger.payments.some(p=>p.billId===bill.id&&["prepared","pending","confirmed"].includes(p.status))?["Existing active or completed payment"]:[])];
+      return {success:true,data:{mode:"Demo / Simulated",billId:bill.id,reference:bill.reference,workOrder:bill.orderReference||"No work order",eligible:!blockers.length,blockers,recipient:profile?.wallet||null,source:asset,destination:{chain:"NEAR",asset:"NEAR",amount:bill.amount},illustrativeFeeNear:formatNear(fee.toString()),totalNearEquivalent:formatNear(total.toString()),proposal:bill.status==="Approved"?"Review and authorize simulated payment":"Review invoice for owner approval",confirmationRequired:true,nextStep:"Open View invoices. Owner approval and structured confirmation of the saved quote are required. No state was changed by this preview."}};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Demo access denied."};}
+  }
   // Contractor Tools
   async listContractors(args: {}): Promise<ToolResult<any[]>> {
     try {
