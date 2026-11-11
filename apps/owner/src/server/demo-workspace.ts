@@ -363,7 +363,7 @@ export class DemoWorkspaceStore {
         const receipts = payments.filter(p => p.status === "confirmed").map(p => ({
             id: p.id, contractor: p.contractor, recipient: p.recipient, amount: p.amount,
             reference: p.reference, at: p.createdAt,
-            summary: `${p.contractor || p.recipient} · ${p.amount} NEAR · ${p.reference} · ${p.description} · Demo receipt: simulated funds, no live transfer.`
+            summary: `${p.contractor || p.recipient} · ${formatNear(p.amount)} NEAR · ${p.reference} · ${p.description} · Demo receipt: simulated funds, no live transfer.`
         }));
         return {
             mode: "simulation", token, initialized: !!profile,

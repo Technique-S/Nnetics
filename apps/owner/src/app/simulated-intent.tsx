@@ -29,7 +29,7 @@ export function SimulatedIntentPayment({billId,onChanged}:{billId:string;onChang
     }
     const intent=active?.intent,expired=!!intent&&intent.expiresAt<=tick;
     const retry=!intent||["FAILED","REFUNDED","EXPIRED"].includes(intent.state);
-    return <details className="reference-disclosure" open={intent?.state==="EXECUTING"}>
+    return <details className="reference-disclosure">
         <summary>Simulated NEAR Intents</summary>
         <section aria-label="Simulated NEAR Intents payment">
             <p className={s.notice}><strong>Demo / Simulated</strong> · No deposits, signatures or blockchain transactions.</p>

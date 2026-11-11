@@ -52,11 +52,11 @@ test("unlinked contractor bill → simulated intent settlement, refresh and fail
         await card.getByRole("button",{name:"Execute simulated payment",exact:true}).click();
     }
     const first=await submit("Design milestone");await quote(first.card);
-    await expect(first.card.getByText("COMPLETED",{exact:true})).toBeVisible({timeout:15_000});
+    await expect(first.card.getByRole("status").filter({hasText:"COMPLETED"})).toBeVisible({timeout:15_000});
     await expect(first.card.getByText("Paid",{exact:true})).toBeVisible();
     await page.reload();
     await first.card.getByText("Simulated NEAR Intents",{exact:true}).click();
-    await expect(first.card.getByText("COMPLETED",{exact:true})).toBeVisible();
+    await expect(first.card.getByRole("status").filter({hasText:"COMPLETED"})).toBeVisible();
     await first.card.getByText(/Payment audit history/).click();
     await expect(first.card.getByText("EXECUTING",{exact:true})).toBeVisible();
     await expect(page.locator('a[href*="nearblocks"], a[href*="explorer"]')).toHaveCount(0);
@@ -65,14 +65,14 @@ test("unlinked contractor bill → simulated intent settlement, refresh and fail
     const balance=await (await page.request.get("/api/demo/workspace/state")).json();
     expect(balance.vault.spent).toBe("1002500000000000000000000");expect(balance.vault.reserved).toBe("0");
     const second=await submit("Recovery milestone");await quote(second.card,"failure");
-    await expect(second.card.getByText("FAILED",{exact:true})).toBeVisible({timeout:15_000});
+    await expect(second.card.getByRole("status").filter({hasText:"FAILED"})).toBeVisible({timeout:15_000});
     await expect(second.card.getByText("Approved",{exact:true})).toBeVisible();
     await second.card.getByLabel("Simulation outcome").selectOption("success");
     await second.card.getByRole("button",{name:"Preview simulated quote",exact:true}).click();
     await second.card.getByRole("checkbox").check();
     await second.card.getByRole("button",{name:"Authorize simulated payment",exact:true}).click();
     await second.card.getByRole("button",{name:"Execute simulated payment",exact:true}).click();
-    await expect(second.card.getByText("COMPLETED",{exact:true})).toBeVisible({timeout:15_000});
+    await expect(second.card.getByRole("status").filter({hasText:"COMPLETED"})).toBeVisible({timeout:15_000});
     await contractor.getByRole("button",{name:"Refresh status",exact:true}).click();
     await expect(contractor.getByText("Paid",{exact:true})).toHaveCount(2);
     await context.close();

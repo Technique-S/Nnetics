@@ -9,6 +9,7 @@ import {ContractorRecordStore} from "../src/server/contractor-records.ts";
 import {LocalDemoIntents} from "../src/server/demo-intents.ts";
 import {amountFromNear} from "../src/data/owner-adapter.ts";
 import type {IntentScenario} from "../src/data/demo-intents.ts";
+import {DatabaseSync} from "node:sqlite";
 
 function fixture() {
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"nnetics-intents-"));
@@ -95,4 +96,29 @@ test("owner can associate and unlink an existing order without changing original
         f.portal.ownerCommand(f.owner,{action:"associate-order",invoiceId:bill.id,orderId:order.id});let changed=f.portal.snapshot(f.session).invoices[0];assert.equal(changed.orderId,order.id);assert.equal(changed.originalText,bill.text);assert.equal(changed.status,"Approved");
         f.portal.ownerCommand(f.owner,{action:"associate-order",invoiceId:bill.id,orderId:""});assert.equal(f.portal.snapshot(f.session).invoices[0].orderId,"");assert.equal((f.portal.db.prepare("SELECT count(*) n FROM demo_bill_history WHERE bill=?").get(bill.id) as {n:number}).n,3);
     }finally{f.close();}
+});
+
+test("existing mandatory-order databases migrate without losing original invoice payloads",()=>{
+    const directory=fs.mkdtempSync(path.join(os.tmpdir(),"nnetics-order-migration-")),file=path.join(directory,"old.db");
+    const db=new DatabaseSync(file);
+    db.exec("CREATE TABLE demo_bills(id TEXT PRIMARY KEY,org TEXT NOT NULL,profile TEXT NOT NULL,reference TEXT NOT NULL,order_id TEXT NOT NULL UNIQUE,payload TEXT NOT NULL,UNIQUE(org,profile,reference))");
+    const original=JSON.stringify({id:"bill",orderId:"",originalText:"Original request",attachment:{id:"upload"},status:"Approved"});
+    db.prepare("INSERT INTO demo_bills VALUES ('bill','org','profile','INV-1','direct-legacy',?)").run(original);db.close();
+    const store=new DemoContractorStore(file);
+    try{
+        const row=store.db.prepare("SELECT payload,order_id FROM demo_bills WHERE id='bill'").get() as {payload:string;order_id:string|null};
+        assert.equal(row.payload,original);assert.equal(row.order_id,null);
+        const column=(store.db.prepare("PRAGMA table_info(demo_bills)").all() as {name:string;notnull:number}[]).find(c=>c.name==="order_id")!;
+        assert.equal(column.notnull,0);
+        store.db.prepare("INSERT INTO demo_bills VALUES ('bill-2','org','profile','INV-2',NULL,?)").run(original);
+    }finally{store.db.close();fs.rmSync(directory,{recursive:true,force:true});}
+});
+
+test("simulation completes with all outbound network requests disabled",()=>{
+    const original=globalThis.fetch;
+    globalThis.fetch=async()=>{throw Error("Network access forbidden in simulation");};
+    const f=fixture();try{
+        f.wallet();const q=f.quote(f.bill().id);f.engine.authorize(f.token,f.owner,q.intent.id);f.engine.execute(f.token,f.owner,q.intent.id);f.advance();
+        assert.equal(f.engine.list(f.token,f.owner)[0].intent.state,"COMPLETED");
+    }finally{f.close();globalThis.fetch=original;}
 });
