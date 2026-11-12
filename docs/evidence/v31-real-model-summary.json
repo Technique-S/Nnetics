@@ -1,0 +1,73 @@
+{
+  "recordedDate": "2026-11-12",
+  "reviewedDate": "2026-11-13",
+  "source": "apps/owner/artifacts/v31-real-model-2026-11-12.json",
+  "sourceSha256": "a8b58fce0aaa25b2ef3bbb139902a944fc14894a6bd90a9bbfb83c1b549e2a7d",
+  "scope": "Historical demo real-model HTTP requests; not fresh acceptance, wallet proof was simulated.",
+  "completed": false,
+  "results": [
+    {
+      "label": "edit",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 3,
+      "toolCalls": 2
+    },
+    {
+      "label": "wallet and contextual identity",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "invitation",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "revoke invitation",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "archive",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "restore",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "pending wallet request",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "wallet decision",
+      "passed": true,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "modelCalls": 2,
+      "toolCalls": 1
+    },
+    {
+      "label": "eligible deletion",
+      "passed": false,
+      "errorCode": "rate_limit",
+      "httpStatus": 429
+    }
+  ],
+  "releaseDecision": "Available artifact does not substantiate the prior full GO report. Complete real-model acceptance is unverified."
+}

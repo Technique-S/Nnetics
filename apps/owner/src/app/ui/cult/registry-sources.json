@@ -1,0 +1,22 @@
+{
+  "retrieved": "2026-11-11",
+  "license": "LICENSE.cult-ui.md",
+  "installation": "Manual installation from inspected official registry payload; local semantic-CSS and accessibility adaptations.",
+  "scope": "Repository consolidation (2026-11-12) ships only the side-panel component; the other adapted cult components stay on their source branch (see docs/feature-reconciliation-matrix.md).",
+  "components": [
+    {
+      "name": "side-panel",
+      "url": "https://www.cult-ui.com/r/side-panel.json",
+      "upstreamPath": "registry/default/ui/side-panel.tsx",
+      "upstreamSha256": "1d5eda0e84a4d16353ca6089d65aa6c339da943698813adf34154fcc96ad5979",
+      "localFile": "side-panel.tsx",
+      "status": "ADAPTED",
+      "changes": [
+        "Retain controlled expansion callback, custom toggle rendering, measured content and Motion.",
+        "Full-width inline read-only disclosure replaces source text details; no modal or financial confirmation use.",
+        "Add named region, aria-expanded/controls, focus-safe header, Escape collapse and hidden collapsed content.",
+        "Original/clarified billing strings render unchanged; no viewport cropping or example video."
+      ]
+    }
+  ]
+}

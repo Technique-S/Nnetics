@@ -1,5 +1,11 @@
 # V3.1 real-model acceptance — 2026-11-11
 
+## Evidence reconciliation — 2026-11-13
+
+The follow-up below is a preserved prior-session report, not a fresh verification. During repository consolidation, its cited local JSON (`apps/owner/artifacts/v31-real-model-2026-11-12.json`) contained **eight passing requests and a rate-limited eligible-deletion request**, with `completed: false`. It does not substantiate the reported nine-request GO. No separate complete success artifact was located. The report and the available artifact therefore disagree; full real-model lifecycle acceptance remains **unverified for release purposes** until complete evidence is recovered or a separately authorized acceptance run succeeds. No paid model call or new financial action was made to resolve this discrepancy. Automated mocked model/confirmation coverage is reported separately in [the current audit](pre-submission-audit.md).
+
+The original follow-up is retained below for traceability.
+
 ## Follow-up — 2026-11-12
 
 The quota reset was confirmed: 15 used, 50 allowed, 35 remaining before acceptance. The unchanged configured model `nvidia/nemotron-3.5-super-vl:free` completed nine sequential agent requests covering all ten requested scenarios (wallet status and contextual identity were combined). Each request returned OpenRouter identity, at least one tool call and at least two model calls, demonstrating tool-result continuation. Total: 19 model calls and 10 tool calls. No inference retries were needed.

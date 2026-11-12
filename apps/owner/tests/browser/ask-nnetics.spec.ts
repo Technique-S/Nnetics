@@ -1,6 +1,7 @@
 import {test, expect} from "@playwright/test";
 
 test("Ask Nnetics uses its configured model to create, find and follow up on demo records", async ({page}, info) => {
+  test.skip(process.env.NNETICS_RUN_REAL_MODEL_ACCEPTANCE !== "1", "External-provider acceptance is opt-in; the default regression suite needs no model key or quota.");
   test.skip(info.project.name !== "desktop", "One configured-provider run covers model behavior.");
   test.setTimeout(180_000);
   const name = `Design Acceptance ${Date.now().toString(36)}`;

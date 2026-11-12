@@ -1,0 +1,10 @@
+/* Cult UI adaptations use the current Nnetics palette, type and motion tokens.
+   Ported for the Side Panel billing-source disclosure; provenance in
+   src/app/ui/cult/registry-sources.json. */
+.cult-side-panel,.cult-side-content { width:100%; min-width:0; }
+.cult-side-content { overflow:hidden; overflow-wrap:anywhere; }
+.cult-side-content[hidden] { display:none; }
+.cult-side-content pre { max-width:100%; white-space:pre-wrap; overflow-wrap:anywhere; }
+.cult-billing-source-toggle { display:flex; align-items:center; justify-content:space-between; gap:var(--space-md); width:100%; min-height:44px; padding-block:var(--space-sm); color:var(--text); text-align:start; }
+.cult-billing-source-toggle svg { flex:none; transition:transform var(--motion-panel) var(--motion-ease); }
+.cult-billing-source-toggle[aria-expanded=true] svg { transform:rotate(90deg); }

@@ -14,6 +14,9 @@ Nnetics' original code is licensed under [MIT](LICENSE), selected by the project
 | TypeScript | 5.9.3 | Apache-2.0 |
 | Playwright Test | 1.64.1 | Apache-2.0 |
 | Tailwind PostCSS | 4.3.3 | MIT |
+| react-use-measure | 2.1.7 | MIT |
+
+The inline original-billing-text disclosure adapts Cult UI's Side Panel. Its [upstream MIT license](apps/owner/src/app/ui/cult/LICENSE.cult-ui.md) and [source/adaptation record](apps/owner/src/app/ui/cult/registry-sources.json) ship with the component. It uses the existing Motion dependency and Nnetics design tokens.
 
 These declarations were read from the installed manifests. Full dependency/transitive notices ship in the npm packages; retain those notices when redistributing a built application. The manifests and lockfiles are the authoritative dependency inventory. Rust dependency declarations and versions are in the Cargo manifests/lockfile; retain each crate's upstream notices when redistributing binaries.
 

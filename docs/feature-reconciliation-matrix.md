@@ -79,6 +79,8 @@ Dependency finding: both branches independently adopted `motion@14.12.0` (no eng
 
 ## 3. Conflicts & integration summary for Phase 3/4
 
+**2026-11-13 consolidation update:** the Side Panel/BillingSource port is integrated with its pinned dependency, CSS, upstream license and provenance. Fresh verification and remaining limits are in [pre-submission-audit.md](pre-submission-audit.md). The earlier walkthrough below remains dated evidence. Its row 12 reference to recorded real-model GO must be read with the [evidence discrepancy](NNETICS_V31_REAL_MODEL_ACCEPTANCE.md#evidence-reconciliation--2026-11-13): the available raw artifact ends in a rate-limit failure and does not independently support full acceptance.
+
 1. **Only port from cult-ui:** `c8aa80e` Side Panel/BillingSource (near-zero conflict) — files: `ui/cult/side-panel.tsx`, fixed `ui/cult/motion.ts`, `cult-ui.css` side-panel block, `registry-sources.json`, `LICENSE.cult-ui.md`, corresponding `cult-ui.spec.ts` subset (+optional `cult-fixture.ts`), dep `react-use-measure@2.1.7`. Single edit: `demo/portal-ui.tsx` `<details>` → `BillingSource`.
 2. **Optional ports (defer, judge value before deadline):** `35939c4` tabs (medium), `b93aeb5` popover (low-medium), `6643fe6` onboarding stepper (high). None is a submission blocker.
 3. **No porting from:** demo-intents (contained), lifecycle-verify (superseded), task-dashboard (excluded experiment), cult commits `2877a4d`/`9007a4c`/`aced8ee`/`34cd12a` (superseded).

@@ -7,6 +7,7 @@ import {appearanceBootstrap} from "../data/appearance";
 import {AppearanceControl} from "./appearance-control";
 import {DemoPresentation} from "../components/demo/demo-context";
 import "./demo-magic.css";
+import "./cult-ui.css";
 import {jakarta} from "./fonts";
 export const metadata = privateMetadata("Sign in to your workspace | Nnetics", "Sign in with your supported wallet to access your organizations, review contractor invoices and manage payments within approved limits.");
 export const viewport:Viewport={themeColor:"#F6F3EC"};
