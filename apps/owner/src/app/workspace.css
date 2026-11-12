@@ -553,8 +553,8 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
 
 /* Demo entry and setup */
 .signin-screen, .demo-setup { max-width: 1320px; min-height: 100dvh; margin-inline: auto; padding: 0 var(--workspace-gutter); }
-.signin-screen { isolation: isolate; }
-.signin-screen::before {
+body { isolation: isolate; }
+body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -562,7 +562,7 @@ html[data-nav-collapsed=false] .redesigned-sidebar .nav-label {
   pointer-events: none;
   background: url("/blob-scene-haikei.svg") center / cover no-repeat;
 }
-html[data-theme="dark"] .signin-screen::before {
+html[data-theme="dark"] body::before {
   background-image: url("/blob-scene-haikei-dark.svg");
 }
 .entry-header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-lg); min-height: 80px; border-bottom: 1px solid var(--border); }
@@ -780,7 +780,7 @@ body:has(.demo-shell) { background: var(--background); }
 .demo-shell {
   display: flex;
   min-height: 100dvh;
-  background: var(--background);
+  background: transparent;
 }
 .demo-setup-shell { display: block; }
 .demo-shell .workspace-main { flex: 1; min-width: 0; }
