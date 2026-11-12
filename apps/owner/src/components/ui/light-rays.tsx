@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 
 interface LightRaysProps extends React.HTMLAttributes<HTMLDivElement> {
   ref?: React.Ref<HTMLDivElement>
+  staticMode?: boolean
   count?: number
   color?: string
   blur?: number
@@ -58,26 +59,29 @@ const Ray = ({
   delay,
   duration,
   intensity,
-}: LightRay) => {
+  staticMode,
+}: LightRay & {staticMode: boolean}) => {
   return (
     <motion.div
-      className="pointer-events-none absolute -top-[12%] left-[var(--ray-left)] h-[var(--light-rays-length)] w-[var(--ray-width)] origin-top -translate-x-1/2 rounded-full bg-linear-to-b from-[color-mix(in_srgb,var(--light-rays-color)_70%,transparent)] to-transparent opacity-0 mix-blend-screen blur-[var(--light-rays-blur)]"
+      data-light-ray="true"
+      data-static={staticMode}
+      className="pointer-events-none absolute -top-[12%] left-[var(--ray-left)] h-[var(--light-rays-length)] w-[var(--ray-width)] origin-top -translate-x-1/2 rounded-full bg-linear-to-b from-[color-mix(in_srgb,var(--light-rays-color)_70%,transparent)] to-transparent opacity-0 mix-blend-normal blur-[var(--light-rays-blur)]"
       style={
         {
           "--ray-left": `${left}%`,
           "--ray-width": `${width}px`,
         } as CSSProperties
       }
-      initial={{ rotate: rotate }}
-      animate={{
-        opacity: [0, intensity, 0],
+      initial={{ rotate, opacity: intensity * 0.4 }}
+      animate={staticMode ? {opacity: intensity * 0.4, rotate} : {
+        opacity: [intensity * 0.25, intensity * 0.8, intensity * 0.25],
         rotate: [rotate - swing, rotate + swing, rotate - swing],
       }}
-      transition={{
+      transition={staticMode ? {duration: 0} : {
         duration: duration,
         repeat: Infinity,
         ease: "easeInOut",
-        delay: delay,
+        delay: -delay,
         repeatDelay: duration * 0.1,
       }}
     />
@@ -87,6 +91,7 @@ const Ray = ({
 export function LightRays({
   className,
   style,
+  staticMode = false,
   count = 7,
   color = "var(--action)",
   blur = 36,
@@ -141,7 +146,7 @@ export function LightRays({
           }
         />
         {rays.map((ray) => (
-          <Ray key={ray.id} {...ray} />
+          <Ray key={ray.id} {...ray} staticMode={staticMode}/>
         ))}
       </div>
     </div>

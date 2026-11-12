@@ -7,7 +7,6 @@ import {MagicCard} from '../ui/magic-card';
 import {AnimatedList} from '../ui/animated-list';
 import {NumberTicker} from '../ui/number-ticker';
 import {TypingAnimation} from '../ui/typing-animation';
-import {LightRays} from '../ui/light-rays';
 import {useDemoUI} from './demo-context';
 
 export function DemoGrid(props: ComponentPropsWithoutRef<'div'> & {children: ReactNode}) {
@@ -61,20 +60,4 @@ export function DemoTyping({children, animate = true}: {children: string; animat
     <span className="demo-typing-presentation" aria-hidden="true"><TypingAnimation duration={Math.min(12, 500 / Math.max(1, children.length))}
       startOnView={false} showCursor={false} className="demo-typing-text">{children}</TypingAnimation></span>
   </span>;
-}
-
-export function DemoEntryRays() {
-  const demo = useDemoUI();
-  const reduced = useReducedMotion();
-  const [visible, setVisible] = useState(true);
-  useEffect(() => {
-    const sync = () => setVisible(document.visibilityState === 'visible');
-    document.addEventListener('visibilitychange', sync);
-    return () => document.removeEventListener('visibilitychange', sync);
-  }, []);
-  if (!demo) return null;
-  return <div className="demo-entry-rays" aria-hidden="true" data-demo-entry-rays="true">
-    <div className="demo-rays-static"/>
-    {!reduced && visible && <LightRays count={4} color="var(--action)" speed={24} blur={48} length="85vh"/>}
-  </div>;
 }

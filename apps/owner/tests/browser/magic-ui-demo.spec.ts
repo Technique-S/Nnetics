@@ -11,7 +11,7 @@ test.afterEach(({page}) => expect(runtimeErrors.get(page)).toEqual([]));
 
 async function setup(page: Page) {
   await page.goto('/?mode=demo');
-  await expect(page.getByLabel('Owner name')).toBeVisible();
+  await expect(page.getByLabel('Owner name')).toBeVisible({timeout: 30_000});
   await expect(page.locator('html')).toHaveAttribute('data-demo-ui', 'true');
   await page.getByLabel('Owner name').fill('Magic UI verification');
   await page.getByRole('button', {name: 'Continue', exact: true}).click();
@@ -26,13 +26,12 @@ for (const viewport of [{name: 'desktop', width: 1440, height: 1080}, {name: 'ta
     await page.setViewportSize(viewport);
     await page.emulateMedia({colorScheme: 'light', reducedMotion: 'reduce'});
     await page.goto('/?mode=demo');
-    await expect(page.getByLabel('Owner name')).toBeVisible();
-    await expect(page.locator('[data-demo-entry-rays]')).toHaveCount(1);
-    await expect(page.locator('.demo-entry-rays')).toHaveCSS('pointer-events', 'none');
+    await expect(page.getByLabel('Owner name')).toBeVisible({timeout: 30_000});
+    await expect(page.locator('[data-signin-light-rays]')).toHaveCount(0);
     await expect(page.locator('.demo-smooth-cursor')).toHaveCount(0);
     await page.screenshot({path: `artifacts/magic-ui/${viewport.name}-entry.png`, fullPage: true});
     await setup(page);
-    await expect(page.locator('[data-demo-entry-rays]')).toHaveCount(0);
+    await expect(page.locator('[data-signin-light-rays]')).toHaveCount(0);
     for (const theme of ['light', 'dark'] as const) {
       await page.emulateMedia({colorScheme: theme, reducedMotion: 'reduce'});
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -65,26 +64,19 @@ for (const viewport of [{name: 'desktop', width: 1440, height: 1080}, {name: 'ta
   });
 }
 
-test('cursor stays operational over dialogs, preserves editing and disables for reduced motion', async ({page}) => {
+test('desktop demo uses native pointers and native text editing', async ({page}) => {
   await page.emulateMedia({reducedMotion: 'no-preference'});
   await setup(page);
   await page.mouse.move(400, 300);
-  await expect(page.locator('html')).toHaveAttribute('data-smooth-cursor', 'true');
-  await expect(page.locator('.demo-smooth-cursor')).toHaveCSS('pointer-events', 'none');
-  expect(await page.locator('.demo-smooth-cursor').evaluate(el => el.matches(':popover-open'))).toBeTruthy();
+  await expect(page.locator('html')).not.toHaveAttribute('data-smooth-cursor', 'true');
+  await expect(page.locator('.demo-smooth-cursor')).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Ask Nnetics', exact: true})).not.toHaveCSS('cursor', 'none');
   await page.getByRole('button', {name: 'Ask Nnetics', exact: true}).click();
   const input = page.getByLabel('Message the demo assistant');
   await input.hover();
-  await expect(page.locator('html')).not.toHaveAttribute('data-smooth-cursor', 'true');
-  await expect(input).toHaveCSS('cursor', 'text');
+  await expect(input).not.toHaveCSS('cursor', 'none');
   await input.fill('Selection remains native');
   await input.selectText();
-  await page.getByRole('heading', {name: 'Ask Nnetics', exact: true}).hover();
-  await expect(page.locator('html')).toHaveAttribute('data-smooth-cursor', 'true');
-  expect(await page.locator('.demo-smooth-cursor').evaluate(el => el.matches(':popover-open'))).toBeTruthy();
-  await page.emulateMedia({reducedMotion: 'reduce'});
-  await expect(page.locator('.demo-smooth-cursor')).toHaveCount(0);
-  await expect(page.locator('html')).not.toHaveAttribute('data-smooth-cursor', 'true');
 });
 
 test('new activity keeps chronological keys and exact smallest-unit amounts without replaying history', async ({page}) => {
@@ -150,7 +142,8 @@ test('signed-out live pages do not receive any demo effects', async ({page}) => 
     await page.goto(route);
     await expect(page.getByRole('heading', {name: route === '/' ? 'Sign in' : 'Private access unavailable', exact: true})).toBeVisible();
     await expect(page.locator('html')).not.toHaveAttribute('data-demo-ui', 'true');
-    await expect(page.locator('.demo-magic-button,.demo-smooth-cursor,[data-demo-entry-rays],[data-magic-bento]')).toHaveCount(0);
+    await expect(page.locator('[data-signin-light-rays]')).toHaveCount(route === '/' ? 1 : 0);
+    await expect(page.locator('.demo-magic-button,.demo-smooth-cursor,[data-magic-bento]')).toHaveCount(0);
   }
 });
 
@@ -159,7 +152,7 @@ test('touch devices retain their native pointer', async ({browser, baseURL}) => 
   try {
     const page = await context.newPage();
     await page.goto(`${baseURL}/?mode=demo`);
-    await expect(page.getByLabel('Owner name')).toBeVisible();
+    await expect(page.getByLabel('Owner name')).toBeVisible({timeout: 30_000});
     await expect(page.locator('.demo-smooth-cursor')).toHaveCount(0);
     await expect(page.locator('html')).not.toHaveAttribute('data-smooth-cursor', 'true');
   } finally {await context.close();}

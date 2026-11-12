@@ -1,6 +1,6 @@
 "use client";
 import {DemoButton} from "../components/demo/demo-button";
-import {DemoGrid, DemoCard, DemoActivity, DemoRecordFeed, DemoCount, DemoTyping, DemoEntryRays} from "../components/demo/demo-surfaces";
+import {DemoGrid, DemoCard, DemoActivity, DemoRecordFeed, DemoCount, DemoTyping} from "../components/demo/demo-surfaces";
 
 import {BrandMark, WorkspacePreview} from "./brand-mark";
 import {ViewMetadata} from "./view-metadata";
@@ -365,7 +365,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   // profile and vault are created in one labelled walkthrough, then every tab
   // behaves like the standard dashboard on simulated funds.
   if (demoWs && !demoWs.demo()?.initialized)
-    return <div className="app-shell demo-shell demo-setup-shell"><DemoEntryRays/><ViewMetadata name="Demo setup"/><a className="skip-link" href="#workspace-content">Skip to content</a>
+    return <div className="app-shell demo-shell demo-setup-shell"><ViewMetadata name="Demo setup"/><a className="skip-link" href="#workspace-content">Skip to content</a>
       <main className="main-content demo-setup" id="workspace-content" tabIndex={-1}>
         <header className="entry-header"><a className="entry-brand-link" href="/"><BrandMark/>Nnetics</a><AppearanceControl inline/></header>
         <DemoWorkspaceSetup busy={busy.length > 0} flowError={error} onCreate={async (profileName, vaultName) => {

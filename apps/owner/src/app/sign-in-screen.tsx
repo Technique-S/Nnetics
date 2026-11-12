@@ -1,3 +1,4 @@
+import {SignInRays} from "../components/sign-in-rays";
 import {BrandMark, WorkspacePreview} from "./brand-mark";
 import {ActionButton} from "./action-button";
 import {AppearanceControl} from "./appearance-control";
@@ -33,6 +34,7 @@ export function SignInScreen({
 }: SignInScreenProps) {
   return (
     <main className="signin-screen">
+      <SignInRays/>
       <header className="entry-header">
         <a className="entry-brand-link" href="/" aria-label="Nnetics home"><BrandMark/>Nnetics</a>
         <AppearanceControl inline />
