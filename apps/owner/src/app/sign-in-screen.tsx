@@ -41,8 +41,8 @@ export function SignInScreen({
       </header>
       <div className="signin-content">
         <div className="signin-intro">
-          <p className="signin-display">Contractor payments, from first invoice to receipt.</p>
-          <p className="signin-lede">Manage contractors, review invoices and prepare payouts from one workspace.</p>
+          <p className="signin-display">Your work agreements deserve more than a DM.</p>
+          <p className="signin-lede">Manage contractors, document agreements, and make payments with verifiable onchain records. Hire with confidence. Pay with proof.</p>
           <a className="button primary signin-demo" href="/?mode=demo">Try demo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a>
           <p className="signin-demo-note">Simulated funds only. No account or wallet needed.</p>
         </div>
