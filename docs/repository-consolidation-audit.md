@@ -3,6 +3,8 @@
 Date: 2026-11-12 · Auditor: consolidation agent · Method: read-only inspection, all findings evidence-backed
 Scope: the Nnetics git repository at `C:\Users\Kazi\Documents\PayScope_Foundation\payscope` and its five sibling worktrees.
 
+Continuation: the interrupted Side Panel integration was completed on 2026-11-13. This document retains the discovery-time topology and findings; see [pre-submission-audit.md](pre-submission-audit.md) for current verification, cleanup decisions and publication status.
+
 ---
 
 ## 1. Repository identity

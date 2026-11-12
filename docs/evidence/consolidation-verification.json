@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-13",
+  "timezone": "Africa/Lagos",
+  "branch": "chore/nnetics-repository-consolidation",
+  "applicationCommit": "cf71c11",
+  "testHarnessCommit": "dfdb921",
+  "environment": {
+    "os": "Windows",
+    "node": "24.18.0",
+    "browser": "Microsoft Edge",
+    "productionBuildDirectory": ".next-hosting",
+    "temporaryDatabases": true
+  },
+  "referenceTests": {
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ownerTests": {
+    "passed": 363,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": "passed",
+  "themeCheck": "passed",
+  "productionBuild": "passed",
+  "browser": {
+    "fullRun": {
+      "passed": 261,
+      "failed": 2,
+      "skipped": 3,
+      "workerTeardownErrors": 1,
+      "exitCode": 1,
+      "elapsed": "30.3m"
+    },
+    "findings": [
+      "Unconditional external model acceptance with no provider key (HTTP 503).",
+      "45-second total budget exhausted by native browser restart lifecycle; worker teardown also timed out."
+    ],
+    "fixes": [
+      "External provider acceptance explicitly opts in; all success assertions retained.",
+      "Three-process restart test total budget is 120 seconds; individual assertion timeouts unchanged."
+    ],
+    "lastFailedRerun": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 1,
+      "exitCode": 0,
+      "elapsed": "30.5s",
+      "restartCaseSeconds": 19.3
+    },
+    "providerOptInCheck": {
+      "skipped": 4,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "distinctCasesAfterResolution": {
+      "passed": 262,
+      "externalProviderSkipped": 4,
+      "unresolvedFailures": 0
+    },
+    "note": "Combined full-run and targeted-rerun evidence; not a claim of one clean full-suite invocation."
+  },
+  "limitations": {
+    "standaloneLint": "No configured command",
+    "rustSandbox": "Unavailable on this host (no Cargo/WSL; supported sandbox platform required)",
+    "fullRealModelAcceptance": "Unverified: available historical artifact is incomplete",
+    "newWalletOrOnchainAcceptance": "Not performed",
+    "remoteCI": "Not run",
+    "publication": "Pending owner review"
+  },
+  "logHashes": {
+    "consolidation-root-tests.log": "c1e3dca88f01ad594f002488788f64df95b831f24c88e144e571021cfae67396",
+    "consolidation-owner-tests.log": "8dc14a3d4900ead5cbed750ccee81a7b031f93877111b285a995101d797e6805",
+    "consolidation-typecheck-final.log": "2b8ea7f7a6cd350afc040266aac8c99a9d10d178127c6f29b3fbffb4c29d6d16",
+    "consolidation-build.log": "67188f7048f68696e0c7e7c887f6ad016caf5cf375661cb3fd0cb39700985973",
+    "consolidation-browser.log": "1ebb9f53b1ae26e2b72e0735eb1be2e55e794399958e3a5b420b13cd45b680a1",
+    "consolidation-last-failed.log": "bc2ea0d333db8d6596c33e1b5deb092321f7e9a7dee5ea78700d6b01b53d7ccb",
+    "consolidation-provider-final.log": "787daeba3b7dfbbe711f4cf1fbe2425e847aefd6276c09c4528f3e39a00537b1"
+  }
+}

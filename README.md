@@ -35,7 +35,7 @@ No `.env.local` is needed for the sample demo. Keep demo records synthetic; thei
 | Historical contractor transfer | INV-0002: one confirmed **0.001 NEAR** payment to `babygoat.testnet`, transaction below. The existing Paid job/evidence are preserved, not recreated for the demo |
 | Historical Meteor storage call | Accepted separately under reviewed V3 for that one transaction only. V2's original mismatch/manual-review hold, both IDs and consumed authorization remain |
 | Future automatic Meteor reference-block reconciliation | **Not enabled or live-verified**. Historical V3 acceptance does not authorize future envelopes or clear the hold |
-| New owner transactions / automated payouts / new provisioning | **Disabled**. Vault remains paused; worker authorization revoked and process stopped |
+| New owner transactions / automated payouts / new provisioning | **Disabled** by release configuration. Last recorded vault state was paused and worker authorization revoked; this consolidation did not reverify chain state or start a worker |
 | Demo routes | Explicitly simulated/sample data and wallet proof. Simulated Paid/Pending/Failed examples are not evidence of real transfers |
 | Hosted service | Prepared, **not deployed**. Local video is the selected submission route; hosting is optional |
 
@@ -90,7 +90,7 @@ Use [the isolated fixture recipe](docs/DEMO_GUIDE.md#regressions) or the existin
 
 ## Hackathon provenance and submission
 
-Built for NEAR HACKATHON. The repository's first implementation commit is **29 October 2026**, within the permitted post-announcement window beginning 19 October. Dedicated development branch: [codex/nnetics-live-integration](https://github.com/Technique-S/Nnetics/tree/codex/nnetics-live-integration). [Full branch history](https://github.com/Technique-S/Nnetics/commits/codex/nnetics-live-integration/) includes the initial core; subsequent changes are visible in its [development comparison](https://github.com/Technique-S/Nnetics/compare/9206f079ca69b0c8893f5d777f7d3b474b6fda21...codex/nnetics-live-integration). The first commit is part of the entry, not an excluded baseline. Final submission revision remains to be reviewed/committed/pushed; no new tag or release is claimed.
+Built for NEAR HACKATHON. The repository's first implementation commit is **29 October 2026**, within the permitted post-announcement window beginning 19 October. Earlier published development branch: [codex/nnetics-live-integration](https://github.com/Technique-S/Nnetics/tree/codex/nnetics-live-integration). Its [branch history](https://github.com/Technique-S/Nnetics/commits/codex/nnetics-live-integration/) includes the initial core; subsequent published changes are visible in its [development comparison](https://github.com/Technique-S/Nnetics/compare/9206f079ca69b0c8893f5d777f7d3b474b6fda21...codex/nnetics-live-integration). The first commit is part of the entry, not an excluded baseline. Consolidation commits remain local and await release review/publication; no new tag or release is claimed.
 
 AI assistance: OpenAI Codex and OpenCode. Direct libraries include Next/React, near-api-js 7.4.0, Wallet Selector 10.1.4, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests also use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are in the manifests/lockfiles. [Third-party notices](THIRD_PARTY_NOTICES.md) disclose adapted UI and the isolated Stageshow design illustration. Original code: [MIT](LICENSE), selected by the project owner.
 

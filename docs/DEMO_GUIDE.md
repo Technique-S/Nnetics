@@ -79,7 +79,7 @@ npm run test:browser
 
 Playwright starts and stops the production server. Windows uses installed Edge; Linux uses Chromium (`npx playwright install --with-deps chromium`). The clean-checkout [CI workflow](../.github/workflows/owner-integration.yml) provides the Linux equivalent. If you intentionally built into `.next-hosting`, set `NNETICS_BUILD_DIRECTORY=.next-hosting` for typecheck, build and browser run consistently. Never reuse private databases. Both demo database overrides are required for isolation.
 
-`ask-nnetics.spec.ts` is a separate real-provider acceptance test. The default suite skips it unless `NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1` is explicitly set. A separately approved run also needs a configured server-side provider key and available quota; its assertions still require real successful responses. Controlled-provider agent/lifecycle tests run without this opt-in. No complete real-provider pass is claimed by the default suite.
+`ask-nnetics.spec.ts` and the configured-provider case in `demo-intents-integration.spec.ts` are separate real-provider acceptance tests. The default suite skips them unless `NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1` is explicitly set. A separately approved run also needs a configured server-side provider key and available quota; assertions still require real successful responses. Controlled-provider agent/lifecycle tests run without this opt-in. No complete real-provider pass is claimed by the default suite.
 
 Rust/sandbox checks require the supported Linux/macOS runtime: `bash scripts/check-core.sh` and `bash scripts/check-provisioning.sh`. They use local sandbox accounts. Do not substitute a public-network sandbox binary or initiate new testnet transfers.
 
