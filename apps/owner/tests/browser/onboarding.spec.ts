@@ -495,6 +495,9 @@ test('an unreadable RPC-service response retains records and can recover without
 });
 
 test('persistent HttpOnly session survives a browser process restart and logout survives the next restart',async({},testInfo)=>{
+ test.setTimeout(120_000);
+ // Three real browser launches/closes need a process-level budget; keep each
+ // session, HttpOnly-cookie and logout assertion at its normal expectation timeout.
  // Both desktop and emulated mobile persistent contexts are supported here.
  const address=String(testInfo.project.use.baseURL);
  const profile=await mkdtemp(join(tmpdir(),'nnetics-session-test-'));let context:Awaited<ReturnType<typeof chromium.launchPersistentContext>>|undefined;

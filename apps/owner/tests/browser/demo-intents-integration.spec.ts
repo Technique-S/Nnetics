@@ -108,6 +108,7 @@ test("main Demo Mode integrates unlinked billing, intent payment, balances, hist
 });
 
 test("existing Ask Nnetics interface previews an integrated demo invoice through its configured provider",async({page},info)=>{
+    test.skip(process.env.NNETICS_RUN_REAL_MODEL_ACCEPTANCE!=="1","External-provider acceptance requires explicit opt-in; controlled-provider regressions run without credentials.");
     test.skip(info.project.name!=="desktop","One configured-provider check covers the model path.");
     test.setTimeout(150_000);
     const status=await (await page.request.get("/api/agent")).json();
