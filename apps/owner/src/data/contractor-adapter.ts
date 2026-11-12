@@ -46,6 +46,9 @@ export interface ContractorOrder {
     title: string;
     amount: string;
     recipient: string;
+    status?: "active" | "cancelled";
+    updatedAt?: string;
+    cancelledAt?: string | null;
 }
 export interface BillFields {
     reference?: string; // Read-only reference assigned by server; legacy source labels are ignored.
@@ -128,6 +131,14 @@ export type OwnerPortalCommand = {action:"propose-amendment";invoiceId:string;am
     reference: string;
     title: string;
     amount: string;
+} | {
+    action: "update-order";
+    orderId: string;
+    title?: string;
+    amount?: string;
+} | {
+    action: "cancel-order";
+    orderId: string;
 } | {
     action: "update-contractor";
     profileId: string;

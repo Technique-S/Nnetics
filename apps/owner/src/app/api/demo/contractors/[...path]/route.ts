@@ -136,6 +136,21 @@ export async function POST(req: NextRequest, context: Context) {
                 const invitation=operation.kind === "replace-portal" ? issueAgentInvitation(owner,profile.id) : (store.ownerCommand(owner,{action:"revoke-link",profileId:profile.id}),null);
                 return json({state:"completed",invitation,operation:{kind:operation.kind,contractorName:profile.name}});
             }
+            if (operation.kind === "update-work-order" || operation.kind === "cancel-work-order") {
+                const d=operation.details ?? {}, orderId=String(d.orderId ?? "");
+                const order=snapshot.orders.find(o=>o.id===orderId && o.contractorId===profile.id);
+                if(!order || (order.status??"active")==="cancelled" || snapshot.invoices.some(b=>b.orderId===orderId)) throw Error("Work order changed or is no longer eligible. Prepare a fresh action.");
+                const command=operation.kind === "cancel-work-order" ? {action:"cancel-order",orderId} : {action:"update-order",orderId,...(d.title ? {title:String(d.title)} : {}),...(d.amount ? {amount:String(d.amount)} : {})};
+                store.ownerCommand(owner,command as OwnerPortalCommand);
+                return json({state:"completed",operation:{kind:operation.kind,contractorName:profile.name,orderId}});
+            }
+            if (operation.kind === "review-invoice") {
+                const d=operation.details ?? {}, bill=snapshot.invoices.find(b=>b.id===String(d.invoiceId ?? "") && b.contractorId===profile.id);
+                if(!bill || bill.status!==d.status || bill.amount!==d.amount || bill.asset!==d.asset || (bill.orderId||null)!==(d.orderId||null)) throw Error("Invoice changed. Prepare a fresh review.");
+                const decision=String(d.decision); if(!["approve","reject","clarify"].includes(decision)) throw Error("Invalid review decision.");
+                store.ownerCommand(owner,{action:"review-invoice",invoiceId:bill.id,decision:decision as "approve"|"reject"|"clarify",note:String(d.note??"")} as OwnerPortalCommand);
+                return json({state:"completed",operation:{kind:operation.kind,contractorName:profile.name,invoiceId:bill.id},invoice:store.ownerSnapshot(owner).invoices.find(b=>b.id===bill.id)});
+            }
             const result = store.ownerCommand(owner, { action: `${operation.kind}-contractor`, profileId: operation.contractorId } as OwnerPortalCommand);
             return json({ operation: { kind: operation.kind, contractorId: operation.contractorId, contractorName: operation.contractorName }, result, state: store.ownerSnapshot(owner) });
         }

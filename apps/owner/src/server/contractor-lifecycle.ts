@@ -8,7 +8,7 @@
 // operation. A model can never turn its own output into consent.
 import crypto from "node:crypto";
 
-export type LifecycleKind = "archive" | "restore" | "delete" | "revoke-portal" | "replace-portal" | "wallet-decision";
+export type LifecycleKind = "archive" | "restore" | "delete" | "revoke-portal" | "replace-portal" | "wallet-decision" | "update-work-order" | "cancel-work-order" | "review-invoice";
 
 export interface LifecycleEligibility {
     eligible: boolean;
@@ -61,6 +61,9 @@ export const LIFECYCLE_CONSEQUENCE: Record<LifecycleKind, string> = {
     archive: "The contractor leaves the active list, portal access is revoked and an audit record is kept. Invoices and payment history are preserved.",
     restore: "The contractor returns to the active list. No financial record changes.",
     delete: "The contractor profile is permanently removed, portal access is revoked and an audit record is kept. This cannot be undone.",
+    "update-work-order": "Update the exact displayed work order only if it still has no linked invoices. This does not create or execute a payment.",
+    "cancel-work-order": "Cancel the exact displayed work order only if it still has no linked invoices. This does not create or execute a payment.",
+    "review-invoice": "Apply the exact displayed invoice review decision. Approval is an off-chain review only; it does not prepare or execute payment.",
 };
 
 /**

@@ -33,7 +33,9 @@ export type AgentToolName =
   | "get_vault_transaction_history"
   | "list_invoices"
   | "get_invoice"
-  | "get_organization_overview";
+  | "get_organization_overview"
+  | "create_work_order" | "list_work_orders" | "get_work_order" | "update_work_order" | "cancel_work_order"
+  | "review_invoice" | "get_invoice_payment_readiness";
 
 export interface AgentToolDefinition {
   name: AgentToolName;
@@ -48,6 +50,13 @@ const noArgs = { type: "object", properties: {}, additionalProperties: false } a
 
 const definitions: AgentToolDefinition[] = [
   ...contractorTools,
+  {name:"create_work_order",risk:"write",confirmationRequired:false,modes:["demo"],description:"Create a persisted demo work order for a contractor with an approved wallet. This never executes payment.",inputSchema:{type:"object",properties:{contractorId:{type:"string"},reference:{type:"string"},title:{type:"string"},amount:{type:"string"}},required:["contractorId","reference","title","amount"],additionalProperties:false}},
+  {name:"list_work_orders",risk:"read",confirmationRequired:false,modes:["demo"],description:"List authorized work orders; optionally filter by contractor ID or active/cancelled status.",inputSchema:{type:"object",properties:{contractorId:{type:"string"},status:{type:"string",enum:["active","cancelled"]}},additionalProperties:false}},
+  {name:"get_work_order",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read one authorized work order by its exact ID.",inputSchema:{type:"object",properties:{id:{type:"string"}},required:["id"],additionalProperties:false}},
+  {name:"update_work_order",risk:"write",confirmationRequired:true,modes:["demo"],description:"Prepare a consequential update to an unlinked active work order. The owner must confirm in the dashboard; this never executes payment.",inputSchema:{type:"object",properties:{id:{type:"string"},title:{type:"string"},amount:{type:"string"}},required:["id"],additionalProperties:false}},
+  {name:"cancel_work_order",risk:"write",confirmationRequired:true,modes:["demo"],description:"Prepare cancellation of an unlinked active work order. The owner must confirm in the dashboard; this never executes payment.",inputSchema:{type:"object",properties:{id:{type:"string"}},required:["id"],additionalProperties:false}},
+  {name:"review_invoice",risk:"write",confirmationRequired:true,modes:["demo"],description:"Review one submitted invoice and prepare approve, reject, or clarification. Results include deterministic discrepancies. Owner confirmation is always required and approval never executes payment.",inputSchema:{type:"object",properties:{id:{type:"string"},decision:{type:"string",enum:["approve","reject","clarify"]},note:{type:"string"}},required:["id","decision"],additionalProperties:false}},
+  {name:"get_invoice_payment_readiness",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read-only readiness for a single invoice: approval, wallet, vault, and active-payment blockers. It never creates or executes payment.",inputSchema:{type:"object",properties:{id:{type:"string"}},required:["id"],additionalProperties:false}},
   {name:"list_payables",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read the authorized unified Payables list. Use for awaiting approval, ready to pay, processing, paid, failed or overdue questions. A failed attempt does not revoke invoice approval. Return only recorded approvers, amounts and dates; overdue is unknown when no due date exists. This tool cannot approve or pay.",inputSchema:{type:"object",properties:{status:{type:"string",enum:["All","Awaiting Approval","Ready to Pay","Processing","Paid","Rejected / Failed"]},query:{type:"string"},overdue:{type:"boolean"}},additionalProperties:false}},
   {name:"get_payable",risk:"read",confirmationRequired:false,modes:["demo"],description:"Read one payable by exact invoice ID or invoice number: original purpose/text, requested amount, approved amount, recorded approver and time, approved wallet, remaining payable, payment status, due-date availability and blocking reasons. Unknown provenance must remain unknown. Open View payables for review and payment; never execute payment through this tool.",inputSchema:{type:"object",properties:{id:{type:"string"}},required:["id"],additionalProperties:false}},
   {name:"list_unlinked_invoices",risk:"read",confirmationRequired:false,modes:["demo"],inputSchema:noArgs,description:"Lists demo bills without a work order, including unpaid bills. Work orders are optional; the owner can review these bills directly."},
@@ -244,7 +253,7 @@ export function findAgentTool(name: string, mode: AgentMode): AgentToolDefinitio
 
 export const UNSUPPORTED_OPERATIONS = [
   "Directly changing contractor payout wallets, roles or financial fields. Wallet changes must use the contractor request and confirmed owner decision workflow.",
-  "Creating work orders, reviewing invoices, preparing payment drafts or executing payments. These are done in the dashboard.",
+  "Creating invoices, preparing payment drafts or executing payments. Contractors create invoices through their authenticated portal; every payment action stays in the dashboard.",
   "Real blockchain, wallet, or live payment operations. Every tool in this build is demo-only and uses simulated funds.",
 ] as const;
 

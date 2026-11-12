@@ -225,7 +225,7 @@ function lifecycleChips(executions: AgentToolExecution[], scope: string | undefi
   const chips: AgentActionChip[] = [];
   for (const execution of executions) {
     if (!execution.result.success) continue;
-    if (!["archive_contractor", "restore_contractor", "delete_contractor", "prepare_delete_contractor", "create_contractor_portal_invitation", "revoke_contractor_portal_invitation", "prepare_wallet_change_decision"].includes(execution.name)) continue;
+    if (!["archive_contractor", "restore_contractor", "delete_contractor", "prepare_delete_contractor", "create_contractor_portal_invitation", "revoke_contractor_portal_invitation", "prepare_wallet_change_decision", "update_work_order", "cancel_work_order", "review_invoice"].includes(execution.name)) continue;
     const data = execution.result.data && typeof execution.result.data === "object" && !Array.isArray(execution.result.data)
       ? execution.result.data as Record<string, unknown>
       : {};
@@ -235,7 +235,7 @@ function lifecycleChips(executions: AgentToolExecution[], scope: string | undefi
     if (!secret) continue;
     const kind = typeof data.kind === "string" ? data.kind : "archive";
     const contractorName = typeof data.contractorName === "string" ? data.contractorName : "this contractor";
-    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : kind === "archive" ? "Archive" : kind === "replace-portal" ? "Replace portal invitation for" : kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision === "approve" ? "Approve" : "Reject"} wallet change for` : "Revoke portal access for";
+    const verb = kind === "delete" ? "Delete" : kind === "restore" ? "Restore" : kind === "archive" ? "Archive" : kind === "update-work-order" ? "Update work order for" : kind === "cancel-work-order" ? "Cancel work order for" : kind === "review-invoice" ? `${(data.details as Record<string,unknown>)?.decision === "approve" ? "Approve" : (data.details as Record<string,unknown>)?.decision === "reject" ? "Reject" : "Request clarification from"}` : kind === "replace-portal" ? "Replace portal invitation for" : kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision === "approve" ? "Approve" : "Reject"} wallet change for` : "Revoke portal access for";
     chips.push({
       action: { kind: "confirm-contractor-lifecycle", operationId, secret, contractorId:data.contractorId, contractorName, actionKind:kind === "wallet-decision" ? `${(data.details as Record<string,unknown>)?.decision ?? "review"}-wallet-change` : kind, consequence:data.consequence, expiresAt:data.expiresAt, details:data.details },
       label: `${verb} ${contractorName} — confirm`,

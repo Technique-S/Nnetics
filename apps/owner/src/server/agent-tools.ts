@@ -119,6 +119,13 @@ export interface AgentToolExecutor {
   listUnlinkedInvoices?(args:{}):Promise<ToolResult<unknown>>;
   getSimulatedPaymentStatus?(args:{}):Promise<ToolResult<unknown>>;
   previewSimulatedIntent?(args:{id:string;sourceAsset:string}):Promise<ToolResult<unknown>>;
+  createWorkOrder?(args:{contractorId:string;reference:string;title:string;amount:string}):Promise<ToolResult<unknown>>;
+  listWorkOrders?(args:{contractorId?:string;status?:string}):Promise<ToolResult<unknown>>;
+  getWorkOrder?(args:{id:string}):Promise<ToolResult<unknown>>;
+  updateWorkOrder?(args:{id:string;title?:string;amount?:string}):Promise<ToolResult<unknown>>;
+  cancelWorkOrder?(args:{id:string}):Promise<ToolResult<unknown>>;
+  reviewInvoice?(args:{id:string;decision:string;note?:string}):Promise<ToolResult<unknown>>;
+  getInvoicePaymentReadiness?(args:{id:string}):Promise<ToolResult<unknown>>;
   // Contractor Tools
   listContractors(args: {}): Promise<ToolResult<ContractorProfile[]>>;
   getContractor(args: { id?: string; name?: string }): Promise<ToolResult<ContractorProfile | null>>;

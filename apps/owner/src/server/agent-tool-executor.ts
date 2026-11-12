@@ -487,6 +487,31 @@ export class AgentToolExecutor implements AgentToolExecutor {
     }
   }
 
+  async listWorkOrders(args:{contractorId?:string;status?:string}):Promise<ToolResult<any>> {
+    try { const snapshot=demoContractors().ownerSnapshot(this.demoOwnerToken()); const names=new Map([...snapshot.profiles,...(snapshot.archivedProfiles??[])].map(p=>[p.id,p.name]));
+      const orders=snapshot.orders.filter(o=>(!args.contractorId||o.contractorId===args.contractorId)&&(!args.status||(o.status??"active")===args.status)).map(o=>({...o,status:o.status??"active",contractorName:names.get(o.contractorId)??null,linkedInvoiceCount:snapshot.invoices.filter(b=>b.orderId===o.id).length}));
+      return {success:true,data:{count:orders.length,workOrders:orders}};
+    } catch(e){return {success:false,error:e instanceof Error?e.message:"Work order access denied."};}
+  }
+  async getWorkOrder(args:{id:string}):Promise<ToolResult<any>> { const r=await this.listWorkOrders({}); if(!r.success)return r; const item=(r.data as any).workOrders.find((o:any)=>o.id===args.id); return {success:true,data:item??null}; }
+  async createWorkOrder(args:{contractorId:string;reference:string;title:string;amount:string}):Promise<ToolResult<any>> {
+    try { const store=demoContractors(),owner=this.demoOwnerToken(); store.ownerCommand(owner,{action:"create-order",profileId:args.contractorId,reference:args.reference,title:args.title,amount:args.amount} as OwnerPortalCommand); const order=store.ownerSnapshot(owner).orders.find(o=>o.reference===args.reference&&o.contractorId===args.contractorId); return {success:true,data:order??null}; } catch(e){return {success:false,error:e instanceof Error?e.message:"Work order was not created."};}
+  }
+  private prepareFinancial(kind:"update-work-order"|"cancel-work-order"|"review-invoice",id:string,details:Record<string,string|number|null>):ToolResult<any> {
+    try { const store=demoContractors(),owner=this.demoOwnerToken(),org=store.owner(owner); if(!org) throw Error("Demo owner session required."); const snapshot=store.ownerSnapshot(owner);
+      const order=kind.includes("work-order")?snapshot.orders.find(o=>o.id===id):undefined; const bill=kind==="review-invoice"?snapshot.invoices.find(b=>b.id===id):undefined;
+      const contractorId=order?.contractorId??bill?.contractorId; const profile=[...snapshot.profiles,...(snapshot.archivedProfiles??[])].find(p=>p.id===contractorId); if(!profile) throw Error(kind==="review-invoice"?"Invoice access denied.":"Work order access denied.");
+      if(order&&((order.status??"active")==="cancelled"||snapshot.invoices.some(b=>b.orderId===order.id))) throw Error("This work order is no longer eligible: linked invoices or cancellation prevent the change.");
+      if(order) details={...details,orderId:order.id};
+      if(bill){ const decision=String(details.decision); if(!["approve","reject","clarify"].includes(decision)) throw Error("Invalid review decision."); if(!["Submitted","Under review","In review","Needs clarification"].includes(bill.status)) throw Error("Invoice review is already complete."); const discrepancies=[...bill.reasons,...(bill.orderId&&snapshot.orders.find(o=>o.id===bill.orderId)?.amount!==bill.amount?["Invoice amount differs from linked work order."]:[])]; if(decision==="approve"&&discrepancies.length) throw Error(`Approval blocked: ${discrepancies.join(" ")}`); if((decision==="reject"||decision==="clarify")&&!String(details.note??"").trim()) throw Error("A review note is required for rejection or clarification."); details={...details,invoiceId:bill.id,status:bill.status,amount:bill.amount,asset:bill.asset,orderId:bill.orderId||null,discrepancies:discrepancies.join(" | ")}; }
+      const op=prepareLifecycle({scope:lifecycleScope(owner),kind,contractorId:profile.id,contractorName:profile.name,eligibility:{eligible:true,reason:"Eligible; the current record will be revalidated at confirmation.",linked:{bills:0,orders:0,uploads:0,activeLinks:0}},details}); return {success:true,data:lifecycleSummary(op)};
+    }catch(e){return {success:false,error:e instanceof Error?e.message:"Unable to prepare action."};}
+  }
+  async updateWorkOrder(args:{id:string;title?:string;amount?:string}):Promise<ToolResult<any>> { if(args.title===undefined&&args.amount===undefined)return {success:false as const,error:"Specify a work-order field to update."}; return this.prepareFinancial("update-work-order",args.id,{title:args.title??null,amount:args.amount??null}); }
+  async cancelWorkOrder(args:{id:string}):Promise<ToolResult<any>> { return this.prepareFinancial("cancel-work-order",args.id,{}); }
+  async reviewInvoice(args:{id:string;decision:string;note?:string}):Promise<ToolResult<any>> { return this.prepareFinancial("review-invoice",args.id,{decision:args.decision,note:args.note??""}); }
+  async getInvoicePaymentReadiness(args:{id:string}):Promise<ToolResult<any>> { const r=await this.previewSimulatedIntent({id:args.id,sourceAsset:"near"}); if(!r.success)return r; const d=r.data as any; return {success:true,data:{invoiceId:d.billId,reference:d.reference,eligible:d.eligible,blockers:d.blockers,recipient:d.recipient,approvalRequired:d.invoice?.status!=="Approved",paymentExecution:"not available through Ask Nnetics"}}; }
+
   async getPendingInvoices(args: {}): Promise<ToolResult<any[]>> {
     try {
       return { success: true, data: [] };

@@ -303,6 +303,20 @@ export class ContractorRecordStore {
             this.db.prepare("UPDATE demo_bills SET payload=? WHERE id=? AND org=?").run(JSON.stringify(bill), bill.id, org);
             return {};
         }
+        if ((input.action === "update-order" || input.action === "cancel-order")) {
+            const order = this.rows<ContractorOrder>("demo_orders", org).find(o => o.id === input.orderId);
+            if (!order) throw Error("Work order access denied.");
+            if (order.status === "cancelled") throw Error("This work order is already cancelled.");
+            if (this.rows<ContractorBill>("demo_bills", org).some(b => b.orderId === order.id)) throw Error("A work order linked to an invoice cannot be changed or cancelled.");
+            if (input.action === "update-order") {
+                if (input.title === undefined && input.amount === undefined) throw Error("Specify a work-order field to update.");
+                if (input.title !== undefined) order.title = text(input.title, 240, "work description");
+                if (input.amount !== undefined) order.amount = formatNear(amountFromNear(input.amount));
+            } else { order.status = "cancelled"; order.cancelledAt = new Date().toISOString(); }
+            order.updatedAt = new Date().toISOString();
+            this.db.prepare("UPDATE demo_orders SET payload=? WHERE id=? AND org=?").run(JSON.stringify(order), order.id, org);
+            return {};
+        }
         if (!("profileId" in input))
             throw Error("Unsupported demo action.");
         const p = this.profile(input.profileId, org);
@@ -394,7 +408,7 @@ export class ContractorRecordStore {
         if (input.action === "create-order") {
             if (!p.wallet)
                 throw Error("Approve the contractor's initial wallet first.");
-            const o: ContractorOrder = { id: id(), reference: text(input.reference, 80, "work order reference"), title: text(input.title, 240, "work description"), contractorId: p.id, recipient: p.wallet, amount: formatNear(amountFromNear(input.amount)) };
+            const o: ContractorOrder = { id: id(), reference: text(input.reference, 80, "work order reference"), title: text(input.title, 240, "work description"), contractorId: p.id, recipient: p.wallet, amount: formatNear(amountFromNear(input.amount)), status:"active", updatedAt:new Date().toISOString(), cancelledAt:null };
             this.db.prepare("INSERT INTO demo_orders VALUES (?,?,?,?,?)").run(o.id, org, p.id, o.reference, JSON.stringify(o));
             return {};
         }

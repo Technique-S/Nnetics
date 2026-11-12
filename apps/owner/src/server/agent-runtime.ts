@@ -329,6 +329,12 @@ function modelPayload(name: AgentToolName, result: ToolResult<unknown>): unknown
         note: "The operation is prepared but not applied. The owner must confirm it in the dashboard. Never report it as done.",
       };
     }
+    case "update_work_order":
+    case "cancel_work_order":
+    case "review_invoice": {
+      const item = data && typeof data === "object" && !Array.isArray(data) ? data as Record<string, unknown> : {};
+      return {success:true,prepared:true,operationId:item.operationId ?? null,kind:item.kind ?? null,contractorName:item.contractorName ?? null,eligible:item.eligible === true,reason:item.reason ?? null,consequence:item.consequence ?? null,note:"The action is prepared but not applied. The owner must confirm it in the dashboard."};
+    }
     case "get_vault_balance": {
       return {
         success: true,
@@ -437,6 +443,13 @@ async function executeValidated(name: AgentToolName, args: Record<string, unknow
         return await executor.getInvoice({ id: String(args.id) });
       case "get_organization_overview":
         return await executor.getOrganizationOverview({});
+      case "create_work_order": return executor.createWorkOrder ? await executor.createWorkOrder({contractorId:String(args.contractorId),reference:String(args.reference),title:String(args.title),amount:String(args.amount)}) : {success:false,error:"Tool unavailable."};
+      case "list_work_orders": return executor.listWorkOrders ? await executor.listWorkOrders({contractorId:typeof args.contractorId==="string"?args.contractorId:undefined,status:typeof args.status==="string"?args.status:undefined}) : {success:false,error:"Tool unavailable."};
+      case "get_work_order": return executor.getWorkOrder ? await executor.getWorkOrder({id:String(args.id)}) : {success:false,error:"Tool unavailable."};
+      case "update_work_order": return executor.updateWorkOrder ? await executor.updateWorkOrder({id:String(args.id),title:typeof args.title==="string"?args.title:undefined,amount:typeof args.amount==="string"?args.amount:undefined}) : {success:false,error:"Tool unavailable."};
+      case "cancel_work_order": return executor.cancelWorkOrder ? await executor.cancelWorkOrder({id:String(args.id)}) : {success:false,error:"Tool unavailable."};
+      case "review_invoice": return executor.reviewInvoice ? await executor.reviewInvoice({id:String(args.id),decision:String(args.decision),note:typeof args.note==="string"?args.note:undefined}) : {success:false,error:"Tool unavailable."};
+      case "get_invoice_payment_readiness": return executor.getInvoicePaymentReadiness ? await executor.getInvoicePaymentReadiness({id:String(args.id)}) : {success:false,error:"Tool unavailable."};
       default:
         return { success: false, error: "Unknown application tool.", code: "unknown_tool" };
     }
