@@ -1,5 +1,19 @@
 # V3.1 real-model acceptance — 2026-11-11
 
+## Follow-up — 2026-11-12
+
+The quota reset was confirmed: 15 used, 50 allowed, 35 remaining before acceptance. The unchanged configured model `nvidia/nemotron-3.5-super-vl:free` completed nine sequential agent requests covering all ten requested scenarios (wallet status and contextual identity were combined). Each request returned OpenRouter identity, at least one tool call and at least two model calls, demonstrating tool-result continuation. Total: 19 model calls and 10 tool calls. No inference retries were needed.
+
+Passed: profile rename; actual wallet-status read; contextual follow-up resolving the renamed contractor; first invitation creation and authenticated private reveal; portal revocation preparation plus confirmed execution; archival preparation plus confirmed execution; restoration preparation plus confirmed execution; pending wallet-request retrieval; exact wallet approval preparation plus confirmed execution; eligible deletion preparation plus confirmed execution.
+
+Sensitive actions used the server-issued confirmation-card payload and its separate authenticated confirmation endpoint, under the user's explicit authorization for this acceptance run. Confirmation HTTP responses succeeded. These were HTTP integration checks of the card payload and execution, not a new browser click/render run. Prior browser rendering coverage remains the earlier local evidence.
+
+A subsequent read-only SQLite inspection independently verified the original persisted contractor ID, updated name, active restored status, approved `acceptance-marcus.testnet` wallet, cleared pending request, retained approved decision, removal of the eligible deletion profile, and audit events for update, issuance, revocation, archival, restoration and wallet approval. Wallet proof was simulated; no blockchain transaction occurred.
+
+Evidence: `apps/owner/artifacts/v31-real-model-2026-11-12.json`; reproducible HTTP harness: `apps/owner/scripts/v31-real-acceptance.mjs`. Application code, model and origin settings were unchanged. No code-triggered regression rerun was required; previous regression/build results are not represented as fresh results.
+
+Updated decision: **GO for the requested demo real-model lifecycle HTTP acceptance.** No requested scenario failed or remains unverified at that layer. Free-tier daily availability remains an operational constraint. This does not certify concurrent Payables changes or constitute a new full browser/release regression run. The historical NO-GO diagnosis below is superseded by this follow-up.
+
 Checkpoint verified: `4effc2cb22af31ae44d93cb4eef0595645eb40b6`.
 
 Decision: **NO-GO for full real-model acceptance. Locally verified; real-model acceptance pending.**
