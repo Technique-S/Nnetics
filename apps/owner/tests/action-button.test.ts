@@ -1,18 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {readFile} from "node:fs/promises";
 import {createElement} from "react";
 import {renderToStaticMarkup} from "react-dom/server";
-import {transpileModule, ModuleKind, JsxEmit} from "typescript";
+import {compiledTsx} from './fixtures/load-tsx.ts';
 
 // Node's native TS runner does not parse TSX. Compile this presentation component
 // with the repository's existing compiler; no test dependency or request is added.
-const source = await readFile(new URL("../src/app/action-button.tsx", import.meta.url), "utf8");
-const compiled = transpileModule(source, {
-  compilerOptions: {module: ModuleKind.ESNext, jsx: JsxEmit.ReactJSX},
-}).outputText.replace(/from ["'](react(?:\/jsx-runtime)?)["']/g,
-  (_, name: string) => `from ${JSON.stringify(import.meta.resolve(name))}`);
-const {ActionButton} = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
+const {ActionButton} = await import(await compiledTsx(new URL('../src/app/action-button.tsx', import.meta.url)));
 const render = (props: Record<string, unknown> = {}) =>
   renderToStaticMarkup(createElement(ActionButton, {children: "Request payment", ...props}));
 

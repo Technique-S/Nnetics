@@ -42,6 +42,9 @@ test("owner invite → contractor upload and clarification → owner review, wal
     await expect(page.getByText("WO-ARTICLE · One article")).toBeVisible();
     await contractor.bringToFront();
     await contractor.getByRole("button", { name: "Send a bill", exact: true }).click();
+    // The owner created this agreement in a different browser context. Wait for
+    // the portal's existing focus/poll refresh before formatting its reference.
+    await expect(contractor.getByLabel("Work order (optional)", {exact: true})).toContainText("WO-ARTICLE");
     await expect(contractor.getByLabel("Invoice denomination",{exact:true})).toHaveValue("NEAR");
     await contractor.getByText("Attachments and extraction (optional)",{exact:true}).click();
     await contractor.getByLabel("Attach an invoice", { exact: true }).setInputFiles({ name: "article.txt", mimeType: "text/plain", buffer: Buffer.from("Invoice: INV-ARTICLE\nWork order: WO-ARTICLE\nAmount: 2 NEAR\nArticle delivered.") });

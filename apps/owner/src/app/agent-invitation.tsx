@@ -1,4 +1,6 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+
 import { useState } from "react";
 export function AgentInvitation({reference,contractorName}:{reference:string;contractorName?:string}) {
   const [url,setUrl]=useState("");
@@ -19,7 +21,7 @@ export function AgentInvitation({reference,contractorName}:{reference:string;con
   return <section className="agent-confirmation" aria-label="Private contractor invitation">
     <h3>Portal invitation · {contractorName}</h3>
     <p>Private access expires in seven days. Anyone with this link can access this contractor’s demo records. Delivery is available for ten minutes.</p>
-    <div className="ask-nnetics-actions"><button type="button" className="button secondary" disabled={busy} onClick={()=>void reveal()}>Show invitation</button><button type="button" className="button secondary" disabled={busy} onClick={()=>void reveal(true)}>Copy invitation</button></div>
+    <div className="ask-nnetics-actions"><DemoButton type="button" className="button secondary" disabled={busy} onClick={()=>void reveal()}>Show invitation</DemoButton><DemoButton type="button" className="button secondary" disabled={busy} onClick={()=>void reveal(true)}>Copy invitation</DemoButton></div>
     {url && <label>Private invitation<input aria-label="Private invitation URL" readOnly value={url} onFocus={event=>event.currentTarget.select()}/></label>}
     <p role="status">{busy ? "Verifying access…" : status}</p>
   </section>;

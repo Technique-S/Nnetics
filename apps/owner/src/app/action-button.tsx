@@ -1,9 +1,10 @@
 "use client";
+import {DemoButton, type DemoButtonProps} from "../components/demo/demo-button";
 import {useEffect,useRef} from "react";
-import type {ButtonHTMLAttributes, ReactNode} from "react";
+import type {ReactNode} from "react";
 
 export type ActionState = "idle" | "loading" | "success" | "error";
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = DemoButtonProps & {
   state?: ActionState;
   pending?: boolean;
   busy?: boolean;
@@ -19,7 +20,7 @@ export function ActionButton({state="idle",pending=false,busy=false,pendingLabel
   useEffect(()=>{if(!busy&&!pending)initiated.current=false;},[busy,pending]);
   const loading=pending||state==="loading"||(busy&&initiated.current);
   const label=loading?(pendingLabel??"Working…"):state==="error"?(retryLabel??children):state==="success"?(successLabel??children):children;
-  return <button {...props} onClick={event=>{
+  return <DemoButton {...props} onClick={event=>{
     initiated.current=true;
     try {props.onClick?.(event);} finally {
       // A synchronous selection must not inherit another button's later request.
@@ -28,5 +29,5 @@ export function ActionButton({state="idle",pending=false,busy=false,pendingLabel
     }
   }} disabled={disabled||loading} aria-busy={loading} data-action-state={loading?"loading":state}>
     {loading&&<span className="action-spinner" aria-hidden="true"/>}{label}
-  </button>;
+  </DemoButton>;
 }

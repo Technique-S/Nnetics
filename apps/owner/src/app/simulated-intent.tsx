@@ -34,7 +34,7 @@ export function SimulatedIntentPayment({billId,onChanged,invoice,contractorName,
     }
     const intent=active?.intent,expired=!!intent&&intent.expiresAt<=tick;
     const retry=!intent||["FAILED","REFUNDED","EXPIRED"].includes(intent.state);
-    return <>{canAuthorize&&<ActionButton className={s.button} onClick={()=>setOpened(true)}>Pay approved amount</ActionButton>}<details className="reference-disclosure" open={opened} onToggle={e=>setOpened(e.currentTarget.open)}>
+    return <>{canAuthorize&&<ActionButton effect="none" className={s.button} onClick={()=>setOpened(true)}>Pay approved amount</ActionButton>}<details className="reference-disclosure" open={opened} onToggle={e=>setOpened(e.currentTarget.open)}>
         <summary>Simulated NEAR Intents</summary>
         <section aria-label="Simulated NEAR Intents payment">
             <p className={s.notice}><strong>Demo / Simulated</strong> · No deposits, signatures or blockchain transactions.</p>
@@ -62,8 +62,8 @@ export function SimulatedIntentPayment({billId,onChanged,invoice,contractorName,
                 <dt>Approved by</dt><dd>{invoice.approval?.by??"Not recorded"}</dd><dt>Approval time</dt><dd>{invoice.approval?.at?new Date(invoice.approval.at).toLocaleString():"Not recorded"}</dd>
                 <dt>Budget and spending eligibility</dt><dd>{!vault?"Balance and policy are rechecked by the server before authorization.":vault.paused?"Demo vault is paused.":BigInt(intent.total)>BigInt(vault.available)&&intent.state==="QUOTE_READY"?"Insufficient available demo funds.":vault.limit&&BigInt(intent.total)>BigInt(vault.limit)?"Exceeds the current spending limit.":"Within the current demo balance and spending limit; server checks still apply."}</dd>
             </dl></section>}<p role="status"><strong>{intent.state}</strong>{intent.reason&&` · ${intent.reason}`}</p>
-            {canAuthorize&&intent.state==="QUOTE_READY"&&!expired&&<><label><input type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}/> I approve this invoice, recipient, source amount and illustrative fee for simulated payment.</label><ActionButton className={s.button} disabled={busy||!checked} busy={busy} onClick={()=>void action("authorize")}>Authorize simulated payment</ActionButton></>}
-            {canAuthorize&&intent.state==="APPROVED"&&!expired&&<><p>Demo funds are reserved. The recipient and spending policy will be checked again.</p><ActionButton className={s.button} busy={busy} disabled={busy} onClick={()=>void action("execute")}>Execute simulated payment</ActionButton></>}
+            {canAuthorize&&intent.state==="QUOTE_READY"&&!expired&&<><label><input type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}/> I approve this invoice, recipient, source amount and illustrative fee for simulated payment.</label><ActionButton effect="none" className={s.button} disabled={busy||!checked} busy={busy} onClick={()=>void action("authorize")}>Authorize simulated payment</ActionButton></>}
+            {canAuthorize&&intent.state==="APPROVED"&&!expired&&<><p>Demo funds are reserved. The recipient and spending policy will be checked again.</p><ActionButton effect="none" className={s.button} busy={busy} disabled={busy} onClick={()=>void action("execute")}>Execute simulated payment</ActionButton></>}
             {intent.state==="COMPLETED"&&<p>Delivered {intent.deliveredAmount??intent.destinationAmount} {intent.destinationSymbol??intent.destinationAsset} on {intent.destinationChain} · simulated only.</p>}{intent.state==="EXECUTING"&&<p aria-live="polite">Mock solver processing. Demo funds stay reserved until settlement or refund.</p>}
             {expired&&["QUOTE_READY","APPROVED"].includes(intent.state)&&<ActionButton className={s.button} disabled={busy} onClick={()=>void read()}>Check expired quote</ActionButton>}
             </>}

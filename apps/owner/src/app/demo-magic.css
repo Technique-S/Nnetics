@@ -1,0 +1,72 @@
+/* Magic UI presentation is confined to explicitly selected demo routes. */
+html[data-demo-ui] .demo-magic-button { position:relative; isolation:isolate; overflow:hidden; }
+html[data-demo-ui] .demo-ripple-content { display:contents; }
+html[data-demo-ui] .demo-magic-button:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+html[data-demo-ui] .demo-hover-content, html[data-demo-ui] .demo-hover-label {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+html[data-demo-ui] .demo-hover-fill {
+  position:absolute; inset:0; z-index:-1; background:var(--action-hover);
+  clip-path:circle(0% at 10% 50%); transition:clip-path 220ms var(--motion-ease);
+}
+html[data-demo-ui] .demo-hover-label { transition:transform 180ms var(--motion-ease),opacity 180ms var(--motion-ease); }
+html[data-demo-ui] .demo-hover-overlay {
+  display:flex; position:absolute; inset:0; align-items:center; justify-content:center; gap:8px;
+  padding:inherit; opacity:0; transform:translateX(-8px); pointer-events:none;
+  transition:opacity 180ms var(--motion-ease),transform 180ms var(--motion-ease);
+}
+html[data-demo-ui] .demo-hover-overlay svg { width:16px; height:16px; flex:none; }
+@media(hover:hover) and (prefers-reduced-motion:no-preference) {
+  html[data-demo-ui] .demo-hover-button:hover:not(:disabled) { color:var(--action-text); }
+  html[data-demo-ui] .demo-hover-button:hover:not(:disabled) .demo-hover-fill { clip-path:circle(150% at 10% 50%); }
+  html[data-demo-ui] .demo-hover-button:hover:not(:disabled) .demo-hover-label { transform:translateX(8px); opacity:0; }
+  html[data-demo-ui] .demo-hover-button:hover:not(:disabled) .demo-hover-overlay { transform:translateX(0); opacity:1; }
+}
+html[data-demo-ui] .demo-magic-button:disabled .demo-hover-overlay { display:none; }
+html[data-demo-ui] .overview-card:has(>.demo-magic-card) { padding:0; border:0; }
+html[data-demo-ui] .demo-magic-card { height:100%; border-radius:var(--radius-panel); }
+html[data-demo-ui] .demo-magic-card>div:first-child { background:var(--surface); }
+html[data-demo-ui] .demo-magic-card>div:last-child { padding:clamp(16px,2.3cqw,28px); }
+html[data-demo-ui] .overview-balance .demo-magic-card { --surface:var(--hero-surface); --border:var(--hero-line); }
+html[data-demo-ui] .overview-list-item { width:100%; }
+html[data-demo-ui] .demo-count { font:inherit; color:inherit; font-variant-numeric:tabular-nums; }
+html[data-demo-ui] .demo-typing { display:inline-grid; grid-template-areas:"copy"; position:relative; }
+html[data-demo-ui] .demo-typing>* { grid-area:copy; }
+html[data-demo-ui] .demo-typing-full { opacity:0; }
+html[data-demo-ui] .demo-typing-presentation { pointer-events:none; user-select:none; }
+html[data-demo-ui] .demo-typing-text { display:inline; font:inherit; line-height:inherit; letter-spacing:inherit; }
+html[data-demo-ui] .demo-setup-shell { position:relative; isolation:isolate; }
+html[data-demo-ui] .demo-setup-shell>.main-content { position:relative; z-index:1; }
+html[data-demo-ui] .demo-entry-rays { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; opacity:.16; }
+html[data-demo-ui] .demo-rays-static { position:absolute; inset:0; background:radial-gradient(ellipse at 65% 0%,color-mix(in srgb,var(--action) 28%,transparent),transparent 65%); }
+html[data-demo-ui] .demo-scroll-frame { position:relative; min-width:0; min-height:0; }
+html[data-demo-ui] .demo-scroll-frame>.ask-nnetics-transcript { height:100%; }
+html[data-demo-ui] .demo-scroll-frame>.payables-list { overflow:auto; max-height:min(65dvh,680px); padding-block:12px; scroll-padding-block:14px; }
+html[data-demo-ui] .demo-scroll-edges { position:absolute; inset:0; pointer-events:none; z-index:2; }
+html[data-demo-ui] .demo-scroll-frame:focus-within>.demo-scroll-edges { visibility:hidden; }
+html[data-demo-ui] .demo-scroll-edge { pointer-events:none; }
+html[data-demo-ui] .sidebar:has(.demo-sidebar-frame) { overflow:hidden; }
+html[data-demo-ui] .demo-sidebar-frame { height:100%; }
+html[data-demo-ui] .demo-shell .sidebar nav a:is([aria-current=page],:hover) { background:var(--sidebar-hover); color:var(--sidebar-text); }
+html[data-demo-ui] .demo-sidebar-scroll { display:flex; flex-direction:column; height:100%; max-height:100%; overflow:auto; padding-block:2px 12px; scroll-padding-block:14px; }
+.demo-smooth-cursor {
+  margin:0; padding:0; border:0; background:transparent; overflow:visible;
+  width:20px; height:25px; contain:layout style; pointer-events:none!important;
+}
+.demo-smooth-cursor::backdrop { display:none; }
+html[data-demo-ui][data-smooth-cursor] *, html[data-demo-ui][data-smooth-cursor] { cursor:none!important; }
+html[data-demo-ui][data-smooth-cursor] :is(input,textarea,[contenteditable]:not([contenteditable=false])) { cursor:text!important; }
+@media(prefers-reduced-motion:reduce) {
+  html[data-demo-ui] .demo-typing-full { opacity:1; }
+  html[data-demo-ui] .demo-typing-presentation { display:none; }
+  html[data-demo-ui] .demo-hover-overlay { display:none; }
+  html[data-demo-ui] .demo-magic-card>.pointer-events-none { display:none; }
+  .demo-smooth-cursor { display:none!important; }
+}
+@media(forced-colors:active) {
+  html[data-demo-ui] .demo-scroll-edges, html[data-demo-ui] .demo-entry-rays { display:none; }
+  html[data-demo-ui] .demo-magic-card { border-color:CanvasText; }
+}
+@container(max-width:650px) {
+  html[data-demo-ui] .overview-metrics .demo-magic-card>div:last-child { padding:var(--space-md); }
+}

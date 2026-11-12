@@ -1,4 +1,8 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+import {DemoScroll} from "../components/demo/demo-scroll";
+
+import {DemoTyping} from "../components/demo/demo-surfaces";
 import { useEffect, useRef, useState } from "react";
 import { AgentInvitation } from "./agent-invitation";
 import { AgentConfirmation, type ContractorConfirmation } from "./agent-confirmation";
@@ -38,6 +42,7 @@ interface PanelMessage {
   text: string;
   mode?: "demo" | "live" | "error";
   chips?: ActionChip[];
+  fresh?: boolean;
 }
 
 const CONVERSATION_KEY = "ask-nnetics-conversation";
@@ -138,7 +143,7 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
       setMessages(old => [...old, {
         who: "assistant", text: data.reply!,
         mode: data.mode === "demo" ? "demo" : data.mode === "live" ? "live" : "error",
-        chips: data.actions ?? []
+        fresh: true, chips: data.actions ?? []
       }]);
     } catch (error) {
       if (error instanceof TypeError) setFailedRequest({message, key});
@@ -159,33 +164,33 @@ export function AskNnetics({ onAction }: { onAction: (action: AssistantAction) =
         <AssistantMark/>
         <div><h2>Ask Nnetics</h2><p>Demo workspace · simulated funds</p></div>
         <button type="button" className="text-button ask-nnetics-expand" aria-pressed={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Shrink" : "Expand"}</button>
-        <button type="button" className="text-button" onClick={() => setOpen(false)} aria-label="Close the demo assistant">Close</button>
+        <DemoButton type="button" className="text-button" onClick={() => setOpen(false)} aria-label="Close the demo assistant">Close</DemoButton>
       </header>
-      <div className="ask-nnetics-transcript" ref={transcriptRef} role="log" aria-label="Conversation" tabIndex={0}>
+      <DemoScroll className="ask-nnetics-transcript" ref={transcriptRef} role="log" aria-label="Conversation" tabIndex={0}>
         {messages.length === 0 && <div className="ask-nnetics-empty">
-          <h3>What would you like to check?</h3>
+          <h3><DemoTyping>What would you like to check?</DemoTyping></h3>
           <p>Ask about your vault, contractors or invoices. Actions that need approval open for review in the workspace.</p>
           <div className="ask-nnetics-actions">
             {["What is my vault balance?", "Show my payables", "How many contractors do I have?"].map(prompt => (
-              <button key={prompt} type="button" className="button secondary" onClick={() => {setInput(prompt);inputRef.current?.focus();}}>{prompt}</button>
+              <DemoButton key={prompt} type="button" className="button secondary" onClick={() => {setInput(prompt);inputRef.current?.focus();}}>{prompt}</DemoButton>
             ))}
           </div>
         </div>}
         {messages.map((message, index) => (
           <article key={index} data-mode={message.mode} className={message.who === "you" ? "ask-nnetics-you" : "ask-nnetics-assistant"}>
             <strong className="ask-nnetics-mode">{message.who === "you" ? "You" : message.mode === "error" ? "Request failed" : "Nnetics"}</strong>
-            <p>{message.text}</p>
+            <p><DemoTyping animate={!!message.fresh && message.who === "assistant" && message.mode !== "error" && !message.chips?.length && !/\d|NEAR|USD|USDT|USDC|wallet|recipient|balance|fee|approv|confirm|payment|transaction|0x|\.testnet\b|\.eth\b|\.bnb\b/i.test(message.text)}>{message.text}</DemoTyping></p>
             {message.chips && message.chips.length > 0 && <div className="ask-nnetics-actions">
-              {message.chips.map((item, chipIndex) => item.action.kind === "reveal-contractor-invitation" ? <AgentInvitation key={chipIndex} reference={item.action.reference} contractorName={item.action.contractorName}/> : item.action.kind === "confirm-contractor-lifecycle" ? <AgentConfirmation key={chipIndex} action={item.action}/> : <button key={chipIndex} type="button" className="button secondary" onClick={() => {
+              {message.chips.map((item, chipIndex) => item.action.kind === "reveal-contractor-invitation" ? <AgentInvitation key={chipIndex} reference={item.action.reference} contractorName={item.action.contractorName}/> : item.action.kind === "confirm-contractor-lifecycle" ? <AgentConfirmation key={chipIndex} action={item.action}/> : <DemoButton key={chipIndex} type="button" className="button secondary" onClick={() => {
                 onAction(item.action);
                 if (panelRef.current?.matches(":modal")) setOpen(false);
-              }}>{item.label}</button>)}
+              }}>{item.label}</DemoButton>)}
             </div>}
           </article>
         ))}
         {busy && <p className="ask-nnetics-progress" role="status">Waiting for Nnetics…</p>}
-        {failedRequest && <button type="button" className="button secondary" onClick={() => void send(failedRequest)}>Retry request</button>}
-      </div>
+        {failedRequest && <DemoButton type="button" className="button secondary" onClick={() => void send(failedRequest)}>Retry request</DemoButton>}
+      </DemoScroll>
       <form className="ask-nnetics-form" onSubmit={event => {event.preventDefault();void send();}}>
         <label className="ask-nnetics-input-label" htmlFor="ask-nnetics-message">Message the demo assistant</label>
         <input id="ask-nnetics-message" ref={inputRef} value={input} onChange={event => setInput(event.target.value)} maxLength={500} placeholder="Ask about your workspace" readOnly={busy}/>

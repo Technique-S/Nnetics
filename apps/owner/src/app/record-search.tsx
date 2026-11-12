@@ -1,3 +1,5 @@
+
+import {DemoButton} from "../components/demo/demo-button";
 import type { ReactNode } from "react";
 
 export function matchesRecords(query: string, ...values: (string | null | undefined)[]) {
@@ -18,6 +20,6 @@ export function RecordSearch({label, query, onQuery, onReset, children}: {
   return <div className="record-filters">
     <label className="filter-label record-search">{label}<input type="search" value={query} onChange={event => onQuery(event.target.value)} placeholder="Enter a name or reference"/></label>
     {children}
-    {onReset && <button type="button" className="text-button" onClick={onReset}>Reset filters</button>}
+    {onReset && <DemoButton type="button" className="text-button" onClick={onReset}>Reset filters</DemoButton>}
   </div>;
 }

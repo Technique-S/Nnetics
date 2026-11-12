@@ -1,4 +1,7 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+import {DemoGrid, DemoCard, DemoActivity, DemoRecordFeed, DemoCount, DemoTyping, DemoEntryRays} from "../components/demo/demo-surfaces";
+
 import {BrandMark, WorkspacePreview} from "./brand-mark";
 import {ViewMetadata} from "./view-metadata";
 import {getUserMessage} from "../data/user-message";
@@ -362,7 +365,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
   // profile and vault are created in one labelled walkthrough, then every tab
   // behaves like the standard dashboard on simulated funds.
   if (demoWs && !demoWs.demo()?.initialized)
-    return <div className="app-shell demo-shell demo-setup-shell"><ViewMetadata name="Demo setup"/><a className="skip-link" href="#workspace-content">Skip to content</a>
+    return <div className="app-shell demo-shell demo-setup-shell"><DemoEntryRays/><ViewMetadata name="Demo setup"/><a className="skip-link" href="#workspace-content">Skip to content</a>
       <main className="main-content demo-setup" id="workspace-content" tabIndex={-1}>
         <header className="entry-header"><a className="entry-brand-link" href="/"><BrandMark/>Nnetics</a><AppearanceControl inline/></header>
         <DemoWorkspaceSetup busy={busy.length > 0} flowError={error} onCreate={async (profileName, vaultName) => {
@@ -475,14 +478,14 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
         <MainSurface className="main-content" id="workspace-content" tabIndex={-1}>
           <div className="page-heading">
             <div><h1>{view}</h1><p>{subtitles[view]}</p></div>
-            {view === "Vault & Controls" && !readOnly && <button className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</button>}
+            {view === "Vault & Controls" && !readOnly && <DemoButton className="button primary" onClick={() => go("Contractors")}><Icon name="plus" size={16}/>Add contractor</DemoButton>}
           </div>
           <OperationFeedback active={loading || busy.length > 0} message="Checking workspace records…"/>
-          {error && <div className="error-banner" role="alert" aria-label={live ? "Testnet error" : "Simulation error"}>{getUserMessage(error)} <button onClick={() => void refresh()}>Retry refresh</button></div>}
-          {notice && <div className="notice" role="status">{notice} <button className="text-button" onClick={() => setNotice("")}>Dismiss</button></div>}
+          {error && <div className="error-banner" role="alert" aria-label={live ? "Testnet error" : "Simulation error"}>{getUserMessage(error)} <DemoButton onClick={() => void refresh()}>Retry refresh</DemoButton></div>}
+          {notice && <div className="notice" role="status">{notice} <DemoButton className="text-button" onClick={() => setNotice("")}>Dismiss</DemoButton></div>}
           {view === "Overview" && (
-            <div className="overview-grid">
-              <section className="overview-card overview-balance">
+            <DemoGrid className="overview-grid">
+              <DemoCard className="overview-card overview-balance">
                 <div className="overview-vault-heading">
                   <h2>Available vault balance</h2>
                   <span className="overview-vault-state"><Icon name={vault.paused ? "pause" : "shield"} size={15}/>{vault.paused ? "Paused" : "Active"}</span>
@@ -491,55 +494,55 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                 {demoWs && <p>Simulated NEAR</p>}
                 <div className="overview-vault-footer">
                   <div><h3>Reserved funds</h3><Amount value={vault.reserved}/></div>
-                  <button className="button secondary" onClick={() => go("Vault & Controls")}>Open vault <Icon name="arrow" size={16}/></button>
+                  <DemoButton className="button secondary" onClick={() => go("Vault & Controls")}>Open vault <Icon name="arrow" size={16}/></DemoButton>
                 </div>
-              </section>
-              <section className="overview-card overview-attention">
+              </DemoCard>
+              <DemoCard className="overview-card overview-attention">
                 <h2>Needs attention</h2>
                 {overviewWarnings.length > 0 && <ul className="overview-warnings">{overviewWarnings.map(warning => <li key={warning}>{warning}</li>)}</ul>}
                 {needsAttentionItems.length === 0 && overviewWarnings.length === 0 && <p className="empty">No items need your attention.</p>}
                 {overviewWarnings.length === 0 && <p>{nextAction.detail}</p>}
-                <button className="button primary" onClick={() => go(nextAction.view)}>{nextAction.label}</button>
-              </section>
+                <DemoButton effect="primary" className="button primary" onClick={() => go(nextAction.view)}>{nextAction.label}</DemoButton>
+              </DemoCard>
               <div className="overview-metrics" aria-label="Workspace metrics">
-                <section className="overview-card">
+                <DemoCard className="overview-card">
                   <h2>Pending invoices</h2>
-                  <p className="overview-metric">{pendingInvoiceCount}</p>
-                  <button className="text-button" onClick={() => go("Payables")}>Open payables <Icon name="arrow" size={14}/></button>
-                </section>
-                <section className="overview-card">
+                  <p className="overview-metric"><DemoCount value={pendingInvoiceCount}/></p>
+                  <DemoButton className="text-button" onClick={() => go("Payables")}>Open payables <Icon name="arrow" size={14}/></DemoButton>
+                </DemoCard>
+                <DemoCard className="overview-card">
                   <h2>Active contractors</h2>
-                  <p className="overview-metric">{activeContractorCount}</p>
-                  <button className="text-button" onClick={() => go("Contractors")}>Open contractors <Icon name="arrow" size={14}/></button>
-                </section>
-                <section className="overview-card overview-paid">
+                  <p className="overview-metric"><DemoCount value={activeContractorCount}/></p>
+                  <DemoButton className="text-button" onClick={() => go("Contractors")}>Open contractors <Icon name="arrow" size={14}/></DemoButton>
+                </DemoCard>
+                <DemoCard className="overview-card overview-paid">
                   <h2>Total paid</h2>{demoWs&&<p className="muted">NEAR equivalent · payout assets shown in receipts</p>}
                   <p className="overview-metric"><Amount value={totalPaid.toString()}/></p>
-                  <p>{confirmed.length} confirmed {confirmed.length === 1 ? "payout" : "payouts"}</p>
-                </section>
+                  <p><DemoCount value={confirmed.length}/> confirmed {confirmed.length === 1 ? "payout" : "payouts"}</p>
+                </DemoCard>
               </div>
-              <section className="overview-card overview-activity">
-                <div className="record-heading"><h2>Recent activity</h2><button className="text-button" onClick={() => go("Activity")}>View activity <Icon name="arrow" size={14}/></button></div>
+              <DemoCard className="overview-card overview-activity">
+                <div className="record-heading"><h2>Recent activity</h2><DemoButton className="text-button" onClick={() => go("Activity")}>View activity <Icon name="arrow" size={14}/></DemoButton></div>
                 {recentActivity.length === 0 ? <p className="empty">Funding and payment records appear here.</p> :
-                  <div className="overview-list">{recentActivity.slice(0, 5).map(record => (
+                  <DemoActivity className="overview-list">{recentActivity.slice(0, 5).map(record => (
                     <button key={record.key} className="overview-list-item" type="button" onClick={() => go("Activity", record.receipt)}>
                       <span><strong>{record.label}</strong><small>{record.date}</small></span>
                       <Amount value={record.amount}/><Badge status={record.status}/>
                     </button>
-                  ))}</div>}
-              </section>
-              <section className="overview-card overview-rail-card">
+                  ))}</DemoActivity>}
+              </DemoCard>
+              <DemoCard className="overview-card overview-rail-card">
                 <h2>Payment status</h2>
                 <div className="payment-status-visual">
                   {demoWs && <StatusDonut paid={confirmed.length} pending={outstanding.length} failed={failedPayments.length}/>}
                   <ul className="payment-status-legend">
-                    <li><i className="payment-status-swatch" style={{background:"var(--action)"}} aria-hidden="true"/><span>Paid</span><strong>{confirmed.length}</strong></li>
-                    <li><i className="payment-status-swatch" style={{background:"var(--warning)"}} aria-hidden="true"/><span>Pending</span><strong>{outstanding.length}</strong></li>
-                    <li><i className="payment-status-swatch" style={{background:"var(--danger)"}} aria-hidden="true"/><span>Failed</span><strong>{failedPayments.length}</strong></li>
+                    <li><i className="payment-status-swatch" style={{background:"var(--action)"}} aria-hidden="true"/><span>Paid</span><strong><DemoCount value={confirmed.length}/></strong></li>
+                    <li><i className="payment-status-swatch" style={{background:"var(--warning)"}} aria-hidden="true"/><span>Pending</span><strong><DemoCount value={outstanding.length}/></strong></li>
+                    <li><i className="payment-status-swatch" style={{background:"var(--danger)"}} aria-hidden="true"/><span>Failed</span><strong><DemoCount value={failedPayments.length}/></strong></li>
                   </ul>
                 </div>
-              </section>
-              <section className="overview-card overview-chart-card">
+              </DemoCard>
+              <DemoCard className="overview-card overview-chart-card">
                 <h2>Confirmed payouts over time</h2>
                 {confirmed.length === 0
                   ? <p className="empty">Confirmed payouts will appear here over time.</p>
@@ -561,16 +564,16 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                         ))}
                       </div>;
                     })()}
-              </section>
-              <section className="overview-card overview-next-action">
+              </DemoCard>
+              <DemoCard className="overview-card overview-next-action">
                 <h2>Quick actions</h2>
                 <div className="actions">
-                  <button className="button secondary" onClick={() => go("Contractors")}>Add contractor</button>
-                  <button className="button secondary" onClick={() => go("Payables")}>Prepare a payment</button>
+                  <DemoButton effect="primary" className="button secondary" onClick={() => go("Contractors")}>Add contractor</DemoButton>
+                  <DemoButton className="button secondary" onClick={() => go("Payables")}>Prepare a payment</DemoButton>
                   <button className="button secondary" onClick={() => go("Vault & Controls")}>Fund the vault</button>
                 </div>
-              </section>
-            </div>
+              </DemoCard>
+            </DemoGrid>
           )}
 
           {view === "Overview" && demoWs?.demo() && <DemoFirstSteps key={demoWs.demo()!.profile.createdAt} workspace={demoWs.demo()!.profile.createdAt} funded={BigInt(vault.funded) > 0n} hasContractor={activeContractorCount > 0} go={go}/>}
@@ -582,13 +585,13 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
               <p>{formatNear(vault.reserved)} NEAR set aside for pending payments.</p>
               {vault.paused && <p><Badge status="Paused"/> New payments cannot be sent while the vault is paused.</p>}
               {!vault.agent && <p>Automatic payments are off.</p>}
-              {outstanding.length > 0 && <button className="text-button" onClick={() => go("Activity")}>Check {outstanding.length} outstanding {outstanding.length === 1 ? "payment" : "payments"}</button>}
+              {outstanding.length > 0 && <DemoButton className="text-button" onClick={() => go("Activity")}>Check {outstanding.length} outstanding {outstanding.length === 1 ? "payment" : "payments"}</DemoButton>}
             </section>
             {live ? <TestnetControls adapter={live} snapshot={s} run={run} section="vault"/> : demoWs ? <DemoVaultCard demoWs={demoWs} run={run}/> : <section className="panel payment-workspace-panel"><h2>Payment limits</h2><p>{formatNear(vault.payment_cap)} NEAR per payment · {formatNear(vault.budget)} NEAR total</p><p>Funding is unavailable in the simulation.</p></section>}
             {live && !readOnly && live.config.ownerTransactionsEnabled && pauseReview !== null &&
-              <ActionButton className="button secondary" busy={busy.length>0} onClick={()=>void run("pause",()=>live.command({method:"set_paused",args:{paused:pauseReview}}))}>{pauseReview ? "Review pause in wallet" : "Review unpause in wallet"}</ActionButton>}
+              <ActionButton effect="none" className="button secondary" busy={busy.length>0} onClick={()=>void run("pause",()=>live.command({method:"set_paused",args:{paused:pauseReview}}))}>{pauseReview ? "Review pause in wallet" : "Review unpause in wallet"}</ActionButton>}
             {live && !readOnly && live.config.ownerTransactionsEnabled && ownerScope?.method === "revoke_agent" &&
-              <ActionButton className="button secondary" busy={busy.length>0} onClick={()=>void run("revoke",()=>live.command({method:"revoke_agent",args:{}}))}>Review turning off automatic payments</ActionButton>}
+              <ActionButton effect="none" className="button secondary" busy={busy.length>0} onClick={()=>void run("revoke",()=>live.command({method:"revoke_agent",args:{}}))}>Review turning off automatic payments</ActionButton>}
           </>}
           {view === "Contractors" && (live
             ? <PersistentContractorOwner embedded organization={s.access?.organization || live.config.organization} readOnly={readOnly} limit={vault.payment_cap}/>
@@ -629,7 +632,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                   : undefined}
                 paymentFee={demoWs ? DEMO_FEE : undefined}
                 intent={intent ?? undefined}/>)}
-          {demoWs && intent && <button className="text-button" onClick={() => setIntent(null)}>Clear the prepared assistant step</button>}
+          {demoWs && intent && <DemoButton className="text-button" onClick={() => setIntent(null)}>Clear the prepared assistant step</DemoButton>}
                               {view === "Activity" && (
             <div className="activity-surface">
               <section className="panel payment-workspace-panel" aria-label="Activity filters">
@@ -648,31 +651,31 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                       {["All outcomes","Pending","Paid","Failed"].map(status => <option key={status}>{status}</option>)}
                     </select></label>
                     <p className="record-count">{activityPayments.length + activityQueue.length} payment records</p>
-                    {activityPayments.map(p => {
+                    <DemoRecordFeed>{activityPayments.map(p => {
                       const info = details(p), status = paymentDisplayStatus(s,p);
                       return <article className="payment-record" key={p.attempt_id}>
                         <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {p.invoice_id}</p>{status === "Pending" && <p>Awaiting confirmation. Do not send this payment again.</p>}{["TransferSucceeded","TransferFailed"].includes(status) && <p>The transfer result is recorded. Final accounting is pending.</p>}</div>
                         <div className="payment-record-actions"><Amount value={p.amount}/><Badge status={["TransferSucceeded","TransferFailed"].includes(status)?"Pending":status}/>{status === "Paid" && <a href={`#Activity/${encodeURIComponent(p.attempt_id)}`} onClick={e=>{e.preventDefault();go("Activity",p.attempt_id);}}>View receipt</a>}{status !== "Paid" && info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}</div>
                       </article>;
-                    })}
-                    {activityQueue.map(job => <article key={job.id} className="payment-record"><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding. Check the existing attempt before taking action."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}
+                    })}</DemoRecordFeed>
+                    <DemoRecordFeed>{activityQueue.map(job => <article key={job.id} className="payment-record"><div><h2>{job.id}</h2><p>{job.state === "review" ? "Awaiting authorization" : job.state === "failed" ? "Payment failed" : "Outstanding. Check the existing attempt before taking action."}</p></div><Badge status={job.state === "failed" ? "Failed" : "Pending"}/></article>)}</DemoRecordFeed>
                     {!activityPayments.length && !activityQueue.length && <p className="empty">{s.payments.length || s.queue?.length ? "No payments match these filters." : "Payment attempts will appear here."}</p>}
                   </section>
                   <section className="panel payment-workspace-panel" aria-label="Confirmed receipts">
                     <h2>Receipts</h2>
                     {visibleReceipts.length === 0 && <p className="empty">{confirmed.length ? "No receipts match this search." : "Receipts appear here after payment is confirmed."}</p>}
-                    {visibleReceipts.map(p => {
+                    <DemoRecordFeed>{visibleReceipts.map(p => {
                       const info = details(p);
                       const summary = [live ? "Nnetics testnet receipt" : "Nnetics demo receipt · simulated funds", p.reference, info.contractor, p.recipient, `${formatNear(p.amount)} ${demoWs?"NEAR equivalent":"NEAR"}`, date(p.initiated_at_ns), info.description, info.url].filter(Boolean).join("\n");
                       return <article className="payment-record" key={p.attempt_id} id={`receipt-${p.attempt_id}`} tabIndex={-1}>
                         <div><h2>{info.contractor}</h2><p>{date(p.initiated_at_ns)} · {live ? "Payment initiated" : "Simulated receipt"} · {p.invoice_id}</p>{info.description && <p className="payment-record-description">{info.description}</p>}</div>
                         <div className="payment-record-actions"><Amount value={p.amount}/><Badge status="Paid"/>
                           {info.url && <a href={info.url} target="_blank" rel="noreferrer">View transaction</a>}
-                          <button className="text-button" onClick={async () => {try{await navigator.clipboard.writeText(summary);setNotice("Receipt copied.");}catch{setNotice("Clipboard unavailable. Select the receipt details to copy them.");}}}>Copy receipt</button>
+                          <DemoButton className="text-button" onClick={async () => {try{await navigator.clipboard.writeText(summary);setNotice("Receipt copied.");}catch{setNotice("Clipboard unavailable. Select the receipt details to copy them.");}}}>Copy receipt</DemoButton>
                           <a className="text-button" download={`nnetics-receipt-${p.attempt_id}.txt`} href={`data:text/plain;charset=utf-8,${encodeURIComponent(summary)}`}>Download receipt</a>
                         </div>
                       </article>;
-                    })}
+                    })}</DemoRecordFeed>
                   </section>
                 </>
               )}
@@ -681,10 +684,10 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                   <h2>Invoices</h2>
                   <p className="record-count">{activityInvoices.length} invoice records</p>
                   {activityInvoices.length === 0 && <p className="empty">{portalInvoices.length ? "No invoices match this search." : "Invoice activity appears here after a contractor submits a bill."}</p>}
-                  {activityInvoices.map(b => <article className="payment-record" key={b.id}>
+                  <DemoRecordFeed>{activityInvoices.map(b => <article className="payment-record" key={b.id}>
                     <div><h2>{b.reference}</h2><p>{portalContractorName(b.contractorId)} · {b.amount} NEAR</p><p className="payment-record-description">{b.description}</p></div>
                     <div className="payment-record-actions"><Badge status={b.status}/></div>
-                  </article>)}
+                  </article>)}</DemoRecordFeed>
                 </section>
               )}
               {demoWs && (activityFilter === "All activity" || activityFilter === "Funding") &&
@@ -692,16 +695,16 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                   <h2>Vault funding</h2>
                   <p className="record-count">{visibleFunding.length} funding records</p>
                   {visibleFunding.length === 0 && <p className="empty">{funding.length ? "No funding records match this search." : "Simulated funding appears here."}</p>}
-                  {visibleFunding.map(event => <article className="payment-record" key={event.id}>
+                  <DemoRecordFeed>{visibleFunding.map(event => <article className="payment-record" key={event.id}>
                     <div><h3>{event.label}</h3><p>{shortDate(event.at)}</p></div><Amount value={amountFromNear(event.amount).toString()}/>
-                  </article>)}
+                  </article>)}</DemoRecordFeed>
                 </section>}
               {(activityFilter === "All activity" || activityFilter === "Audit events") && (
                 <section className="panel payment-workspace-panel" aria-label="Audit events">
                   <h2>Audit events</h2>
                   <p className="record-count">{visibleAudit.length} audit events</p>
                   {visibleAudit.length === 0 && <p className="empty">{auditEvents.length ? "No audit events match this search." : "Vault controls and contractor changes appear here."}</p>}
-                  {visibleAudit.map(event => <article className="payment-record" key={event.id}><div><h2>{event.label}</h2><p>{new Date(event.at).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</p></div></article>)}
+                  <DemoRecordFeed>{visibleAudit.map(event => <article className="payment-record" key={event.id}><div><h2>{event.label}</h2><p>{new Date(event.at).toLocaleString("en-GB", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</p></div></article>)}</DemoRecordFeed>
                 </section>
               )}
               {live && recoveryNeeded && <details className="reference-disclosure"><summary>Check unresolved payments</summary><TestnetControls adapter={live} snapshot={s} run={run} section="recovery"/></details>}
@@ -779,8 +782,8 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
                   <input name="limit" inputMode="decimal" defaultValue={demoWs.demo()?.vault.limit ? formatNear(demoWs.demo()!.vault.limit) : ""} placeholder="e.g. 2 · leave empty for no limit"/>
                 </label>
                 <div className="actions">
-                  <button className="button secondary">Save limit</button>
-                  <button type="button" className="text-button" onClick={() => void run("demo-limit", () => demoWs.setLimit(""), "Demo spending limit cleared.")}>Clear limit</button>
+                  <DemoButton className="button secondary">Save limit</DemoButton>
+                  <DemoButton type="button" className="text-button" onClick={() => void run("demo-limit", () => demoWs.setLimit(""), "Demo spending limit cleared.")}>Clear limit</DemoButton>
                 </div>
               </form>
               <p>Demo assistant: {assistantConfigured === null ? "checking configuration…" : assistantConfigured ? `model answers configured server-side (${assistantModel ?? "configured model"}) · the API key never enters the browser or logs` : "provider unavailable. A server model must be configured to answer requests."}</p>
@@ -805,7 +808,7 @@ function DemoWorkspaceSetup({busy, flowError, onCreate}: {busy: boolean; flowErr
   return <div className="demo-setup-layout">
     <section className="demo-setup-panel">
       <h1>Try the Nnetics demo</h1>
-      <p>Your workspace and vault are private to this browser session. All funds and payments are simulated.</p>
+      <p><DemoTyping>Your workspace and vault are private to this browser session. All funds and payments are simulated.</DemoTyping></p>
       <ol className="demo-setup-steps" aria-label="Workspace setup progress">
         <li aria-current={step === 1 ? "step" : undefined}>Owner profile</li>
         <li aria-current={step === 2 ? "step" : undefined}>Demo vault</li>
@@ -814,15 +817,15 @@ function DemoWorkspaceSetup({busy, flowError, onCreate}: {busy: boolean; flowErr
         <h2>Set up your workspace</h2>
         <label htmlFor="demo-owner-name">Owner name</label>
         <input ref={ownerField} id="demo-owner-name" value={profile} onChange={event => setProfile(event.target.value)} maxLength={80} required placeholder="e.g. Alex Morgan"/>
-        <button className="button primary" disabled={!profile.trim()}>Continue</button>
+        <DemoButton effect="primary" className="button primary" disabled={!profile.trim()}>Continue</DemoButton>
       </form> : <form onSubmit={event => { event.preventDefault(); if (!busy) void onCreate(profile.trim(), vault.trim()); }}>
         <h2>Name your demo vault</h2>
         <label htmlFor="demo-vault-name">Vault name</label>
         <input ref={vaultField} id="demo-vault-name" value={vault} onChange={event => setVault(event.target.value)} maxLength={80} required placeholder="e.g. Studio operations"/>
         <p>Start with an empty vault. Add simulated NEAR from Vault &amp; Controls when you are ready.</p>
         <div className="actions">
-          <ActionButton className="button primary" busy={busy} pendingLabel="Creating demo workspace…" disabled={busy || !vault.trim()}>Create demo workspace</ActionButton>
-          <button type="button" className="text-button" disabled={busy} onClick={() => {setStep(1);requestAnimationFrame(() => ownerField.current?.focus());}}>Back</button>
+          <ActionButton effect="primary" className="button primary" busy={busy} pendingLabel="Creating demo workspace…" disabled={busy || !vault.trim()}>Create demo workspace</ActionButton>
+          <DemoButton type="button" className="text-button" disabled={busy} onClick={() => {setStep(1);requestAnimationFrame(() => ownerField.current?.focus());}}>Back</DemoButton>
         </div>
       </form>}
       {flowError && <p className="error-banner" role="alert">{getUserMessage(flowError)}</p>}
@@ -844,14 +847,14 @@ function DemoFirstSteps({workspace, funded, hasContractor, go}: {
     try { localStorage.setItem(key, "complete"); } catch {}
   }, [complete, dismissed, key]);
   if (complete || dismissed) return null;
-  return <section className="overview-card demo-first-steps">
-    <div className="record-heading"><h2>Get started</h2><button type="button" className="text-button" onClick={() => setDismissed(true)}>Skip guide</button></div>
+  return <DemoCard className="overview-card demo-first-steps">
+    <div className="record-heading"><h2>Get started</h2><DemoButton type="button" className="text-button" onClick={() => setDismissed(true)}>Skip guide</DemoButton></div>
     <ol>
       <li><span>Workspace created</span><strong>Done</strong></li>
-      <li><span>Fund the demo vault</span>{funded ? <strong>Done</strong> : <button className="text-button" onClick={() => go("Vault & Controls")}>Open vault</button>}</li>
-      <li><span>Add your first contractor</span>{hasContractor ? <strong>Done</strong> : <button className="text-button" onClick={() => go("Contractors")}>Open contractors</button>}</li>
+      <li><span>Fund the demo vault</span>{funded ? <strong>Done</strong> : <DemoButton className="text-button" onClick={() => go("Vault & Controls")}>Open vault</DemoButton>}</li>
+      <li><span>Add your first contractor</span>{hasContractor ? <strong>Done</strong> : <DemoButton className="text-button" onClick={() => go("Contractors")}>Open contractors</DemoButton>}</li>
     </ol>
-  </section>;
+  </DemoCard>;
 }
 
 function DemoVaultCard({demoWs, run}: {demoWs: DemoWorkspaceAdapter; run: (key: string, action: () => Promise<void>, message?: string) => Promise<void>}) {
@@ -877,7 +880,7 @@ function DemoVaultCard({demoWs, run}: {demoWs: DemoWorkspaceAdapter; run: (key: 
       <label htmlFor="demo-fund-amount">Fund the Demo Wallet · NEAR</label>
       <div className="actions">
         <input id="demo-fund-amount" name="amount" inputMode="decimal" required placeholder="e.g. 5 · any positive exact amount"/>
-        <button className="button primary">Fund vault</button>
+        <DemoButton className="button primary">Fund vault</DemoButton>
       </div>
       <p>Demo wallet funding is simulated NEAR only; no blockchain, wallet or token is involved. Fundings stack, so repeat the amount any time.</p>
     </form>

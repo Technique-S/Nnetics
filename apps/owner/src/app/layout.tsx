@@ -5,6 +5,8 @@ import "./workspace.css";
 import "./tokens.css";
 import {appearanceBootstrap} from "../data/appearance";
 import {AppearanceControl} from "./appearance-control";
+import {DemoPresentation} from "../components/demo/demo-context";
+import "./demo-magic.css";
 import {jakarta} from "./fonts";
 export const metadata = privateMetadata("Sign in to your workspace | Nnetics", "Sign in with your supported wallet to access your organizations, review contractor invoices and manage payments within approved limits.");
 export const viewport:Viewport={themeColor:"#F6F3EC"};
@@ -14,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={jakarta.variable} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{__html:appearanceBootstrap}} /></head>
-      <body>{children}<AppearanceControl /></body>
+      <body><DemoPresentation>{children}<AppearanceControl /></DemoPresentation></body>
     </html>
   );
 }

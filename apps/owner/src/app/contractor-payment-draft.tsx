@@ -1,4 +1,6 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+
 
 import {useEffect, useRef, useState} from "react";
 import {amountFromNear, formatNear} from "../data/owner-adapter";
@@ -109,15 +111,15 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
         </p>
       ) : <>
         <p role="status">This payment is prepared and its amount is reserved. Confirm to run the simulation.</p>
-        <ActionButton type="button" className="button primary" busy={busy} pendingLabel="Confirming payment…" disabled={busy || !onConfirm} onClick={() => void once(async () => {
+        <ActionButton effect="none" type="button" className="button primary" busy={busy} pendingLabel="Confirming payment…" disabled={busy || !onConfirm} onClick={() => void once(async () => {
           if (!onConfirm) return;
           await onConfirm(prepared);
           setSubmitted(true);
         })}>Confirm and simulate payment</ActionButton>
-        {onCancel && <button type="button" className="text-button" disabled={busy} onClick={() => void once(async () => {
+        {onCancel && <DemoButton type="button" className="text-button" disabled={busy} onClick={() => void once(async () => {
           await onCancel(prepared);
           setPrepared(null);
-        })}>Cancel and release the reservation</button>}
+        })}>Cancel and release the reservation</DemoButton>}
       </>}
     </section> : draft ? <section aria-label="Review payment">
       <h4>Review payment</h4>
@@ -136,7 +138,7 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
         const preparedPayment = await onPrepare(draft);
         setPrepared(preparedPayment);
       })}>Prepare simulated payment</ActionButton> : <p role="status">{blocked || "Direct payment needs separate approval for the contractor registration, agreement and worker transaction. This draft cannot request a signature or move funds."}</p>}
-      <button type="button" className="text-button" disabled={busy} onClick={() => {setDraft(null);setError("");}}>Edit payment</button>
+      <DemoButton type="button" className="text-button" disabled={busy} onClick={() => {setDraft(null);setError("");}}>Edit payment</DemoButton>
     </section> : <form onSubmit={event=>{
       event.preventDefault();
       const fields = new FormData(event.currentTarget);
@@ -151,7 +153,7 @@ export function ContractorPaymentForm({id,name,wallet,onPrepare,onConfirm,onCanc
     }}>
       <label>Amount (NEAR)<input name="amount" inputMode="decimal" required/></label>
       <label>Payment description<input name="description" maxLength={240} required/></label>
-      <button className="button primary">Review payment</button>
+      <DemoButton className="button primary">Review payment</DemoButton>
     </form>}
     {error && <p role="alert">{error}</p>}
   </details>;

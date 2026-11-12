@@ -1,4 +1,7 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+import {DemoScroll} from "../components/demo/demo-scroll";
+
 import {billingAsset,NEAR_ASSET} from "../data/billing-assets";
 import {useEffect,useRef,useState,type ReactNode} from "react";
 import type {ContractorBill,PortalSnapshot} from "../data/contractor-adapter";
@@ -45,17 +48,17 @@ export function PayablesPanel({snapshot,payments=[],contractorId,renderDetails}:
     function open(item:Payable){setSelectedId(item.id);history.replaceState(null,"",`#Payables/${encodeURIComponent(item.id)}`);if(innerWidth<900)requestAnimationFrame(()=>detail.current?.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"instant":"smooth"}));}
     return <section className="panel unified-payables" aria-label="Payables workspace">
         <RecordSearch label="Search payables" query={query} onQuery={setQuery} onReset={query||filter!=="All"?()=>{setQuery("");setFilter("All");}:undefined}/>
-        <div className="payable-filters" role="group" aria-label="Payable status">{PAYABLE_FILTERS.map(value=><button key={value} type="button" className="payable-filter" aria-pressed={filter===value} onClick={()=>setFilter(value)}>{value}<span>{items.filter(item=>matchesPayable(item,value)).length}</span></button>)}</div>
+        <div className="payable-filters" role="group" aria-label="Payable status">{PAYABLE_FILTERS.map(value=><DemoButton key={value} type="button" className="payable-filter" aria-pressed={filter===value} onClick={()=>setFilter(value)}>{value}<span>{items.filter(item=>matchesPayable(item,value)).length}</span></DemoButton>)}</div>
         <p className="record-count" role="status">{visible.length} of {items.length} payables</p>
         <div className="payables-layout">
-            <div className="payables-list" aria-label="Payable records">
+            <DemoScroll className="payables-list" aria-label="Payable records">
                 {!visible.length&&<p className="empty">{items.length?"No payables match these filters.":"Contractor invoices will appear here for review and payment."}</p>}
                 {visible.map(item=><button type="button" key={item.id} className="payable-row" data-selected={selected?.id===item.id} aria-pressed={selected?.id===item.id} aria-label={`Open payable · ${item.invoiceNumber}`} onClick={()=>open(item)}>
                     <span className="payable-row-heading"><strong>{item.invoiceNumber}</strong><span className="badge" data-status={item.stage}>{item.stage}</span></span>
                     <span>{item.contractor}</span><span className="payable-purpose">{item.description}</span>
                     <span className="payable-row-amount">Requested: {item.requestedAmount} {item.requestedCurrency}<br/>Approved: {item.approvedAmount===null?"Awaiting approval":`${item.approvedAmount} ${item.approvedCurrency}`}{item.failed&&<span>Last payment attempt failed</span>}</span>
                 </button>)}
-            </div>
+            </DemoScroll>
             <section ref={detail} className="payable-details" aria-label="Payable Details" tabIndex={-1}>
                 {selected?<><h2>Payable Details</h2><p className="muted">Review the original request, approval and payment in one place.</p>
                     {!visible.some(item=>item.id===selected.id)&&<p className="payable-context-note">The selected payable stays open while its status changes or you filter the list.</p>}

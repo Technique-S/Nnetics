@@ -1899,3 +1899,25 @@ footer > span:last-child {
 .action-progress{font-size:13px;color:var(--text-muted);padding:12px 0}.empty{padding:24px;border:1px dashed var(--control-border);border-radius:8px;background:var(--surface);color:var(--text-muted)}
 @media(min-width:761px){.identity-bar{position:sticky;top:0}.wallet-session-notice{position:sticky;top:64px;z-index:24}.redesigned-sidebar.sidebar{position:fixed;top:0;height:100dvh;min-height:0;overflow-y:auto}body:has(.identity-bar) .redesigned-sidebar.sidebar{top:98px;height:calc(100dvh - 98px)}}
 .stat-card.stat-0 .amount{color:var(--text)}
+
+@theme inline {
+  --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
+  --animate-rippling: rippling var(--duration) ease-out;
+  @keyframes blink-cursor {
+  0%, 49% {
+    opacity: 1;
+    }
+  50%, 100% {
+    opacity: 0;
+    }
+  }
+  @keyframes rippling {
+  0% {
+    opacity: 1;
+    }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+    }
+  }
+}

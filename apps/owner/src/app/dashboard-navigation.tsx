@@ -1,4 +1,7 @@
 "use client";
+import {DemoButton} from "../components/demo/demo-button";
+
+import {DemoSidebarScroll} from "../components/demo/demo-scroll";
 import {BrandMark} from "./brand-mark";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 
@@ -86,12 +89,12 @@ export function DashboardNavigation({view,onNavigate,live,organization,demo=fals
   function toggle(){if(innerWidth<=760)setOpen(true);else setCollapsed(value=>{try{localStorage.setItem("nnetics-sidebar",value?"expanded":"collapsed");}catch{}return !value;});}
   return <><button ref={trigger} className="navigation-toggle" aria-label="Toggle navigation" aria-expanded={mobile?open:!collapsed} aria-controls="owner-navigation" onClick={toggle}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></button>{open&&<div className="navigation-backdrop" onClick={()=>setOpen(false)}/>}
   <aside id="owner-navigation" ref={side} className={`sidebar redesigned-sidebar ${open?"drawer-open":""}`} role={open?"dialog":undefined} aria-modal={open?true:undefined} aria-label="Workspace navigation">
-  <button className="drawer-close" onClick={()=>setOpen(false)}>Close navigation</button>
+  <DemoSidebarScroll><button className="drawer-close" onClick={()=>setOpen(false)}>Close navigation</button>
   <a className="brand" href="#Overview" onClick={()=>{onNavigate("Overview");setOpen(false);}}>{demo && <span className="brand-mark" aria-hidden="true"><BrandMark/></span>}Nnetics<span className="brand-period">.</span></a>
   <div className="workspace">{demo && <small>Demo workspace</small>}<strong title={organization}>{organization.length>40?`Workspace · ${organization.slice(0,8)}`:organization}</strong></div>
   <nav aria-label="Owner dashboard"><span className="nav-active-indicator" aria-hidden="true"/>{destinations.map((name,i)=><a key={name} href={`#${encodeURIComponent(name)}`} aria-label={name} title={name} aria-current={view===name?"page":undefined} onClick={e=>{e.preventDefault();onNavigate(name);setOpen(false);}}><span aria-hidden="true" className="navigation-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={paths[i]}/></svg></span><span className="nav-label">{name}</span></a>)}</nav>
   <div className="sidebar-bottom"><span className="nav-label">{live?"NEAR testnet":"Simulated demo"}</span><p className="nav-label">Approval and payment are separate.</p></div>
-  </aside>
+  </DemoSidebarScroll></aside>
   {mobile&&<nav className="mobile-destinations" aria-label="Workspace destinations" aria-hidden={open || undefined}>
     {mobilePrimary.map(name=><a key={name} href={`#${encodeURIComponent(name)}`} aria-label={name} aria-current={view===name?"page":undefined} onClick={e=>{e.preventDefault();onNavigate(name);setMore(false);}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[destinations.indexOf(name)]}/></svg><span className="nav-label">{name}</span></a>)}
     <button ref={moreTrigger} type="button" aria-expanded={more} aria-controls="mobile-more" aria-current={!(mobilePrimary as readonly string[]).includes(view)?"page":undefined} onClick={()=>setMore(value=>!value)}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span className="nav-label">More</span></button>
@@ -99,7 +102,7 @@ export function DashboardNavigation({view,onNavigate,live,organization,demo=fals
   {mobile && more && <dialog className="mobile-more-panel" id="mobile-more" ref={moreDialog}
     aria-label="More destinations" onClose={() => setMore(false)}
     onClick={event => { if (event.target === event.currentTarget) setMore(false); }}>
-    <header><h2>More destinations</h2><button type="button" className="button secondary" onClick={() => setMore(false)}>Close navigation</button></header>
+    <header><h2>More destinations</h2><DemoButton type="button" className="button secondary" onClick={() => setMore(false)}>Close navigation</DemoButton></header>
     <nav aria-label="More destinations">
       {(["Vault & Controls", "Settings"] as const).map(name => (
         <a key={name} href={`#${encodeURIComponent(name)}`} aria-current={view === name ? "page" : undefined}
