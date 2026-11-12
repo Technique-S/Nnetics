@@ -26,6 +26,7 @@
     "@near-wallet-selector/core": "10.1.4",
     "@near-wallet-selector/nightly": "10.1.4",
     "buffer": "6.0.3",
+    "lucide-react": "^1.72.0",
     "near-api-js": "7.4.0",
     "next": "16.4.3",
     "react": "19.3.1",
