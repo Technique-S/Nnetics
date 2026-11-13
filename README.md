@@ -96,11 +96,7 @@ Fresh Rust/Sandbox execution requires the [pinned Linux verification procedure](
 
 Use [the isolated fixture recipe](docs/DEMO_GUIDE.md#regressions) or the existing CI workflows for browser tests; do not point mutation tests at a real/private database. Linux Rust checks: `bash scripts/check-core.sh` (rustup and system prerequisites in [PAYMENT_CORE.md](docs/PAYMENT_CORE.md)); these use local Sandbox accounts and do not deploy to public networks. Passing tests are not independent security review.
 
-## Hackathon provenance and submission
-
-Built for NEAR HACKATHON. The repository's first implementation commit is **29 October 2026**, within the permitted post-announcement window beginning 19 October. Earlier published development branch: [codex/nnetics-live-integration](https://github.com/Technique-S/Nnetics/tree/codex/nnetics-live-integration). Its [branch history](https://github.com/Technique-S/Nnetics/commits/codex/nnetics-live-integration/) includes the initial core; subsequent published changes are visible in its [development comparison](https://github.com/Technique-S/Nnetics/compare/9206f079ca69b0c8893f5d777f7d3b474b6fda21...codex/nnetics-live-integration). The first commit is part of the entry, not an excluded baseline. Consolidation commits remain local and await release review/publication; no new tag or release is claimed.
-
-AI assistance: OpenAI Codex and OpenCode. Direct libraries include Next/React, near-api-js 7.4.0, Wallet Selector 10.1.4, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests also use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are in the manifests/lockfiles. [Third-party notices](THIRD_PARTY_NOTICES.md) disclose adapted UI and the isolated Stageshow design illustration. Original code: [MIT](LICENSE), selected by the project owner.
+Direct libraries include Next/React, near-api-js 7.4.0, Wallet Selector 10.1.4, near-sdk 5.29.1, near-workspaces 0.23.0, near-sandbox 0.3.12, Tokio, anyhow and serde_json; proof tests also use near-primitives 0.37.4, ed25519-dalek 2.2.0 and reqwest 0.13.5. Exact dependencies are in the manifests/lockfiles. [Third-party notices](THIRD_PARTY_NOTICES.md) disclose adapted UI and the isolated Stageshow design illustration. Original code: [MIT](LICENSE), selected by the project owner.
 
 ## Documentation map
 
