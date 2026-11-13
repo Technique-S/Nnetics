@@ -2,7 +2,7 @@
 
 Date: 2026-11-13 (Africa/Lagos). Candidate: `chore/nnetics-repository-consolidation`, canonical application `apps/owner`. This continues OpenCode's interrupted nine-phase consolidation; it does not restart the project or merge entire historical worktrees.
 
-> 2026-11-13 update: the final pre-submission verification pass is recorded in [final-release-verification.md](final-release-verification.md). It supersedes the counts and scope limits in section D below (lint is now established, test totals expanded, and the real-model status is precisely quota-blocked for four tools). Section D is retained as the consolidation-phase record.
+> 2026-11-13 update: the final pre-submission verification pass is recorded in [final-release-verification.md](final-release-verification.md). Where section D below differs, that report is authoritative: lint is now established, test totals are expanded (45 root / 395 owner / 262 browser), the real-model status is precisely quota-blocked for four tools, and the deployment-tooling comparison is no longer strictly unchanged — `deploy/measure.mjs` carries the functionally inert Promise-executor lint fix from commit `0be8d19` (contract sources remain byte-identical). Section D is retained as the consolidation-phase record.
 
 ## Release decision
 
