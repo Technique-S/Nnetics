@@ -48,7 +48,7 @@ try {
       );
     }
     if (process.argv.includes("--once")) break;
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => { setTimeout(resolve, 5000); });
   } while (!stopped);
 } finally {
   unlock();

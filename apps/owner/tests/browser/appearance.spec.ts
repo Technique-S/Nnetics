@@ -35,7 +35,7 @@ for(const theme of ['light','dark'] as const){
    await page.emulateMedia({colorScheme:theme});await page.route('**/api/live/config',route=>route.fulfill({json:{network:'testnet',wallet:'meteor',missing:[],configurationValid:true,transactionsEnabled:false,paymentExecutionEnabled:false}}));
    await page.goto('/');await expect(page.getByRole('heading',{name:'Sign in'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-signin`);
    await page.goto('/contractor');await expect(page.getByRole('heading',{name:'Private access unavailable'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-contractor-invalid`);
-   let release!:()=>void;const gate=new Promise<void>(r=>release=r);let requested=false;
+   let release!:()=>void;const gate=new Promise<void>(r=>{ release=r; });let requested=false;
    await page.route('**/api/demo/contractors/owner',async route=>{requested=true;await gate;await route.fulfill({status:503,json:{error:'Fixture unavailable'}});});
    await page.goto('/demo/contractors');await expect.poll(()=>requested).toBeTruthy();await capture(page,`${info.project.name}-${theme}-loading`);release();await expect(page.getByRole('heading',{name:'Contractor records unavailable'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-error`);
    await page.goto('/unavailable-theme-fixture');await expect(page.getByRole('heading',{name:'Page not found'})).toBeVisible();await capture(page,`${info.project.name}-${theme}-not-found`);

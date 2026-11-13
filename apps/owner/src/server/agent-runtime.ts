@@ -6,7 +6,7 @@ import { contractorTools, validateContractorTool } from "./agent-contractor-tool
 // bounds the number of model/tool steps. No deterministic intent parser is used.
 import crypto from "node:crypto";
 import type { AgentToolExecutor, ToolResult } from "./agent-tools.ts";
-import { formatNear } from "../data/owner-adapter.ts";
+import { amountFromNear, formatNear } from "../data/owner-adapter.ts";
 import {
   catalogForMode,
   findAgentTool,
@@ -170,6 +170,32 @@ function stringArg(value: unknown, label: string, min: number, max: number): str
 function validateToolArguments(name: AgentToolName, raw: unknown): Validation {
   if (!plainObject(raw)) return { ok: false, error: "Tool arguments must be a JSON object." };
   const args = raw as Record<string, unknown>;
+  if (["create_work_order", "list_work_orders", "get_work_order", "update_work_order", "cancel_work_order", "review_invoice", "get_invoice_payment_readiness"].includes(name)) {
+    const allowed: Record<string, string[]> = {
+      create_work_order: ["contractorId", "reference", "title", "amount"],
+      list_work_orders: ["contractorId", "status"], get_work_order: ["id"],
+      update_work_order: ["id", "title", "amount"], cancel_work_order: ["id"],
+      review_invoice: ["id", "decision", "note"], get_invoice_payment_readiness: ["id"],
+    };
+    const unexpected = checkKeys(args, allowed[name]);
+    if (unexpected) return {ok:false,error:unexpected};
+    if (name !== "list_work_orders" && name !== "create_work_order" && !stringArg(args.id,"id",1,120)) return {ok:false,error:"An exact record ID is required."};
+    if ((name === "create_work_order" || args.contractorId !== undefined) && !stringArg(args.contractorId,"contractorId",1,120)) return {ok:false,error:"An exact contractor ID is required."};
+    if (name === "create_work_order" && !stringArg(args.reference,"reference",1,80)) return {ok:false,error:"A work-order reference of 1-80 characters is required."};
+    if ((name === "create_work_order" || args.title !== undefined) && !stringArg(args.title,"title",1,240)) return {ok:false,error:"A work description of 1-240 characters is required."};
+    if (name === "create_work_order" || args.amount !== undefined) {
+      try { if(typeof args.amount !== "string")throw Error(); amountFromNear(args.amount); }
+      catch { return {ok:false,error:"An exact positive NEAR amount is required."}; }
+    }
+    if (name === "list_work_orders" && args.status !== undefined && (typeof args.status !== "string" || !["active","cancelled"].includes(args.status))) return {ok:false,error:"Invalid work-order status."};
+    if (name === "update_work_order" && args.title === undefined && args.amount === undefined) return {ok:false,error:"Specify a work-order field to update."};
+    if (name === "review_invoice") {
+      if (typeof args.decision !== "string" || !["approve","reject","clarify"].includes(args.decision)) return {ok:false,error:"Invalid invoice decision."};
+      if (args.note !== undefined && (typeof args.note !== "string" || args.note.length > 1000)) return {ok:false,error:"Review notes must be at most 1000 characters."};
+      if (args.decision !== "approve" && !stringArg(args.note,"note",1,1000)) return {ok:false,error:"A review note is required for rejection or clarification."};
+    }
+    return {ok:true,args};
+  }
   if(name==="list_payables") {
     const unexpected=checkKeys(args,["status","query","overdue"]);
     if(unexpected)return {ok:false,error:unexpected};

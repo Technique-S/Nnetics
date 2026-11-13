@@ -90,7 +90,7 @@ for(const ordering of ['during RPC','after finalization'] as const)test(`conflic
   const peer={...f.s,queue:{db:other}} as OrganizationService;
   const original=f.s.chain.rpc.bind(f.s.chain);
   let entered!:()=>void,release!:()=>void,arrivals=0;
-  const started=new Promise<void>(resolve=>entered=resolve),held=new Promise<void>(resolve=>release=resolve);
+  const started=new Promise<void>(resolve=>{ entered=resolve; }),held=new Promise<void>(resolve=>{ release=resolve; });
   f.s.chain.rpc=async<T>(method:string,params:unknown)=>{if(method==='tx'){if(++arrivals===(ordering==='during RPC'?2:1))entered();await held;}return original<T>(method,params);};
   const pending=ownerAttempt(f.s,'session'),concurrent=ordering==='during RPC'?ownerAttempt(peer,'session'):null;await started;
   const conflicting='2'.repeat(44),another='3'.repeat(44);
@@ -115,7 +115,7 @@ test('concurrent successful reconciliations retain one history and consumed auth
  const f=fixture();try{
   const p=await f.prepare();await ownerAttempt(f.s,'session',{action:'dispatch',id:p.id});f.setFinal();
   const original=f.s.chain.rpc.bind(f.s.chain);let release!:()=>void,entered!:()=>void,count=0;
-  const held=new Promise<void>(resolve=>release=resolve),started=new Promise<void>(resolve=>entered=resolve);
+  const held=new Promise<void>(resolve=>{ release=resolve; }),started=new Promise<void>(resolve=>{ entered=resolve; });
   f.s.chain.rpc=async<T>(method:string,params:unknown)=>{if(method==='tx'){if(++count===2)entered();await held;}return original<T>(method,params);};
   const a=ownerAttempt(f.s,'session'),b=ownerAttempt(f.s,'session');await started;release();
   assert.deepEqual((await Promise.all([a,b])).map(r=>r.state),['confirmed','confirmed']);

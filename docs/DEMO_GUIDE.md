@@ -54,7 +54,7 @@ These links are preserved historical references, not freshly reverified chain ob
 
 ## Verification with isolated data
 
-At repository root, run `npm test`. In `apps/owner`, run `npm test`, `npm run typecheck`, `npm run check:theme`, and `npm run build`. There is no configured standalone lint command; do not represent type checking as a lint run.
+At repository root, run `npm ci`, `npm run lint`, and `npm test`. In `apps/owner`, run `npm ci`, `npm run lint`, `npm test`, `npm run typecheck`, `npm run check:theme`, and `npm run build`. ESLint is a separate correctness gate; type checking is not represented as lint. The app lint command uses the root tooling installation.
 
 For browser checks, use a clean checkout with no private environment file, a free port, and a fresh directory. From `apps/owner` on PowerShell:
 
@@ -79,9 +79,13 @@ npm run test:browser
 
 Playwright starts and stops the production server. Windows uses installed Edge; Linux uses Chromium (`npx playwright install --with-deps chromium`). The clean-checkout [CI workflow](../.github/workflows/owner-integration.yml) provides the Linux equivalent. If you intentionally built into `.next-hosting`, set `NNETICS_BUILD_DIRECTORY=.next-hosting` for typecheck, build and browser run consistently. Never reuse private databases. Both demo database overrides are required for isolation.
 
+For ordinary regression checks, `npm run test:browser:isolated` applies the isolated settings automatically and rejects remote origins. It defaults to port 3120 and the repository's single worker. Run large builds and development acceptance separately from browser timing checks on constrained Windows hosts. The manual recipe above remains available for inspection.
+
 `ask-nnetics.spec.ts` and the configured-provider case in `demo-intents-integration.spec.ts` are separate real-provider acceptance tests. The default suite skips them unless `NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1` is explicitly set. A separately approved run also needs a configured server-side provider key and available quota; assertions still require real successful responses. Controlled-provider agent/lifecycle tests run without this opt-in. No complete real-provider pass is claimed by the default suite.
 
 Rust/sandbox checks require the supported Linux/macOS runtime: `bash scripts/check-core.sh` and `bash scripts/check-provisioning.sh`. They use local sandbox accounts. Do not substitute a public-network sandbox binary or initiate new testnet transfers.
+
+For final release evidence, use [LINUX_RELEASE_VERIFICATION.md](LINUX_RELEASE_VERIFICATION.md) and `bash scripts/check-release-contracts.sh` on both pinned runtimes. Real-model HTTP acceptance is separately reproducible with `NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1 npm run test:real-model`; its records/proofs are synthetic but the configured provider responses are real. Provider errors and skipped checks cannot be presented as a full pass. See the [current final report](final-release-verification.md) for actual coverage and quota blockers.
 
 ## Publication
 

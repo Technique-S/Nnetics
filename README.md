@@ -4,6 +4,8 @@ Your work agreements deserve more than a DM. Manage contractors, document agreem
 
 Nnetics is a **NEAR testnet MVP** for contractor billing: private invitations, wallet approval, text-first invoices, clarification and owner review, with payment rules independently enforced by a Rust vault. The submission demo uses clearly labeled sample records. **New owner transactions, automated payments and provisioning are disabled.** This is not a mainnet payment service or an independently reviewed contract.
 
+It serves small teams managing independent contractors and contractors who need a private place to submit invoices, clarify work and track review/payment evidence.
+
 The canonical local application is **`apps/owner` on `chore/nnetics-repository-consolidation`**. The sibling `payscope-*` folders are recovery worktrees of this same repository, not additional services. Start development with `cd apps/owner && npm ci && npm run dev`. [Repository audit](docs/repository-consolidation-audit.md) and [feature reconciliation](docs/feature-reconciliation-matrix.md) explain the source decisions. The remote default branch was last observed as the older `codex/payscope-milestone-1`; publication and a default-branch change remain pending owner review. See the [current release audit](docs/pre-submission-audit.md).
 
 ## Try it locally — no wallet or secrets required
@@ -77,6 +79,8 @@ See the [current release audit](docs/pre-submission-audit.md) for commands, coun
 
 ```sh
 # Repository root: policy regressions, no network transactions
+npm ci
+npm run lint
 npm test
 # Owner app: backend, types, theme and production build
 cd apps/owner
@@ -85,6 +89,10 @@ npm run typecheck
 npm run check:theme
 npm run build
 ```
+
+Linting uses pinned ESLint/TypeScript parsing and React hook-order checks for active JavaScript/TypeScript source, tests and tooling. It does not replace type checking or Rust fmt/Clippy. From `apps/owner`, `npm run lint` requires the root `npm ci` first. `npm run test:browser:isolated` starts a separate local production server with fresh temporary databases and all model/transaction flags disabled. `npm run verify:clean` at the root checks installation, lint and production build from a fresh source-only temporary checkout.
+
+Fresh Rust/Sandbox execution requires the [pinned Linux verification procedure](docs/LINUX_RELEASE_VERIFICATION.md). The [final acceptance report](docs/final-release-verification.md) maps the original brief to evidence and blockers. Real-provider acceptance uses `NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1 npm run test:real-model` from `apps/owner` with the actual configured server key/model; it is not part of the default secretless suite. Current real-model verification is partial and provider-quota dependent; consult the report before claiming full acceptance.
 
 Use [the isolated fixture recipe](docs/DEMO_GUIDE.md#regressions) or the existing CI workflows for browser tests; do not point mutation tests at a real/private database. Linux Rust checks: `bash scripts/check-core.sh` (rustup and system prerequisites in [PAYMENT_CORE.md](docs/PAYMENT_CORE.md)); these use local Sandbox accounts and do not deploy to public networks. Passing tests are not independent security review.
 

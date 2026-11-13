@@ -204,7 +204,10 @@ export class OpenRouterAgentAdapter implements AgentModelAdapter {
       model: this.model,
       messages: request.messages,
       temperature: 0,
-      max_tokens: 900,
+      // Leave room for the configured reasoning model's tool calls and final
+      // answer. The previous 900-token ceiling truncated valid acceptance
+      // requests. Response bytes, request timeout and runtime step caps remain.
+      max_tokens: 2048,
       provider: { require_parameters: true },
     };
     if (hasTools) {

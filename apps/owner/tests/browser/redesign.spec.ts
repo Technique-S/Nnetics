@@ -6,7 +6,7 @@ import {fixtureWorkspace} from './release-fixture';
 test('zero-budget empty vault renders safely and administration stays contextual',async({page})=>{
  const snapshot=await new MockOwnerAdapter(0).snapshot();snapshot.mode='testnet';snapshot.protocolVersion=88;snapshot.access={organization:'studio',accountId:'owner.testnet',role:'owner',vaultOwner:snapshot.vault.owner};
  Object.assign(snapshot.vault,{budget:'0',spent:'0',reserved:'0',funded:'0',paused:true,agent:null});snapshot.vendors=[];snapshot.orders=[];snapshot.invoices=[];snapshot.payments=[];snapshot.queue=[];
- let release!:()=>void;const gate=new Promise<void>(resolve=>release=resolve);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ let release!:()=>void;const gate=new Promise<void>(resolve=>{ release=resolve; });const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/api/live/config',r=>r.fulfill({json:{network:'testnet',organization:'studio',contract:'vault.owner.testnet',worker:'worker.owner.testnet',publicKey:'',configured:true,transactionsEnabled:false}}));
  await page.route('**/api/live/identity',r=>r.fulfill({json:{accountId:'owner.testnet',network:'testnet',organizations:[{id:'studio',name:'Content studio',status:'ready',role:'owner'}],notice:''}}));
  await page.route('**/api/live/contractors/owner**',r=>r.fulfill({json:{mode:'persistent',profiles:[],orders:[],invoices:[]}}));

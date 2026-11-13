@@ -9,7 +9,7 @@ import type {
 } from "./owner-adapter.ts";
 
 const sleep = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+  new Promise<void>((resolve) => { setTimeout(resolve, ms); });
 const id = (value: string) => {
   if (!/^[A-Za-z0-9_:-]{1,64}$/.test(value))
     throw new Error(

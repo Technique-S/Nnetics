@@ -483,7 +483,7 @@ test('an accepted wallet message followed by workspace RPC failure offers saved-
 });
 
 test('focus loss does not cancel an in-flight organization action or require wallet proof',async({page})=>{
- const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>release=r);await page.route('**/api/live/organizations',async route=>{await hold;await route.fulfill({json:{id:'new-org',name:'New workspace',status:'unprovisioned',role:'creator'}})});
+ const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>{ release=r; });await page.route('**/api/live/organizations',async route=>{await hold;await route.fulfill({json:{id:'new-org',name:'New workspace',status:'unprovisioned',role:'creator'}})});
  await page.goto('/');await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();await page.getByLabel('Organization name').fill('New workspace');await page.getByRole('button',{name:'Create organization',exact:true}).click();await page.evaluate(()=>window.dispatchEvent(new Event('blur')));release();await expect(page.getByRole('button',{name:'Create organization',exact:true})).toBeEnabled();expect(f.logoutCalls()).toBe(0);expect(f.resumeCalls()).toBe(0);
 });
 
@@ -501,6 +501,7 @@ test('persistent HttpOnly session survives a browser process restart and logout 
  // Both desktop and emulated mobile persistent contexts are supported here.
  const address=String(testInfo.project.use.baseURL);
  const profile=await mkdtemp(join(tmpdir(),'nnetics-session-test-'));let context:Awaited<ReturnType<typeof chromium.launchPersistentContext>>|undefined;
+ if(!profile.startsWith(join(tmpdir(),'nnetics-session-test-')))throw Error('Unexpected test profile path');
  const launch=async()=>{context=await chromium.launchPersistentContext(profile,{headless:true,channel:process.platform==='win32'?'msedge':undefined,viewport:testInfo.project.use.viewport,isMobile:testInfo.project.use.isMobile,hasTouch:testInfo.project.use.hasTouch});const page=await context.newPage();const f=await fixture(page,'first.testnet');
  const hasSession=(cookie:string|undefined)=>cookie?.includes('test_identity=opaque-test-token');
  await page.route('**/api/live/identity',route=>route.fulfill(hasSession(route.request().headers().cookie)?{json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:''}}:{status:401,json:{error:'Sign in required'}}));
@@ -512,7 +513,7 @@ test('persistent HttpOnly session survives a browser process restart and logout 
  run=await launch();await run.page.goto(address);await expect(run.page.getByText('Signed in as first.testnet \u00b7 NEAR network',{exact:true})).toBeVisible();expect(await run.page.evaluate(()=>(window as any).meteorProbe.requests)).toBe(0);
  await openAccountMenu(run.page);await run.page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(run.page.getByRole('heading',{name:'Sign in'})).toBeVisible();await expect.poll(async()=>(await context!.cookies()).some(c=>c.name==='test_identity')).toBe(false);await context!.close();context=undefined;
  run=await launch();await run.page.goto(address);await expect(run.page.getByRole('button',{name:'Connect to Meteor',exact:true})).toBeVisible();await expect(run.page.getByRole('button',{name:'Create organization',exact:true})).toHaveCount(0);
- }finally{await context?.close();if(!profile.startsWith(join(tmpdir(),'nnetics-session-test-')))throw Error('Unexpected test profile path');await rm(profile,{recursive:true,force:true});}
+ }finally{await context?.close();await rm(profile,{recursive:true,force:true});}
 });
 
 test('a cancelled optional wallet check retains the authenticated account and its records',async({page})=>{
@@ -521,7 +522,7 @@ test('a cancelled optional wallet check retains the authenticated account and it
 
 
 test('refresh waits for saved-session restoration instead of falsely showing a disconnected wallet',async({page})=>{
- const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>release=r);await page.route('**/api/live/identity',async route=>{await hold;await route.fulfill({json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:''}})});
+ const f=await fixture(page,'first.testnet');let release!:()=>void;const hold=new Promise<void>(r=>{ release=r; });await page.route('**/api/live/identity',async route=>{await hold;await route.fulfill({json:{accountId:'first.testnet',network:'testnet',organizations:[],notice:''}})});
  await page.goto('/');await expect(page.getByRole('heading',{name:'Restoring your saved session'})).toBeVisible();await expect(page.getByRole('button',{name:'Connect to Meteor',exact:true})).toHaveCount(0);release();await expect(page.getByRole('heading',{name:'Your workspace',exact:true})).toBeVisible();expect(f.loginCalls()).toBe(0);expect(f.logoutCalls()).toBe(0);
 });
 

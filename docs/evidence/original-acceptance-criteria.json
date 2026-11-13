@@ -1,0 +1,1638 @@
+{
+  "source": "Original nine-phase brief supplied by the operator",
+  "sourceSha256": "43ebf8815f1710aa958844f831cc8b77ded7bc18cb923eb27647d0bbc04f97ec",
+  "requirements": [
+    {
+      "id": "SAFETY.001",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not delete either source branch before successful consolidation and verification."
+    },
+    {
+      "id": "SAFETY.002",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not force-push, reset shared branches, rewrite public history, or delete remote branches without explicit approval."
+    },
+    {
+      "id": "SAFETY.003",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not overwrite newer working functionality with older implementations."
+    },
+    {
+      "id": "SAFETY.004",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not remove code based solely on filenames, modification dates, or apparent inactivity."
+    },
+    {
+      "id": "SAFETY.005",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not delete tests because they currently fail."
+    },
+    {
+      "id": "SAFETY.006",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not delete security checks, permission boundaries, or authorization logic to simplify the demo."
+    },
+    {
+      "id": "SAFETY.007",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not modify deployed NEAR contract state, initiate payments, or execute blockchain transactions."
+    },
+    {
+      "id": "SAFETY.008",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Preserve production and testnet contract interfaces unless a change is necessary and explicitly approved."
+    },
+    {
+      "id": "SAFETY.009",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Do not expose wallet credentials, private keys, environment secrets, or API keys."
+    },
+    {
+      "id": "SAFETY.010",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Preserve existing user data, migrations, invoice records, and backend persistence behavior."
+    },
+    {
+      "id": "SAFETY.011",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Never claim a feature works unless its behavior has been verified."
+    },
+    {
+      "id": "SAFETY.012",
+      "phase": "SAFETY",
+      "section": "Non-negotiable safety",
+      "criterion": "Keep all consolidation work on a dedicated working branch until acceptance checks pass."
+    },
+    {
+      "id": "P1.001",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Current branch and working-tree status."
+    },
+    {
+      "id": "P1.002",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "All local and remote branches."
+    },
+    {
+      "id": "P1.003",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Default branch."
+    },
+    {
+      "id": "P1.004",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Branch relationships and merge bases."
+    },
+    {
+      "id": "P1.005",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Commit history and divergence."
+    },
+    {
+      "id": "P1.006",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Uncommitted changes and untracked files."
+    },
+    {
+      "id": "P1.007",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Application directories and entry points."
+    },
+    {
+      "id": "P1.008",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Package managers and workspace configurations."
+    },
+    {
+      "id": "P1.009",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Frontend, backend, and smart contract directories."
+    },
+    {
+      "id": "P1.010",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "CI/CD workflows."
+    },
+    {
+      "id": "P1.011",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Existing tests."
+    },
+    {
+      "id": "P1.012",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Deployment configuration."
+    },
+    {
+      "id": "P1.013",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Documentation and demo assets."
+    },
+    {
+      "id": "P1.014",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Generated build artifacts."
+    },
+    {
+      "id": "P1.015",
+      "phase": "P1",
+      "section": "PHASE 1: FULL REPOSITORY DISCOVERY",
+      "criterion": "Duplicate application implementations."
+    },
+    {
+      "id": "P1.016",
+      "phase": "P1",
+      "section": "Required deliverable",
+      "criterion": "Create docs/repository-consolidation-audit.md"
+    },
+    {
+      "id": "P2.001",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "NEAR wallet connection."
+    },
+    {
+      "id": "P2.002",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Meteor wallet integration."
+    },
+    {
+      "id": "P2.003",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "NEP-413 authentication."
+    },
+    {
+      "id": "P2.004",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Wallet session handling."
+    },
+    {
+      "id": "P2.005",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Organization creation."
+    },
+    {
+      "id": "P2.006",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Organization ownership."
+    },
+    {
+      "id": "P2.007",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Wallet-based organization isolation."
+    },
+    {
+      "id": "P2.008",
+      "phase": "P2",
+      "section": "Authentication and identity",
+      "criterion": "Owner and viewer permissions."
+    },
+    {
+      "id": "P2.009",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Contractor profile creation."
+    },
+    {
+      "id": "P2.010",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Contractor invitation links."
+    },
+    {
+      "id": "P2.011",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Revocable private contractor portals."
+    },
+    {
+      "id": "P2.012",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Contractor wallet registration."
+    },
+    {
+      "id": "P2.013",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Wallet change requests."
+    },
+    {
+      "id": "P2.014",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Owner approval workflows."
+    },
+    {
+      "id": "P2.015",
+      "phase": "P2",
+      "section": "Organization and contractor management",
+      "criterion": "Contractor access restrictions."
+    },
+    {
+      "id": "P2.016",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Invoice submissions."
+    },
+    {
+      "id": "P2.017",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Text-based invoice extraction."
+    },
+    {
+      "id": "P2.018",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "File-based invoice handling."
+    },
+    {
+      "id": "P2.019",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Automatic invoice numbering."
+    },
+    {
+      "id": "P2.020",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "NEAR denomination defaults."
+    },
+    {
+      "id": "P2.021",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Invoice status tracking."
+    },
+    {
+      "id": "P2.022",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Invoice review and approval."
+    },
+    {
+      "id": "P2.023",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Original invoice content preservation."
+    },
+    {
+      "id": "P2.024",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Work-order relationships."
+    },
+    {
+      "id": "P2.025",
+      "phase": "P2",
+      "section": "Invoices and approvals",
+      "criterion": "Record persistence."
+    },
+    {
+      "id": "P2.026",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "NEAR vault provisioning."
+    },
+    {
+      "id": "P2.027",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Organization-to-vault binding."
+    },
+    {
+      "id": "P2.028",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Spending controls."
+    },
+    {
+      "id": "P2.029",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Payment authorizations."
+    },
+    {
+      "id": "P2.030",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Spending reservations."
+    },
+    {
+      "id": "P2.031",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Payment execution workflows."
+    },
+    {
+      "id": "P2.032",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Pausing and revocation."
+    },
+    {
+      "id": "P2.033",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Expiry restrictions."
+    },
+    {
+      "id": "P2.034",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Historical proof and verification."
+    },
+    {
+      "id": "P2.035",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Transaction references."
+    },
+    {
+      "id": "P2.036",
+      "phase": "P2",
+      "section": "Payment infrastructure",
+      "criterion": "Payment receipts and audit history."
+    },
+    {
+      "id": "P2.037",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Overview page."
+    },
+    {
+      "id": "P2.038",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Contractor management views."
+    },
+    {
+      "id": "P2.039",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Invoice management views."
+    },
+    {
+      "id": "P2.040",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Payment management views."
+    },
+    {
+      "id": "P2.041",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Vault information."
+    },
+    {
+      "id": "P2.042",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Activity and history."
+    },
+    {
+      "id": "P2.043",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Loading screens."
+    },
+    {
+      "id": "P2.044",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Authentication screens."
+    },
+    {
+      "id": "P2.045",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Private contractor portal."
+    },
+    {
+      "id": "P2.046",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Responsive desktop and mobile layouts."
+    },
+    {
+      "id": "P2.047",
+      "phase": "P2",
+      "section": "Dashboard and interface",
+      "criterion": "Existing visual design system."
+    },
+    {
+      "id": "P2.048",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "AI assistant interface."
+    },
+    {
+      "id": "P2.049",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "LLM integration."
+    },
+    {
+      "id": "P2.050",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "API key handling."
+    },
+    {
+      "id": "P2.051",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "Agent/tool integrations."
+    },
+    {
+      "id": "P2.052",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "Demo action execution."
+    },
+    {
+      "id": "P2.053",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "Authorization checks."
+    },
+    {
+      "id": "P2.054",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "Confirmation requirements for sensitive actions."
+    },
+    {
+      "id": "P2.055",
+      "phase": "P2",
+      "section": "Ask Nnetics",
+      "criterion": "Action logging and error handling."
+    },
+    {
+      "id": "P2.056",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Whether it exists in `payscope`."
+    },
+    {
+      "id": "P2.057",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Whether it exists in `payscope-demo-intents`."
+    },
+    {
+      "id": "P2.058",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Which implementation is more complete."
+    },
+    {
+      "id": "P2.059",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Which implementation is more recent."
+    },
+    {
+      "id": "P2.060",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Which implementation is actually functional."
+    },
+    {
+      "id": "P2.061",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Dependencies or conflicting implementations."
+    },
+    {
+      "id": "P2.062",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Required integration work."
+    },
+    {
+      "id": "P2.063",
+      "phase": "P2",
+      "section": "Other capabilities",
+      "criterion": "Final reconciliation decision."
+    },
+    {
+      "id": "P2.064",
+      "phase": "P2",
+      "section": "Important",
+      "criterion": "Create docs/feature-reconciliation-matrix.md"
+    },
+    {
+      "id": "P3.001",
+      "phase": "P3",
+      "section": "PHASE 3: ESTABLISH ONE CANONICAL APPLICATION",
+      "criterion": "Preserve recovery references to both source branches."
+    },
+    {
+      "id": "P3.002",
+      "phase": "P3",
+      "section": "PHASE 3: ESTABLISH ONE CANONICAL APPLICATION",
+      "criterion": "Record their exact commit hashes."
+    },
+    {
+      "id": "P3.003",
+      "phase": "P3",
+      "section": "PHASE 3: ESTABLISH ONE CANONICAL APPLICATION",
+      "criterion": "Preserve uncommitted work safely."
+    },
+    {
+      "id": "P3.004",
+      "phase": "P3",
+      "section": "PHASE 3: ESTABLISH ONE CANONICAL APPLICATION",
+      "criterion": "Ensure the working tree is suitable for consolidation."
+    },
+    {
+      "id": "P3.005",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One authoritative frontend."
+    },
+    {
+      "id": "P3.006",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One authoritative backend architecture."
+    },
+    {
+      "id": "P3.007",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One consistent set of application routes."
+    },
+    {
+      "id": "P3.008",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One coherent component architecture."
+    },
+    {
+      "id": "P3.009",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One clear package/workspace structure."
+    },
+    {
+      "id": "P3.010",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One documented development startup path."
+    },
+    {
+      "id": "P3.011",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One documented production build path."
+    },
+    {
+      "id": "P3.012",
+      "phase": "P3",
+      "section": "Canonical application requirements",
+      "criterion": "One coherent approach to application configuration."
+    },
+    {
+      "id": "P4.001",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Identify the preferred source implementation."
+    },
+    {
+      "id": "P4.002",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Trace its dependencies."
+    },
+    {
+      "id": "P4.003",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Verify authentication and authorization expectations."
+    },
+    {
+      "id": "P4.004",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Integrate it into the canonical application."
+    },
+    {
+      "id": "P4.005",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Resolve incompatible data models or imports."
+    },
+    {
+      "id": "P4.006",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Preserve existing working behavior."
+    },
+    {
+      "id": "P4.007",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Add or update relevant tests."
+    },
+    {
+      "id": "P4.008",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Verify that the feature works within the consolidated application."
+    },
+    {
+      "id": "P4.009",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Latest dashboard functionality."
+    },
+    {
+      "id": "P4.010",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Overview tab."
+    },
+    {
+      "id": "P4.011",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Complete visual design system."
+    },
+    {
+      "id": "P4.012",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Private contractor portal."
+    },
+    {
+      "id": "P4.013",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Invoice management."
+    },
+    {
+      "id": "P4.014",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Organization provisioning."
+    },
+    {
+      "id": "P4.015",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "NEAR wallet integration."
+    },
+    {
+      "id": "P4.016",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Vault management."
+    },
+    {
+      "id": "P4.017",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Ask Nnetics functionality."
+    },
+    {
+      "id": "P4.018",
+      "phase": "P4",
+      "section": "PHASE 4: RESTORE AND INTEGRATE ALL VALUABLE FEATURES",
+      "criterion": "Demo-specific workflows."
+    },
+    {
+      "id": "P5.001",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Duplicate frontend applications."
+    },
+    {
+      "id": "P5.002",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Superseded components."
+    },
+    {
+      "id": "P5.003",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Unreferenced utility functions."
+    },
+    {
+      "id": "P5.004",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Unused assets."
+    },
+    {
+      "id": "P5.005",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Abandoned experiments."
+    },
+    {
+      "id": "P5.006",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Stale demo implementations."
+    },
+    {
+      "id": "P5.007",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Deprecated scripts."
+    },
+    {
+      "id": "P5.008",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Obsolete configuration files."
+    },
+    {
+      "id": "P5.009",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Redundant documentation."
+    },
+    {
+      "id": "P5.010",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Generated artifacts accidentally tracked by Git."
+    },
+    {
+      "id": "P5.011",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Temporary debugging files."
+    },
+    {
+      "id": "P5.012",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Unused dependencies."
+    },
+    {
+      "id": "P5.013",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Dead routes and imports."
+    },
+    {
+      "id": "P5.014",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Application source code."
+    },
+    {
+      "id": "P5.015",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Dynamic imports."
+    },
+    {
+      "id": "P5.016",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Package scripts."
+    },
+    {
+      "id": "P5.017",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "CI workflows."
+    },
+    {
+      "id": "P5.018",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Build configuration."
+    },
+    {
+      "id": "P5.019",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Tests."
+    },
+    {
+      "id": "P5.020",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Documentation."
+    },
+    {
+      "id": "P5.021",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Deployment processes."
+    },
+    {
+      "id": "P5.022",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Smart contract tooling."
+    },
+    {
+      "id": "P5.023",
+      "phase": "P5",
+      "section": "PHASE 5: REPOSITORY CLEANUP",
+      "criterion": "Runtime configuration."
+    },
+    {
+      "id": "P6.001",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Type checking."
+    },
+    {
+      "id": "P6.002",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Linting."
+    },
+    {
+      "id": "P6.003",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Production build."
+    },
+    {
+      "id": "P6.004",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Component and integration tests."
+    },
+    {
+      "id": "P6.005",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Browser smoke tests."
+    },
+    {
+      "id": "P6.006",
+      "phase": "P6",
+      "section": "Frontend",
+      "criterion": "Responsive layout checks."
+    },
+    {
+      "id": "P6.007",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "API tests."
+    },
+    {
+      "id": "P6.008",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Authentication tests."
+    },
+    {
+      "id": "P6.009",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Organization isolation tests."
+    },
+    {
+      "id": "P6.010",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Invoice persistence tests."
+    },
+    {
+      "id": "P6.011",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Contractor portal tests."
+    },
+    {
+      "id": "P6.012",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Authorization tests."
+    },
+    {
+      "id": "P6.013",
+      "phase": "P6",
+      "section": "Backend",
+      "criterion": "Restart persistence checks."
+    },
+    {
+      "id": "P6.014",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Rust unit tests."
+    },
+    {
+      "id": "P6.015",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Smart contract sandbox tests where supported."
+    },
+    {
+      "id": "P6.016",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Contract-interface compatibility checks."
+    },
+    {
+      "id": "P6.017",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Vault provisioning tests."
+    },
+    {
+      "id": "P6.018",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Spending guard tests."
+    },
+    {
+      "id": "P6.019",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Payment reservation tests."
+    },
+    {
+      "id": "P6.020",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Pause and revocation tests."
+    },
+    {
+      "id": "P6.021",
+      "phase": "P6",
+      "section": "NEAR infrastructure",
+      "criterion": "Expiry tests."
+    },
+    {
+      "id": "P6.022",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "LLM integration tests using safe mocks where appropriate."
+    },
+    {
+      "id": "P6.023",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "Tool invocation tests."
+    },
+    {
+      "id": "P6.024",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "Permission boundary tests."
+    },
+    {
+      "id": "P6.025",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "Confirmation flow tests."
+    },
+    {
+      "id": "P6.026",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "Invalid action and failure handling."
+    },
+    {
+      "id": "P6.027",
+      "phase": "P6",
+      "section": "AI assistant",
+      "criterion": "Demo intent execution tests."
+    },
+    {
+      "id": "P6.028",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Open Nnetics."
+    },
+    {
+      "id": "P6.029",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Connect a supported NEAR testnet wallet."
+    },
+    {
+      "id": "P6.030",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Create an organization."
+    },
+    {
+      "id": "P6.031",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Open the Overview dashboard."
+    },
+    {
+      "id": "P6.032",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Create a contractor profile."
+    },
+    {
+      "id": "P6.033",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Generate a private invitation."
+    },
+    {
+      "id": "P6.034",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Open the contractor portal."
+    },
+    {
+      "id": "P6.035",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Submit an invoice."
+    },
+    {
+      "id": "P6.036",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Review the submitted invoice as the owner."
+    },
+    {
+      "id": "P6.037",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Approve the invoice."
+    },
+    {
+      "id": "P6.038",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Verify the associated payment workflow."
+    },
+    {
+      "id": "P6.039",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Inspect the corresponding status, evidence, and available receipt."
+    },
+    {
+      "id": "P6.040",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Exercise Ask Nnetics functionality."
+    },
+    {
+      "id": "P6.041",
+      "phase": "P6",
+      "section": "Full application journey",
+      "criterion": "Verify access isolation and responsive behavior."
+    },
+    {
+      "id": "P7.001",
+      "phase": "P7",
+      "section": "PHASE 7: CLEAN GIT BRANCH STRUCTURE",
+      "criterion": "`main`: canonical, submission-ready Nnetics application."
+    },
+    {
+      "id": "P7.002",
+      "phase": "P7",
+      "section": "PHASE 7: CLEAN GIT BRANCH STRUCTURE",
+      "criterion": "A temporary consolidation branch until review and integration are complete."
+    },
+    {
+      "id": "P7.003",
+      "phase": "P7",
+      "section": "PHASE 7: CLEAN GIT BRANCH STRUCTURE",
+      "criterion": "Optional active development branches that are genuinely needed."
+    },
+    {
+      "id": "P7.004",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Identify merged and unmerged branches."
+    },
+    {
+      "id": "P7.005",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Determine whether each branch contains unique work."
+    },
+    {
+      "id": "P7.006",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Confirm whether its valuable changes exist in the canonical application."
+    },
+    {
+      "id": "P7.007",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Prepare an explicit list of branches proposed for deletion."
+    },
+    {
+      "id": "P7.008",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Mark branches that must remain protected."
+    },
+    {
+      "id": "P7.009",
+      "phase": "P7",
+      "section": "Branch cleanup procedure",
+      "criterion": "Request approval before deleting local or remote branches."
+    },
+    {
+      "id": "P8.001",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Project name: Nnetics."
+    },
+    {
+      "id": "P8.002",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Concise product overview."
+    },
+    {
+      "id": "P8.003",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Problem being solved."
+    },
+    {
+      "id": "P8.004",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Target users."
+    },
+    {
+      "id": "P8.005",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Core capabilities."
+    },
+    {
+      "id": "P8.006",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Technical architecture."
+    },
+    {
+      "id": "P8.007",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "NEAR integration."
+    },
+    {
+      "id": "P8.008",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Requirements and dependencies."
+    },
+    {
+      "id": "P8.009",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Installation instructions."
+    },
+    {
+      "id": "P8.010",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Environment configuration."
+    },
+    {
+      "id": "P8.011",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Local development instructions."
+    },
+    {
+      "id": "P8.012",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Build and test instructions."
+    },
+    {
+      "id": "P8.013",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Demo instructions."
+    },
+    {
+      "id": "P8.014",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Screenshots or demo links where available."
+    },
+    {
+      "id": "P8.015",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Current limitations."
+    },
+    {
+      "id": "P8.016",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Contract addresses and deployment references where verified."
+    },
+    {
+      "id": "P8.017",
+      "phase": "P8",
+      "section": "README",
+      "criterion": "Security and authorization considerations."
+    },
+    {
+      "id": "P8.018",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Application architecture."
+    },
+    {
+      "id": "P8.019",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Project structure."
+    },
+    {
+      "id": "P8.020",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Contractor workflows."
+    },
+    {
+      "id": "P8.021",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "NEAR contract integration."
+    },
+    {
+      "id": "P8.022",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Vault lifecycle."
+    },
+    {
+      "id": "P8.023",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Permission model."
+    },
+    {
+      "id": "P8.024",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "AI assistant capabilities."
+    },
+    {
+      "id": "P8.025",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Demo setup."
+    },
+    {
+      "id": "P8.026",
+      "phase": "P8",
+      "section": "Documentation",
+      "criterion": "Known limitations."
+    },
+    {
+      "id": "P8.027",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "What Nnetics does."
+    },
+    {
+      "id": "P8.028",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "Why NEAR is used."
+    },
+    {
+      "id": "P8.029",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "Where important application logic lives."
+    },
+    {
+      "id": "P8.030",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "How to run the application."
+    },
+    {
+      "id": "P8.031",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "How to reproduce the demo."
+    },
+    {
+      "id": "P8.032",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "Which features are genuinely operational."
+    },
+    {
+      "id": "P8.033",
+      "phase": "P8",
+      "section": "Judge-friendly repository structure",
+      "criterion": "What blockchain evidence supports the product's claims."
+    },
+    {
+      "id": "P9.001",
+      "phase": "P9",
+      "section": "PHASE 9: FINAL AUDIT AND REPORT",
+      "criterion": "Create docs/pre-submission-audit.md"
+    },
+    {
+      "id": "P9.002",
+      "phase": "P9",
+      "section": "A. Consolidation summary",
+      "criterion": "Original branches and commit hashes."
+    },
+    {
+      "id": "P9.003",
+      "phase": "P9",
+      "section": "A. Consolidation summary",
+      "criterion": "Selected canonical baseline."
+    },
+    {
+      "id": "P9.004",
+      "phase": "P9",
+      "section": "A. Consolidation summary",
+      "criterion": "Merge/integration strategy."
+    },
+    {
+      "id": "P9.005",
+      "phase": "P9",
+      "section": "A. Consolidation summary",
+      "criterion": "Features restored from each branch."
+    },
+    {
+      "id": "P9.006",
+      "phase": "P9",
+      "section": "A. Consolidation summary",
+      "criterion": "Conflicts resolved."
+    },
+    {
+      "id": "P9.007",
+      "phase": "P9",
+      "section": "B. Final feature inventory",
+      "criterion": "Fully operational features."
+    },
+    {
+      "id": "P9.008",
+      "phase": "P9",
+      "section": "B. Final feature inventory",
+      "criterion": "Partially operational features."
+    },
+    {
+      "id": "P9.009",
+      "phase": "P9",
+      "section": "B. Final feature inventory",
+      "criterion": "Demo-only functionality."
+    },
+    {
+      "id": "P9.010",
+      "phase": "P9",
+      "section": "B. Final feature inventory",
+      "criterion": "Disabled functionality."
+    },
+    {
+      "id": "P9.011",
+      "phase": "P9",
+      "section": "B. Final feature inventory",
+      "criterion": "Known limitations."
+    },
+    {
+      "id": "P9.012",
+      "phase": "P9",
+      "section": "C. Cleanup summary",
+      "criterion": "Files removed."
+    },
+    {
+      "id": "P9.013",
+      "phase": "P9",
+      "section": "C. Cleanup summary",
+      "criterion": "Directories removed."
+    },
+    {
+      "id": "P9.014",
+      "phase": "P9",
+      "section": "C. Cleanup summary",
+      "criterion": "Dependencies removed."
+    },
+    {
+      "id": "P9.015",
+      "phase": "P9",
+      "section": "C. Cleanup summary",
+      "criterion": "Duplicate implementations consolidated."
+    },
+    {
+      "id": "P9.016",
+      "phase": "P9",
+      "section": "C. Cleanup summary",
+      "criterion": "Reasons for each significant deletion."
+    },
+    {
+      "id": "P9.017",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Commands executed."
+    },
+    {
+      "id": "P9.018",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Passing tests."
+    },
+    {
+      "id": "P9.019",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Failing tests."
+    },
+    {
+      "id": "P9.020",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Skipped tests."
+    },
+    {
+      "id": "P9.021",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Unavailable verification environments."
+    },
+    {
+      "id": "P9.022",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Browser validation results."
+    },
+    {
+      "id": "P9.023",
+      "phase": "P9",
+      "section": "D. Test results",
+      "criterion": "Contract validation results."
+    },
+    {
+      "id": "P9.024",
+      "phase": "P9",
+      "section": "E. Git status",
+      "criterion": "Final working branch."
+    },
+    {
+      "id": "P9.025",
+      "phase": "P9",
+      "section": "E. Git status",
+      "criterion": "Commits created."
+    },
+    {
+      "id": "P9.026",
+      "phase": "P9",
+      "section": "E. Git status",
+      "criterion": "Remaining branches."
+    },
+    {
+      "id": "P9.027",
+      "phase": "P9",
+      "section": "E. Git status",
+      "criterion": "Branches proposed for deletion."
+    },
+    {
+      "id": "P9.028",
+      "phase": "P9",
+      "section": "E. Git status",
+      "criterion": "Working-tree cleanliness."
+    },
+    {
+      "id": "P9.029",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "Build reproducibility."
+    },
+    {
+      "id": "P9.030",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "Local setup success."
+    },
+    {
+      "id": "P9.031",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "Documentation completeness."
+    },
+    {
+      "id": "P9.032",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "NEAR integration evidence."
+    },
+    {
+      "id": "P9.033",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "Demo readiness."
+    },
+    {
+      "id": "P9.034",
+      "phase": "P9",
+      "section": "F. Hackathon readiness",
+      "criterion": "Outstanding risks."
+    },
+    {
+      "id": "SUCCESS.001",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "One clearly identified canonical Nnetics application exists."
+    },
+    {
+      "id": "SUCCESS.002",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "All verified, valuable features from both source versions are preserved."
+    },
+    {
+      "id": "SUCCESS.003",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "No known regression has been introduced."
+    },
+    {
+      "id": "SUCCESS.004",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "The consolidated frontend and backend work together."
+    },
+    {
+      "id": "SUCCESS.005",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "Duplicate implementations have been safely eliminated or documented."
+    },
+    {
+      "id": "SUCCESS.006",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "The repository contains no confirmed obsolete clutter."
+    },
+    {
+      "id": "SUCCESS.007",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "The relevant tests and production build pass."
+    },
+    {
+      "id": "SUCCESS.008",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "Documentation accurately reflects the implementation."
+    },
+    {
+      "id": "SUCCESS.009",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "A clean, reviewable consolidation commit history exists."
+    },
+    {
+      "id": "SUCCESS.010",
+      "phase": "SUCCESS",
+      "section": "Final success criteria",
+      "criterion": "The repository is ready for final hackathon submission review."
+    }
+  ]
+}

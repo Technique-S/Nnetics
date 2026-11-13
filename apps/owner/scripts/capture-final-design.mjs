@@ -79,7 +79,7 @@ try {
       await page.getByRole("dialog", {name: "Ask Nnetics demo assistant"}).waitFor();
       await save("assistant-empty");
       await page.route("**/api/agent", async route => {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => { setTimeout(resolve, 2000); });
         await route.fulfill({ status: 503, json: { error: "The assistant provider is unavailable. Try again in a moment." } });
       });
       await page.getByLabel("Message the demo assistant").fill("What is my vault balance?");
@@ -96,7 +96,7 @@ try {
     await check("workspace loading and retry", async () => {
       const state = "**/api/demo/workspace/state";
       await page.route(state, async route => {
-        await new Promise(resolve => setTimeout(resolve, 1600));
+        await new Promise(resolve => { setTimeout(resolve, 1600); });
         await route.fulfill({ status: 503, json: { error: "Workspace temporarily unavailable." } });
       });
       await visit(page, "/?mode=demo");

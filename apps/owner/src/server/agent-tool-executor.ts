@@ -513,14 +513,9 @@ export class AgentToolExecutor implements AgentToolExecutor {
   async getInvoicePaymentReadiness(args:{id:string}):Promise<ToolResult<any>> { const r=await this.previewSimulatedIntent({id:args.id,sourceAsset:"near"}); if(!r.success)return r; const d=r.data as any; return {success:true,data:{invoiceId:d.billId,reference:d.reference,eligible:d.eligible,blockers:d.blockers,recipient:d.recipient,approvalRequired:d.invoice?.status!=="Approved",paymentExecution:"not available through Ask Nnetics"}}; }
 
   async getPendingInvoices(args: {}): Promise<ToolResult<any[]>> {
-    try {
-      return { success: true, data: [] };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to get pending invoices"
-      };
-    }
+    // Legacy helper, not exposed in the model tool catalog. No throwing work
+    // occurs here; keep its existing empty result without an unreachable catch.
+    return { success: true, data: [] };
   }
 
   async getOverdueInvoices(args: {}): Promise<ToolResult<any[]>> {

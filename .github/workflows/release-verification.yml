@@ -1,0 +1,73 @@
+name: Final submission verification (no deployment)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  application:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+      - run: npm ci
+      - run: npm ci --prefix apps/owner
+      - run: npm run lint
+      - run: npm test
+      - working-directory: apps/owner
+        run: npm run typecheck && npm test && npm run check:theme && npm run build
+      - working-directory: apps/owner
+        run: npx playwright install --with-deps chromium
+      - working-directory: apps/owner
+        run: npm run test:browser
+        env:
+          CI: 'true'
+          NNETICS_BROWSER_BASE_URL: http://127.0.0.1:3120
+          NNETICS_APP_ORIGIN: http://127.0.0.1:3120
+          NNETICS_DATABASE: /tmp/nnetics-release/invoices.db
+          NNETICS_IDENTITY_DATABASE: /tmp/nnetics-release/identities.db
+          NNETICS_CONTRACTOR_DATABASE: /tmp/nnetics-release/contractors.db
+          NNETICS_DEMO_PORTAL_DB: /tmp/nnetics-release/portal.db
+          NNETICS_DEMO_WORKSPACE_DB: /tmp/nnetics-release/workspace.db
+          NNETICS_OWNER_TRANSACTIONS_AUTHORIZED: ''
+          NNETICS_PAYMENT_EXECUTION_AUTHORIZED: ''
+          NNETICS_PROVISIONING_ENABLED: ''
+          OPENROUTER_API_KEY: ''
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: release-browser-${{ github.sha }}
+          path: apps/owner/test-results/
+          retention-days: 14
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        sandbox: ['2.13.0', '2.14.0-rc.5']
+    env:
+      NNETICS_SANDBOX_VERSION: ${{ matrix.sandbox }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+      - run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libssl-dev clang cmake
+      - run: rustup show
+      - run: bash scripts/check-release-contracts.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: release-contracts-${{ github.sha }}-${{ matrix.sandbox }}
+          path: |
+            artifacts/release-contracts/
+            artifacts/runs/
+            artifacts/provisioning/
+          retention-days: 14

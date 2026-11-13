@@ -65,6 +65,7 @@ test("adapter sends native tool definitions and parses a tool call without leaki
   assert.equal(capturedUrl, "https://openrouter.ai/api/v1/chat/completions");
   assert.equal(capturedHeaders!.get("authorization"), "Bearer test-key-not-real");
   assert.equal(capturedBody!.model, "openai/gpt-4o-mini");
+  assert.equal(capturedBody!.max_tokens, 2048);
   assert.deepEqual(capturedBody!.provider, { require_parameters: true });
   assert.equal(capturedBody!.tool_choice, "auto");
   assert.deepEqual(capturedBody!.tools, [TOOL]);

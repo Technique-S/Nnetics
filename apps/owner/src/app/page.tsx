@@ -208,7 +208,7 @@ function Dashboard({ adapter, organizationName, accountActions }: { adapter: Own
     if (!demoWs || !hasPendingPayments) return;
     const timer = setTimeout(() => { void refresh(); }, 1600);
     return () => clearTimeout(timer);
-  }, [demoWs, hasPendingPayments, snapshot?.revision]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [demoWs, hasPendingPayments, snapshot?.revision]);
   // The Invoices and Activity surfaces read the same portal records the
   // contractor panel uses, so there is one source of truth for a bill.
   useEffect(() => {

@@ -92,7 +92,7 @@ function fakeFetch(status: number, content: string, delay = 0) {
         const headers = (init?.headers ?? {}) as Record<string, string>;
         const init_body = typeof init?.body === "string" ? init.body : "";
         calls.push({url: String(url), headers, body: init_body});
-        if (delay) await new Promise(r => setTimeout(r, delay));
+        if (delay) await new Promise(r => { setTimeout(r, delay); });
         const sized = Buffer.byteLength(content, "utf8");
         const big = new Uint8Array(Math.max(sized, 40 * 1024));
         big.set(Buffer.from(content), 0);

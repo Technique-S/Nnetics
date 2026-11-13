@@ -7,10 +7,10 @@ import {DatabaseSync} from 'node:sqlite';
 import {checkEnvironment,pins,sha,verifyPaid,maintenanceServer} from '../../../deploy/hosting.mjs';
 import {exportSnapshot,restoreSnapshot,captureSnapshot} from '../../../deploy/snapshot.mjs';
 test('maintenance serves health but blocks wallet, private-data and financial requests',async()=>{
- const server=maintenanceServer();await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const server=maintenanceServer();await new Promise<void>(resolve=>{ server.listen(0,'127.0.0.1',resolve); });
  try{const base=`http://127.0.0.1:${(server.address() as {port:number}).port}`;
  for(const route of ['/api/health','/','/api/live/identity','/api/live/login','/api/live/enqueue']){const response=await fetch(base+route,{method:route.includes('login')||route.includes('enqueue')?'POST':'GET'});assert.equal(response.status,route==='/api/health'?200:503);assert.equal(response.headers.get('cache-control'),'no-store');assert.deepEqual(await response.json(),{status:'maintenance',paymentsEnabled:false,ownerTransactionsEnabled:false});}
- }finally{await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
+ }finally{await new Promise<void>((resolve,reject)=>{ server.close(error=>error?reject(error):resolve()); });}
 });
 test('hosted acceptance rejects non-HTTPS origins, ephemeral paths, changed authority and signing configuration',()=>{
  const root=path.resolve(os.tmpdir(),'hosted-config'),env={NNETICS_APP_ORIGIN:'https://nnetics.example.com',NNETICS_NETWORK:'testnet',NNETICS_HOSTED_MAINTENANCE:'1',NNETICS_ORGANIZATION_ID:pins.organization,NNETICS_VAULT_ID:pins.vault,NNETICS_EXPECTED_CODE_HASH:pins.codeHash,NNETICS_WORKER_ID:pins.worker,NNETICS_WORKER_PUBLIC_KEY:pins.publicKey,NNETICS_RPC_URL:'https://test.rpc.fastnear.com',NNETICS_DATABASE:path.join(root,'live/invoices.db'),NNETICS_IDENTITY_DATABASE:path.join(root,'live/identities.db'),NNETICS_CONTRACTOR_DATABASE:path.join(root,'live/contractors.db'),NNETICS_DEMO_PORTAL_DB:path.join(root,'demo/contractors.db')};

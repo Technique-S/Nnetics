@@ -7,14 +7,14 @@ import net from 'node:net';
 import assert from 'node:assert/strict';
 import {spawn,execFileSync} from 'node:child_process';
 const app=path.resolve(import.meta.dirname,'../apps/owner'),stateRoot=process.env.NNETICS_MEASURE_STATE_ROOT||os.tmpdir(),root=fs.mkdtempSync(path.join(stateRoot,'nnetics-measure-'));
-const server=net.createServer();await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-const port=server.address().port;await new Promise(resolve=>server.close(resolve));
+const server=net.createServer();await new Promise(resolve=>{ server.listen(0,'127.0.0.1',resolve); });
+const port=server.address().port;await new Promise(resolve=>{ server.close(resolve); });
 const base=`http://127.0.0.1:${port}`,duration=Number(process.env.NNETICS_MEASURE_SECONDS||30)*1000;
 assert.ok(duration>=10000&&duration<=300000);
 let child,timer;const samples=[],latencies=[];
 const env={...process.env,NODE_ENV:'production',NODE_OPTIONS:'',NEXT_TELEMETRY_DISABLED:'1',NNETICS_BUILD_DIRECTORY:process.env.NNETICS_MEASURE_BUILD_DIRECTORY||'.next',NNETICS_APP_ORIGIN:base,NNETICS_NETWORK:'testnet',NNETICS_ORGANIZATION_ID:'',NNETICS_VAULT_ID:'unconfigured.testnet',NNETICS_WORKER_ID:'unconfigured-worker.testnet',NNETICS_WORKER_PUBLIC_KEY:'',NNETICS_EXPECTED_CODE_HASH:'',NNETICS_DATABASE:path.join(root,'invoices.db'),NNETICS_IDENTITY_DATABASE:path.join(root,'identities.db'),NNETICS_CONTRACTOR_DATABASE:path.join(root,'contractors.db'),NNETICS_DEMO_PORTAL_DB:path.join(root,'demo.db')};
 for(const key of ['NNETICS_TRANSACTIONS_AUTHORIZED','NNETICS_OWNER_TRANSACTIONS_AUTHORIZED','NNETICS_PAYMENT_EXECUTION_AUTHORIZED','NNETICS_OWNER_TRANSACTION_PLAN','NNETICS_OWNER_TRANSACTION_PLAN_SHA256','NNETICS_PROVISIONING_ENABLED','NNETICS_WORKER_KEY_FILE','NNETICS_SETUP_KEY_FILE','NNETICS_SETUP_KEYCHAIN_CLI','NNETICS_DEPLOYMENT_APPROVED_PLAN_SHA256','OPENROUTER_API_KEY'])env[key]='';
-const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const sleep=ms=>new Promise(resolve=>{ setTimeout(resolve,ms); });
 function sample(){
  if(!child||child.exitCode!==null)return;
  if(process.platform==='linux'){
