@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "inspectedCommit": "04f34a49475c673f35d22e1df830c10de4ca8aff",
-  "generatedAt": "2026-11-13T08:06:24.678Z",
+  "inspectedCommit": "428d48b1ea8be32f4966208fb26314809dbdb66d",
+  "generatedAt": "2026-11-13T08:33:39.828Z",
   "deletionsExecuted": false,
   "approvalRequired": true,
   "referenceProcedure": "rg -n <filename/config entry> across src, apps/owner/src, scripts, deploy, .github, package manifests, tsconfigs and documentation; inspect implicit compiler/glob/worktree consumers separately.",
@@ -16,7 +16,7 @@
       "operatorAction": "Approve removal of this exact tracked file; retain its Git blob/history.",
       "sha256": "194ad0dac50f7c3fb014f3eb8d96365a68a8fe7eebcbf7c681ce7a43d727d32c",
       "gitBlob": "1f20cebf1527a9265f44dcd5fceecd612312ceca",
-      "recovery": "git show 04f34a49475c673f35d22e1df830c10de4ca8aff:pd_append.py"
+      "recovery": "git show 428d48b1ea8be32f4966208fb26314809dbdb66d:pd_append.py"
     },
     {
       "path": "apps/owner/src/tsconfig.json",
@@ -28,7 +28,7 @@
       "operatorAction": "Review editor impact and approve an isolated removal/reverification batch before declaring obsolete.",
       "sha256": "1abf2cd3ca95b468e459348a6c6b09d36bfc35b92382d1f1e3ee6b64a15944c5",
       "gitBlob": "c1a14546238ea6323b5c28d4c52607dc300c31c1",
-      "recovery": "git show 04f34a49475c673f35d22e1df830c10de4ca8aff:apps/owner/src/tsconfig.json"
+      "recovery": "git show 428d48b1ea8be32f4966208fb26314809dbdb66d:apps/owner/src/tsconfig.json"
     },
     {
       "path": "apps/owner/src/next-env.d.ts",
@@ -40,7 +40,7 @@
       "operatorAction": "Validate type-generation/build effects in an approved removal batch; do not delete based on filename.",
       "sha256": "b8b3a344484b959af5e4e3fc1a1609dac3cb9ece0cdeb6c145be29bc4c491000",
       "gitBlob": "a419cbe4e3a5e8d4b481b851dbf4ac767de069e6",
-      "recovery": "git show 04f34a49475c673f35d22e1df830c10de4ca8aff:apps/owner/src/next-env.d.ts"
+      "recovery": "git show 428d48b1ea8be32f4966208fb26314809dbdb66d:apps/owner/src/next-env.d.ts"
     }
   ],
   "branches": [
@@ -74,7 +74,7 @@
     },
     {
       "name": "chore/nnetics-repository-consolidation",
-      "tip": "04f34a49475c673f35d22e1df830c10de4ca8aff",
+      "tip": "428d48b1ea8be32f4966208fb26314809dbdb66d",
       "mergedIntoCandidate": true,
       "exclusiveCommits": 0,
       "uniquePatchCount": 0,
@@ -84,7 +84,7 @@
       "disposition": "PROTECT",
       "reason": "Active canonical candidate; retain.",
       "operatorAction": "No deletion authorized.",
-      "recovery": "Original tip 04f34a49475c673f35d22e1df830c10de4ca8aff; verify it remains reachable before any approved pointer deletion."
+      "recovery": "Original tip 428d48b1ea8be32f4966208fb26314809dbdb66d; verify it remains reachable before any approved pointer deletion."
     },
     {
       "name": "codex/nnetics-before-design-integration",
