@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-13",
+  "timezone": "Africa/Lagos",
+  "branch": "chore/nnetics-repository-consolidation",
+  "verificationReport": "docs/final-release-verification.md",
+  "environment": {
+    "os": "Windows 11 workstation",
+    "node": "v24.18.0",
+    "browser": "Microsoft Edge (installed)",
+    "shell": "PowerShell"
+  },
+  "lint": {
+    "command": "npm run lint (root) / npm run lint (apps/owner after root npm ci)",
+    "result": "pass, --max-warnings=0",
+    "stack": "eslint@10.14.0, @typescript-eslint/parser@8.72.2, eslint-plugin-react-hooks@7.1.1, typescript@5.9.3 (pinned exact)"
+  },
+  "referenceTests": {
+    "command": "npm test (root)",
+    "passed": 45,
+    "failed": 0
+  },
+  "ownerTests": {
+    "command": "npm test (apps/owner)",
+    "passed": 395,
+    "failed": 0
+  },
+  "typecheck": {
+    "command": "NNETICS_BUILD_DIRECTORY=.next-hosting npm run typecheck (apps/owner)",
+    "result": "pass"
+  },
+  "themeCheck": {
+    "command": "npm run check:theme (apps/owner)",
+    "result": "pass"
+  },
+  "productionBuild": {
+    "command": "NNETICS_BUILD_DIRECTORY=.next-hosting npm run build (apps/owner)",
+    "result": "pass"
+  },
+  "browser": {
+    "command": "npm run test:browser:isolated (apps/owner, single worker)",
+    "passed": 262,
+    "failed": 0,
+    "skipped": 4,
+    "skipReason": "external configured-provider acceptance is explicit opt-in (NNETICS_RUN_REAL_MODEL_ACCEPTANCE=1)",
+    "elapsed": "16.9m",
+    "log": "artifacts/final-browser-serial.log",
+    "cleanSingleInvocation": true
+  },
+  "cleanCheckout": {
+    "command": "npm run verify:clean (root)",
+    "result": "pass",
+    "detail": "fresh source-only checkout (1061 files): root npm ci, apps/owner npm ci, lint, build all exit 0",
+    "evidence": "artifacts/final-clean-checkout/2026-11-13T00-39-11.942Z/acceptance.json"
+  },
+  "realModel": {
+    "provider": "OpenRouter nvidia/nemotron-3.5-super-vl:free (actual configured integration)",
+    "status": "BLOCKED — free-tier daily request quota exhausted (50/50 used, 0 remaining)",
+    "resetUtc": "2026-11-14T00:00:00.000Z",
+    "coveredTools": 30,
+    "uncoveredTools": [
+      "get_invoice_payment_readiness",
+      "preview_simulated_intent",
+      "prepare_delete_contractor",
+      "delete_contractor"
+    ],
+    "evidenceChain": "artifacts/final-real-model/<timestamp>/acceptance.json",
+    "chainHashes": [
+      {
+        "dir": "2026-11-13T00-14-45.224Z",
+        "sha256": "4f293fefba0c2ff748330fa85781895fe79599e6bdfb8b64daf8348d70110d6d"
+      },
+      {
+        "dir": "2026-11-13T00-18-34.542Z",
+        "sha256": "839c18a5094e8eb863e4aa9aae0ee479b429ae2fb9dfec90ebff976f5fe00750"
+      },
+      {
+        "dir": "2026-11-13T00-27-21.467Z",
+        "sha256": "74be76eee3b72a721ad149cbe13cc7fa5c96fbfa9baf0136ebd8400127b27aa3"
+      },
+      {
+        "dir": "2026-11-13T00-30-12.782Z",
+        "sha256": "4476bf577ce8a9adeceefae325e4bc7aaa8227c7218bcd6790f44df3df425952"
+      },
+      {
+        "dir": "2026-11-13T00-36-13.831Z",
+        "sha256": "fe7f913d6ba0a0b10ef641ee6b034a25c728add7363c0f2e00a1495bf61ed82e"
+      },
+      {
+        "dir": "2026-11-13T00-38-49.102Z",
+        "sha256": "ada232a6975557bbbaee22a6fdf43c6b16af8fb22ab76af03d279cf0c6d6842f"
+      },
+      {
+        "dir": "2026-11-13T00-42-47.346Z",
+        "sha256": "7b26fa6cfaaf482744f039e15bc9a6696f50c7c1600a2ab18ec5064e0e864a60"
+      },
+      {
+        "dir": "2026-11-13T01-07-59.070Z",
+        "sha256": "f41d592d0ad8bd2692bdc5fe8bec0be53b31e054369c8dac31a571687da9043b"
+      }
+    ],
+    "note": "Combined scoped actual-provider runs; not one uninterrupted pass. No mocked provider responses."
+  },
+  "logs": {
+    "final-root-tests.log": "28197c76ee41805f568111602025cdc3b06cd9328bdb4923e70437d3be189bbe",
+    "final-owner-tests-release.log": "3e9fd44f76d3a7f2545d5499b1bc6dd63a5ebea948f91523106e96f2ef02edd2",
+    "final-typecheck-release.log": "2b8ea7f7a6cd350afc040266aac8c99a9d10d178127c6f29b3fbffb4c29d6d16",
+    "final-build-release.log": "95570b10481cb9cb7c3ce001b75d124ad1e55365b31da66740e6e4063db56860",
+    "final-theme.log": "5c5b84a220ad5b160297641b3ab2563979d087191d90c40dbad71a0718e5abbe",
+    "final-lint-release.log": "e7ff8a308418d4f5d306876ba67e14b63d64a178349d4128aef364c2b97816fa",
+    "final-browser-serial.log": "7e420b139417581944a35fda57f4e76ad833372c4750b476d528eb9a0aef29cb",
+    "final-clean-checkout-release.log": "3ba442ca93e216dcd87fcdcbadbe44f4c36183d48937e5a3a1a3d50a1ef93a58",
+    "final-real-model-resumed.log": "a534b92c634d4340352f21ea5e81715b7fcef2b318c53339e0dab8c84fdf73cf",
+    "final-financial-validation.log": "dd2c59a061303ddd93d0af94e69b29fe029c2de2b1a32c50269c098c50fea3e7"
+  }
+}

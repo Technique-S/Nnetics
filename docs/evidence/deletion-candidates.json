@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "inspectedCommit": "677d75423ef3693d51e9310afdbae103b18b41a3",
-  "generatedAt": "2026-11-13T00:21:21.689Z",
+  "inspectedCommit": "0be8d19eda7896bb2602af768fba6292f1b274fa",
+  "generatedAt": "2026-11-13T00:59:16.152Z",
   "deletionsExecuted": false,
   "approvalRequired": true,
   "referenceProcedure": "rg -n <filename/config entry> across src, apps/owner/src, scripts, deploy, .github, package manifests, tsconfigs and documentation; inspect implicit compiler/glob/worktree consumers separately.",
@@ -9,14 +9,14 @@
     {
       "path": "pd_append.py",
       "disposition": "DELETE_CANDIDATE_AFTER_APPROVAL",
-      "uniqueCode": false,
+      "uniqueCode": true,
       "uniqueHistoricalContent": true,
-      "reason": "One-shot appender for the completed 2026-11-07 progress note. It is not a runtime, package, CI or deployment entry point.",
+      "reason": "Unique one-shot appender for the completed 2026-11-07 progress note. Its code is historical, not a runtime, package, CI or deployment entry point.",
       "consumers": "No active source/script/workflow consumers found; historical references are documentation only.",
       "operatorAction": "Approve removal of this exact tracked file; retain its Git blob/history.",
       "sha256": "194ad0dac50f7c3fb014f3eb8d96365a68a8fe7eebcbf7c681ce7a43d727d32c",
       "gitBlob": "1f20cebf1527a9265f44dcd5fceecd612312ceca",
-      "recovery": "git show 677d75423ef3693d51e9310afdbae103b18b41a3:pd_append.py"
+      "recovery": "git show 0be8d19eda7896bb2602af768fba6292f1b274fa:pd_append.py"
     },
     {
       "path": "apps/owner/src/tsconfig.json",
@@ -28,7 +28,7 @@
       "operatorAction": "Review editor impact and approve an isolated removal/reverification batch before declaring obsolete.",
       "sha256": "1abf2cd3ca95b468e459348a6c6b09d36bfc35b92382d1f1e3ee6b64a15944c5",
       "gitBlob": "c1a14546238ea6323b5c28d4c52607dc300c31c1",
-      "recovery": "git show 677d75423ef3693d51e9310afdbae103b18b41a3:apps/owner/src/tsconfig.json"
+      "recovery": "git show 0be8d19eda7896bb2602af768fba6292f1b274fa:apps/owner/src/tsconfig.json"
     },
     {
       "path": "apps/owner/src/next-env.d.ts",
@@ -40,7 +40,7 @@
       "operatorAction": "Validate type-generation/build effects in an approved removal batch; do not delete based on filename.",
       "sha256": "b8b3a344484b959af5e4e3fc1a1609dac3cb9ece0cdeb6c145be29bc4c491000",
       "gitBlob": "a419cbe4e3a5e8d4b481b851dbf4ac767de069e6",
-      "recovery": "git show 677d75423ef3693d51e9310afdbae103b18b41a3:apps/owner/src/next-env.d.ts"
+      "recovery": "git show 0be8d19eda7896bb2602af768fba6292f1b274fa:apps/owner/src/next-env.d.ts"
     }
   ],
   "branches": [
@@ -74,7 +74,7 @@
     },
     {
       "name": "chore/nnetics-repository-consolidation",
-      "tip": "677d75423ef3693d51e9310afdbae103b18b41a3",
+      "tip": "0be8d19eda7896bb2602af768fba6292f1b274fa",
       "mergedIntoCandidate": true,
       "exclusiveCommits": 0,
       "uniquePatchCount": 0,
@@ -84,7 +84,7 @@
       "disposition": "PROTECT",
       "reason": "Active canonical candidate; retain.",
       "operatorAction": "No deletion authorized.",
-      "recovery": "Original tip 677d75423ef3693d51e9310afdbae103b18b41a3; verify it remains reachable before any approved pointer deletion."
+      "recovery": "Original tip 0be8d19eda7896bb2602af768fba6292f1b274fa; verify it remains reachable before any approved pointer deletion."
     },
     {
       "name": "codex/nnetics-before-design-integration",

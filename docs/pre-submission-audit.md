@@ -2,6 +2,8 @@
 
 Date: 2026-11-13 (Africa/Lagos). Candidate: `chore/nnetics-repository-consolidation`, canonical application `apps/owner`. This continues OpenCode's interrupted nine-phase consolidation; it does not restart the project or merge entire historical worktrees.
 
+> 2026-11-13 update: the final pre-submission verification pass is recorded in [final-release-verification.md](final-release-verification.md). It supersedes the counts and scope limits in section D below (lint is now established, test totals expanded, and the real-model status is precisely quota-blocked for four tools). Section D is retained as the consolidation-phase record.
+
 ## Release decision
 
 **Local consolidation verified within the scope below; publication is pending.** Backend/reference tests, type checking, theme checks and production build pass. Across the full browser run and targeted reruns, **262 distinct browser cases passed**, with **four external-provider cases intentionally opt-in**. The initial full run and its resolved failures are recorded separately, not presented as one clean invocation. A complete real-provider acceptance run and fresh Linux Rust/sandbox verification are not established by this run. Do not describe this as production financial readiness. [Machine-readable verification summary and log hashes](evidence/consolidation-verification.json).
