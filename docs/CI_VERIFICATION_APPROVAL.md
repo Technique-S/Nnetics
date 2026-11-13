@@ -2,7 +2,7 @@
 
 Prepared 2026-11-13 for the operator decision gate. **Nothing has been pushed, dispatched, or published.** This document contains the exact commands, expected outcomes, and disclosures so each step can be approved separately.
 
-Candidate under review: local branch `chore/nnetics-repository-consolidation`. The reviewed revision is `ab7e5130ad1907eef37dc49c7b45a0bb589c6513` — exactly the tree reviewed in [final-release-verification.md](final-release-verification.md). The branch tip sits ahead of it by documentation-only commits only (as of 2026-11-13: `428d48b` this approval package, `4cde474` manifest regeneration). Before executing any command below, confirm the delta is still documentation-only:
+Candidate under review: local branch `chore/nnetics-repository-consolidation`. The reviewed revision is `ab7e5130ad1907eef37dc49c7b45a0bb589c6513` — exactly the tree reviewed in [final-release-verification.md](final-release-verification.md). The branch tip sits ahead of it by documentation-only commits only (this approval package and the deletion-manifest regeneration). Before executing any command below, confirm the delta is still documentation-only:
 
 ```bash
 git diff --name-only ab7e5130ad1907eef37dc49c7b45a0bb589c6513..chore/nnetics-repository-consolidation
@@ -37,7 +37,7 @@ Inspected this session: the full workflow, its complete script chain (`scripts/c
 
 - `origin` = `https://github.com/Technique-S/Nnetics.git`
 - Remote heads: `codex/nnetics-live-integration` @ `2d4daf5e`, `codex/owner-dashboard-local` @ `7d194e49`, `codex/payscope-milestone-1` @ `091aca09` (default branch)
-- The candidate branch is **not** on the remote; the local tip is `4cde474872916b8e45f678e5e9c98b2249bf6927`, documentation-only ahead of the reviewed revision `ab7e513` (diff limited to `docs/`, verified 2026-11-13).
+- The candidate branch is **not** on the remote; the local tip sits documentation-only ahead of the reviewed revision `ab7e513` (diff limited to `docs/`, verified 2026-11-13).
 - The remote default branch contains **only** `payment-core.yml` under `.github/workflows/` (`git ls-tree 091aca09`); the candidate tip carries all five workflow files, including `release-verification.yml` (blob `ce31cf3f…`).
 - `gh` 2.96.0 is installed but **not authenticated**; repo privacy is unconfirmed until login.
 
@@ -79,7 +79,7 @@ gh api repos/Technique-S/Nnetics/git/refs \
 gh api repos/Technique-S/Nnetics/branches/chore/nnetics-repository-consolidation --jq .commit.sha
 ```
 
-Pin the **current tip** (as of 2026-11-13: `4cde474872916b8e45f678e5e9c98b2249bf6927`) so the remote branch matches local and needs no follow-up push — a later push to the existing branch would fire the standing workflows anyway. Creating the ref at the older reviewed revision `ab7e513` would diverge local and remote and is not recommended.
+Pin the **current tip** (`git rev-parse chore/nnetics-repository-consolidation`), so the remote branch matches local and needs no follow-up push — a later push to the existing branch would fire the standing workflows anyway. Creating the ref at the older reviewed revision `ab7e513` would diverge local and remote and is not recommended. The docs-only diff check above is the safety gate for whatever tip exists at execution time.
 
 Expected: the branch is created server-side without a push event, so the four standing workflows do not fire. This expectation is **unverified until executed**; if runs fire anyway, they are exactly the read-only jobs disclosed under Option A. Option B avoids spending those minutes if the no-event behavior holds.
 
